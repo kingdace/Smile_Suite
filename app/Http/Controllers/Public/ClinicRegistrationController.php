@@ -1,0 +1,142 @@
+<?php
+
+namespace App\Http\Controllers\Public;
+
+use App\Http\Controllers\Controller;
+use App\Models\ClinicRegistrationRequest;
+use App\Models\Clinic;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
+
+class ClinicRegistrationController extends Controller
+{
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'clinic_name' => 'required|string|max:255',
+            'contact_person' => 'required|string|max:255',
+            'email' => 'required|email|unique:clinic_registration_requests,email',
+            'phone' => 'required|string|max:20',
+            'license_number' => 'required|string|max:50',
+            'description' => 'nullable|string',
+            'message' => 'nullable|string',
+            'subscription_plan' => 'required|string|in:basic,premium,enterprise',
+        ]);
+
+        // Calculate subscription amount based on plan
+        $subscriptionAmount = match($validated['subscription_plan']) {
+            'basic' => 99.00,
+            'premium' => 199.00,
+            'enterprise' => 399.00,
+            default => 99.00,
+        };
+
+        $registrationRequest = ClinicRegistrationRequest::create([
+            ...$validated,
+            'subscription_amount' => $subscriptionAmount,
+            'payment_status' => 'pending', // Will be updated when payment is processed
+            'status' => 'pending',
+        ]);
+
+        // In a real application, you would redirect to payment gateway here
+        // For now, we'll just show a success message
+
+        return redirect()->route('register.clinic.success', ['id' => $registrationRequest->id])
+            ->with('success', 'Your clinic registration request has been submitted successfully. We will review it and get back to you within 24-48 hours.');
+    }
+
+    public function success($id)
+    {
+        $request = ClinicRegistrationRequest::findOrFail($id);
+
+        return Inertia::render('Auth/ClinicRegisterSuccess', [
+            'request' => $request
+        ]);
+    }
+
+    public function setup($token)
+    {
+        $request = ClinicRegistrationRequest::where('approval_token', $token)
+            ->where('status', 'approved')
+            ->where('expires_at', '>', now())
+            ->firstOrFail();
+
+        return Inertia::render('Auth/ClinicSetup', [
+            'request' => $request,
+            'token' => $token
+        ]);
+    }
+
+    public function setupSuccess()
+    {
+        return \Inertia\Inertia::render('Auth/ClinicSetupSuccess');
+    }
+
+    public function completeSetup(Request $request, $token)
+    {
+        $registrationRequest = ClinicRegistrationRequest::where('approval_token', $token)
+            ->where('status', 'approved')
+            ->where('expires_at', '>', now())
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'street_address' => 'nullable|string|max:255',
+            'region_code' => 'nullable|string|max:10',
+            'province_code' => 'nullable|string|max:10',
+            'city_municipality_code' => 'nullable|string|max:10',
+            'barangay_code' => 'nullable|string|max:10',
+            'postal_code' => 'nullable|string|max:10',
+            'address_details' => 'nullable|string',
+        ]);
+
+        DB::transaction(function () use ($registrationRequest, $validated) {
+            // Create the clinic
+            $clinic = Clinic::create([
+                'name' => $registrationRequest->clinic_name,
+                'street_address' => $validated['street_address'] ?? null,
+                'contact_number' => $registrationRequest->phone,
+                'email' => $registrationRequest->email,
+                'license_number' => $registrationRequest->license_number,
+                'description' => $registrationRequest->description,
+                'slug' => Str::slug($registrationRequest->clinic_name),
+                'logo_url' => '/images/default-clinic-logo.png',
+                'subscription_plan' => $registrationRequest->subscription_plan,
+                'subscription_status' => 'active',
+                'subscription_start_date' => now(),
+                'subscription_end_date' => now()->addYear(),
+                'is_active' => true,
+                'region_code' => $validated['region_code'] ?? null,
+                'province_code' => $validated['province_code'] ?? null,
+                'city_municipality_code' => $validated['city_municipality_code'] ?? null,
+                'barangay_code' => $validated['barangay_code'] ?? null,
+                'postal_code' => $validated['postal_code'] ?? null,
+                'address_details' => $validated['address_details'] ?? null,
+            ]);
+
+            // Create the admin user for the clinic
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'clinic_admin',
+                'clinic_id' => $clinic->id,
+                'email_verified_at' => now(), // Auto-verify since they came from approved request
+            ]);
+
+            // Mark the registration request as completed
+            $registrationRequest->update([
+                'status' => 'completed',
+            ]);
+        });
+
+        // Redirect to the dedicated success page
+        return redirect()->route('clinic.setup.success');
+    }
+}
