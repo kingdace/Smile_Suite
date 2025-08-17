@@ -12,6 +12,9 @@ import {
     BadgeCheck,
     Trash2,
     Edit2,
+    RotateCcw,
+    AlertCircle,
+    X,
 } from "lucide-react";
 
 export default function Index({ auth, users, clinics, show_deleted, filters }) {
@@ -21,6 +24,10 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState("add");
     const [selectedUser, setSelectedUser] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [userToRestore, setUserToRestore] = useState(null);
 
     // Debounced search function that waits 300ms after the user stops typing
     const debouncedSearch = useCallback(
@@ -32,6 +39,7 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                     role: filters.role,
                     clinic_id: filters.clinic_id,
                     show_deleted: show_deleted,
+                    page: 1, // Reset to first page when searching
                 },
                 { preserveState: true, replace: true }
             );
@@ -55,6 +63,7 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                 role: newRole,
                 clinic_id: clinicFilter,
                 show_deleted: show_deleted,
+                page: 1, // Reset to first page when filtering
             },
             { preserveState: true, replace: true }
         );
@@ -70,6 +79,7 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                 role: roleFilter,
                 clinic_id: newClinic,
                 show_deleted: show_deleted,
+                page: 1, // Reset to first page when filtering
             },
             { preserveState: true, replace: true }
         );
@@ -84,6 +94,7 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                 role: roleFilter,
                 clinic_id: clinicFilter,
                 show_deleted: newShowDeleted,
+                page: 1, // Reset to first page when toggling deleted
             },
             { preserveState: true, replace: true }
         );
@@ -107,6 +118,52 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
         // For now, Inertia will handle updates via redirect/flash
     };
 
+    const handleDeleteClick = (user) => {
+        setUserToDelete(user);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleRestoreClick = (user) => {
+        setUserToRestore(user);
+        setRestoreDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        if (userToDelete) {
+            router.delete(route("admin.users.destroy", userToDelete.id), {
+                onSuccess: () => {
+                    setDeleteDialogOpen(false);
+                    setUserToDelete(null);
+                },
+                onError: (errors) => {
+                    console.error("Delete failed:", errors);
+                    setDeleteDialogOpen(false);
+                    setUserToDelete(null);
+                },
+            });
+        }
+    };
+
+    const confirmRestore = () => {
+        if (userToRestore) {
+            router.patch(
+                route("admin.users.restore", userToRestore.id),
+                {},
+                {
+                    onSuccess: () => {
+                        setRestoreDialogOpen(false);
+                        setUserToRestore(null);
+                    },
+                    onError: (errors) => {
+                        console.error("Restore failed:", errors);
+                        setRestoreDialogOpen(false);
+                        setUserToRestore(null);
+                    },
+                }
+            );
+        }
+    };
+
     return (
         <AuthenticatedLayout
             auth={auth}
@@ -126,22 +183,30 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                 clinics={clinics}
                 mode={modalMode}
             />
-            <div className="py-12 bg-gradient-to-br from-blue-50 via-cyan-50 to-white min-h-screen">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-xl sm:rounded-2xl">
-                        <div className="p-8 text-gray-900">
-                            <div className="flex justify-between items-center mb-8">
-                                <h1 className="text-3xl font-extrabold text-blue-900 flex items-center gap-2">
-                                    <Shield className="w-7 h-7 text-blue-400" />{" "}
-                                    Users
-                                </h1>
-                                <div className="space-x-4">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-6">
+                    <div className="bg-white/90 backdrop-blur-sm overflow-hidden shadow-xl sm:rounded-2xl border border-blue-200/50">
+                        <div className="p-6 text-gray-900">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+                                            <Shield className="w-5 h-5 text-white" />
+                                        </div>
+                                        Users Management
+                                    </h1>
+                                    <p className="text-gray-600 mt-1 text-sm">
+                                        Manage system users and their
+                                        permissions
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-3">
                                     <button
                                         onClick={toggleShowDeleted}
-                                        className={`px-4 py-2 rounded-md font-semibold transition-colors ${
+                                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 shadow-md text-sm ${
                                             show_deleted
-                                                ? "bg-red-100 text-red-700 hover:bg-red-200"
-                                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                                ? "bg-gradient-to-r from-red-100 to-red-200 text-red-700 hover:from-red-200 hover:to-red-300"
+                                                : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-gray-200 hover:to-gray-300"
                                         }`}
                                     >
                                         {show_deleted
@@ -150,177 +215,458 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                     </button>
                                     <button
                                         onClick={openAddModal}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded-md font-semibold shadow hover:bg-blue-600 transition-colors"
+                                        className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm"
                                     >
                                         + Add New User
                                     </button>
                                 </div>
                             </div>
-                            <div className="mb-6 flex flex-col md:flex-row gap-4 md:gap-6">
-                                <div className="flex-1 flex items-center gap-2 bg-blue-50 rounded-lg px-3 py-2">
-                                    <User className="w-5 h-5 text-blue-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search users..."
-                                        value={searchValue}
-                                        onChange={handleSearchChange}
-                                        className="flex-1 border-none bg-transparent focus:ring-0 text-lg"
-                                    />
-                                </div>
-                                <select
-                                    value={roleFilter}
-                                    onChange={handleRoleFilterChange}
-                                    className="border-gray-300 focus:border-blue-400 focus:ring-blue-400 rounded-md shadow-sm"
-                                >
-                                    <option value="">All Roles</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="dentist">Dentist</option>
-                                    <option value="staff">Staff</option>
-                                    <option value="clinic_admin">
-                                        Clinic Admin
-                                    </option>
-                                </select>
-                                <select
-                                    value={clinicFilter}
-                                    onChange={handleClinicFilterChange}
-                                    className="border-gray-300 focus:border-blue-400 focus:ring-blue-400 rounded-md shadow-sm"
-                                >
-                                    <option value="">All Clinics</option>
-                                    {clinics.map((clinic) => (
-                                        <option
-                                            key={clinic.id}
-                                            value={clinic.id}
-                                        >
-                                            {clinic.name}
+                            <div className="mb-5 bg-gradient-to-r from-blue-50 via-white to-cyan-50/30 backdrop-blur-sm rounded-xl shadow-md border border-blue-200/50 p-4">
+                                <div className="flex flex-col md:flex-row gap-3">
+                                    <div className="flex-1 relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <User className="h-4 w-4 text-blue-500" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Search users by name or email..."
+                                            value={searchValue}
+                                            onChange={handleSearchChange}
+                                            className="block w-full pl-10 pr-4 py-2 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 transition-all duration-300 text-sm"
+                                        />
+                                    </div>
+                                    <select
+                                        value={roleFilter}
+                                        onChange={handleRoleFilterChange}
+                                        className="px-3 py-2 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition-all duration-300 text-sm"
+                                    >
+                                        <option value="">All Roles</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="dentist">Dentist</option>
+                                        <option value="staff">Staff</option>
+                                        <option value="clinic_admin">
+                                            Clinic Admin
                                         </option>
-                                    ))}
-                                </select>
+                                    </select>
+                                    <select
+                                        value={clinicFilter}
+                                        onChange={handleClinicFilterChange}
+                                        className="px-3 py-2 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition-all duration-300 text-sm"
+                                    >
+                                        <option value="">All Clinics</option>
+                                        {clinics.map((clinic) => (
+                                            <option
+                                                key={clinic.id}
+                                                value={clinic.id}
+                                            >
+                                                {clinic.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                            <div className="overflow-x-auto rounded-xl border border-blue-100 bg-blue-50/40">
-                                <table className="min-w-full divide-y divide-blue-100">
-                                    <thead className="bg-blue-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                                                <User className="inline w-4 h-4 mr-1 text-blue-400" />{" "}
-                                                Name
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                                                <Building2 className="inline w-4 h-4 mr-1 text-blue-400" />{" "}
-                                                Clinic
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                                                <Mail className="inline w-4 h-4 mr-1 text-blue-400" />{" "}
-                                                Email
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                                                <Shield className="inline w-4 h-4 mr-1 text-blue-400" />{" "}
-                                                Role
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-blue-50">
-                                        {users.data.length === 0 ? (
+                            <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50/30 rounded-xl shadow-lg border border-blue-200/50 overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full divide-y divide-blue-100">
+                                        <thead className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600">
                                             <tr>
-                                                <td
-                                                    colSpan={6}
-                                                    className="text-center py-12 text-blue-400 text-lg"
-                                                >
-                                                    No users found.
-                                                </td>
+                                                <th className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    <User className="inline w-4 h-4 mr-2" />
+                                                    User
+                                                </th>
+                                                <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    <Building2 className="inline w-4 h-4 mr-2" />
+                                                    Clinic
+                                                </th>
+                                                <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    <Mail className="inline w-4 h-4 mr-2" />
+                                                    Email
+                                                </th>
+                                                <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    <Shield className="inline w-4 h-4 mr-2" />
+                                                    Role
+                                                </th>
+                                                <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                                <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    Actions
+                                                </th>
                                             </tr>
-                                        ) : (
-                                            users.data.map((user) => (
-                                                <tr
-                                                    key={user.id}
-                                                    className={
-                                                        user.deleted_at
-                                                            ? "opacity-60"
-                                                            : ""
-                                                    }
-                                                >
-                                                    <td className="px-6 py-4 whitespace-nowrap text-base font-medium text-blue-900">
-                                                        {user.name}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-blue-700">
-                                                        {user.clinic ? (
-                                                            user.clinic.name
-                                                        ) : (
-                                                            <span className="text-gray-400">
-                                                                N/A
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-blue-700">
-                                                        {user.email}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span
-                                                            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${
-                                                                user.role ===
-                                                                "admin"
-                                                                    ? "bg-blue-100 text-blue-700"
-                                                                    : user.role ===
-                                                                      "dentist"
-                                                                    ? "bg-cyan-100 text-cyan-700"
-                                                                    : user.role ===
-                                                                      "clinic_admin"
-                                                                    ? "bg-indigo-100 text-indigo-700"
-                                                                    : "bg-gray-100 text-gray-700"
-                                                            }`}
-                                                        >
-                                                            <Shield className="w-4 h-4" />{" "}
-                                                            {user.role.replace(
-                                                                "_",
-                                                                " "
-                                                            )}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {user.deleted_at ? (
-                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700">
-                                                                <Trash2 className="w-4 h-4" />{" "}
-                                                                Deleted
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700">
-                                                                <BadgeCheck className="w-4 h-4" />{" "}
-                                                                Active
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                                                        <button
-                                                            onClick={() =>
-                                                                openEditModal(
-                                                                    user
-                                                                )
-                                                            }
-                                                            className="inline-flex items-center gap-1 px-3 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-semibold transition-colors"
-                                                        >
-                                                            <Edit2 className="w-4 h-4" />{" "}
-                                                            Edit
-                                                        </button>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-blue-100">
+                                            {users.data.length === 0 ? (
+                                                <tr>
+                                                    <td
+                                                        colSpan={6}
+                                                        className="text-center py-10 text-gray-500"
+                                                    >
+                                                        <div className="flex flex-col items-center gap-3">
+                                                            <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center">
+                                                                <User className="w-7 h-7 text-blue-400" />
+                                                            </div>
+                                                            <p className="text-base font-semibold text-gray-700">
+                                                                No users found
+                                                            </p>
+                                                            <p className="text-sm text-gray-500">
+                                                                Try adjusting
+                                                                your search or
+                                                                filters
+                                                            </p>
+                                                        </div>
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ) : (
+                                                users.data.map(
+                                                    (user, index) => (
+                                                        <tr
+                                                            key={user.id}
+                                                            className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-cyan-50/50 transition-all duration-300 ${
+                                                                user.deleted_at
+                                                                    ? "opacity-60"
+                                                                    : ""
+                                                            } ${
+                                                                index % 2 === 0
+                                                                    ? "bg-white"
+                                                                    : "bg-blue-50/20"
+                                                            }`}
+                                                        >
+                                                            <td className="px-4 py-3">
+                                                                <div className="flex items-center">
+                                                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
+                                                                        <span className="text-white text-sm font-bold">
+                                                                            {user.name
+                                                                                .charAt(
+                                                                                    0
+                                                                                )
+                                                                                .toUpperCase()}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="font-semibold text-gray-900 text-sm">
+                                                                            {
+                                                                                user.name
+                                                                            }
+                                                                        </div>
+                                                                        <div className="text-xs text-gray-500">
+                                                                            ID:{" "}
+                                                                            {
+                                                                                user.id
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-3 py-3">
+                                                                {user.clinic ? (
+                                                                    <div className="flex items-center">
+                                                                        <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-md flex items-center justify-center mr-2">
+                                                                            <Building2 className="w-3 h-3 text-white" />
+                                                                        </div>
+                                                                        <span className="text-sm font-medium text-gray-700">
+                                                                            {
+                                                                                user
+                                                                                    .clinic
+                                                                                    .name
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className="text-sm text-gray-400 italic">
+                                                                        No
+                                                                        clinic
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                            <td className="px-3 py-3">
+                                                                <div className="flex items-center">
+                                                                    <Mail className="w-4 h-4 text-blue-400 mr-2" />
+                                                                    <span className="text-sm text-gray-700 truncate max-w-[200px]">
+                                                                        {
+                                                                            user.email
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-3 py-3">
+                                                                <span
+                                                                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold ${
+                                                                        user.role ===
+                                                                        "admin"
+                                                                            ? "bg-gradient-to-r from-red-100 to-red-200 text-red-700 border border-red-200"
+                                                                            : user.role ===
+                                                                              "dentist"
+                                                                            ? "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 border border-blue-200"
+                                                                            : user.role ===
+                                                                              "clinic_admin"
+                                                                            ? "bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-700 border border-cyan-200"
+                                                                            : "bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-200"
+                                                                    }`}
+                                                                >
+                                                                    <Shield className="w-3 h-3" />
+                                                                    {user.role.replace(
+                                                                        "_",
+                                                                        " "
+                                                                    )}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-3 py-3">
+                                                                {user.deleted_at ? (
+                                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-red-100 to-red-200 text-red-700 border border-red-200">
+                                                                        <Trash2 className="w-3 h-3" />
+                                                                        Deleted
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700 border border-emerald-200">
+                                                                        <BadgeCheck className="w-3 h-3" />
+                                                                        Active
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                            <td className="px-3 py-3">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            openEditModal(
+                                                                                user
+                                                                            )
+                                                                        }
+                                                                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-600 text-white text-xs font-semibold hover:from-blue-600 hover:to-cyan-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                    >
+                                                                        <Edit2 className="w-3 h-3" />
+                                                                        Edit
+                                                                    </button>
+
+                                                                    {user.deleted_at ? (
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                handleRestoreClick(
+                                                                                    user
+                                                                                )
+                                                                            }
+                                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-semibold hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                        >
+                                                                            <RotateCcw className="w-3 h-3" />
+                                                                            Restore
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                handleDeleteClick(
+                                                                                    user
+                                                                                )
+                                                                            }
+                                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                        >
+                                                                            <Trash2 className="w-3 h-3" />
+                                                                            Delete
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
+
                             {/* Pagination */}
-                            <div className="mt-8 flex justify-center">
-                                {/* ... existing pagination logic ... */}
-                            </div>
+                            {users.links && users.links.length > 3 && (
+                                <div className="px-6 py-4 border-t border-blue-100">
+                                    {/* Page Info */}
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div className="text-sm text-gray-600">
+                                            Showing{" "}
+                                            <span className="font-semibold">
+                                                {(users.current_page - 1) *
+                                                    users.per_page +
+                                                    1}
+                                            </span>{" "}
+                                            to{" "}
+                                            <span className="font-semibold">
+                                                {Math.min(
+                                                    users.current_page *
+                                                        users.per_page,
+                                                    users.total
+                                                )}
+                                            </span>{" "}
+                                            of{" "}
+                                            <span className="font-semibold">
+                                                {users.total}
+                                            </span>{" "}
+                                            users
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Page{" "}
+                                            <span className="font-semibold">
+                                                {users.current_page}
+                                            </span>{" "}
+                                            of{" "}
+                                            <span className="font-semibold">
+                                                {users.last_page}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-center">
+                                        <nav className="flex items-center space-x-2">
+                                            {users.links.map((link, index) =>
+                                                link.url ? (
+                                                    <Link
+                                                        key={index}
+                                                        href={link.url}
+                                                        className={`px-4 py-2 text-sm rounded-lg border transition-all duration-300 font-semibold shadow-sm ${
+                                                            link.active
+                                                                ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-blue-600 shadow-md"
+                                                                : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50 hover:shadow-md"
+                                                        }`}
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: link.label,
+                                                        }}
+                                                        preserveState
+                                                        preserveScroll
+                                                    />
+                                                ) : (
+                                                    <span
+                                                        key={index}
+                                                        className="px-4 py-2 text-sm rounded-lg opacity-50 cursor-not-allowed border border-gray-200"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: link.label,
+                                                        }}
+                                                    />
+                                                )
+                                            )}
+                                        </nav>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            {deleteDialogOpen && userToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in border border-gray-200/50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 text-white relative">
+                            <button
+                                onClick={() => setDeleteDialogOpen(false)}
+                                className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors duration-200 focus:outline-none"
+                                aria-label="Close"
+                                type="button"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">
+                                        Delete User
+                                    </h2>
+                                    <p className="text-red-100 text-xs">
+                                        This action cannot be undone
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            <div className="text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Trash2 className="w-6 h-6 text-red-600" />
+                                </div>
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                    Delete {userToDelete.name}?
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    This will soft delete the user account. The
+                                    user will no longer be able to access the
+                                    system, but their data will be preserved.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 pt-3">
+                                <button
+                                    onClick={confirmDelete}
+                                    className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 text-sm"
+                                >
+                                    Delete User
+                                </button>
+                                <button
+                                    onClick={() => setDeleteDialogOpen(false)}
+                                    className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Restore Confirmation Dialog */}
+            {restoreDialogOpen && userToRestore && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in border border-gray-200/50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-emerald-600 to-green-700 p-4 text-white relative">
+                            <button
+                                onClick={() => setRestoreDialogOpen(false)}
+                                className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors duration-200 focus:outline-none"
+                                aria-label="Close"
+                                type="button"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                                    <RotateCcw className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">
+                                        Restore User
+                                    </h2>
+                                    <p className="text-emerald-100 text-xs">
+                                        Reactivate user account
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            <div className="text-center">
+                                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <RotateCcw className="w-6 h-6 text-emerald-600" />
+                                </div>
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                    Restore {userToRestore.name}?
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    This will restore the user account. The user
+                                    will be able to access the system again with
+                                    their previous permissions.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 pt-3">
+                                <button
+                                    onClick={confirmRestore}
+                                    className="flex-1 bg-gradient-to-r from-emerald-600 to-green-700 text-white px-4 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 text-sm"
+                                >
+                                    Restore User
+                                </button>
+                                <button
+                                    onClick={() => setRestoreDialogOpen(false)}
+                                    className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

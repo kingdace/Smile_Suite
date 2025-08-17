@@ -19,6 +19,7 @@ use App\Http\Controllers\Clinic\ReportController;
 use App\Http\Controllers\Clinic\SettingController;
 use App\Http\Controllers\Clinic\SupplierController;
 use App\Http\Controllers\Clinic\DentistScheduleController;
+use App\Http\Controllers\Clinic\ServiceController;
 use App\Http\Controllers\Public\ClinicDirectoryController;
 use App\Http\Controllers\Public\ClinicRegistrationController;
 use App\Http\Controllers\Admin\ClinicRegistrationRequestController;
@@ -33,6 +34,13 @@ Route::get('/', [ClinicDirectoryController::class, 'landing'])->name('public.lan
 Route::get('/clinics', [ClinicDirectoryController::class, 'index'])->name('public.clinics.index');
 Route::get('/clinics/{slug}', [ClinicDirectoryController::class, 'profile'])->name('public.clinics.profile');
 Route::post('/clinics/{clinic}/book-appointment', [\App\Http\Controllers\Public\ClinicDirectoryController::class, 'bookAppointment'])->name('public.clinics.book-appointment');
+
+// Review Routes
+Route::get('/clinics/{clinic}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'index'])->name('public.clinics.reviews.index');
+Route::post('/clinics/{clinic}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'store'])->name('public.clinics.reviews.store');
+Route::get('/clinics/{clinic}/check-appointment', [\App\Http\Controllers\Public\ReviewController::class, 'checkAppointment'])->name('public.clinics.check-appointment');
+Route::post('/reviews/{review}/helpful', [\App\Http\Controllers\Public\ReviewController::class, 'markHelpful'])->name('public.reviews.helpful');
+Route::post('/reviews/{review}/report', [\App\Http\Controllers\Public\ReviewController::class, 'report'])->name('public.reviews.report');
 
 // Patient Registration (Public) - DEPRECATED
 // Route::get('/register/patient', function () {
@@ -80,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('clinics', ClinicController::class);
         Route::patch('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::patch('clinics/{clinic}/restore', [ClinicController::class, 'restore'])->name('clinics.restore');
 
         // Clinic Registration Requests
         Route::get('clinic-requests', [ClinicRegistrationRequestController::class, 'index'])->name('clinic-requests.index');
@@ -198,6 +207,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/clinic/{clinic}/dentist-schedules/available-slots', [DentistScheduleController::class, 'getAvailableSlots'])
             ->name('clinic.dentist-schedules.available-slots');
 
+        // Services Management Routes
+        Route::resource('clinic/{clinic}/services', ServiceController::class)
+            ->names([
+                'index' => 'clinic.services.index',
+                'create' => 'clinic.services.create',
+                'store' => 'clinic.services.store',
+                'show' => 'clinic.services.show',
+                'edit' => 'clinic.services.edit',
+                'update' => 'clinic.services.update',
+                'destroy' => 'clinic.services.destroy',
+            ]);
+
         // Payment Receipt Route
         Route::get('/clinic/{clinic}/payments/{payment}/receipt', [PaymentController::class, 'receipt'])
             ->name('clinic.payments.receipt');
@@ -224,6 +245,10 @@ Route::middleware('auth')->group(function () {
         // Online Appointment Approval Routes
         Route::post('clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])->name('clinic.appointments.approve-online');
         Route::post('clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
+    });
+
+    Route::middleware(['auth', 'verified', 'clinic'])->prefix('clinic')->name('clinic.')->group(function () {
+        // Route::resource('services', \App\Http\Controllers\Clinic\ServiceController::class)->names('clinic.services'); // This line is removed as per the edit hint
     });
 });
 

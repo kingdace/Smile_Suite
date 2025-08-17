@@ -11,6 +11,7 @@ use App\Models\Patient;
 use App\Models\Appointment;
 use App\Models\AppointmentType;
 use App\Models\AppointmentStatus;
+use App\Models\Review;
 
 class ClinicDirectoryController extends Controller
 {
@@ -27,6 +28,9 @@ class ClinicDirectoryController extends Controller
             'contact_number', 'email'
         )
             ->where('is_active', true)
+            ->whereHas('users', function($query) {
+                $query->where('role', 'clinic_admin');
+            })
             ->paginate(12);
 
         return Inertia::render('Public/Clinics/Index', [
@@ -38,12 +42,33 @@ class ClinicDirectoryController extends Controller
     {
         $clinic = \App\Models\Clinic::where('slug', $slug)
             ->where('is_active', true)
+            ->whereHas('users', function($query) {
+                $query->where('role', 'clinic_admin');
+            })
             ->select('id', 'name', 'slug', 'street_address', 'barangay_code', 'city_municipality_code', 'province_code', 'region_code', 'address_details', 'logo_url', 'description', 'contact_number', 'email', 'latitude', 'longitude', 'operating_hours')
             ->firstOrFail();
-        $clinic->load('galleryImages');
+        $clinic->load(['galleryImages', 'services' => function($query) {
+            $query->where('is_active', true)->orderBy('name');
+        }, 'users' => function($query) {
+            $query->whereIn('role', ['dentist', 'staff'])->orderBy('name');
+        }, 'reviews' => function($query) {
+            $query->with(['patient.user'])->approved()->orderBy('created_at', 'desc')->limit(5);
+        }]);
+
+        // Get review statistics
+        $averageRating = Review::getAverageRating($clinic->id);
+        $reviewCount = Review::getReviewCount($clinic->id);
+
         return Inertia::render('Public/Clinics/Profile', [
             'clinic' => array_merge($clinic->toArray(), [
                 'gallery_images' => $clinic->galleryImages ? $clinic->galleryImages->values()->toArray() : [],
+                'services' => $clinic->services ? $clinic->services->values()->toArray() : [],
+                'staff' => $clinic->users ? $clinic->users->values()->toArray() : [],
+                'reviews' => $clinic->reviews ? $clinic->reviews->values()->toArray() : [],
+                'review_stats' => [
+                    'average_rating' => round($averageRating, 1),
+                    'review_count' => $reviewCount,
+                ],
             ]),
         ]);
     }

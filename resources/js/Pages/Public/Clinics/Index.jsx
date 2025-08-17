@@ -6,13 +6,34 @@ import {
     Phone,
     Mail,
     ShieldCheck,
+    Search,
+    Building2,
+    Filter,
     Star,
+    Clock,
+    Users,
+    Calendar,
+    Heart,
+    Eye,
+    BookOpen,
+    Award,
+    CheckCircle,
+    TrendingUp,
+    Globe,
     ArrowRight,
+    Sparkles,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
 
 export default function ClinicDirectory({ clinics }) {
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedRegion, setSelectedRegion] = useState("");
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedCity, setSelectedCity] = useState("");
+    const [viewMode, setViewMode] = useState("grid"); // grid or list
+    const [sortBy, setSortBy] = useState("name"); // name, location, rating
+    const [favorites, setFavorites] = useState([]);
+    const [expandedDescriptions, setExpandedDescriptions] = useState({});
     const [psgc, setPsgc] = useState({
         regions: [],
         provinces: [],
@@ -43,50 +64,33 @@ export default function ClinicDirectory({ clinics }) {
         !psgc.municipalities.length ||
         !psgc.barangays.length
     ) {
-        return <div>Loading clinics...</div>;
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading clinic directory...</p>
+                </div>
+            </div>
+        );
     }
 
     function getPSGCName(type, code) {
         if (!code) return "";
         const list = psgc[type];
         if (!list) return code;
-        // Try to match by 'code' (the field in your JSON)
         let found = list.find((item) => item.code === String(code));
-        // Fallback: Try to match by 'psgc_id' (for compatibility with other PSGC formats)
         if (!found && list[0] && list[0].psgc_id) {
             found = list.find((item) => item.psgc_id === String(code));
         }
         if (found) return found.name;
-        // If not found, check if the code is already a name (case-insensitive)
         let nameMatch = list.find(
             (item) =>
                 item.name.toLowerCase().trim() ===
                 String(code).toLowerCase().trim()
         );
         if (nameMatch) return nameMatch.name;
-        // If not found, just return the code (for seeded clinics with names)
         return code;
     }
-
-    const planColors = {
-        basic: "bg-gray-200 text-gray-800",
-        premium: "bg-blue-200 text-blue-800",
-        enterprise: "bg-yellow-200 text-yellow-800",
-    };
-
-    const filteredClinics =
-        clinics.data?.filter(
-            (clinic) =>
-                clinic.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (clinic.street_address &&
-                    clinic.street_address
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase())) ||
-                (clinic.description &&
-                    clinic.description
-                        .toLowerCase()
-                        .includes(searchTerm.toLowerCase()))
-        ) || [];
 
     function formatClinicAddress(clinic) {
         const cityOrMunicipality =
@@ -104,266 +108,714 @@ export default function ClinicDirectory({ clinics }) {
         return parts.filter(Boolean).join(", ");
     }
 
+    function getShortAddress(clinic) {
+        const cityOrMunicipality =
+            getPSGCName("cities", clinic.city_municipality_code) ||
+            getPSGCName("municipalities", clinic.city_municipality_code);
+        const province = getPSGCName("provinces", clinic.province_code);
+
+        const parts = [cityOrMunicipality, province].filter(Boolean);
+        return parts.join(", ");
+    }
+
+    // Filter clinics based on search and location filters
+    const filteredClinics =
+        clinics.data?.filter((clinic) => {
+            const matchesSearch =
+                clinic.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (clinic.street_address &&
+                    clinic.street_address
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase())) ||
+                (clinic.description &&
+                    clinic.description
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase()));
+
+            const matchesRegion =
+                !selectedRegion ||
+                getPSGCName("regions", clinic.region_code) === selectedRegion;
+
+            const matchesProvince =
+                !selectedProvince ||
+                getPSGCName("provinces", clinic.province_code) ===
+                    selectedProvince;
+
+            const matchesCity =
+                !selectedCity ||
+                getPSGCName("cities", clinic.city_municipality_code) ===
+                    selectedCity ||
+                getPSGCName("municipalities", clinic.city_municipality_code) ===
+                    selectedCity;
+
+            return (
+                matchesSearch && matchesRegion && matchesProvince && matchesCity
+            );
+        }) || [];
+
+    // Sort clinics based on selected criteria
+    const sortedClinics = [...filteredClinics].sort((a, b) => {
+        switch (sortBy) {
+            case "name":
+                return a.name.localeCompare(b.name);
+            case "location":
+                return getShortAddress(a).localeCompare(getShortAddress(b));
+            case "rating":
+                // For now, we'll use a mock rating system
+                return Math.random() - 0.5; // Random sorting for demo
+            default:
+                return 0;
+        }
+    });
+
+    // Get unique regions, provinces, and cities for filters
+    const availableRegions = [
+        ...new Set(
+            clinics.data
+                ?.map((clinic) => getPSGCName("regions", clinic.region_code))
+                .filter(Boolean)
+        ),
+    ].sort();
+
+    const availableProvinces = [
+        ...new Set(
+            clinics.data
+                ?.map((clinic) =>
+                    getPSGCName("provinces", clinic.province_code)
+                )
+                .filter(Boolean)
+        ),
+    ].sort();
+
+    const availableCities = [
+        ...new Set(
+            clinics.data
+                ?.map(
+                    (clinic) =>
+                        getPSGCName("cities", clinic.city_municipality_code) ||
+                        getPSGCName(
+                            "municipalities",
+                            clinic.city_municipality_code
+                        )
+                )
+                .filter(Boolean)
+        ),
+    ].sort();
+
     return (
-        <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-screen flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <SiteHeader />
-            {/* Hero Section: slightly more pronounced gradient */}
-            <section className="relative z-10 bg-gradient-to-br from-blue-50 via-white to-cyan-100 pb-0">
-                <div className="max-w-7xl mx-auto flex flex-col items-center justify-center py-16 px-4 sm:px-8 lg:px-16 text-center">
-                    <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight mb-4 font-montserrat">
-                        Find Your Perfect{" "}
-                        <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 bg-clip-text text-transparent">
-                            Dental Clinic
-                        </span>
-                    </h1>
-                    <p className="mt-2 mb-8 text-lg text-gray-500 max-w-2xl font-medium">
-                        Discover professional dental clinics in your area.
-                        Browse through our network of trusted dental practices
-                        and book your next appointment with ease.
-                    </p>
-                </div>
-            </section>
-            {/* Search/Filters section: aligned, integrated, white background */}
-            <section className="bg-white w-full py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-16">
-                    <div className="w-full">
-                        <div className="relative w-full">
-                            <input
-                                type="text"
-                                className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg leading-5 bg-white placeholder-gray-400 text-gray-900 text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                                placeholder="Search clinics by name, location, or services..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                            <svg
-                                className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-blue-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                />
-                            </svg>
+
+            {/* Hero Section */}
+            <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 text-white overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-indigo-600/20"></div>
+                <div className="absolute top-0 left-0 w-72 h-72 bg-white/5 rounded-full -translate-x-36 -translate-y-36"></div>
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
+                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16"></div>
+
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                    <div className="text-center">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm font-medium mb-8">
+                            <Building2 className="w-4 h-4 mr-2" />
+                            Clinic Directory
                         </div>
-                        <div className="w-full text-left text-sm text-gray-500 mt-2">
-                            Showing {filteredClinics.length} of{" "}
-                            {clinics.data?.length || 0} clinics
+                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                            Find Your Perfect{" "}
+                            <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                                Dental Clinic
+                            </span>
+                        </h1>
+                        <p className="text-xl text-blue-100 max-w-4xl mx-auto mb-12 leading-relaxed">
+                            Discover trusted dental clinics in your area. Browse
+                            our network of professional dental practices and
+                            find the perfect match for your oral health needs.
+                        </p>
+
+                        {/* Enhanced Quick Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                                <div className="flex items-center justify-center mb-3">
+                                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                        <Users className="w-6 h-6" />
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold mb-1">
+                                        {clinics.data?.length || 0}+
+                                    </div>
+                                    <div className="text-blue-100 text-sm">
+                                        Active Clinics
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                                <div className="flex items-center justify-center mb-3">
+                                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
+                                        <ShieldCheck className="w-6 h-6" />
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold mb-1">
+                                        100%
+                                    </div>
+                                    <div className="text-blue-100 text-sm">
+                                        Verified & Trusted
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                                <div className="flex items-center justify-center mb-3">
+                                    <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                                        <Calendar className="w-6 h-6" />
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold mb-1">
+                                        24/7
+                                    </div>
+                                    <div className="text-blue-100 text-sm">
+                                        Easy Booking
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Trust indicators */}
+                        <div className="flex flex-wrap justify-center items-center gap-8 text-blue-100">
+                            <div className="flex items-center">
+                                <CheckCircle className="w-5 h-5 mr-2 text-green-300" />
+                                <span className="text-sm">HIPAA Compliant</span>
+                            </div>
+                            <div className="flex items-center">
+                                <Award className="w-5 h-5 mr-2 text-yellow-300" />
+                                <span className="text-sm">Award Winning</span>
+                            </div>
+                            <div className="flex items-center">
+                                <TrendingUp className="w-5 h-5 mr-2 text-blue-300" />
+                                <span className="text-sm">Growing Network</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
-            {/* Clinics grid: blue-50 background, cards are white */}
-            <section className="py-16 bg-blue-50">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-8 lg:px-16">
-                    {filteredClinics.length > 0 ? (
-                        filteredClinics.map((clinic) => (
-                            <div
-                                key={clinic.id}
-                                className="flex flex-col justify-between bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-200 overflow-hidden border border-gray-100 group relative min-h-[420px]"
-                            >
-                                {/* Top: Logo and Name */}
-                                <div className="flex flex-col items-center px-6 pt-8 pb-2">
-                                    {/* Logo - larger and prominent */}
-                                    <div className="mb-3">
-                                        <img
-                                            src={
-                                                clinic.logo_url ||
-                                                "/images/clinic-logo.png"
-                                            }
-                                            alt={clinic.name}
-                                            className="h-24 w-24 rounded-full object-cover bg-gray-100 shadow-lg border-4 border-blue-200 group-hover:scale-105 transition-transform duration-200"
-                                        />
-                                    </div>
-                                    {/* Clinic Name */}
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-1 text-center font-inter">
-                                        {clinic.name}
-                                    </h3>
-                                    {/* Address with icon */}
-                                    <div className="flex items-center justify-center text-sm text-gray-500 mb-2 gap-1 text-center">
-                                        <MapPin className="w-4 h-4 text-blue-400" />
-                                        <span className="leading-tight">
-                                            {formatClinicAddress(clinic)}
-                                        </span>
-                                    </div>
-                                </div>
-                                {/* Middle: Contact Info and Description */}
-                                <div className="flex flex-col items-center px-6 pb-2">
-                                    {/* Contact Info Box */}
-                                    <div className="w-full bg-blue-50 rounded-lg px-4 py-2 mb-2 flex flex-col gap-1 items-center">
-                                        {clinic.contact_number && (
-                                            <div className="flex items-center gap-2 text-blue-700 text-sm">
-                                                <Phone className="w-4 h-4" />
-                                                <span className="font-medium">
-                                                    {clinic.contact_number}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {clinic.email && (
-                                            <div className="flex items-center gap-2 text-blue-700 text-sm">
-                                                <Mail className="w-4 h-4" />
-                                                <span className="font-medium truncate max-w-[180px]">
-                                                    {clinic.email}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {/* Description */}
-                                    {clinic.description && (
-                                        <p className="text-sm text-gray-600 mb-2 line-clamp-2 text-center font-inter">
-                                            {clinic.description}
-                                        </p>
-                                    )}
-                                </div>
-                                {/* Bottom: View Profile Button */}
-                                <div className="mt-auto px-6 pb-8 pt-2 w-full">
-                                    <Link
-                                        href={route("public.clinics.profile", {
-                                            slug: clinic.slug,
-                                        })}
-                                        className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 font-inter"
+
+            {/* Enhanced Search and Filters Section */}
+            <section className="relative -mt-8 z-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8">
+                        {/* Search Bar */}
+                        <div className="mb-8">
+                            <div className="relative max-w-3xl mx-auto">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-500" />
+                                <input
+                                    type="text"
+                                    className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                    placeholder="Search clinics by name, location, or services..."
+                                    value={searchTerm}
+                                    onChange={(e) =>
+                                        setSearchTerm(e.target.value)
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        {/* Enhanced Filters and Controls */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto">
+                            <div className="text-center">
+                                <label className="block text-sm font-medium text-gray-700 mb-3">
+                                    Region
+                                </label>
+                                <select
+                                    value={selectedRegion}
+                                    onChange={(e) => {
+                                        setSelectedRegion(e.target.value);
+                                        setSelectedProvince("");
+                                        setSelectedCity("");
+                                    }}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                                >
+                                    <option value="">All Regions</option>
+                                    {availableRegions.map((region) => (
+                                        <option key={region} value={region}>
+                                            {region}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="text-center">
+                                <label className="block text-sm font-medium text-gray-700 mb-3">
+                                    Province
+                                </label>
+                                <select
+                                    value={selectedProvince}
+                                    onChange={(e) => {
+                                        setSelectedProvince(e.target.value);
+                                        setSelectedCity("");
+                                    }}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                                    disabled={!selectedRegion}
+                                >
+                                    <option value="">All Provinces</option>
+                                    {availableProvinces.map((province) => (
+                                        <option key={province} value={province}>
+                                            {province}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="text-center">
+                                <label className="block text-sm font-medium text-gray-700 mb-3">
+                                    City/Municipality
+                                </label>
+                                <select
+                                    value={selectedCity}
+                                    onChange={(e) =>
+                                        setSelectedCity(e.target.value)
+                                    }
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                                    disabled={!selectedProvince}
+                                >
+                                    <option value="">All Cities</option>
+                                    {availableCities.map((city) => (
+                                        <option key={city} value={city}>
+                                            {city}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Enhanced Results Counter and Controls */}
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div className="flex items-center gap-4">
+                                <span className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
+                                    Showing {sortedClinics.length} of{" "}
+                                    {clinics.data?.length || 0} clinics
+                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">
+                                        Sort by:
+                                    </span>
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) =>
+                                            setSortBy(e.target.value)
+                                        }
+                                        className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     >
-                                        View Profile
-                                        <svg
-                                            className="ml-2 h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9 5l7 7-7 7"
-                                            />
-                                        </svg>
-                                    </Link>
+                                        <option value="name">Name</option>
+                                        <option value="location">
+                                            Location
+                                        </option>
+                                        <option value="rating">Rating</option>
+                                    </select>
                                 </div>
                             </div>
-                        ))
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-600">
+                                    View:
+                                </span>
+                                <div className="flex bg-gray-100 rounded-lg p-1">
+                                    <button
+                                        onClick={() => setViewMode("grid")}
+                                        className={`p-2 rounded-md transition-colors ${
+                                            viewMode === "grid"
+                                                ? "bg-white shadow-sm text-blue-600"
+                                                : "text-gray-600 hover:text-gray-900"
+                                        }`}
+                                    >
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode("list")}
+                                        className={`p-2 rounded-md transition-colors ${
+                                            viewMode === "list"
+                                                ? "bg-white shadow-sm text-blue-600"
+                                                : "text-gray-600 hover:text-gray-900"
+                                        }`}
+                                    >
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Enhanced Clinics Gallery */}
+            <section className="py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Section Header */}
+                    <div className="text-center mb-16">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium mb-6">
+                            <Building2 className="w-4 h-4 mr-2" />
+                            Available Clinics
+                        </div>
+                        <h2 className="text-4xl font-bold text-gray-900 mb-6">
+                            Trusted Dental Clinics
+                        </h2>
+                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                            Choose from our network of professional dental
+                            clinics, each committed to providing exceptional
+                            care and outstanding patient experience
+                        </p>
+                    </div>
+
+                    {/* Enhanced Clinics Display */}
+                    {sortedClinics.length > 0 ? (
+                        <div
+                            className={
+                                viewMode === "grid"
+                                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                                    : "space-y-6"
+                            }
+                        >
+                            {sortedClinics.map((clinic) => (
+                                <div
+                                    key={clinic.id}
+                                    className={`group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 flex flex-col h-full ${
+                                        viewMode === "list" ? "flex-row" : ""
+                                    }`}
+                                >
+                                    {/* Modern Header with Enhanced Gradient Background */}
+                                    <div className="relative bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 p-6 border-b border-blue-200/50">
+                                        {/* Subtle Pattern Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-blue-200/10 rounded-t-2xl"></div>
+                                        {/* Decorative Elements */}
+                                        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full -translate-y-12 translate-x-12"></div>
+                                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-indigo-400/10 to-blue-400/10 rounded-full -translate-y-8 -translate-x-8"></div>
+
+                                        {/* Clinic Logo and Info */}
+                                        <div className="flex items-center space-x-4">
+                                            <div className="relative">
+                                                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-0.5">
+                                                    <img
+                                                        src={
+                                                            clinic.logo_url ||
+                                                            "/images/clinic-logo.png"
+                                                        }
+                                                        alt={clinic.name}
+                                                        className="w-full h-full rounded-xl object-cover"
+                                                        onError={(e) => {
+                                                            e.target.src =
+                                                                "/images/clinic-logo.png";
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                                                    <ShieldCheck className="w-3 h-3 text-white" />
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 h-14 flex items-center">
+                                                    {clinic.name}
+                                                </h3>
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="flex items-center bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                                                        <ShieldCheck className="w-3 h-3 mr-1" />
+                                                        Verified
+                                                    </div>
+                                                    <div className="flex items-center bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
+                                                        <Star className="w-3 h-3 mr-1 fill-current" />
+                                                        4.8
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Content Section */}
+                                    <div className="flex-1 flex flex-col p-6">
+                                        {/* Location */}
+                                        <div className="mb-4">
+                                            <div className="flex items-start space-x-3">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                    <MapPin className="w-4 h-4 text-blue-600" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm text-gray-700 font-medium line-clamp-2">
+                                                        {getShortAddress(
+                                                            clinic
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact Information */}
+                                        <div className="mb-6">
+                                            <div className="space-y-3">
+                                                {clinic.contact_number && (
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                                                            <Phone className="w-4 h-4 text-green-600" />
+                                                        </div>
+                                                        <span className="text-sm font-medium text-gray-800">
+                                                            {
+                                                                clinic.contact_number
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {clinic.email && (
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                                                            <Mail className="w-4 h-4 text-purple-600" />
+                                                        </div>
+                                                        <span className="text-sm font-medium text-gray-800 truncate">
+                                                            {clinic.email}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Description */}
+                                        <div className="flex-1 mb-6">
+                                            {clinic.description ? (
+                                                <div className="bg-gray-50 rounded-xl p-4">
+                                                    <p
+                                                        className={`text-sm text-gray-700 leading-relaxed ${
+                                                            expandedDescriptions[
+                                                                clinic.id
+                                                            ]
+                                                                ? ""
+                                                                : "line-clamp-2 h-12"
+                                                        }`}
+                                                    >
+                                                        {clinic.description}
+                                                    </p>
+                                                    {clinic.description.length >
+                                                        100 && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setExpandedDescriptions(
+                                                                    (prev) => ({
+                                                                        ...prev,
+                                                                        [clinic.id]:
+                                                                            !prev[
+                                                                                clinic
+                                                                                    .id
+                                                                            ],
+                                                                    })
+                                                                );
+                                                            }}
+                                                            className="text-sm text-blue-600 hover:text-blue-800 font-medium mt-2 transition-colors flex items-center"
+                                                        >
+                                                            {expandedDescriptions[
+                                                                clinic.id
+                                                            ]
+                                                                ? "See Less"
+                                                                : "See More"}
+                                                            <ArrowRight
+                                                                className={`w-3 h-3 ml-1 transition-transform ${
+                                                                    expandedDescriptions[
+                                                                        clinic
+                                                                            .id
+                                                                    ]
+                                                                        ? "rotate-180"
+                                                                        : ""
+                                                                }`}
+                                                            />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="h-12"></div>
+                                            )}
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="mt-auto space-y-3">
+                                            <Link
+                                                href={route(
+                                                    "public.clinics.profile",
+                                                    {
+                                                        slug: clinic.slug,
+                                                    }
+                                                )}
+                                                className="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm group-hover:scale-105 shadow-lg"
+                                            >
+                                                <Eye className="w-4 h-4 mr-2" />
+                                                View Details
+                                            </Link>
+                                            <button
+                                                className="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 text-sm group-hover:scale-105 shadow-lg"
+                                                onClick={() => {
+                                                    window.open(
+                                                        route(
+                                                            "public.clinics.profile",
+                                                            {
+                                                                slug: clinic.slug,
+                                                            }
+                                                        ),
+                                                        "_blank"
+                                                    );
+                                                }}
+                                            >
+                                                <BookOpen className="w-4 h-4 mr-2" />
+                                                Book Appointment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     ) : (
-                        <div className="col-span-full text-center py-12">
-                            <svg
-                                className="mx-auto h-12 w-12 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"
-                                />
-                            </svg>
-                            <h3 className="mt-2 text-sm font-medium text-gray-900">
-                                No clinics found
-                            </h3>
-                            <p className="mt-1 text-sm text-gray-500">
-                                {searchTerm
-                                    ? `No clinics match "${searchTerm}". Try adjusting your search.`
-                                    : "No clinics are currently available."}
-                            </p>
+                        <div className="text-center py-16">
+                            <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
+                                <Search className="w-16 h-16 text-gray-400 mx-auto mb-6" />
+                                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                                    No clinics found
+                                </h3>
+                                <p className="text-gray-600 mb-8 leading-relaxed">
+                                    {searchTerm ||
+                                    selectedRegion ||
+                                    selectedProvince ||
+                                    selectedCity
+                                        ? "No clinics match your search criteria. Try adjusting your filters."
+                                        : "No clinics are currently available in your area."}
+                                </p>
+                                {(searchTerm ||
+                                    selectedRegion ||
+                                    selectedProvince ||
+                                    selectedCity) && (
+                                    <button
+                                        onClick={() => {
+                                            setSearchTerm("");
+                                            setSelectedRegion("");
+                                            setSelectedProvince("");
+                                            setSelectedCity("");
+                                        }}
+                                        className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                    >
+                                        Clear All Filters
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {clinics.links && clinics.links.length > 3 && (
+                        <div className="mt-12 flex justify-center">
+                            <nav className="bg-white rounded-xl shadow-lg border border-gray-100 p-2">
+                                <div className="flex items-center space-x-1">
+                                    {clinics.links.map((link, i) => (
+                                        <Link
+                                            key={i}
+                                            href={link.url || "#"}
+                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                link.active
+                                                    ? "bg-blue-600 text-white shadow-lg"
+                                                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                            } ${
+                                                !link.url
+                                                    ? "pointer-events-none opacity-50"
+                                                    : ""
+                                            }`}
+                                            dangerouslySetInnerHTML={{
+                                                __html: link.label,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </nav>
                         </div>
                     )}
                 </div>
-
-                {/* Pagination */}
-                {clinics.links && clinics.links.length > 3 && (
-                    <div className="mt-8 flex justify-center">
-                        <nav className="flex items-center space-x-2">
-                            {clinics.links.map((link, i) => (
-                                <Link
-                                    key={i}
-                                    href={link.url || "#"}
-                                    className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        link.active
-                                            ? "bg-blue-600 text-white"
-                                            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                                    } ${
-                                        !link.url
-                                            ? "pointer-events-none opacity-50"
-                                            : ""
-                                    }`}
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
-                                />
-                            ))}
-                        </nav>
-                    </div>
-                )}
             </section>
 
             {/* Footer */}
-            <footer className="bg-gray-800 mt-16">
-                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-                    <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-                        <div className="space-y-8 xl:col-span-1">
-                            <h3 className="text-2xl font-bold text-white">
-                                Smile Suite
-                            </h3>
-                            <p className="text-gray-300 text-base">
+            <footer className="bg-gray-900 text-white">
+                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div>
+                            <div className="flex items-center mb-4">
+                                <img
+                                    src="/images/smile-suite-logo.png"
+                                    alt="Smile Suite"
+                                    className="w-8 h-8 mr-3"
+                                />
+                                <h3 className="text-xl font-bold">
+                                    Smile Suite
+                                </h3>
+                            </div>
+                            <p className="text-gray-300">
                                 Cloud-based dental clinic management solution
                                 designed to streamline your practice operations.
                             </p>
                         </div>
-                        <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
-                            <div className="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-                                <div>
-                                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-                                        Platform
-                                    </h3>
-                                    <ul className="mt-4 space-y-4">
-                                        <li>
-                                            <Link
-                                                href="/#features"
-                                                className="text-base text-gray-300 hover:text-white"
-                                            >
-                                                Features
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                href="/"
-                                                className="text-base text-gray-300 hover:text-white"
-                                            >
-                                                Home
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="mt-12 md:mt-0">
-                                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-                                        Support
-                                    </h3>
-                                    <ul className="mt-4 space-y-4">
-                                        <li>
-                                            <Link
-                                                href="/#about"
-                                                className="text-base text-gray-300 hover:text-white"
-                                            >
-                                                About
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                href={route("login")}
-                                                className="text-base text-gray-300 hover:text-white"
-                                            >
-                                                Login
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                                Platform
+                            </h4>
+                            <ul className="space-y-3">
+                                <li>
+                                    <Link
+                                        href="/#features"
+                                        className="text-gray-300 hover:text-white transition-colors"
+                                    >
+                                        Features
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/"
+                                        className="text-gray-300 hover:text-white transition-colors"
+                                    >
+                                        Home
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                                Support
+                            </h4>
+                            <ul className="space-y-3">
+                                <li>
+                                    <Link
+                                        href="/#about"
+                                        className="text-gray-300 hover:text-white transition-colors"
+                                    >
+                                        About
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href={route("login")}
+                                        className="text-gray-300 hover:text-white transition-colors"
+                                    >
+                                        Login
+                                    </Link>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    <div className="mt-12 border-t border-gray-700 pt-8">
-                        <p className="text-base text-gray-400 xl:text-center">
+                    <div className="mt-8 pt-8 border-t border-gray-800 text-center">
+                        <p className="text-gray-400">
                             &copy; 2024 Smile Suite. All rights reserved.
                         </p>
                     </div>

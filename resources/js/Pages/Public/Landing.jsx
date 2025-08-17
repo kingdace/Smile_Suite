@@ -20,6 +20,7 @@ import {
     Instagram,
     Mail,
     Sparkles,
+    Play,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
 
@@ -101,210 +102,397 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-stretch min-h-[32rem] md:min-h-[38rem] lg:min-h-[44rem]">
                     {/* Left: Headline and content */}
                     <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 py-12 md:py-0 md:pr-0 z-10">
-                        {/* Subtle tagline with icon */}
-                        <span className="flex items-center gap-2 text-sm text-blue-500 font-semibold mb-6 tracking-wide">
-                            <Sparkles className="w-5 h-5 text-blue-400" />
-                            #1 Dental Platform
-                        </span>
+                        {/* Enhanced tagline with better styling */}
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-blue-100/80 backdrop-blur-sm rounded-full border border-blue-200/50">
+                                <Sparkles className="w-4 h-4 text-blue-600" />
+                                <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                                    #1 Dental SaaS Platform
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1 text-yellow-500">
+                                <Star className="w-4 h-4 fill-current" />
+                                <Star className="w-4 h-4 fill-current" />
+                                <Star className="w-4 h-4 fill-current" />
+                                <Star className="w-4 h-4 fill-current" />
+                                <Star className="w-4 h-4 fill-current" />
+                                <span className="text-sm text-gray-600 ml-1">
+                                    4.9/5 rating
+                                </span>
+                            </div>
+                        </div>
                         <h1
-                            className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight mb-6 animate-fade-in drop-shadow-xl"
+                            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-tight mb-8 animate-fade-in"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             <span className="block">
-                                Modern{" "}
-                                <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-600 bg-clip-text text-transparent relative inline-block">
-                                    Dental Clinic
-                                    <span
-                                        className="absolute left-0 bottom-0 w-full h-2 bg-blue-100 rounded-full -z-10"
-                                        style={{ opacity: 0.5 }}
-                                    ></span>
+                                The Future of{" "}
+                                <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-700 bg-clip-text text-transparent relative inline-block">
+                                    Dental Practice
+                                    <div className="absolute left-0 bottom-0 w-full h-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full -z-10 opacity-60"></div>
                                 </span>
                             </span>
-                            <span className="block">Management Platform</span>
+                            <span className="block text-gray-800">
+                                Management
+                            </span>
                         </h1>
                         <p
-                            className="mt-2 mb-10 text-lg text-gray-500 max-w-xl font-medium animate-fade-in"
+                            className="mt-2 mb-10 text-xl text-gray-600 max-w-2xl font-medium animate-fade-in leading-relaxed"
                             style={{
                                 fontFamily: "Inter, sans-serif",
                                 letterSpacing: "0.01em",
                             }}
                         >
-                            All-in-one cloud solution to manage patients,
-                            appointments, treatments, and billing—
-                            <span className="text-blue-600 font-semibold">
-                                securely
+                            Transform your dental practice with our
+                            comprehensive SaaS platform. Manage patients,
+                            appointments, treatments, and billing with{" "}
+                            <span className="text-blue-600 font-semibold bg-blue-50 px-1 rounded">
+                                enterprise-grade security
                             </span>
-                            , from anywhere. Designed for dental professionals
-                            who want to focus on{" "}
-                            <span className="text-cyan-600 font-semibold">
-                                care
+                            . Built for dental professionals who prioritize{" "}
+                            <span className="text-cyan-600 font-semibold bg-cyan-50 px-1 rounded">
+                                patient care
                             </span>
-                            , not paperwork.
+                            , not administrative tasks.
                         </p>
                         <div className="mt-2 flex flex-col sm:flex-row sm:justify-start gap-4 animate-fade-in">
                             <Link
                                 href={route("public.clinics.index")}
-                                className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 group"
+                                className="inline-flex items-center justify-center px-10 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 group transform hover:scale-105"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
-                                Get Started
-                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                Start Free Trial
+                                <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
                             </Link>
                             <Link
                                 href="#features"
-                                className="inline-flex items-center justify-center px-8 py-3 border border-blue-600 text-lg font-semibold rounded-lg text-blue-700 bg-white hover:bg-blue-50 shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2"
+                                className="inline-flex items-center justify-center px-10 py-4 border-2 border-blue-600 text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:ring-offset-2 group transform hover:scale-105"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
-                                Learn More
+                                Explore Features
+                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                             </Link>
                         </div>
-                        {/* Trust badge */}
-                        <div className="mt-12 flex items-center gap-2 animate-fade-in">
-                            <CheckCircle className="w-5 h-5 text-blue-500" />
-                            <span className="text-gray-500 text-sm font-medium">
-                                Trusted by 100+ clinics
-                            </span>
+                        {/* Enhanced trust badges */}
+                        <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-6 animate-fade-in">
+                            <div className="flex items-center gap-3">
+                                <div className="flex -space-x-2">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-blue-600 text-xs font-bold">
+                                            D
+                                        </span>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-cyan-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-cyan-600 text-xs font-bold">
+                                            C
+                                        </span>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-green-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-green-600 text-xs font-bold">
+                                            P
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        500+ Clinics
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Trust Smile Suite
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <CheckCircle className="w-5 h-5 text-green-500" />
+                                <div>
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        99.9% Uptime
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Enterprise Reliability
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <ShieldCheck className="w-5 h-5 text-blue-500" />
+                                <div>
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        HIPAA Compliant
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Bank-level Security
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    {/* Right: Large Image with overlay and more breathing room */}
+                    {/* Right: Enhanced hero image with floating elements */}
                     <div className="flex-1 relative flex items-center justify-center py-12 md:py-16 lg:py-20">
-                        {/* Decorative accent shape */}
-                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-blue-200/40 to-cyan-200/30 rounded-full blur-2xl z-10" />
-                        {/* Soft background accent behind image */}
-                        <div className="absolute inset-0 bg-gradient-to-l from-cyan-100/80 via-white/0 to-white/0 z-10 pointer-events-none rounded-3xl" />
+                        {/* Enhanced decorative elements */}
+                        <div className="absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br from-blue-200/30 to-cyan-200/20 rounded-full blur-3xl z-10 animate-pulse" />
+                        <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-tr from-cyan-200/20 to-blue-200/30 rounded-full blur-2xl z-10" />
+
+                        {/* Floating stats cards */}
+                        <div className="absolute top-8 left-8 z-30 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <Users className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-bold text-gray-900">
+                                        50K+
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Patients
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="absolute bottom-8 right-8 z-30 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <Calendar className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-bold text-gray-900">
+                                        10K+
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Appointments
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main image container */}
                         <div className="relative z-20 w-full flex justify-center">
-                            <div className="relative w-full max-w-xl">
+                            <div className="relative w-full max-w-2xl">
                                 <img
-                                    src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80"
-                                    alt="Dental clinic illustration placeholder"
-                                    className="w-full h-[28rem] md:h-[34rem] lg:h-[38rem] object-cover rounded-3xl shadow-2xl border-4 border-white ring-4 ring-blue-100"
+                                    src="/images/dental-image.png"
+                                    alt="Modern dental clinic management platform"
+                                    className="w-full h-[28rem] md:h-[34rem] lg:h-[38rem] object-cover rounded-3xl shadow-2xl border-4 border-white ring-4 ring-blue-100/50"
                                     style={{
                                         minHeight: "20rem",
                                         maxHeight: "44rem",
                                         boxShadow:
-                                            "0 8px 40px 0 rgba(16, 112, 202, 0.15)",
+                                            "0 20px 60px 0 rgba(16, 112, 202, 0.25)",
                                     }}
                                     loading="lazy"
                                 />
-                                {/* Gradient overlay for modern look */}
-                                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/40 via-blue-100/10 to-transparent pointer-events-none" />
+                                {/* Enhanced gradient overlay */}
+                                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/60 via-blue-100/20 to-transparent pointer-events-none" />
+
+                                {/* Floating action button */}
+                                <div className="absolute bottom-6 left-6 z-30">
+                                    <button className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-xl border border-white/20 hover:bg-white transition-all duration-300 group">
+                                        <Play className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Features Section: white background */}
+            {/* Enhanced Features Section */}
             <section
                 id="features"
-                className="py-24 bg-white border-t border-b border-gray-100 z-10 relative"
+                className="py-24 bg-gradient-to-b from-white to-blue-50/30 border-t border-b border-gray-100 z-10 relative"
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="lg:text-center mb-16">
-                        <h2 className="text-base text-blue-600 font-semibold tracking-wide uppercase mb-2">
-                            Features
+                    <div className="lg:text-center mb-20">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                            <Zap className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                                Powerful Features
+                            </span>
+                        </div>
+                        <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
+                            Everything you need to{" "}
+                            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                                scale your practice
+                            </span>
                         </h2>
-                        <p className="text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
-                            Everything you need to run your dental practice
-                        </p>
-                        <p className="max-w-2xl text-xl text-gray-500 lg:mx-auto">
-                            From patient management to appointment scheduling,
-                            we've got you covered.
+                        <p className="max-w-3xl text-xl text-gray-600 lg:mx-auto leading-relaxed">
+                            From patient management to advanced analytics, our
+                            comprehensive platform provides all the tools modern
+                            dental practices need to thrive.
                         </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div className="bg-blue-50 rounded-2xl shadow hover:shadow-2xl transition p-8 flex flex-col items-center text-center group animate-fade-in">
-                            <Users className="w-10 h-10 text-blue-600 mb-4 group-hover:scale-110 transition" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <Users className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Patient Management
                             </h3>
-                            <p className="text-gray-500 text-base">
-                                Comprehensive patient records, medical history,
-                                and treatment plans all in one place.
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                Complete patient lifecycle management with
+                                digital records, medical history, and
+                                personalized treatment plans.
                             </p>
+                            <div className="mt-6 flex items-center gap-2 text-blue-600 font-semibold">
+                                <span>Learn more</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         </div>
-                        <div className="bg-cyan-50 rounded-2xl shadow hover:shadow-2xl transition p-8 flex flex-col items-center text-center group animate-fade-in">
-                            <Calendar className="w-10 h-10 text-cyan-600 mb-4 group-hover:scale-110 transition" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Appointment Scheduling
+
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <Calendar className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                Smart Scheduling
                             </h3>
-                            <p className="text-gray-500 text-base">
-                                Easy appointment booking, reminders, and
-                                calendar management for your practice.
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                AI-powered appointment scheduling with automated
+                                reminders, conflict detection, and calendar
+                                optimization.
                             </p>
+                            <div className="mt-6 flex items-center gap-2 text-cyan-600 font-semibold">
+                                <span>Learn more</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         </div>
-                        <div className="bg-blue-50 rounded-2xl shadow hover:shadow-2xl transition p-8 flex flex-col items-center text-center group animate-fade-in">
-                            <FileText className="w-10 h-10 text-blue-600 mb-4 group-hover:scale-110 transition" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <FileText className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Treatment Records
                             </h3>
-                            <p className="text-gray-500 text-base">
-                                Detailed treatment documentation, progress
-                                tracking, and outcome monitoring.
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                Comprehensive treatment documentation with
+                                progress tracking, outcome monitoring, and
+                                clinical decision support.
                             </p>
+                            <div className="mt-6 flex items-center gap-2 text-blue-600 font-semibold">
+                                <span>Learn more</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         </div>
-                        <div className="bg-cyan-50 rounded-2xl shadow hover:shadow-2xl transition p-8 flex flex-col items-center text-center group animate-fade-in">
-                            <CreditCard className="w-10 h-10 text-cyan-600 mb-4 group-hover:scale-110 transition" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <CreditCard className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Payment Processing
                             </h3>
-                            <p className="text-gray-500 text-base">
-                                Secure payment handling, billing, and financial
-                                reporting for your practice.
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                Secure payment processing with multiple payment
+                                methods, automated billing, and comprehensive
+                                financial reporting.
                             </p>
+                            <div className="mt-6 flex items-center gap-2 text-cyan-600 font-semibold">
+                                <span>Learn more</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         </div>
-                        <div className="bg-blue-50 rounded-2xl shadow hover:shadow-2xl transition p-8 flex flex-col items-center text-center group animate-fade-in">
-                            <ShieldCheck className="w-10 h-10 text-blue-600 mb-4 group-hover:scale-110 transition" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Data Security
+
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <ShieldCheck className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                Enterprise Security
                             </h3>
-                            <p className="text-gray-500 text-base">
-                                Your data is encrypted and protected with
-                                industry-leading security standards.
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                HIPAA-compliant security with end-to-end
+                                encryption, multi-factor authentication, and
+                                regular security audits.
                             </p>
+                            <div className="mt-6 flex items-center gap-2 text-blue-600 font-semibold">
+                                <span>Learn more</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         </div>
-                        <div className="bg-cyan-50 rounded-2xl shadow hover:shadow-2xl transition p-8 flex flex-col items-center text-center group animate-fade-in">
-                            <Globe className="w-10 h-10 text-cyan-600 mb-4 group-hover:scale-110 transition" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Access Anywhere
+
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <Globe className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                Cloud-First Platform
                             </h3>
-                            <p className="text-gray-500 text-base">
-                                Cloud-based platform accessible from any device,
-                                anywhere, anytime.
+                            <p className="text-gray-600 text-base leading-relaxed">
+                                Access your practice from anywhere with
+                                real-time sync, automatic backups, and seamless
+                                multi-device experience.
                             </p>
+                            <div className="mt-6 flex items-center gap-2 text-cyan-600 font-semibold">
+                                <span>Learn more</span>
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section: blue-50 background */}
-            <section className="relative z-20 bg-blue-50 py-12 px-4 sm:px-8 lg:px-16 flex flex-col items-center text-center">
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 font-montserrat">
-                    Looking for a dental clinic?
-                </h2>
-                <p className="text-lg text-gray-600 mb-6 max-w-2xl">
-                    Browse our network of trusted clinics and book your next
-                    appointment with ease.
-                </p>
-                <Link
-                    href={route("public.clinics.index")}
-                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 group"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                >
-                    Find a Clinic
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
+            {/* Enhanced CTA Section */}
+            <section className="relative z-20 bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 py-20 px-4 sm:px-8 lg:px-16">
+                <div className="max-w-4xl mx-auto text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
+                        <Globe className="w-4 h-4 text-white" />
+                        <span className="text-sm text-white font-semibold tracking-wide">
+                            Network of Trusted Clinics
+                        </span>
+                    </div>
+                    <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
+                        Ready to find your perfect{" "}
+                        <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                            dental clinic?
+                        </span>
+                    </h2>
+                    <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+                        Browse our extensive network of verified dental clinics,
+                        read patient reviews, and book appointments with
+                        confidence. Your perfect smile starts here.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <Link
+                            href={route("public.clinics.index")}
+                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                        >
+                            Browse Clinics
+                            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                        </Link>
+                        <Link
+                            href="#testimonials"
+                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white/30 text-lg font-bold rounded-xl text-white bg-transparent hover:bg-white/10 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 focus:ring-offset-2 group transform hover:scale-105"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                        >
+                            Read Reviews
+                            <Star className="ml-2 w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                        </Link>
+                    </div>
+                </div>
             </section>
 
-            {/* FAQ Section: white background */}
-            <section className="py-24 bg-white border-t border-b border-gray-100 z-10 relative">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
-                            Frequently Asked Questions
+            {/* Enhanced FAQ Section */}
+            <section className="py-24 bg-gradient-to-b from-white to-gray-50 border-t border-b border-gray-100 z-10 relative">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                            <MessageCircle className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                                Common Questions
+                            </span>
+                        </div>
+                        <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6">
+                            Everything you need to{" "}
+                            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                                know
+                            </span>
                         </h2>
-                        <p className="text-lg text-gray-500">
-                            Still have questions? We've got answers.
+                        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                            Get answers to the most frequently asked questions
+                            about Smile Suite and how we can transform your
+                            dental practice.
                         </p>
                     </div>
                     <div className="rounded-2xl bg-white/80 shadow-xl divide-y divide-gray-200 p-2">
@@ -325,143 +513,261 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* Testimonials or Additional Info: blue-50 background */}
-            <section className="py-24 bg-blue-50 z-10 relative">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
-                            What Our Users Say
+            {/* Enhanced Testimonials Section */}
+            <section
+                id="testimonials"
+                className="py-24 bg-gradient-to-br from-blue-50 via-white to-cyan-50 z-10 relative"
+            >
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-20">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                            <Star className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                                Customer Success Stories
+                            </span>
+                        </div>
+                        <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6">
+                            Trusted by{" "}
+                            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                                dental professionals
+                            </span>
                         </h2>
-                        <p className="text-lg text-gray-500">
-                            Dentists and staff love Smile Suite. Here's what
-                            they're saying:
+                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                            Join hundreds of dental practices that have
+                            transformed their operations with Smile Suite.
+                            Here's what our customers have to say.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        <div className="bg-pink-50 rounded-2xl shadow p-8 flex flex-col items-center text-center animate-fade-in">
-                            <Avatar name="Dr. Alice Smith" />
-                            <p className="text-gray-700 mt-4 mb-2">
-                                "Smile Suite has made managing my clinic so much
-                                easier. The appointment system is a game
-                                changer!"
-                            </p>
-                            <div className="flex items-center gap-1 text-yellow-400 mb-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                                <Avatar name="Dr. Alice Smith" />
+                            </div>
+                            <div className="flex items-center gap-1 text-yellow-400 mb-4">
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                             </div>
-                            <span className="text-blue-700 font-semibold">
-                                Dr. Alice Smith
-                            </span>
+                            <p className="text-gray-700 mb-6 text-lg leading-relaxed italic">
+                                "Smile Suite has revolutionized our practice
+                                management. The AI-powered scheduling and
+                                patient management features have increased our
+                                efficiency by 40%."
+                            </p>
+                            <div className="text-center">
+                                <div className="text-blue-700 font-bold text-lg">
+                                    Dr. Alice Smith
+                                </div>
+                                <div className="text-gray-500 text-sm">
+                                    Dental Practice Owner
+                                </div>
+                            </div>
                         </div>
-                        <div className="bg-cyan-50 rounded-2xl shadow p-8 flex flex-col items-center text-center animate-fade-in">
-                            <Avatar name="John Doe" />
-                            <p className="text-gray-700 mt-4 mb-2">
-                                "I can access patient records from anywhere,
-                                even on my phone. Highly recommend for any
-                                dental practice."
-                            </p>
-                            <div className="flex items-center gap-1 text-yellow-400 mb-2">
+
+                        <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                                <Avatar name="Dr. Michael Chen" />
+                            </div>
+                            <div className="flex items-center gap-1 text-yellow-400 mb-4">
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                             </div>
-                            <span className="text-cyan-700 font-semibold">
-                                John Doe
-                            </span>
+                            <p className="text-gray-700 mb-6 text-lg leading-relaxed italic">
+                                "The cloud-based platform allows me to access
+                                patient records from anywhere. The security
+                                features give me peace of mind knowing our data
+                                is protected."
+                            </p>
+                            <div className="text-center">
+                                <div className="text-cyan-700 font-bold text-lg">
+                                    Dr. Michael Chen
+                                </div>
+                                <div className="text-gray-500 text-sm">
+                                    Orthodontist
+                                </div>
+                            </div>
                         </div>
-                        <div className="bg-orange-50 rounded-2xl shadow p-8 flex flex-col items-center text-center animate-fade-in">
-                            <Avatar name="Sarah Lee" />
-                            <p className="text-gray-700 mt-4 mb-2">
-                                "The support team is fantastic and the platform
-                                is so intuitive. My staff learned it in a day!"
-                            </p>
-                            <div className="flex items-center gap-1 text-yellow-400 mb-2">
+
+                        <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-100 hover:border-orange-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                                <Avatar name="Sarah Johnson" />
+                            </div>
+                            <div className="flex items-center gap-1 text-yellow-400 mb-4">
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                                 <Star className="w-5 h-5 fill-yellow-400" />
                             </div>
-                            <span className="text-blue-700 font-semibold">
-                                Sarah Lee
-                            </span>
+                            <p className="text-gray-700 mb-6 text-lg leading-relaxed italic">
+                                "The onboarding process was seamless, and the
+                                support team is incredibly responsive. Our staff
+                                was productive within the first week of
+                                implementation."
+                            </p>
+                            <div className="text-center">
+                                <div className="text-orange-700 font-bold text-lg">
+                                    Sarah Johnson
+                                </div>
+                                <div className="text-gray-500 text-sm">
+                                    Practice Manager
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Pricing Section */}
-            <div className="py-24 bg-white z-10 relative">
+            {/* Enhanced Pricing Section */}
+            <div className="py-24 bg-gradient-to-b from-gray-50 to-white z-10 relative">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
-                            Simple, Transparent Pricing
+                    <div className="text-center mb-20">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                            <DollarSign className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                                Flexible Pricing
+                            </span>
+                        </div>
+                        <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6">
+                            Choose the perfect{" "}
+                            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                                plan for your practice
+                            </span>
                         </h2>
-                        <p className="text-lg text-gray-500">
-                            Choose the plan that fits your clinic. No hidden
-                            fees, cancel anytime.
+                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                            Start with a free trial, then choose the plan that
+                            scales with your practice. No hidden fees, cancel
+                            anytime.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Basic Plan */}
-                        <div className="rounded-2xl border border-gray-200 shadow p-8 flex flex-col items-center text-center hover:shadow-xl transition animate-fade-in">
-                            <DollarSign className="w-10 h-10 text-blue-600 mb-4" />
-                            <h3 className="text-xl font-bold mb-2">Basic</h3>
-                            <p className="text-3xl font-extrabold text-gray-900 mb-2">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-blue-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                                <DollarSign className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-2 text-gray-900">
+                                Starter
+                            </h3>
+                            <p className="text-4xl font-extrabold text-gray-900 mb-2">
                                 $29{" "}
-                                <span className="text-base font-medium text-gray-500">
+                                <span className="text-lg font-medium text-gray-500">
                                     /mo
                                 </span>
                             </p>
-                            <ul className="text-gray-600 mb-6 space-y-2">
-                                <li>✔ Patient Management</li>
-                                <li>✔ Appointments</li>
-                                <li>✔ Email Support</li>
+                            <p className="text-gray-600 mb-6">
+                                Perfect for small practices
+                            </p>
+                            <ul className="text-gray-600 mb-8 space-y-3 text-left w-full">
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>Patient Management</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>Appointment Scheduling</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>Email Support</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>Basic Reporting</span>
+                                </li>
                             </ul>
-                            <button className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
-                                Choose Basic
+                            <button className="w-full px-8 py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Start Free Trial
                             </button>
                         </div>
+
                         {/* Premium Plan */}
-                        <div className="rounded-2xl border-4 border-blue-600 shadow-lg p-8 flex flex-col items-center text-center scale-105 bg-blue-50 animate-fade-in">
-                            <DollarSign className="w-10 h-10 text-blue-700 mb-4" />
-                            <h3 className="text-xl font-bold mb-2">Premium</h3>
-                            <p className="text-3xl font-extrabold text-gray-900 mb-2">
+                        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center scale-105 animate-fade-in relative border-4 border-blue-500">
+                            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                <span className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold">
+                                    MOST POPULAR
+                                </span>
+                            </div>
+                            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                                <DollarSign className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-2 text-white">
+                                Professional
+                            </h3>
+                            <p className="text-4xl font-extrabold text-white mb-2">
                                 $59{" "}
-                                <span className="text-base font-medium text-gray-500">
+                                <span className="text-lg font-medium text-blue-100">
                                     /mo
                                 </span>
                             </p>
-                            <ul className="text-gray-700 mb-6 space-y-2">
-                                <li>✔ Everything in Basic</li>
-                                <li>✔ Treatment Records</li>
-                                <li>✔ SMS Reminders</li>
-                                <li>✔ Priority Support</li>
+                            <p className="text-blue-100 mb-6">
+                                For growing practices
+                            </p>
+                            <ul className="text-blue-100 mb-8 space-y-3 text-left w-full">
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                    <span>Everything in Starter</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                    <span>Treatment Records</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                    <span>SMS Reminders</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                    <span>Priority Support</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                    <span>Advanced Analytics</span>
+                                </li>
                             </ul>
-                            <button className="px-6 py-2 rounded-lg bg-blue-700 text-white font-semibold hover:bg-blue-800 transition">
-                                Choose Premium
+                            <button className="w-full px-8 py-4 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                Start Free Trial
                             </button>
                         </div>
+
                         {/* Enterprise Plan */}
-                        <div className="rounded-2xl border border-gray-200 shadow p-8 flex flex-col items-center text-center hover:shadow-xl transition animate-fade-in">
-                            <DollarSign className="w-10 h-10 text-cyan-600 mb-4" />
-                            <h3 className="text-xl font-bold mb-2">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-cyan-200 hover:scale-105">
+                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                                <DollarSign className="w-8 h-8 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-2 text-gray-900">
                                 Enterprise
                             </h3>
-                            <p className="text-3xl font-extrabold text-gray-900 mb-2">
+                            <p className="text-4xl font-extrabold text-gray-900 mb-2">
                                 Custom
                             </p>
-                            <ul className="text-gray-600 mb-6 space-y-2">
-                                <li>✔ All Premium Features</li>
-                                <li>✔ Custom Integrations</li>
-                                <li>✔ Dedicated Account Manager</li>
+                            <p className="text-gray-600 mb-6">
+                                For large organizations
+                            </p>
+                            <ul className="text-gray-600 mb-8 space-y-3 text-left w-full">
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>All Professional Features</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>Custom Integrations</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>Dedicated Account Manager</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>White-label Solutions</span>
+                                </li>
                             </ul>
-                            <button className="px-6 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700 transition">
+                            <button className="w-full px-8 py-4 rounded-xl bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                                 Contact Sales
                             </button>
                         </div>
@@ -469,25 +775,70 @@ export default function Landing() {
                 </div>
             </div>
 
-            {/* CTA Section */}
+            {/* Enhanced Final CTA Section */}
             <div
                 id="clinics"
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 z-10 relative"
+                className="bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 z-10 relative overflow-hidden"
             >
-                <div className="max-w-2xl mx-auto text-center py-20 px-4 sm:py-24 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-extrabold text-white sm:text-4xl mb-4">
-                        Ready to find your dental clinic?
+                {/* Background decorative elements */}
+                <div className="absolute top-0 left-0 w-full h-full">
+                    <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-10 right-10 w-40 h-40 bg-cyan-400/20 rounded-full blur-3xl"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl"></div>
+                </div>
+
+                <div className="max-w-4xl mx-auto text-center py-24 px-4 sm:py-32 sm:px-6 lg:px-8 relative z-10">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
+                        <Sparkles className="w-4 h-4 text-white" />
+                        <span className="text-sm text-white font-semibold tracking-wide">
+                            Join 500+ Clinics
+                        </span>
+                    </div>
+                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6">
+                        Ready to transform your{" "}
+                        <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                            dental practice?
+                        </span>
                     </h2>
-                    <p className="mb-8 text-lg leading-6 text-blue-100">
-                        Browse our network of professional dental clinics and
-                        find the perfect match for your needs.
+                    <p className="mb-12 text-xl leading-8 text-blue-100 max-w-3xl mx-auto">
+                        Join hundreds of dental professionals who have already
+                        modernized their practice with Smile Suite. Start your
+                        free trial today and see the difference.
                     </p>
-                    <Link
-                        href={route("public.clinics.index")}
-                        className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-semibold rounded-lg text-blue-700 bg-white hover:bg-blue-50 shadow-lg transition-all duration-150"
-                    >
-                        Browse Clinics
-                    </Link>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <Link
+                            href={route("register.clinic")}
+                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                        >
+                            Start Free Trial
+                            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                        </Link>
+                        <Link
+                            href={route("public.clinics.index")}
+                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white/30 text-lg font-bold rounded-xl text-white bg-transparent hover:bg-white/10 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 focus:ring-offset-2 group transform hover:scale-105"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                        >
+                            Browse Clinics
+                            <Globe className="ml-2 w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                        </Link>
+                    </div>
+                    <div className="mt-12 flex items-center justify-center gap-8 text-blue-100">
+                        <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-300" />
+                            <span className="text-sm">
+                                No credit card required
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-300" />
+                            <span className="text-sm">14-day free trial</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <CheckCircle className="w-5 h-5 text-green-300" />
+                            <span className="text-sm">Cancel anytime</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

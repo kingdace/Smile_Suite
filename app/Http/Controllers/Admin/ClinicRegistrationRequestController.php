@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ClinicRegistrationRequest;
 use App\Mail\ClinicRegistrationApproved;
+use App\Mail\ClinicRegistrationRejected;
 use App\Mail\PaymentConfirmed;
+use App\Mail\PaymentFailed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -46,7 +48,7 @@ class ClinicRegistrationRequestController extends Controller
             });
         }
 
-        $requests = $query->latest()->paginate(10)->withQueryString();
+        $requests = $query->latest()->paginate(5)->withQueryString();
 
         return Inertia::render('Admin/ClinicRegistrationRequests/Index', [
             'requests' => $requests,
@@ -62,6 +64,9 @@ class ClinicRegistrationRequestController extends Controller
         if (Auth::user()->role !== 'admin') {
             return redirect()->route('dashboard');
         }
+
+        // Load the clinic relationship to ensure address data is available
+        $registrationRequest->load('clinic');
 
         return Inertia::render('Admin/ClinicRegistrationRequests/Show', [
             'request' => $registrationRequest,
@@ -148,17 +153,26 @@ class ClinicRegistrationRequestController extends Controller
             'new_status' => $newPaymentStatus
         ]);
 
-        // If payment status changed to 'paid', send setup email
-        if ($oldPaymentStatus !== 'paid' && $newPaymentStatus === 'paid') {
+        // Handle email notifications based on payment status change
+        if ($oldPaymentStatus !== $newPaymentStatus) {
             try {
-                Mail::to($registrationRequest->email)->send(new PaymentConfirmed($registrationRequest));
-                Log::info('Payment confirmation email sent to: ' . $registrationRequest->email);
-                Log::info('Setup link: ' . route('clinic.setup', ['token' => $registrationRequest->approval_token]));
-
-                return back()->with('success', 'Payment confirmed! Setup email sent to ' . $registrationRequest->email);
+                if ($newPaymentStatus === 'paid') {
+                    // Payment confirmed - send setup email
+                    Mail::to($registrationRequest->email)->send(new PaymentConfirmed($registrationRequest));
+                    Log::info('Payment confirmation email sent to: ' . $registrationRequest->email);
+                    Log::info('Setup link: ' . route('clinic.setup', ['token' => $registrationRequest->approval_token]));
+                    
+                    return back()->with('success', 'Payment confirmed! Setup email sent to ' . $registrationRequest->email);
+                } elseif ($newPaymentStatus === 'failed') {
+                    // Payment failed - send failure notification
+                    Mail::to($registrationRequest->email)->send(new PaymentFailed($registrationRequest));
+                    Log::info('Payment failed email sent to: ' . $registrationRequest->email);
+                    
+                    return back()->with('success', 'Payment status updated to failed. Notification email sent to ' . $registrationRequest->email);
+                }
             } catch (\Exception $e) {
-                Log::error('Failed to send payment confirmation email: ' . $e->getMessage());
-                return back()->with('error', 'Payment status updated but failed to send setup email.');
+                Log::error('Failed to send payment status email: ' . $e->getMessage());
+                return back()->with('error', 'Payment status updated but failed to send notification email.');
             }
         }
 
@@ -167,10 +181,11 @@ class ClinicRegistrationRequestController extends Controller
 
     private function sendRejectionEmail(ClinicRegistrationRequest $request)
     {
-        // This would send a rejection email
-        Log::info('Rejection email would be sent to: ' . $request->email);
-
-        // In production, you would use:
-        // Mail::to($request->email)->send(new ClinicRejectionMail($request));
+        try {
+            Mail::to($request->email)->send(new ClinicRegistrationRejected($request));
+            Log::info('Rejection email sent to: ' . $request->email);
+        } catch (\Exception $e) {
+            Log::error('Failed to send rejection email: ' . $e->getMessage());
+        }
     }
 }

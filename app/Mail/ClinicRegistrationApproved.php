@@ -43,14 +43,4 @@ class ClinicRegistrationApproved extends Mailable
             view: 'emails.clinic-registration-approved',
         );
     }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
-    }
 }

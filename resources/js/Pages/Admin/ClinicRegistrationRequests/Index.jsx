@@ -29,6 +29,12 @@ import {
     DollarSign,
     ClipboardList,
     Inbox,
+    Filter,
+    RotateCcw,
+    AlertTriangle,
+    TrendingUp,
+    Users,
+    Building2,
 } from "lucide-react";
 import { Tooltip } from "@/Components/ui/tooltip";
 
@@ -42,6 +48,7 @@ export default function Index({ auth, requests, filters }) {
     const handleFilter = () => {
         const params = {
             search,
+            page: 1, // Reset to first page when filtering
         };
 
         if (status !== "all") {
@@ -64,7 +71,7 @@ export default function Index({ auth, requests, filters }) {
         setPaymentStatus("all");
         router.get(
             route("admin.clinic-requests.index"),
-            {},
+            { page: 1 }, // Reset to first page when clearing filters
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -74,12 +81,18 @@ export default function Index({ auth, requests, filters }) {
 
     const getStatusBadge = (status) => {
         const variants = {
-            pending: "bg-yellow-100 text-yellow-800",
-            approved: "bg-green-100 text-green-800",
-            rejected: "bg-red-100 text-red-800",
+            pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+            approved: "bg-green-100 text-green-700 border-green-200",
+            rejected: "bg-red-100 text-red-700 border-red-200",
+            completed: "bg-emerald-100 text-emerald-700 border-emerald-200",
         };
         return (
-            <Badge className={variants[status] || "bg-gray-100 text-gray-800"}>
+            <Badge
+                className={`${
+                    variants[status] ||
+                    "bg-gray-100 text-gray-700 border-gray-200"
+                } text-xs font-medium px-2 py-1`}
+            >
                 {status}
             </Badge>
         );
@@ -87,78 +100,225 @@ export default function Index({ auth, requests, filters }) {
 
     const getPaymentStatusBadge = (status) => {
         const variants = {
-            pending: "bg-yellow-100 text-yellow-800",
-            paid: "bg-green-100 text-green-800",
-            failed: "bg-red-100 text-red-800",
+            pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+            paid: "bg-green-100 text-green-700 border-green-200",
+            failed: "bg-red-100 text-red-700 border-red-200",
         };
         return (
-            <Badge className={variants[status] || "bg-gray-100 text-gray-800"}>
+            <Badge
+                className={`${
+                    variants[status] ||
+                    "bg-gray-100 text-gray-700 border-gray-200"
+                } text-xs font-medium px-2 py-1`}
+            >
                 {status}
             </Badge>
         );
     };
 
     const formatDate = (date) => {
-        return new Date(date).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
+        const d = new Date(date);
+        const month = d.toLocaleDateString("en-US", { month: "short" });
+        const day = d.getDate();
+        const year = d.getFullYear();
+        const time = d.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
+            hour12: true,
         });
+        return `${month} ${day}, ${year} ${time}`;
     };
+
+    // Calculate statistics
+    const stats = [
+        {
+            label: "Total Requests",
+            value: requests.total,
+            icon: Inbox,
+            color: "text-blue-600",
+            bgColor: "bg-blue-50",
+        },
+        {
+            label: "Pending Review",
+            value: requests.data.filter((r) => r.status === "pending").length,
+            icon: Clock,
+            color: "text-yellow-600",
+            bgColor: "bg-yellow-50",
+        },
+        {
+            label: "Approved",
+            value: requests.data.filter((r) => r.status === "approved").length,
+            icon: CheckCircle,
+            color: "text-green-600",
+            bgColor: "bg-green-50",
+        },
+        {
+            label: "Completed Setup",
+            value: requests.data.filter((r) => r.status === "completed").length,
+            icon: Building2,
+            color: "text-emerald-600",
+            bgColor: "bg-emerald-50",
+        },
+    ];
 
     return (
         <AuthenticatedLayout auth={auth}>
             <Head title="Clinic Registration Requests" />
-            <div className="py-12 min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    {/* Section Header */}
-                    <div className="flex items-center gap-3 mb-8">
-                        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 border-2 border-blue-300 shadow-sm">
-                            <ClipboardList className="w-7 h-7 text-blue-500" />
-                        </span>
-                        <span className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                            Clinic Registration Requests
-                        </span>
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
+                    {/* Header */}
+                    <div className="bg-white/90 backdrop-blur-sm overflow-hidden shadow-xl sm:rounded-2xl border border-blue-200/50 mb-8">
+                        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600 px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                                        <ClipboardList className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-xl font-bold text-white">
+                                            Clinic Registration Requests
+                                        </h1>
+                                        <p className="text-blue-100 text-sm">
+                                            Manage and review new clinic
+                                            applications
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() => window.history.back()}
+                                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all duration-300 text-sm font-medium"
+                                    >
+                                        <RotateCcw className="w-4 h-4" />
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Statistics */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        {stats.map((stat, index) => (
+                            <div
+                                key={index}
+                                className="bg-white/95 backdrop-blur-sm rounded-xl p-4 text-center shadow-lg border border-gray-200/50 hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden relative"
+                            >
+                                {/* Background gradient overlay */}
+                                <div
+                                    className={`absolute inset-0 bg-gradient-to-br ${stat.bgColor} opacity-10`}
+                                ></div>
+
+                                {/* Icon with enhanced styling */}
+                                <div className="relative z-10 mb-3">
+                                    <div
+                                        className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mx-auto shadow-md border border-white/50`}
+                                    >
+                                        <stat.icon
+                                            className={`w-5 h-5 ${stat.color}`}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="relative z-10">
+                                    <div className="text-2xl font-bold text-gray-900 mb-1">
+                                        {stat.value}
+                                    </div>
+                                    <div className="text-xs font-medium text-gray-600">
+                                        {stat.label}
+                                    </div>
+                                </div>
+
+                                {/* Decorative corner accent */}
+                                <div
+                                    className={`absolute top-0 right-0 w-12 h-12 ${stat.bgColor} opacity-20 rounded-bl-full`}
+                                ></div>
+                            </div>
+                        ))}
+                    </div>
+
                     {/* Notification Banner for Pending Requests */}
                     {requests.data.some(
                         (request) => request.status === "pending"
                     ) && (
-                        <div className="mb-6 flex items-center gap-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl p-4 shadow-sm">
-                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100">
-                                <Clock className="h-5 w-5 text-yellow-500" />
-                            </span>
-                            <div>
-                                <h3 className="text-sm font-semibold text-yellow-900 flex items-center gap-1">
-                                    Pending Requests Require Attention
-                                </h3>
-                                <p className="text-sm text-yellow-800">
-                                    You have{" "}
-                                    {
-                                        requests.data.filter(
-                                            (r) => r.status === "pending"
-                                        ).length
-                                    }{" "}
-                                    pending clinic registration request(s) that
-                                    need review and approval.
-                                </p>
+                        <div className="mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-4 shadow-md">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-semibold text-yellow-900">
+                                        Pending Requests Require Attention
+                                    </h3>
+                                    <p className="text-sm text-yellow-800">
+                                        You have{" "}
+                                        <span className="font-bold">
+                                            {
+                                                requests.data.filter(
+                                                    (r) =>
+                                                        r.status === "pending"
+                                                ).length
+                                            }
+                                        </span>{" "}
+                                        pending clinic registration request(s)
+                                        that need review and approval.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     )}
-                    {/* Filters Card */}
-                    <Card className="mb-6 shadow-lg rounded-2xl border-l-4 border-blue-200 border-t border-r border-b border-gray-100 bg-white">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-gray-900 font-bold">
-                                <Search className="h-5 w-5 text-blue-400" />
-                                Filters
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div className="flex items-center gap-2">
-                                    <Search className="h-4 w-4 text-gray-300" />
+
+                    {/* Celebration Banner for Completed Setups */}
+                    {requests.data.some(
+                        (request) => request.status === "completed"
+                    ) && (
+                        <div className="mb-6 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4 shadow-md">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                                    <span className="text-2xl">🎉</span>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-semibold text-emerald-900">
+                                        Successful Clinic Setups!
+                                    </h3>
+                                    <p className="text-sm text-emerald-800">
+                                        Congratulations!{" "}
+                                        <span className="font-bold">
+                                            {
+                                                requests.data.filter(
+                                                    (r) =>
+                                                        r.status === "completed"
+                                                ).length
+                                            }
+                                        </span>{" "}
+                                        clinic(s) have successfully completed
+                                        their setup and are now live on Smile
+                                        Suite.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Filters */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md border border-blue-200/50 p-6 mb-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center">
+                                <Filter className="w-4 h-4 text-white" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800">
+                                Search & Filters
+                            </h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">
+                                    Search
+                                </label>
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                     <Input
                                         placeholder="Search clinics, contacts, or emails..."
                                         value={search}
@@ -168,126 +328,146 @@ export default function Index({ auth, requests, filters }) {
                                         onKeyPress={(e) =>
                                             e.key === "Enter" && handleFilter()
                                         }
-                                        className="w-full border-gray-200 focus:border-blue-300 focus:ring-blue-200 rounded-md shadow-sm text-gray-900 transition-all duration-150"
+                                        className="pl-10 w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition-all duration-300 text-sm"
                                     />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <ClipboardList className="h-4 w-4 text-gray-300" />
-                                    <Select
-                                        value={status}
-                                        onValueChange={setStatus}
-                                    >
-                                        <SelectTrigger className="w-full border-gray-200 focus:border-blue-300 focus:ring-blue-200 rounded-md text-gray-900 transition-all duration-150">
-                                            <SelectValue placeholder="All Statuses" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">
-                                                All Statuses
-                                            </SelectItem>
-                                            <SelectItem value="pending">
-                                                Pending
-                                            </SelectItem>
-                                            <SelectItem value="approved">
-                                                Approved
-                                            </SelectItem>
-                                            <SelectItem value="rejected">
-                                                Rejected
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <DollarSign className="h-4 w-4 text-gray-300" />
-                                    <Select
-                                        value={paymentStatus}
-                                        onValueChange={setPaymentStatus}
-                                    >
-                                        <SelectTrigger className="w-full border-gray-200 focus:border-blue-300 focus:ring-blue-200 rounded-md text-gray-900 transition-all duration-150">
-                                            <SelectValue placeholder="All Payment Statuses" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">
-                                                All Payment Statuses
-                                            </SelectItem>
-                                            <SelectItem value="pending">
-                                                Pending
-                                            </SelectItem>
-                                            <SelectItem value="paid">
-                                                Paid
-                                            </SelectItem>
-                                            <SelectItem value="failed">
-                                                Failed
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">
+                                    Status
+                                </label>
+                                <Select
+                                    value={status}
+                                    onValueChange={setStatus}
+                                >
+                                    <SelectTrigger className="w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition-all duration-300 text-sm">
+                                        <SelectValue placeholder="All Statuses" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All Statuses
+                                        </SelectItem>
+                                        <SelectItem value="pending">
+                                            Pending
+                                        </SelectItem>
+                                        <SelectItem value="approved">
+                                            Approved
+                                        </SelectItem>
+                                        <SelectItem value="completed">
+                                            Completed Setup
+                                        </SelectItem>
+                                        <SelectItem value="rejected">
+                                            Rejected
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">
+                                    Payment Status
+                                </label>
+                                <Select
+                                    value={paymentStatus}
+                                    onValueChange={setPaymentStatus}
+                                >
+                                    <SelectTrigger className="w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 transition-all duration-300 text-sm">
+                                        <SelectValue placeholder="All Payment Statuses" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All Payment Statuses
+                                        </SelectItem>
+                                        <SelectItem value="pending">
+                                            Pending
+                                        </SelectItem>
+                                        <SelectItem value="paid">
+                                            Paid
+                                        </SelectItem>
+                                        <SelectItem value="failed">
+                                            Failed
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">
+                                    Actions
+                                </label>
                                 <div className="flex gap-2">
                                     <Button
                                         onClick={handleFilter}
-                                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow rounded-md"
+                                        className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                                     >
                                         Apply Filters
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={clearFilters}
-                                        className="border-gray-200 text-gray-700 font-semibold rounded-md"
+                                        className="border-blue-200 text-blue-700 hover:bg-blue-50 font-semibold transition-all duration-300"
                                     >
                                         Clear
                                     </Button>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
-                    {/* Divider between filters and table */}
-                    <div className="h-px bg-gray-100 mb-6" />
-                    {/* Requests Table Card */}
-                    <Card className="rounded-2xl border-l-4 border-blue-200 border-t border-r border-b border-gray-100 bg-white shadow-md">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <Inbox className="h-5 w-5 text-blue-400" />
-                                Registration Requests ({requests.total})
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                        </div>
+                    </div>
+
+                    {/* Requests Table */}
+                    <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md border border-blue-200/50 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-blue-100">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center">
+                                    <Inbox className="w-4 h-4 text-white" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-800">
+                                    Registration Requests ({requests.total})
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div className="p-6">
                             {requests.data.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-16 text-gray-400 text-base gap-4">
-                                    <Inbox className="w-12 h-12 text-gray-200" />
-                                    <span>
-                                        No clinic registration requests found.
-                                    </span>
-                                    <span className="text-sm text-gray-400">
-                                        New clinics will appear here for your
+                                <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                        <Inbox className="w-8 h-8 text-gray-300" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-gray-500 mb-2">
+                                        No Requests Found
+                                    </h3>
+                                    <p className="text-sm text-gray-400 text-center max-w-md">
+                                        No clinic registration requests match
+                                        your current filters. New clinic
+                                        applications will appear here for
                                         review.
-                                    </span>
+                                    </p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <Table className="min-w-full">
                                         <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                            <TableRow className="bg-blue-50/50">
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/4">
                                                     Clinic Name
                                                 </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                                    Contact Person
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/6">
+                                                    Contact
                                                 </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/5">
                                                     Email
                                                 </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/12">
                                                     Plan
                                                 </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/12">
                                                     Payment
                                                 </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/12">
                                                     Status
                                                 </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                                    Submitted
-                                                </TableHead>
-                                                <TableHead className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                <TableHead className="text-xs font-bold text-gray-700 uppercase tracking-wider px-5 py-3.5 w-1/8">
                                                     Actions
                                                 </TableHead>
                                             </TableRow>
@@ -297,106 +477,89 @@ export default function Index({ auth, requests, filters }) {
                                                 (request, idx) => (
                                                     <TableRow
                                                         key={request.id}
-                                                        className={`transition-colors duration-150 ${
+                                                        className={`transition-all duration-200 hover:bg-blue-50/30 ${
                                                             idx % 2 === 0
                                                                 ? "bg-white"
-                                                                : "bg-gray-50"
-                                                        } hover:bg-blue-50/60`}
+                                                                : "bg-gray-50/50"
+                                                        }`}
                                                     >
-                                                        <TableCell className="font-medium text-gray-900">
-                                                            {
-                                                                request.clinic_name
-                                                            }
+                                                        <TableCell className="px-5 py-3.5">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="flex-shrink-0">
+                                                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+                                                                        <Building2 className="w-4 h-4 text-white" />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <span className="font-semibold text-gray-900 truncate">
+                                                                            {
+                                                                                request.clinic_name
+                                                                            }
+                                                                        </span>
+                                                                        {request.status ===
+                                                                            "completed" && (
+                                                                            <span className="flex-shrink-0 text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md font-medium">
+                                                                                Live
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                                        <span className="flex-shrink-0">
+                                                                            ID:{" "}
+                                                                            {
+                                                                                request.id
+                                                                            }
+                                                                        </span>
+                                                                        {request.status ===
+                                                                            "completed" && (
+                                                                            <span className="flex-shrink-0 text-emerald-600 font-medium flex items-center gap-1">
+                                                                                <span className="text-xs">
+                                                                                    ✓
+                                                                                </span>
+                                                                                Complete
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </TableCell>
-                                                        <TableCell className="text-gray-900">
-                                                            {
-                                                                request.contact_person
-                                                            }
+                                                        <TableCell className="px-5 py-3.5">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                                                    <Users className="w-3 h-3 text-blue-600" />
+                                                                </div>
+                                                                <span className="text-gray-900 font-medium truncate">
+                                                                    {
+                                                                        request.contact_person
+                                                                    }
+                                                                </span>
+                                                            </div>
                                                         </TableCell>
-                                                        <TableCell className="text-gray-900">
-                                                            {request.email}
+                                                        <TableCell className="px-5 py-3.5">
+                                                            <span className="text-gray-700 text-sm truncate block">
+                                                                {request.email}
+                                                            </span>
                                                         </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant="outline"
-                                                                className="capitalize bg-gray-100 text-gray-800 border-none flex items-center gap-1 px-2 py-1"
-                                                            >
-                                                                <DollarSign className="w-4 h-4 text-blue-400" />
+                                                        <TableCell className="px-5 py-3.5">
+                                                            <Badge className="bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 border border-blue-200 text-xs font-medium px-3 py-1 flex items-center gap-1 w-fit">
+                                                                <DollarSign className="w-3 h-3" />
                                                                 {
                                                                     request.subscription_plan
                                                                 }
                                                             </Badge>
                                                         </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant="outline"
-                                                                className={`rounded-full px-3 py-1 font-semibold text-xs border-none flex items-center gap-1 ${
-                                                                    request.payment_status ===
-                                                                    "paid"
-                                                                        ? "bg-green-100 text-green-700"
-                                                                        : request.payment_status ===
-                                                                          "pending"
-                                                                        ? "bg-yellow-100 text-yellow-700"
-                                                                        : request.payment_status ===
-                                                                          "failed"
-                                                                        ? "bg-red-100 text-red-700"
-                                                                        : "bg-gray-100 text-gray-800"
-                                                                }`}
-                                                            >
-                                                                {request.payment_status ===
-                                                                    "paid" && (
-                                                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                                                )}
-                                                                {request.payment_status ===
-                                                                    "pending" && (
-                                                                    <Clock className="w-4 h-4 text-yellow-500" />
-                                                                )}
-                                                                {request.payment_status ===
-                                                                    "failed" && (
-                                                                    <XCircle className="w-4 h-4 text-red-500" />
-                                                                )}
-                                                                {
-                                                                    request.payment_status
-                                                                }
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant="outline"
-                                                                className={`rounded-full px-3 py-1 font-semibold text-xs border-none flex items-center gap-1 ${
-                                                                    request.status ===
-                                                                    "approved"
-                                                                        ? "bg-green-100 text-green-700"
-                                                                        : request.status ===
-                                                                          "pending"
-                                                                        ? "bg-yellow-100 text-yellow-700"
-                                                                        : request.status ===
-                                                                          "rejected"
-                                                                        ? "bg-red-100 text-red-700"
-                                                                        : "bg-gray-100 text-gray-800"
-                                                                }`}
-                                                            >
-                                                                {request.status ===
-                                                                    "approved" && (
-                                                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                                                )}
-                                                                {request.status ===
-                                                                    "pending" && (
-                                                                    <Clock className="w-4 h-4 text-yellow-500" />
-                                                                )}
-                                                                {request.status ===
-                                                                    "rejected" && (
-                                                                    <XCircle className="w-4 h-4 text-red-500" />
-                                                                )}
-                                                                {request.status}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="text-gray-900">
-                                                            {formatDate(
-                                                                request.created_at
+                                                        <TableCell className="px-5 py-3.5">
+                                                            {getPaymentStatusBadge(
+                                                                request.payment_status
                                                             )}
                                                         </TableCell>
-                                                        <TableCell>
+                                                        <TableCell className="px-5 py-3.5">
+                                                            {getStatusBadge(
+                                                                request.status
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="px-5 py-3.5">
                                                             {route(
                                                                 "admin.clinic-requests.show",
                                                                 request.id
@@ -412,9 +575,9 @@ export default function Index({ auth, requests, filters }) {
                                                                         <Button
                                                                             variant="outline"
                                                                             size="sm"
-                                                                            className="border-blue-200 text-blue-700 font-semibold rounded-full px-4 py-1 flex items-center gap-1 hover:bg-blue-50"
+                                                                            className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white border-0 font-semibold rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-md transition-all duration-300"
                                                                         >
-                                                                            <Eye className="h-4 w-4 text-blue-400" />
+                                                                            <Eye className="h-4 w-4" />
                                                                             View
                                                                         </Button>
                                                                     </Tooltip>
@@ -424,9 +587,9 @@ export default function Index({ auth, requests, filters }) {
                                                                     variant="outline"
                                                                     size="sm"
                                                                     disabled
-                                                                    className="border-gray-200 text-gray-400 font-semibold rounded-full px-4 py-1 flex items-center gap-1"
+                                                                    className="border-gray-200 text-gray-400 font-semibold rounded-lg px-4 py-2 flex items-center gap-2"
                                                                 >
-                                                                    <Eye className="h-4 w-4 text-gray-300" />
+                                                                    <Eye className="h-4 w-4" />
                                                                     View
                                                                 </Button>
                                                             )}
@@ -438,10 +601,46 @@ export default function Index({ auth, requests, filters }) {
                                     </Table>
                                 </div>
                             )}
-                            {/* Divider above pagination */}
-                            <div className="h-px bg-gray-100 mt-8 mb-4" />
-                            {/* Pagination */}
-                            {requests.links && requests.links.length > 3 && (
+                        </div>
+
+                        {/* Pagination */}
+                        {requests.links && requests.links.length > 3 && (
+                            <div className="px-6 py-4 border-t border-blue-100">
+                                {/* Page Info */}
+                                <div className="flex justify-between items-center mb-4">
+                                    <div className="text-sm text-gray-600">
+                                        Showing{" "}
+                                        <span className="font-semibold">
+                                            {(requests.current_page - 1) *
+                                                requests.per_page +
+                                                1}
+                                        </span>{" "}
+                                        to{" "}
+                                        <span className="font-semibold">
+                                            {Math.min(
+                                                requests.current_page *
+                                                    requests.per_page,
+                                                requests.total
+                                            )}
+                                        </span>{" "}
+                                        of{" "}
+                                        <span className="font-semibold">
+                                            {requests.total}
+                                        </span>{" "}
+                                        requests
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                        Page{" "}
+                                        <span className="font-semibold">
+                                            {requests.current_page}
+                                        </span>{" "}
+                                        of{" "}
+                                        <span className="font-semibold">
+                                            {requests.last_page}
+                                        </span>
+                                    </div>
+                                </div>
+
                                 <div className="flex justify-center">
                                     <nav className="flex items-center space-x-2">
                                         {requests.links.map((link, index) =>
@@ -449,19 +648,21 @@ export default function Index({ auth, requests, filters }) {
                                                 <Link
                                                     key={index}
                                                     href={link.url}
-                                                    className={`px-3 py-2 text-sm rounded-full border transition-colors duration-150 font-semibold shadow-sm ${
+                                                    className={`px-4 py-2 text-sm rounded-lg border transition-all duration-300 font-semibold shadow-sm ${
                                                         link.active
-                                                            ? "bg-blue-600 text-white border-blue-600"
-                                                            : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
+                                                            ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-blue-600 shadow-md"
+                                                            : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50 hover:shadow-md"
                                                     }`}
                                                     dangerouslySetInnerHTML={{
                                                         __html: link.label,
                                                     }}
+                                                    preserveState
+                                                    preserveScroll
                                                 />
                                             ) : (
                                                 <span
                                                     key={index}
-                                                    className="px-3 py-2 text-sm rounded-full opacity-50 cursor-not-allowed border border-gray-200"
+                                                    className="px-4 py-2 text-sm rounded-lg opacity-50 cursor-not-allowed border border-gray-200"
                                                     dangerouslySetInnerHTML={{
                                                         __html: link.label,
                                                     }}
@@ -470,9 +671,9 @@ export default function Index({ auth, requests, filters }) {
                                         )}
                                     </nav>
                                 </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

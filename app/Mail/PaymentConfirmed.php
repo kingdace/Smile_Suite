@@ -43,14 +43,4 @@ class PaymentConfirmed extends Mailable
             view: 'emails.payment-confirmed',
         );
     }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
-    }
 }

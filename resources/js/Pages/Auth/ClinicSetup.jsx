@@ -10,6 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
+import { CheckCircle, Building2, User, MapPin, Info } from "lucide-react";
 import axios from "axios";
 
 const DAYS_OF_WEEK = [
@@ -225,95 +226,209 @@ export default function ClinicSetup({ request, token }) {
     return (
         <>
             <Head title="Complete Clinic Setup" />
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-2xl w-full space-y-8">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-50 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                {/* Enhanced background decorative elements */}
+                <div className="absolute top-0 left-0 w-full h-full">
+                    {/* Main gradient circles */}
+                    <div
+                        className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full opacity-40 mix-blend-multiply transform rotate-45 animate-pulse shadow-lg"
+                        style={{
+                            animationDuration: "3s",
+                            animationDelay: "0s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full opacity-40 mix-blend-multiply transform -rotate-30 animate-bounce shadow-xl"
+                        style={{
+                            animationDuration: "2.5s",
+                            animationDelay: "0.5s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-500 rounded-full opacity-30 mix-blend-multiply animate-pulse shadow-2xl"
+                        style={{
+                            animationDuration: "4s",
+                            animationDelay: "1s",
+                        }}
+                    ></div>
+
+                    {/* Colorful accent circles */}
+                    <div
+                        className="absolute top-20 right-20 w-24 h-24 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-full opacity-50 mix-blend-multiply animate-bounce shadow-lg"
+                        style={{
+                            animationDuration: "2s",
+                            animationDelay: "0.3s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute bottom-20 left-20 w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full opacity-50 mix-blend-multiply animate-pulse shadow-lg"
+                        style={{
+                            animationDuration: "3.5s",
+                            animationDelay: "0.8s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute top-1/3 right-1/3 w-16 h-16 bg-gradient-to-br from-blue-700 to-indigo-800 rounded-full opacity-40 mix-blend-multiply animate-ping shadow-md"
+                        style={{
+                            animationDuration: "1.5s",
+                            animationDelay: "0.2s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute top-1/4 left-1/4 w-20 h-20 bg-gradient-to-br from-cyan-400 to-teal-500 rounded-full opacity-35 mix-blend-multiply animate-bounce shadow-lg"
+                        style={{
+                            animationDuration: "2.8s",
+                            animationDelay: "0.6s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute bottom-1/4 right-1/4 w-28 h-28 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 rounded-full opacity-45 mix-blend-multiply animate-pulse shadow-xl"
+                        style={{
+                            animationDuration: "3.2s",
+                            animationDelay: "0.4s",
+                        }}
+                    ></div>
+
+                    {/* Additional colorful elements */}
+                    <div
+                        className="absolute top-1/6 left-1/6 w-12 h-12 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full opacity-30 mix-blend-multiply animate-ping shadow-md"
+                        style={{
+                            animationDuration: "1.8s",
+                            animationDelay: "0.7s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute bottom-1/6 left-1/3 w-16 h-16 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-35 mix-blend-multiply animate-bounce shadow-lg"
+                        style={{
+                            animationDuration: "2.2s",
+                            animationDelay: "0.9s",
+                        }}
+                    ></div>
+                    <div
+                        className="absolute top-2/3 right-1/6 w-14 h-14 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full opacity-40 mix-blend-multiply animate-pulse shadow-md"
+                        style={{
+                            animationDuration: "2.7s",
+                            animationDelay: "0.1s",
+                        }}
+                    ></div>
+                </div>
+
+                <div className="max-w-4xl w-full space-y-6 relative z-10">
+                    {/* Header */}
                     <div className="text-center">
                         <Link href="/" className="inline-block">
-                            <h1 className="text-3xl font-bold text-blue-600">
-                                Smile Suite
-                            </h1>
+                            <div className="flex items-center justify-center gap-3 mb-4">
+                                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <img
+                                        src="/images/smile-suite-logo.png"
+                                        alt="Smile Suite Logo"
+                                        className="w-10 h-10 object-contain"
+                                    />
+                                </div>
+                                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                                    Smile Suite
+                                </h1>
+                            </div>
                         </Link>
-                        <h2 className="mt-6 text-3xl font-bold text-gray-900">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
                             Complete Your Clinic Setup
                         </h2>
-                        <p className="mt-2 text-lg text-gray-600">
+                        <p className="text-gray-600">
                             Congratulations! Your clinic registration has been
                             approved.
                         </p>
                     </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Clinic Information</CardTitle>
-                            <CardDescription>
-                                Your clinic "{request.clinic_name}" has been
-                                approved. Please complete the setup below.
-                            </CardDescription>
+                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                        <CardHeader className="pb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+                                    <Building2 className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-xl text-gray-900">
+                                        Clinic Information
+                                    </CardTitle>
+                                    <CardDescription className="text-gray-600">
+                                        Your clinic{" "}
+                                        <strong>"{request.clinic_name}"</strong>{" "}
+                                        has been approved. Please complete the
+                                        setup below.
+                                    </CardDescription>
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                                <div className="flex">
-                                    <div className="flex-shrink-0">
-                                        <svg
-                                            className="h-5 w-5 text-green-400"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                        <CardContent className="space-y-6">
+                            {/* Approval Status */}
+                            <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center">
+                                        <CheckCircle className="w-4 h-4 text-white" />
                                     </div>
-                                    <div className="ml-3">
-                                        <h3 className="text-sm font-medium text-green-800">
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-emerald-800">
                                             Approved for{" "}
                                             {request.subscription_plan_name}{" "}
                                             Plan
                                         </h3>
-                                        <div className="mt-2 text-sm text-green-700">
-                                            <p>
-                                                Monthly subscription: $
-                                                {request.subscription_amount}
-                                            </p>
-                                        </div>
+                                        <p className="text-sm text-emerald-700">
+                                            Monthly subscription:{" "}
+                                            <strong>
+                                                ${request.subscription_amount}
+                                            </strong>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
                             {setupCompleted ? (
-                                <div className="text-center bg-white rounded-lg shadow-lg p-8">
-                                    <h2 className="text-2xl font-bold text-green-600 mb-4">
+                                <div className="text-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-8 border border-green-200">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <CheckCircle className="w-8 h-8 text-white" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-green-700 mb-3">
                                         Clinic Setup Complete!
                                     </h2>
-                                    <p className="mb-6">
+                                    <p className="text-gray-700 mb-6">
                                         Your clinic has been successfully
                                         registered. You may now log in to your
                                         account.
                                     </p>
-                                    <Link
-                                        href="/login"
-                                        className="btn btn-primary block w-full mb-2"
-                                    >
-                                        Go to Login
-                                    </Link>
-                                    <Link
-                                        href="/"
-                                        className="text-sm text-gray-600 hover:text-gray-900"
-                                    >
-                                        Back to Home
-                                    </Link>
+                                    <div className="space-y-3">
+                                        <Link
+                                            href="/login"
+                                            className="inline-block bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-200"
+                                        >
+                                            Go to Login
+                                        </Link>
+                                        <br />
+                                        <Link
+                                            href="/"
+                                            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                                        >
+                                            Back to Home
+                                        </Link>
+                                    </div>
                                 </div>
                             ) : (
                                 <form onSubmit={submit} className="space-y-6">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                            Admin Account Details
-                                        </h3>
-                                        <div className="space-y-4">
+                                    {/* Admin Account Section */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                                <User className="w-4 h-4 text-white" />
+                                            </div>
+                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                Admin Account Details
+                                            </h3>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <Label htmlFor="name">
+                                                <Label
+                                                    htmlFor="name"
+                                                    className="text-sm font-medium text-gray-700"
+                                                >
                                                     Full Name *
                                                 </Label>
                                                 <Input
@@ -326,6 +441,7 @@ export default function ClinicSetup({ request, token }) {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className="mt-1"
                                                     required
                                                 />
                                                 {errors.name && (
@@ -336,7 +452,10 @@ export default function ClinicSetup({ request, token }) {
                                             </div>
 
                                             <div>
-                                                <Label htmlFor="email">
+                                                <Label
+                                                    htmlFor="email"
+                                                    className="text-sm font-medium text-gray-700"
+                                                >
                                                     Email Address *
                                                 </Label>
                                                 <Input
@@ -349,6 +468,7 @@ export default function ClinicSetup({ request, token }) {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className="mt-1"
                                                     required
                                                 />
                                                 {errors.email && (
@@ -359,7 +479,10 @@ export default function ClinicSetup({ request, token }) {
                                             </div>
 
                                             <div>
-                                                <Label htmlFor="password">
+                                                <Label
+                                                    htmlFor="password"
+                                                    className="text-sm font-medium text-gray-700"
+                                                >
                                                     Password *
                                                 </Label>
                                                 <Input
@@ -372,6 +495,7 @@ export default function ClinicSetup({ request, token }) {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className="mt-1"
                                                     required
                                                 />
                                                 {errors.password && (
@@ -382,7 +506,10 @@ export default function ClinicSetup({ request, token }) {
                                             </div>
 
                                             <div>
-                                                <Label htmlFor="password_confirmation">
+                                                <Label
+                                                    htmlFor="password_confirmation"
+                                                    className="text-sm font-medium text-gray-700"
+                                                >
                                                     Confirm Password *
                                                 </Label>
                                                 <Input
@@ -397,6 +524,7 @@ export default function ClinicSetup({ request, token }) {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className="mt-1"
                                                     required
                                                 />
                                                 {errors.password_confirmation && (
@@ -410,13 +538,23 @@ export default function ClinicSetup({ request, token }) {
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                            Additional Address Information
-                                        </h3>
+                                    {/* Address Section */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                                                <MapPin className="w-4 h-4 text-white" />
+                                            </div>
+                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                Address Information
+                                            </h3>
+                                        </div>
+
                                         <div className="space-y-4">
                                             <div>
-                                                <Label htmlFor="street_address">
+                                                <Label
+                                                    htmlFor="street_address"
+                                                    className="text-sm font-medium text-gray-700"
+                                                >
                                                     Street Address
                                                 </Label>
                                                 <Input
@@ -429,6 +567,7 @@ export default function ClinicSetup({ request, token }) {
                                                             e.target.value
                                                         )
                                                     }
+                                                    className="mt-1"
                                                 />
                                                 {errors.street_address && (
                                                     <p className="text-sm text-red-600 mt-1">
@@ -437,10 +576,13 @@ export default function ClinicSetup({ request, token }) {
                                                 )}
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <Label htmlFor="region_code">
-                                                        Region
+                                                    <Label
+                                                        htmlFor="region_code"
+                                                        className="text-sm font-medium text-gray-700"
+                                                    >
+                                                        Region *
                                                     </Label>
                                                     <select
                                                         id="region_code"
@@ -450,7 +592,7 @@ export default function ClinicSetup({ request, token }) {
                                                                 e.target.value
                                                             )
                                                         }
-                                                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                        className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                         required
                                                     >
                                                         <option value="">
@@ -480,8 +622,11 @@ export default function ClinicSetup({ request, token }) {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <Label htmlFor="province_code">
-                                                        Province
+                                                    <Label
+                                                        htmlFor="province_code"
+                                                        className="text-sm font-medium text-gray-700"
+                                                    >
+                                                        Province *
                                                     </Label>
                                                     <select
                                                         id="province_code"
@@ -491,7 +636,7 @@ export default function ClinicSetup({ request, token }) {
                                                                 e.target.value
                                                             )
                                                         }
-                                                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                        className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                         required
                                                         disabled={
                                                             !selectedRegion
@@ -527,10 +672,13 @@ export default function ClinicSetup({ request, token }) {
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <Label htmlFor="city_municipality_code">
-                                                        City/Municipality
+                                                    <Label
+                                                        htmlFor="city_municipality_code"
+                                                        className="text-sm font-medium text-gray-700"
+                                                    >
+                                                        City/Municipality *
                                                     </Label>
                                                     <select
                                                         id="city_municipality_code"
@@ -542,7 +690,7 @@ export default function ClinicSetup({ request, token }) {
                                                                 e.target.value
                                                             )
                                                         }
-                                                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                        className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                         required
                                                         disabled={
                                                             !selectedProvince
@@ -576,8 +724,11 @@ export default function ClinicSetup({ request, token }) {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <Label htmlFor="barangay_code">
-                                                        Barangay
+                                                    <Label
+                                                        htmlFor="barangay_code"
+                                                        className="text-sm font-medium text-gray-700"
+                                                    >
+                                                        Barangay *
                                                     </Label>
                                                     <select
                                                         id="barangay_code"
@@ -587,7 +738,7 @@ export default function ClinicSetup({ request, token }) {
                                                                 e.target.value
                                                             )
                                                         }
-                                                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                        className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                                         required
                                                         disabled={
                                                             !selectedCityMunicipality
@@ -623,94 +774,100 @@ export default function ClinicSetup({ request, token }) {
                                                 </div>
                                             </div>
 
-                                            <div>
-                                                <Label htmlFor="postal_code">
-                                                    Postal Code
-                                                </Label>
-                                                <Input
-                                                    id="postal_code"
-                                                    type="text"
-                                                    value={data.postal_code}
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "postal_code",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
-                                                {errors.postal_code && (
-                                                    <p className="text-sm text-red-600 mt-1">
-                                                        {errors.postal_code}
-                                                    </p>
-                                                )}
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="address_details">
-                                                    Additional Address Details
-                                                </Label>
-                                                <Input
-                                                    id="address_details"
-                                                    type="text"
-                                                    value={data.address_details}
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "address_details",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    placeholder="Building name, floor, room number, etc."
-                                                />
-                                                {errors.address_details && (
-                                                    <p className="text-sm text-red-600 mt-1">
-                                                        {errors.address_details}
-                                                    </p>
-                                                )}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <Label
+                                                        htmlFor="postal_code"
+                                                        className="text-sm font-medium text-gray-700"
+                                                    >
+                                                        Postal Code
+                                                    </Label>
+                                                    <Input
+                                                        id="postal_code"
+                                                        type="text"
+                                                        value={data.postal_code}
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "postal_code",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="mt-1"
+                                                    />
+                                                    {errors.postal_code && (
+                                                        <p className="text-sm text-red-600 mt-1">
+                                                            {errors.postal_code}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <Label
+                                                        htmlFor="address_details"
+                                                        className="text-sm font-medium text-gray-700"
+                                                    >
+                                                        Additional Details
+                                                    </Label>
+                                                    <Input
+                                                        id="address_details"
+                                                        type="text"
+                                                        value={
+                                                            data.address_details
+                                                        }
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "address_details",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Building, floor, room number, etc."
+                                                        className="mt-1"
+                                                    />
+                                                    {errors.address_details && (
+                                                        <p className="text-sm text-red-600 mt-1">
+                                                            {
+                                                                errors.address_details
+                                                            }
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                        <div className="flex">
-                                            <div className="flex-shrink-0">
-                                                <svg
-                                                    className="h-5 w-5 text-blue-400"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
+                                    {/* Info Box */}
+                                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <Info className="w-3 h-3 text-white" />
                                             </div>
-                                            <div className="ml-3">
-                                                <h3 className="text-sm font-medium text-blue-800">
+                                            <div>
+                                                <h3 className="text-sm font-semibold text-blue-800 mb-1">
                                                     Important Information
                                                 </h3>
-                                                <div className="mt-2 text-sm text-blue-700">
-                                                    <p>
-                                                        This will create your
-                                                        clinic admin account.
-                                                        You'll be able to log in
-                                                        immediately after setup
-                                                        and start managing your
-                                                        clinic.
-                                                    </p>
-                                                </div>
+                                                <p className="text-sm text-blue-700">
+                                                    This will create your clinic
+                                                    admin account. You'll be
+                                                    able to log in immediately
+                                                    after setup and start
+                                                    managing your clinic.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <Button
                                         type="submit"
-                                        className="w-full"
+                                        className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-3 rounded-lg shadow-lg transition-all duration-200"
                                         disabled={processing}
                                     >
-                                        {processing
-                                            ? "Setting up your clinic..."
-                                            : "Complete Setup"}
+                                        {processing ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                Setting up your clinic...
+                                            </div>
+                                        ) : (
+                                            "Complete Setup"
+                                        )}
                                     </Button>
                                 </form>
                             )}
@@ -720,7 +877,7 @@ export default function ClinicSetup({ request, token }) {
                     <div className="text-center">
                         <Link
                             href="/"
-                            className="text-sm text-gray-600 hover:text-gray-900"
+                            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                         >
                             ← Back to Home
                         </Link>

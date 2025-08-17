@@ -19,7 +19,27 @@ class ClinicRegistrationController extends Controller
         $validated = $request->validate([
             'clinic_name' => 'required|string|max:255',
             'contact_person' => 'required|string|max:255',
-            'email' => 'required|email|unique:clinic_registration_requests,email',
+            'email' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) {
+                    // Check if email exists in clinic_registration_requests
+                    $existingRequest = \App\Models\ClinicRegistrationRequest::where('email', $value)->latest()->first();
+                    
+                    if ($existingRequest) {
+                        // Allow re-registration if previous request was rejected or expired
+                        if ($existingRequest->status === 'rejected' || 
+                            ($existingRequest->expires_at && $existingRequest->expires_at < now())) {
+                            return; // Allow this email
+                        }
+                        
+                        // Block if there's an active pending or approved request
+                        if ($existingRequest->status === 'pending' || $existingRequest->status === 'approved') {
+                            $fail('This email address is already associated with an active registration request.');
+                        }
+                    }
+                }
+            ],
             'phone' => 'required|string|max:20',
             'license_number' => 'required|string|max:50',
             'description' => 'nullable|string',
@@ -106,7 +126,7 @@ class ClinicRegistrationController extends Controller
                 'license_number' => $registrationRequest->license_number,
                 'description' => $registrationRequest->description,
                 'slug' => Str::slug($registrationRequest->clinic_name),
-                'logo_url' => '/images/default-clinic-logo.png',
+                'logo_url' => '/images/clinic-logo.png',
                 'subscription_plan' => $registrationRequest->subscription_plan,
                 'subscription_status' => 'active',
                 'subscription_start_date' => now(),

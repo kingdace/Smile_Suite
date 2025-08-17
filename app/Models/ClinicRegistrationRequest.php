@@ -89,4 +89,63 @@ class ClinicRegistrationRequest extends Model
             default => 'bg-gray-100 text-gray-800',
         };
     }
+
+    /**
+     * Get the associated clinic if this request has been completed.
+     */
+    public function clinic()
+    {
+        return $this->hasOne(Clinic::class, 'email', 'email');
+    }
+
+    /**
+     * Get the full address by building it from the associated clinic data.
+     */
+    public function getFullAddressAttribute()
+    {
+        // If we have a direct address field, use it
+        if ($this->address) {
+            return $this->address;
+        }
+
+        // Try to get address from associated clinic
+        $clinic = $this->clinic;
+        if ($clinic) {
+            $addressParts = [];
+            
+            if ($clinic->street_address) {
+                $addressParts[] = $clinic->street_address;
+            }
+            
+            if ($clinic->address_details) {
+                $addressParts[] = $clinic->address_details;
+            }
+
+            // Add PSGC codes as text (since PSGC tables may not exist)
+            if ($clinic->barangay_code) {
+                $addressParts[] = $clinic->barangay_code;
+            }
+
+            if ($clinic->city_municipality_code) {
+                $addressParts[] = $clinic->city_municipality_code;
+            }
+
+            if ($clinic->province_code) {
+                $addressParts[] = $clinic->province_code;
+            }
+
+            if ($clinic->region_code) {
+                $addressParts[] = $clinic->region_code;
+            }
+
+            if ($clinic->postal_code) {
+                $addressParts[] = $clinic->postal_code;
+            }
+
+            return implode(', ', array_filter($addressParts));
+        }
+
+        // Fallback to a generic message
+        return 'Address information not available';
+    }
 }

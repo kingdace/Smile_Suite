@@ -7,7 +7,8 @@ export default function ClinicLogo({ clinic, className, ...props }) {
             <img
                 src={clinic.logo_url}
                 alt={`${clinic.name} Logo`}
-                className={className || "h-9 w-auto"}
+                className={`object-contain ${className || "h-9 w-auto"}`}
+                style={{ minWidth: "36px", minHeight: "36px" }}
                 {...props}
             />
         );

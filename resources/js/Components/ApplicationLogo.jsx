@@ -1,18 +1,16 @@
 export default function ApplicationLogo(props) {
     return (
-        <svg
+        <img
+            src="/images/smile-suite-logo.png"
+            alt="Smile Suite Logo"
+            className={`object-contain ${props.className || "h-16 w-16"}`}
+            style={{
+                minWidth: "64px",
+                minHeight: "64px",
+                maxWidth: "80px",
+                maxHeight: "80px",
+            }}
             {...props}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={props.className || "h-6 w-6"}
-        >
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5" />
-            <path d="M2 12l10 5 10-5" />
-        </svg>
+        />
     );
 }

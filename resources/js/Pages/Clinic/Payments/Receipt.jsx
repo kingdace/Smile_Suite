@@ -26,9 +26,12 @@ export default function Receipt({ clinic, payment, auth }) {
                 {/* Clinic Logo and Info - Centered */}
                 <div className="flex flex-col items-center mb-2 mt-1 text-center">
                     <img
-                        src={clinic.logo_url}
+                        src={clinic.logo_url || "/images/clinic-logo.png"}
                         alt="Clinic Logo"
-                        className="h-8 w-8 mb-1 rounded"
+                        className="h-8 w-8 mb-1 rounded object-cover"
+                        onError={(e) => {
+                            e.target.src = "/images/clinic-logo.png";
+                        }}
                     />
                     <div className="text-base font-bold leading-tight">
                         {clinic.name}

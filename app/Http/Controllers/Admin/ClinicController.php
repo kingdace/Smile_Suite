@@ -32,12 +32,14 @@ class ClinicController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('contact_number', 'like', "%{$search}%");
+                  ->orWhere('contact_number', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         // Apply status filter
-        if ($status = $request->input('status')) {
+        $status = $request->input('status');
+        if ($status && $status !== 'all') {
             $query->where('subscription_status', $status);
         }
 
@@ -46,14 +48,21 @@ class ClinicController extends Controller
             $query->where('is_active', $request->boolean('is_active'));
         }
 
+        // Include soft deleted clinics if requested
+        $showDeleted = $request->boolean('show_deleted');
+        if ($showDeleted) {
+            $query->withTrashed();
+        }
+
         $clinics = $query->withCount(['users', 'patients', 'appointments'])
                         ->latest()
-                        ->paginate(10)
+                        ->paginate(5)
                         ->withQueryString();
 
         return Inertia::render('Admin/Clinics/Index', [
             'clinics' => $clinics,
-            'filters' => $request->only(['search', 'status', 'is_active']),
+            'show_deleted' => $showDeleted,
+            'filters' => $request->only(['search', 'status', 'is_active', 'show_deleted']),
             'auth' => [
                 'user' => Auth::user()
             ]
@@ -87,13 +96,16 @@ class ClinicController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'address' => 'required|string',
             'street_address' => 'nullable|string|max:255',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|unique:clinics,email',
             'license_number' => 'required|string|max:50|unique:clinics',
             'operating_hours' => 'nullable|array',
             'subscription_plan' => 'required|string|in:basic,premium,enterprise',
+            'subscription_status' => 'nullable|string|in:trial,active,inactive',
+            'subscription_start_date' => 'nullable|date',
+            'subscription_end_date' => 'nullable|date',
+            'is_active' => 'nullable|boolean',
             'region_code' => 'nullable|string|max:10',
             'province_code' => 'nullable|string|max:10',
             'city_municipality_code' => 'nullable|string|max:10',
@@ -112,12 +124,12 @@ class ClinicController extends Controller
         $clinic = Clinic::create([
             ...$data,
             'slug' => Str::slug($validated['name']),
-            'logo_url' => $validated['logo_url'] ?? '/images/default-clinic-logo.png',
+            'logo_url' => $validated['logo_url'] ?? '/images/clinic-logo.png',
             'description' => $validated['description'] ?? null,
-            'subscription_status' => 'active',
-            'subscription_start_date' => now(),
-            'subscription_end_date' => now()->addYear(),
-            'is_active' => true,
+            'subscription_status' => $request->input('subscription_status', 'active'),
+            'subscription_start_date' => $request->input('subscription_start_date'),
+            'subscription_end_date' => $request->input('subscription_end_date'),
+            'is_active' => $request->input('is_active', true),
         ]);
 
         return redirect()
@@ -172,13 +184,17 @@ class ClinicController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'address' => 'required|string',
             'street_address' => 'nullable|string|max:255',
             'contact_number' => 'required|string|max:20',
             'email' => 'required|email|unique:clinics,email,' . $clinic->id,
+            'license_number' => 'required|string|max:50|unique:clinics,license_number,' . $clinic->id,
+            'description' => 'nullable|string',
             'operating_hours' => 'nullable|array',
             'subscription_plan' => 'required|string|in:basic,premium,enterprise',
-            'is_active' => 'boolean',
+            'subscription_status' => 'nullable|string|in:trial,active,inactive',
+            'subscription_start_date' => 'nullable|date',
+            'subscription_end_date' => 'nullable|date',
+            'is_active' => 'nullable|boolean',
             'region_code' => 'nullable|string|max:10',
             'province_code' => 'nullable|string|max:10',
             'city_municipality_code' => 'nullable|string|max:10',
@@ -207,7 +223,31 @@ class ClinicController extends Controller
 
         return redirect()
             ->route('admin.clinics.index')
-            ->with('success', 'Clinic deleted successfully.');
+            ->with('success', 'Clinic soft deleted successfully.');
+    }
+
+    /**
+     * Restore a soft-deleted clinic.
+     */
+    public function restore($id)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Find the soft-deleted clinic by ID
+        $clinicToRestore = Clinic::withTrashed()->find($id);
+
+        if (!$clinicToRestore) {
+            abort(404, 'Clinic not found.');
+        }
+
+        // Restore the clinic
+        $clinicToRestore->restore();
+
+        return redirect()
+            ->route('admin.clinics.index', ['show_deleted' => true])
+            ->with('success', 'Clinic restored successfully.');
     }
 
     /**

@@ -1,0 +1,55 @@
+/* Minimal Swiper navigation arrows */
+.swiper-button-next,
+.swiper-button-prev {
+    color: #2563eb;
+    background: transparent;
+    border-radius: 9999px;
+    width: 28px;
+    height: 28px;
+    box-shadow: none;
+    transition: none;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.7;
+    z-index: 10;
+    border: none;
+}
+.swiper-button-next {
+    right: 8px;
+}
+.swiper-button-prev {
+    left: 8px;
+}
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* Minimal Swiper pagination dots */
+.swiper-pagination {
+    bottom: 0 !important;
+    margin-top: 0.5rem;
+    position: relative;
+    text-align: center;
+}
+.swiper-pagination-bullet {
+    background: #cbd5e1;
+    opacity: 1;
+    width: 8px;
+    height: 8px;
+    margin: 0 3px !important;
+    border-radius: 9999px;
+    transition: none;
+    box-shadow: none;
+}
+.swiper-pagination-bullet-active {
+    background: #2563eb;
+    transform: none;
+}
+
+/* Card container shadow for extra depth */
+.gallery-card-container {
+    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08),
+        0 1.5px 6px rgba(0, 0, 0, 0.04);
+}

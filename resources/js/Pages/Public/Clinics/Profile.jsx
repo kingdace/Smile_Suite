@@ -21,10 +21,28 @@ import {
     Calendar,
     X,
     Search,
+    Package,
+    DollarSign,
+    Activity,
+    Info,
+    Stethoscope,
+    GraduationCap,
+    Briefcase,
+    ThumbsUp,
+    Flag,
+    MessageSquare,
+    Plus,
+    AlertCircle,
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, A11y } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "./ClinicGallerySwiper.css"; // Add this import for custom Swiper styles
 
 // Custom marker icon fix for default icon issue in Leaflet
 const markerIcon = new L.Icon({
@@ -36,10 +54,38 @@ const markerIcon = new L.Icon({
     shadowSize: [41, 41],
 });
 
+// Add helper for avatar initials
+function getInitials(name) {
+    if (!name) return "?";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name[0].toUpperCase();
+}
+
+// Add helper for avatar colors
+function getAvatarColor(name) {
+    const colors = [
+        "bg-blue-500",
+        "bg-purple-500",
+        "bg-green-500",
+        "bg-orange-50",
+        "bg-pink-500",
+        "bg-indigo-500",
+        "bg-red-500",
+        "bg-teal-50",
+    ];
+    if (!name) return colors[0];
+    const code = name.charCodeAt(0) + (name.charCodeAt(1) || 0);
+    return colors[code % colors.length];
+}
+
 export default function ClinicProfile({ clinic }) {
     const { auth } = usePage().props;
     console.log("auth:", auth); // Debug: See what auth is when logged out or in
     const [showBookingModal, setShowBookingModal] = useState(false);
+    const [showReviewModal, setShowReviewModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [userLocation, setUserLocation] = useState(null);
     const mapRef = useRef();
@@ -47,6 +93,7 @@ export default function ClinicProfile({ clinic }) {
     const [galleryImages, setGalleryImages] = useState(
         clinic.gallery_images || []
     );
+    const [showAllReviews, setShowAllReviews] = useState(false);
 
     const REASONS = [
         { id: "cleaning", label: "Teeth Cleaning" },
@@ -68,6 +115,18 @@ export default function ClinicProfile({ clinic }) {
         notes: "",
     });
 
+    const {
+        data: reviewData,
+        setData: setReviewData,
+        processing: reviewProcessing,
+        errors: reviewErrors,
+        reset: resetReview,
+    } = useForm({
+        rating: 5,
+        title: "",
+        content: "",
+    });
+
     const handleBookAppointment = () => {
         if (!auth || !auth.user || auth.user.role !== "patient") {
             // Not logged in as patient: redirect to login with return URL
@@ -76,6 +135,52 @@ export default function ClinicProfile({ clinic }) {
             });
         } else {
             setShowBookingModal(true);
+        }
+    };
+
+    const handleLeaveReview = () => {
+        if (!auth || !auth.user || auth.user.role !== "patient") {
+            // Not logged in as patient: redirect to login with return URL
+            router.visit(route("login"), {
+                data: { return: window.location.pathname },
+            });
+            return;
+        }
+
+        // Simply open the review modal - no appointment check needed
+        setShowReviewModal(true);
+    };
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(
+                route("public.clinics.reviews.store", { clinic: clinic.id }),
+                {
+                    rating: reviewData.rating,
+                    title: reviewData.title,
+                    content: reviewData.content,
+                }
+            );
+
+            setSuccessMessage("Review submitted successfully!");
+            resetReview();
+            setShowReviewModal(false);
+
+            // Reload the page to show the new review
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                // Validation errors
+                const errs = error.response.data.errors;
+                Object.keys(errs).forEach((field) => {
+                    reviewErrors[field] = errs[field][0];
+                });
+            } else {
+                setSuccessMessage("An error occurred. Please try again.");
+            }
         }
     };
 
@@ -140,40 +245,93 @@ export default function ClinicProfile({ clinic }) {
     return (
         <GuestLayout>
             {/* Hero Section */}
-            <div className="bg-gradient-to-br from-blue-50 via-cyan-50 to-white py-8 border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-8">
-                    <img
-                        src={clinic.logo_url || "/images/clinic-logo.png"}
-                        alt={clinic.name}
-                        className="h-32 w-32 rounded-2xl object-cover bg-gray-100 shadow-lg border-4 border-white"
-                    />
+            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 py-12 border-b relative overflow-hidden">
+                {/* Enhanced pattern overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-blue-800/25"></div>
+                {/* Dynamic geometric patterns */}
+                <div className="absolute inset-0 opacity-8">
+                    <div className="absolute top-8 right-8 w-40 h-40 border-2 border-white/30 rounded-full animate-pulse"></div>
+                    <div className="absolute bottom-8 left-8 w-32 h-32 border-2 border-white/20 transform rotate-45"></div>
+                    <div className="absolute top-1/3 left-1/3 w-20 h-20 border border-white/25 rounded-full"></div>
+                    <div className="absolute bottom-1/3 right-1/3 w-16 h-16 border border-white/15 transform -rotate-30"></div>
+                </div>
+                {/* Subtle mesh gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-transparent to-cyan-500/20"></div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-8 relative z-10">
+                    <div className="relative">
+                        <div className="relative group">
+                            {/* Enhanced logo container with better styling */}
+                            <div className="relative">
+                                <img
+                                    src={
+                                        clinic.logo_url ||
+                                        "/images/clinic-logo.png"
+                                    }
+                                    alt={clinic.name}
+                                    className="h-36 w-36 rounded-3xl object-cover bg-white shadow-2xl border-4 border-white/40 group-hover:scale-105 transition-all duration-300"
+                                    onError={(e) => {
+                                        e.target.src =
+                                            "/images/clinic-logo.png";
+                                    }}
+                                />
+                                {/* Enhanced verification badge */}
+                                <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-xl border-3 border-white">
+                                    <CheckCircle className="w-5 h-5 text-white" />
+                                </div>
+                                {/* Animated glow effect */}
+                                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/30 to-cyan-400/30 opacity-0 group-hover:opacity-100 transition-all duration-500 blur-sm"></div>
+                                {/* Subtle border glow */}
+                                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-2 border-transparent"></div>
+                            </div>
+                            {/* Floating particles effect */}
+                            <div className="absolute -top-2 -left-2 w-4 h-4 bg-yellow-400 rounded-full opacity-60 animate-bounce"></div>
+                            <div
+                                className="absolute -bottom-2 -right-2 w-3 h-3 bg-cyan-400 rounded-full opacity-60 animate-bounce"
+                                style={{ animationDelay: "0.5s" }}
+                            ></div>
+                        </div>
+                    </div>
                     <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-4xl font-extrabold text-blue-900">
+                        {/* Enhanced title section */}
+                        <div className="flex items-center gap-3 mb-3">
+                            <h1 className="text-4xl font-bold text-white">
                                 {clinic.name}
                             </h1>
-                            <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold gap-1">
-                                <CheckCircle className="w-4 h-4" /> Verified
+                            <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full text-xs font-semibold gap-1 shadow-md border border-green-400/30">
+                                <CheckCircle className="w-3 h-3" /> Verified
                             </span>
                         </div>
-                        <p className="text-lg text-gray-700 mb-2">
+
+                        {/* Address and description */}
+                        <p className="text-lg text-blue-100 mb-3 font-medium">
                             {clinic.address}
                         </p>
                         {clinic.description && (
-                            <p className="text-gray-500 mb-2">
+                            <p className="text-blue-50 mb-4 leading-relaxed max-w-2xl text-base">
                                 {clinic.description}
                             </p>
                         )}
-                        <div className="flex flex-wrap gap-4 mt-4">
+
+                        {/* Enhanced contact information */}
+                        <div className="flex flex-wrap gap-3 mt-6">
                             {clinic.contact_number && (
-                                <span className="flex items-center gap-2 text-gray-700">
-                                    <Phone className="w-4 h-4" />{" "}
-                                    {clinic.contact_number}
+                                <span className="flex items-center gap-2 text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl shadow-md border border-white/30 hover:bg-white/30 hover:scale-105 transition-all duration-300 group">
+                                    <div className="p-1.5 bg-blue-500/30 rounded-lg group-hover:bg-blue-500/50 transition-colors duration-300">
+                                        <Phone className="w-4 h-4 text-blue-200" />
+                                    </div>
+                                    <span className="font-semibold text-sm">
+                                        {clinic.contact_number}
+                                    </span>
                                 </span>
                             )}
                             {clinic.email && (
-                                <span className="flex items-center gap-2 text-gray-700">
-                                    <Mail className="w-4 h-4" /> {clinic.email}
+                                <span className="flex items-center gap-2 text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl shadow-md border border-white/30 hover:bg-white/30 hover:scale-105 transition-all duration-300 group">
+                                    <div className="p-1.5 bg-blue-500/30 rounded-lg group-hover:bg-blue-500/50 transition-colors duration-300">
+                                        <Mail className="w-4 h-4 text-blue-200" />
+                                    </div>
+                                    <span className="font-semibold text-sm">
+                                        {clinic.email}
+                                    </span>
                                 </span>
                             )}
                             {clinic.website && (
@@ -181,9 +339,14 @@ export default function ClinicProfile({ clinic }) {
                                     href={clinic.website}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 text-blue-600 hover:underline"
+                                    className="flex items-center gap-2 text-white bg-white/20 backdrop-blur-sm px-4 py-2 rounded-xl shadow-md border border-white/30 hover:bg-white/30 hover:scale-105 transition-all duration-300 group"
                                 >
-                                    <Globe className="w-4 h-4" /> Website
+                                    <div className="p-1.5 bg-blue-500/30 rounded-lg group-hover:bg-blue-500/50 transition-colors duration-300">
+                                        <Globe className="w-4 h-4" />
+                                    </div>
+                                    <span className="font-semibold text-sm">
+                                        Website
+                                    </span>
                                 </a>
                             )}
                         </div>
@@ -196,52 +359,70 @@ export default function ClinicProfile({ clinic }) {
                 {/* Left/Main Column */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Gallery */}
-                    <div className="bg-white rounded-2xl shadow p-8 mb-8 border border-blue-100">
-                        <div className="mb-6">
-                            <h2 className="text-3xl font-extrabold text-blue-900 flex items-center gap-3 mb-1">
-                                <ImageIcon className="w-7 h-7 text-blue-400" />{" "}
+                    <div className="bg-white rounded-2xl border border-blue-100 p-6 mb-8 w-full">
+                        <div className="mb-4">
+                            <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                                <ImageIcon className="w-6 h-6 text-blue-400" />{" "}
                                 Gallery
                             </h2>
-                            <div className="text-gray-500 text-base font-medium">
-                                A glimpse inside our clinic. Click any photo to
-                                enlarge.
+                            <div className="border-b border-blue-100 my-2" />
+                            <div className="text-gray-500 text-base font-normal mt-1">
+                                A glimpse inside our clinic. Swipe or use arrows
+                                to browse.
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            {galleryImages && galleryImages.length > 0 ? (
-                                galleryImages.map((img, idx) => (
-                                    <button
-                                        key={img.id}
-                                        className="relative group w-full h-36 md:h-40 bg-white rounded-xl overflow-hidden border border-blue-100 shadow-md focus:outline-none transition-all duration-300"
-                                        style={{
-                                            minWidth: 0,
-                                            animation: `fadeIn 0.7s ${
-                                                idx * 0.07
-                                            }s both`,
-                                        }}
-                                        onClick={() =>
-                                            setLightboxImg(img.image_url)
-                                        }
-                                        tabIndex={0}
-                                        aria-label="View image"
-                                    >
-                                        <img
-                                            src={img.image_url}
-                                            alt="Clinic gallery"
-                                            className="object-cover w-full h-full transition-transform duration-200 rounded-xl"
-                                            style={{
-                                                width: "100%",
-                                                height: "100%",
-                                            }}
-                                        />
-                                    </button>
-                                ))
-                            ) : (
-                                <div className="col-span-2 md:col-span-4 text-gray-400 italic flex items-center gap-2 justify-center min-h-[100px]">
-                                    <ImageIcon className="w-6 h-6" /> No images
-                                    yet.
-                                </div>
-                            )}
+                        <div className="flex justify-center items-center">
+                            <div className="w-full max-w-2xl mx-auto">
+                                {galleryImages && galleryImages.length > 0 ? (
+                                    <div className="relative">
+                                        <Swiper
+                                            modules={[
+                                                Navigation,
+                                                Pagination,
+                                                A11y,
+                                            ]}
+                                            spaceBetween={0}
+                                            slidesPerView={1}
+                                            navigation
+                                            pagination={{ clickable: true }}
+                                            className="rounded-2xl"
+                                            style={{ paddingBottom: "1.5rem" }}
+                                        >
+                                            {galleryImages.map((img, idx) => (
+                                                <SwiperSlide
+                                                    key={img.id || idx}
+                                                >
+                                                    <button
+                                                        className="w-full aspect-[16/9] flex items-center justify-center bg-gray-50 rounded-2xl overflow-hidden focus:outline-none border border-blue-100 h-64 md:h-80"
+                                                        style={{
+                                                            minHeight: "16rem",
+                                                            maxHeight: "20rem",
+                                                        }}
+                                                        onClick={() =>
+                                                            setLightboxImg(
+                                                                img.image_url
+                                                            )
+                                                        }
+                                                        tabIndex={0}
+                                                        aria-label="View image"
+                                                    >
+                                                        <img
+                                                            src={img.image_url}
+                                                            alt="Clinic gallery"
+                                                            className="object-cover w-full h-full rounded-2xl"
+                                                        />
+                                                    </button>
+                                                </SwiperSlide>
+                                            ))}
+                                        </Swiper>
+                                    </div>
+                                ) : (
+                                    <div className="text-gray-400 italic flex items-center gap-2 justify-center min-h-[100px]">
+                                        <ImageIcon className="w-6 h-6" /> No
+                                        images yet.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         {/* Lightbox Modal */}
                         {lightboxImg && (
@@ -286,38 +467,99 @@ export default function ClinicProfile({ clinic }) {
                     </div>
 
                     {/* Services & Specialties */}
-                    <div className="bg-white rounded-2xl shadow p-6">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Users className="w-6 h-6 text-blue-400" /> Services
-                            & Specialties
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Placeholder services */}
-                            {[
-                                "General Dentistry",
-                                "Dental Cleaning",
-                                "Cavity Fillings",
-                                "Root Canal Treatment",
-                                "Braces/Orthodontics",
-                                "Dental Implants",
-                                "Cosmetic Dentistry",
-                                "Pediatric Dentistry",
-                            ].map((service, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center p-3 bg-gray-50 rounded-lg gap-3"
-                                >
-                                    <CheckCircle className="h-5 w-5 text-green-500" />
-                                    <span className="text-gray-700">
-                                        {service}
-                                    </span>
-                                </div>
-                            ))}
+                    <div className="bg-white rounded-2xl border border-blue-100 p-6 mb-8">
+                        <div className="mb-4">
+                            <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                                <Package className="w-6 h-6 text-blue-400" />{" "}
+                                Services & Specialties
+                            </h2>
+                            <div className="border-b border-blue-100 my-2" />
+                            <div className="text-gray-500 text-base font-normal mt-1">
+                                Comprehensive dental services offered by our
+                                clinic.
+                            </div>
                         </div>
-                        <p className="text-sm text-gray-500 mt-4 italic">
-                            * Services may vary. Please contact the clinic for
-                            specific services and pricing.
-                        </p>
+
+                        {clinic.services && clinic.services.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {clinic.services.map((service) => (
+                                    <div
+                                        key={service.id}
+                                        className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 hover:shadow-md transition-all duration-200 hover:scale-105"
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-2 bg-blue-100 rounded-lg">
+                                                    <Package className="w-5 h-5 text-blue-600" />
+                                                </div>
+                                                <h3 className="font-semibold text-gray-900 text-lg">
+                                                    {service.name}
+                                                </h3>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Activity className="w-4 h-4 text-green-600" />
+                                                <span className="text-xs text-green-600 font-medium">
+                                                    Active
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {service.description && (
+                                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                                                {service.description}
+                                            </p>
+                                        )}
+
+                                        <div className="flex items-center justify-between">
+                                            {service.price ? (
+                                                <div className="flex items-center gap-1">
+                                                    <DollarSign className="w-4 h-4 text-green-600" />
+                                                    <span className="font-semibold text-green-600">
+                                                        ₱
+                                                        {parseFloat(
+                                                            service.price
+                                                        ).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1 text-gray-500">
+                                                    <Info className="w-4 h-4" />
+                                                    <span className="text-sm">
+                                                        Price on request
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            <button
+                                                onClick={handleBookAppointment}
+                                                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-full transition-colors duration-200"
+                                            >
+                                                Book Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <Package className="mx-auto w-12 h-12 text-gray-400 mb-4" />
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                    Services Coming Soon
+                                </h3>
+                                <p className="text-gray-500 mb-4">
+                                    This clinic is setting up their service
+                                    offerings. Please contact them directly for
+                                    available services.
+                                </p>
+                                <button
+                                    onClick={handleBookAppointment}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
+                                >
+                                    <Calendar className="w-4 h-4" />
+                                    Book Appointment
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Operating Hours */}
@@ -488,91 +730,396 @@ export default function ClinicProfile({ clinic }) {
                     </div>
 
                     {/* Doctors & Staff */}
-                    <div className="bg-white rounded-2xl shadow p-6">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <User className="w-6 h-6 text-blue-400" /> Doctors &
-                            Staff
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Placeholder staff */}
-                            {[1, 2].map((i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center gap-4 bg-gray-50 rounded-lg p-4"
-                                >
-                                    <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <User className="w-8 h-8 text-gray-400" />
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold text-gray-800">
-                                            Dr. Jane Doe
-                                        </div>
-                                        <div className="text-gray-500 text-sm">
-                                            Dentist
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                    <div className="bg-white rounded-2xl border border-blue-100 p-6 mb-8">
+                        <div className="mb-4">
+                            <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                                <Users className="w-6 h-6 text-blue-400" />{" "}
+                                Doctors & Staff
+                            </h2>
+                            <div className="border-b border-blue-100 my-2" />
+                            <div className="text-gray-500 text-base font-normal mt-1">
+                                Meet our dedicated team of dental professionals.
+                            </div>
                         </div>
-                        <p className="text-sm text-gray-400 mt-2">
-                            Team info coming soon.
-                        </p>
+
+                        {clinic.staff && clinic.staff.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {clinic.staff.map((member) => {
+                                    const getRoleIcon = (role) => {
+                                        switch (role) {
+                                            case "dentist":
+                                                return (
+                                                    <Stethoscope className="w-5 h-5 text-blue-600" />
+                                                );
+                                            case "staff":
+                                                return (
+                                                    <Briefcase className="w-5 h-5 text-green-600" />
+                                                );
+                                            default:
+                                                return (
+                                                    <User className="w-5 h-5 text-gray-600" />
+                                                );
+                                        }
+                                    };
+
+                                    const getRoleLabel = (role) => {
+                                        switch (role) {
+                                            case "dentist":
+                                                return "Dentist";
+                                            case "staff":
+                                                return "Staff";
+                                            default:
+                                                return "Team Member";
+                                        }
+                                    };
+
+                                    const getRoleColor = (role) => {
+                                        switch (role) {
+                                            case "dentist":
+                                                return "bg-blue-100 text-blue-700";
+                                            case "staff":
+                                                return "bg-green-100 text-green-700";
+                                            default:
+                                                return "bg-gray-100 text-gray-700";
+                                        }
+                                    };
+
+                                    return (
+                                        <div
+                                            key={member.id}
+                                            className="bg-gradient-to-br from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all duration-200 hover:scale-105"
+                                        >
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center border-2 border-blue-200">
+                                                        {member.name ? (
+                                                            <span className="text-blue-700 font-semibold text-lg">
+                                                                {member.name
+                                                                    .charAt(0)
+                                                                    .toUpperCase()}
+                                                            </span>
+                                                        ) : (
+                                                            <User className="w-6 h-6 text-blue-600" />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-900 text-lg">
+                                                            {member.name ||
+                                                                "Team Member"}
+                                                        </h3>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            {getRoleIcon(
+                                                                member.role
+                                                            )}
+                                                            <span
+                                                                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(
+                                                                    member.role
+                                                                )}`}
+                                                            >
+                                                                {getRoleLabel(
+                                                                    member.role
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {member.email && (
+                                                <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                                                    <Mail className="w-4 h-4 text-gray-400" />
+                                                    <span className="truncate">
+                                                        {member.email}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            {member.phone_number && (
+                                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                    <Phone className="w-4 h-4 text-gray-400" />
+                                                    <span>
+                                                        {member.phone_number}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <Users className="mx-auto w-12 h-12 text-gray-400 mb-4" />
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                    Team Information Coming Soon
+                                </h3>
+                                <p className="text-gray-500 mb-4">
+                                    Our team information is being updated.
+                                    Please contact the clinic directly for more
+                                    information about our staff.
+                                </p>
+                                <button
+                                    onClick={handleBookAppointment}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
+                                >
+                                    <Calendar className="w-4 h-4" />
+                                    Book Appointment
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Reviews & Ratings */}
-                    <div className="bg-white rounded-2xl shadow p-6">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Star className="w-6 h-6 text-yellow-400" /> Reviews
-                            & Ratings
-                        </h2>
-                        <div className="flex items-center gap-2 mb-4">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <Star
-                                    key={i}
-                                    className="w-5 h-5 text-yellow-300"
-                                    fill="#fde68a"
-                                />
-                            ))}
-                            <span className="text-gray-700 font-semibold ml-2">
-                                5.0
-                            </span>
-                            <span className="text-gray-400">(0 reviews)</span>
-                        </div>
-                        <div className="space-y-4">
-                            {/* Placeholder reviews */}
-                            {[1, 2].map((i) => (
-                                <div
-                                    key={i}
-                                    className="bg-gray-50 rounded-lg p-4"
-                                >
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <User className="w-5 h-5 text-blue-400" />
-                                        <span className="font-semibold text-gray-800">
-                                            Patient Name
-                                        </span>
-                                        <span className="text-xs text-gray-400 ml-2">
-                                            Just now
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-1 mb-2">
-                                        {[1, 2, 3, 4, 5].map((j) => (
-                                            <Star
-                                                key={j}
-                                                className="w-4 h-4 text-yellow-300"
-                                                fill="#fde68a"
-                                            />
-                                        ))}
-                                    </div>
-                                    <p className="text-gray-600">
-                                        This clinic is great! Review content
-                                        coming soon.
+                    <div className="bg-white rounded-2xl border border-blue-100 p-6 mb-8">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
+                                    <Star className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-extrabold text-blue-900">
+                                        Reviews & Ratings
+                                    </h2>
+                                    <p className="text-gray-500 text-sm">
+                                        Share your experience with this clinic
                                     </p>
                                 </div>
-                            ))}
+                            </div>
+                            <div className="text-right flex flex-col items-end">
+                                <div className="flex items-center gap-1 mb-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star
+                                            key={star}
+                                            className={`w-4 h-4 ${
+                                                star <=
+                                                (clinic.review_stats
+                                                    ?.average_rating || 0)
+                                                    ? "text-yellow-400"
+                                                    : "text-gray-300"
+                                            }`}
+                                            fill={
+                                                star <=
+                                                (clinic.review_stats
+                                                    ?.average_rating || 0)
+                                                    ? "#fde68a"
+                                                    : "none"
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                                <span className="text-lg font-bold text-blue-900">
+                                    {clinic.review_stats?.average_rating || 0}{" "}
+                                    <span className="text-sm font-normal text-gray-500">
+                                        out of 5
+                                    </span>
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                    {clinic.review_stats?.review_count || 0}{" "}
+                                    reviews
+                                </span>
+                            </div>
                         </div>
-                        <button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-semibold transition-colors duration-200">
-                            Leave a Review
-                        </button>
+
+                        {/* Review Form */}
+                        {auth?.user?.role === "patient" && (
+                            <div className="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
+                                <div className="flex items-start gap-4">
+                                    <div
+                                        className={`w-10 h-10 rounded-full ${getAvatarColor(
+                                            auth.user.name
+                                        )} flex items-center justify-center text-white font-bold text-base`}
+                                    >
+                                        {getInitials(auth.user.name)}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="font-semibold text-blue-900">
+                                                Share your experience
+                                            </span>
+                                            <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                                                You
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1 mb-2">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    key={star}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setReviewData(
+                                                            "rating",
+                                                            star
+                                                        )
+                                                    }
+                                                    className="focus:outline-none"
+                                                >
+                                                    <Star
+                                                        className={`w-5 h-5 ${
+                                                            reviewData.rating >=
+                                                            star
+                                                                ? "text-yellow-400"
+                                                                : "text-gray-300"
+                                                        }`}
+                                                    />
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <textarea
+                                            placeholder="Write your review here..."
+                                            className="w-full border border-blue-100 rounded-lg px-3 py-2 text-sm resize-none mb-2"
+                                            rows={3}
+                                            value={reviewData.content}
+                                            onChange={(e) =>
+                                                setReviewData(
+                                                    "content",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Title (optional)"
+                                                className="flex-1 border border-blue-100 rounded-lg px-3 py-2 text-sm"
+                                                value={reviewData.title}
+                                                onChange={(e) =>
+                                                    setReviewData(
+                                                        "title",
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                            <button
+                                                onClick={handleReviewSubmit}
+                                                disabled={
+                                                    !reviewData.content.trim() ||
+                                                    reviewProcessing
+                                                }
+                                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg text-sm disabled:bg-gray-300"
+                                            >
+                                                {reviewProcessing
+                                                    ? "Posting..."
+                                                    : "Post Review"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {/* Sign in prompt for guests */}
+                        {!auth?.user && (
+                            <div className="text-center mb-6">
+                                <button
+                                    onClick={() =>
+                                        router.visit(route("login"), {
+                                            data: {
+                                                return: window.location
+                                                    .pathname,
+                                            },
+                                        })
+                                    }
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg"
+                                >
+                                    <MessageSquare className="w-4 h-4" />
+                                    Sign in to Review
+                                </button>
+                            </div>
+                        )}
+                        <div className="border-t border-blue-100 mb-6" />
+                        {/* Reviews List (scrollable, max height for 2–3 reviews) */}
+                        {clinic.reviews && clinic.reviews.length > 0 ? (
+                            <div
+                                className="overflow-y-auto"
+                                style={{ maxHeight: "420px" }}
+                            >
+                                <div className="space-y-4">
+                                    {clinic.reviews.map((review) => {
+                                        const isCurrentUser =
+                                            auth?.user &&
+                                            review.patient?.user?.id ===
+                                                auth.user.id;
+                                        const name =
+                                            review.patient?.user?.name ||
+                                            review.patient?.first_name ||
+                                            "Anonymous";
+                                        return (
+                                            <div
+                                                key={review.id}
+                                                className="bg-blue-50 border border-blue-100 rounded-xl p-4"
+                                            >
+                                                <div className="flex items-start gap-4">
+                                                    <div
+                                                        className={`w-10 h-10 rounded-full ${getAvatarColor(
+                                                            name
+                                                        )} flex items-center justify-center text-white font-bold text-base`}
+                                                    >
+                                                        {getInitials(name)}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className="font-semibold text-blue-900">
+                                                                {name}
+                                                            </span>
+                                                            {isCurrentUser && (
+                                                                <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                                                                    You
+                                                                </span>
+                                                            )}
+                                                            <span className="text-xs text-gray-500 ml-2">
+                                                                {
+                                                                    review.formatted_date
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 mb-1">
+                                                            {[
+                                                                1, 2, 3, 4, 5,
+                                                            ].map((star) => (
+                                                                <Star
+                                                                    key={star}
+                                                                    className={`w-4 h-4 ${
+                                                                        star <=
+                                                                        review.rating
+                                                                            ? "text-yellow-400"
+                                                                            : "text-gray-300"
+                                                                    }`}
+                                                                    fill={
+                                                                        star <=
+                                                                        review.rating
+                                                                            ? "#fde68a"
+                                                                            : "none"
+                                                                    }
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        {review.title && (
+                                                            <div className="font-medium text-gray-900 mb-2">
+                                                                {review.title}
+                                                            </div>
+                                                        )}
+                                                        <div className="text-gray-700 text-sm leading-relaxed mb-1">
+                                                            {review.content}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <MessageSquare className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                    No reviews yet
+                                </h3>
+                                <p className="text-gray-500 mb-4">
+                                    Be the first to share your experience with
+                                    this clinic.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -909,6 +1456,123 @@ export default function ClinicProfile({ clinic }) {
                                     disabled={processing}
                                 >
                                     Submit Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Review Modal */}
+            {showReviewModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full relative">
+                        <button
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                            onClick={() => setShowReviewModal(false)}
+                        >
+                            <span className="text-2xl">&times;</span>
+                        </button>
+                        <h2 className="text-xl font-bold mb-4">
+                            Leave a Review
+                        </h2>
+                        <form
+                            onSubmit={handleReviewSubmit}
+                            className="space-y-4"
+                        >
+                            {successMessage && (
+                                <div className="mb-2 p-2 bg-green-100 text-green-700 rounded text-center text-sm">
+                                    {successMessage}
+                                </div>
+                            )}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Rating
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <Star
+                                            key={i}
+                                            className={`w-6 h-6 cursor-pointer ${
+                                                reviewData.rating >= i
+                                                    ? "text-yellow-400"
+                                                    : "text-gray-300"
+                                            }`}
+                                            onClick={() =>
+                                                setReviewData("rating", i)
+                                            }
+                                            onMouseEnter={() =>
+                                                setReviewData("rating", i)
+                                            }
+                                            onMouseLeave={() =>
+                                                setReviewData(
+                                                    "rating",
+                                                    reviewData.rating
+                                                )
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                                {reviewErrors.rating && (
+                                    <div className="text-red-600 text-sm">
+                                        {reviewErrors.rating}
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Title (optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-2"
+                                    value={reviewData.title}
+                                    onChange={(e) =>
+                                        setReviewData("title", e.target.value)
+                                    }
+                                />
+                                {reviewErrors.title && (
+                                    <div className="text-red-600 text-sm">
+                                        {reviewErrors.title}
+                                    </div>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Review (required)
+                                </label>
+                                <textarea
+                                    className="w-full border rounded px-3 py-2"
+                                    value={reviewData.content}
+                                    onChange={(e) =>
+                                        setReviewData("content", e.target.value)
+                                    }
+                                    rows={4}
+                                    required
+                                />
+                                {reviewErrors.content && (
+                                    <div className="text-red-600 text-sm">
+                                        {reviewErrors.content}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex justify-end gap-2 mt-4">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                    onClick={() => {
+                                        setShowReviewModal(false);
+                                        resetReview();
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                    disabled={reviewProcessing}
+                                >
+                                    Submit Review
                                 </button>
                             </div>
                         </form>

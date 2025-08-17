@@ -106,6 +106,14 @@ class Clinic extends Model
     }
 
     /**
+     * Get the services associated with the clinic.
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
      * Check if the clinic's subscription is active.
      */
     public function isSubscriptionActive()
@@ -169,5 +177,13 @@ class Clinic extends Model
     public function payments()
     {
         return $this->hasMany(\App\Models\Payment::class);
+    }
+
+    /**
+     * Get the reviews associated with the clinic.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

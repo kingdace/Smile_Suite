@@ -116,17 +116,23 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|in:admin,dentist,staff,clinic_admin',
-            'clinic_id' => 'required|exists:clinics,id',
+            'clinic_id' => $request->input('role') === 'admin' ? 'nullable|exists:clinics,id' : 'required|exists:clinics,id',
         ]);
 
-        // Create the user and associate them with the selected clinic
-        $user = User::create([
+        // Create the user and associate them with the selected clinic (if applicable)
+        $userData = [
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']), // Hash the password
             'role' => $validatedData['role'],
-            'clinic_id' => $validatedData['clinic_id'],
-        ]);
+        ];
+
+        // Only set clinic_id if it's provided (not for System Admins)
+        if (!empty($validatedData['clinic_id'])) {
+            $userData['clinic_id'] = $validatedData['clinic_id'];
+        }
+
+        $user = User::create($userData);
 
         // Redirect back to the user index page with a success message
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
@@ -163,8 +169,12 @@ class UserController extends Controller
         // Eager load the clinic relationship
         $user->load('clinic');
 
+        // Fetch all clinics to populate the dropdown in the form
+        $clinics = \App\Models\Clinic::all();
+
         return Inertia::render('Admin/Users/Edit', [
             'user' => $user,
+            'clinics' => $clinics,
         ]);
     }
 
@@ -184,12 +194,22 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|string|in:admin,dentist,staff,clinic_admin',
             'password' => 'nullable|string|min:8|confirmed',
+            'clinic_id' => $request->input('role') === 'admin' ? 'nullable|exists:clinics,id' : 'required|exists:clinics,id',
         ]);
 
         // Update user details
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
         $user->role = $validatedData['role'];
+
+        // Handle clinic_id based on role
+        if ($validatedData['role'] === 'admin') {
+            // System Admin - remove clinic association
+            $user->clinic_id = null;
+        } else {
+            // Other roles - set clinic_id if provided
+            $user->clinic_id = $validatedData['clinic_id'] ?? null;
+        }
 
         // Update password if provided
         if ($request->filled('password')) {
@@ -212,15 +232,13 @@ class UserController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-         // Prevent deleting the currently authenticated user
+        // Prevent deleting the currently authenticated user
         if (auth()->user()->id === $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account.');
         }
 
-        // Ensure the user being deleted belongs to the authenticated admin's clinic
-        if ($user->clinic_id !== auth()->user()->clinic_id) {
-             abort(403, 'Unauthorized action.');
-        }
+        // For system admins, they can delete any user from any clinic
+        // No need to check clinic_id since admins have system-wide access
 
         // Soft delete the user
         $user->delete();
@@ -231,20 +249,19 @@ class UserController extends Controller
     /**
      * Restore a soft-deleted user.
      */
-    public function restore(User $user)
+    public function restore($id)
     {
         // Check if the authenticated user is an admin
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized action.');
         }
 
-        // Ensure the user being restored belongs to the authenticated admin's clinic
-        // We need to use withTrashed() here to find the soft-deleted user by route model binding
-        $clinic = auth()->user()->clinic;
-        $userToRestore = $clinic->users()->withTrashed()->find($user->id);
+        // For system admins, they can restore any user from any clinic
+        // Find the soft-deleted user directly by ID
+        $userToRestore = User::withTrashed()->find($id);
 
         if (!$userToRestore) {
-             abort(403, 'Unauthorized action.'); // User not found in this clinic's deleted users
+            abort(404, 'User not found.'); // User not found
         }
 
         // Restore the user

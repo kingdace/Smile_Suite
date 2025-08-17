@@ -144,13 +144,18 @@ export default function ClinicInfo({ clinic, plan }) {
                                         setData("logo", e.target.files[0])
                                     }
                                 />
-                                {clinic?.logo_url && (
-                                    <img
-                                        src={clinic.logo_url}
-                                        alt="Clinic Logo"
-                                        className="h-20 mt-2 rounded"
-                                    />
-                                )}
+                                <img
+                                    src={
+                                        clinic?.logo_url ||
+                                        "/images/clinic-logo.png"
+                                    }
+                                    alt="Clinic Logo"
+                                    className="h-20 mt-2 rounded object-cover"
+                                    onError={(e) => {
+                                        e.target.src =
+                                            "/images/clinic-logo.png";
+                                    }}
+                                />
                                 {errors.logo && (
                                     <div className="text-red-600 text-sm">
                                         {errors.logo}

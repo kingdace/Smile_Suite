@@ -15,6 +15,7 @@ import {
     ChevronDown,
     ChevronRight,
     CircleSmall,
+    Scissors,
 } from "lucide-react";
 
 const navigation = (clinicId) => [
@@ -47,6 +48,12 @@ const navigation = (clinicId) => [
         href: route("clinic.treatments.index", [clinicId]),
         routeName: "clinic.treatments.*",
         icon: Stethoscope,
+    },
+    {
+        name: "Services",
+        href: route("clinic.services.index", [clinicId]),
+        routeName: "clinic.services.*",
+        icon: Scissors,
     },
     {
         name: "Inventory",

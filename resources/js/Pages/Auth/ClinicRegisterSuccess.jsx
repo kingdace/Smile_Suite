@@ -9,209 +9,346 @@ import {
 } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import SiteHeader from "@/Components/SiteHeader";
-import { CheckCircle, Info } from "lucide-react";
+import {
+    CheckCircle,
+    Info,
+    Mail,
+    Clock,
+    CreditCard,
+    Settings,
+    Rocket,
+    AlertTriangle,
+} from "lucide-react";
 
 export default function ClinicRegisterSuccess({ request }) {
     return (
         <>
             <Head title="Registration Request Submitted" />
             <SiteHeader />
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-                {/* Soft SVG background pattern for consistency */}
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                {/* Enhanced background pattern */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-100/20 via-indigo-100/20 to-purple-100/20"></div>
                 <svg
-                    className="absolute left-0 top-0 w-full h-full opacity-20 pointer-events-none"
+                    className="absolute left-0 top-0 w-full h-full opacity-10 pointer-events-none"
                     width="100%"
                     height="100%"
                     viewBox="0 0 800 600"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    <circle cx="700" cy="100" r="80" fill="#bae6fd" />
-                    <circle cx="100" cy="500" r="120" fill="#c7d2fe" />
+                    <circle cx="700" cy="100" r="80" fill="#3b82f6" />
+                    <circle cx="100" cy="500" r="120" fill="#6366f1" />
                     <rect
                         x="300"
                         y="350"
                         width="200"
                         height="80"
                         rx="40"
-                        fill="#e0e7ff"
+                        fill="#8b5cf6"
                     />
+                    <circle cx="600" cy="200" r="60" fill="#06b6d4" />
+                    <circle cx="200" cy="300" r="40" fill="#0ea5e9" />
                 </svg>
-                <div className="max-w-2xl w-full space-y-8 relative z-10">
-                    <div className="text-center mb-2">
-                        <div className="flex justify-center items-center gap-2 mb-2">
-                            <CheckCircle className="w-10 h-10 text-green-500 animate-bounce" />
-                            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+
+                <div className="max-w-3xl w-full space-y-8 relative z-10">
+                    {/* Enhanced Header */}
+                    <div className="text-center mb-6">
+                        <div className="flex justify-center items-center gap-3 mb-4">
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-green-400 rounded-full blur-lg opacity-30 animate-pulse"></div>
+                                <CheckCircle className="w-12 h-12 text-green-500 relative z-10 animate-bounce" />
+                            </div>
+                            <h2 className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
                                 Registration Request Submitted!
                             </h2>
                         </div>
-                        <p className="mt-2 text-base text-gray-600">
+                        <p className="text-lg text-gray-600 font-medium">
                             Thank you for your interest in Smile Suite
                         </p>
+                        <div className="mt-2 w-24 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mx-auto"></div>
                     </div>
-                    <Card className="shadow-xl rounded-2xl border border-blue-100 bg-white/90 backdrop-blur-sm">
-                        <CardHeader>
-                            <div className="flex items-center gap-2 mb-1">
-                                <Info className="w-6 h-6 text-blue-400" />
-                                <CardTitle className="text-2xl font-bold text-blue-700">
-                                    What happens next?
-                                </CardTitle>
+
+                    {/* Main Card */}
+                    <Card className="shadow-2xl rounded-3xl border-0 bg-white/95 backdrop-blur-sm overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <Info className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-2xl font-bold text-white">
+                                        What happens next?
+                                    </CardTitle>
+                                    <CardDescription className="text-blue-100 mt-1">
+                                        Your clinic registration request has
+                                        been received and is being reviewed.
+                                    </CardDescription>
+                                </div>
                             </div>
-                            <CardDescription className="text-gray-700">
-                                Your clinic registration request has been
-                                received and is being reviewed.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <h3 className="font-semibold text-blue-900 mb-2">
+                        </div>
+
+                        <CardContent className="p-8 space-y-8">
+                            {/* Request Details Card */}
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-5">
+                                <h3 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
+                                    <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center">
+                                        <Mail className="w-4 h-4 text-white" />
+                                    </div>
                                     Request Details
                                 </h3>
-                                <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">
-                                            Clinic Name:
-                                        </span>
-                                        <span className="font-medium">
-                                            {request.clinic_name}
-                                        </span>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {/* Left Column */}
+                                    <div className="space-y-3">
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center">
+                                                        <span className="text-blue-600 font-bold text-xs">
+                                                            🏥
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-gray-600 font-medium text-sm">
+                                                        Clinic Name
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    className="font-bold text-gray-900 text-right max-w-[180px] truncate text-sm"
+                                                    title={request.clinic_name}
+                                                >
+                                                    {request.clinic_name}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center">
+                                                        <span className="text-blue-600 font-bold text-xs">
+                                                            👤
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-gray-600 font-medium text-sm">
+                                                        Contact Person
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    className="font-bold text-gray-900 text-right max-w-[180px] truncate text-sm"
+                                                    title={
+                                                        request.contact_person
+                                                    }
+                                                >
+                                                    {request.contact_person}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center">
+                                                        <span className="text-blue-600 font-bold text-xs">
+                                                            📧
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-gray-600 font-medium text-sm">
+                                                        Email Address
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    className="font-bold text-gray-900 text-right max-w-[180px] truncate text-sm"
+                                                    title={request.email}
+                                                >
+                                                    {request.email}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">
-                                            Contact Person:
-                                        </span>
-                                        <span className="font-medium">
-                                            {request.contact_person}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">
-                                            Email:
-                                        </span>
-                                        <span className="font-medium">
-                                            {request.email}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">
-                                            Subscription Plan:
-                                        </span>
-                                        <span className="font-medium capitalize">
-                                            {request.subscription_plan}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">
-                                            Monthly Cost:
-                                        </span>
-                                        <span className="font-medium">
-                                            ${request.subscription_amount}
-                                        </span>
+
+                                    {/* Right Column */}
+                                    <div className="space-y-3">
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center">
+                                                        <span className="text-blue-600 font-bold text-xs">
+                                                            📋
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-gray-600 font-medium text-sm">
+                                                        Subscription Plan
+                                                    </span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="inline-block bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-bold capitalize">
+                                                        {
+                                                            request.subscription_plan
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center">
+                                                        <span className="text-blue-600 font-bold text-xs">
+                                                            💰
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-gray-600 font-medium text-sm">
+                                                        Monthly Cost
+                                                    </span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-xl font-bold text-green-600">
+                                                        $
+                                                        {
+                                                            request.subscription_amount
+                                                        }
+                                                    </span>
+                                                    <div className="text-xs text-gray-500">
+                                                        per month
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 shadow-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center">
+                                                    <span className="text-green-600 font-bold text-xs">
+                                                        ✅
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-green-800 text-sm">
+                                                        Request Status
+                                                    </div>
+                                                    <div className="text-xs text-green-600">
+                                                        Pending Review
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-gray-900">
+                            {/* Next Steps */}
+                            <div className="space-y-6">
+                                <h3 className="font-bold text-gray-900 text-xl flex items-center gap-2">
+                                    <Rocket className="w-6 h-6 text-blue-600" />
                                     Next Steps:
                                 </h3>
-                                <div className="space-y-3">
-                                    <div className="flex items-start">
-                                        <div className="flex-shrink-0">
-                                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-blue-100">
-                                                <span className="text-sm font-medium text-blue-600">
-                                                    1
-                                                </span>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-4">
+                                        <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                                            <div className="flex-shrink-0">
+                                                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                                    <span className="text-sm font-bold text-white">
+                                                        1
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-700 font-medium">
+                                                    <span className="text-blue-700 font-bold">
+                                                        Review Process:
+                                                    </span>{" "}
+                                                    Our team will review your
+                                                    application within 24-48
+                                                    hours.
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="ml-3">
-                                            <p className="text-sm text-gray-700">
-                                                <strong>Review Process:</strong>{" "}
-                                                Our team will review your
-                                                application within 24-48 hours.
-                                            </p>
+
+                                        <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                                            <div className="flex-shrink-0">
+                                                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                                    <span className="text-sm font-bold text-white">
+                                                        2
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-700 font-medium">
+                                                    <span className="text-blue-700 font-bold">
+                                                        Payment Processing:
+                                                    </span>{" "}
+                                                    If approved, you'll receive
+                                                    payment instructions.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-start">
-                                        <div className="flex-shrink-0">
-                                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-blue-100">
-                                                <span className="text-sm font-medium text-blue-600">
-                                                    2
-                                                </span>
+
+                                    <div className="space-y-4">
+                                        <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                                            <div className="flex-shrink-0">
+                                                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                                    <span className="text-sm font-bold text-white">
+                                                        3
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-700 font-medium">
+                                                    <span className="text-blue-700 font-bold">
+                                                        Account Setup:
+                                                    </span>{" "}
+                                                    After payment, you'll
+                                                    receive an email with setup
+                                                    instructions.
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="ml-3">
-                                            <p className="text-sm text-gray-700">
-                                                <strong>
-                                                    Payment Processing:
-                                                </strong>{" "}
-                                                If approved, you'll receive
-                                                payment instructions.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start">
-                                        <div className="flex-shrink-0">
-                                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-blue-100">
-                                                <span className="text-sm font-medium text-blue-600">
-                                                    3
-                                                </span>
+
+                                        <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                                            <div className="flex-shrink-0">
+                                                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                                    <span className="text-sm font-bold text-white">
+                                                        4
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="ml-3">
-                                            <p className="text-sm text-gray-700">
-                                                <strong>Account Setup:</strong>{" "}
-                                                After payment, you'll receive an
-                                                email with setup instructions.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start">
-                                        <div className="flex-shrink-0">
-                                            <div className="flex items-center justify-center h-6 w-6 rounded-full bg-blue-100">
-                                                <span className="text-sm font-medium text-blue-600">
-                                                    4
-                                                </span>
+                                            <div>
+                                                <p className="text-sm text-gray-700 font-medium">
+                                                    <span className="text-blue-700 font-bold">
+                                                        Go Live:
+                                                    </span>{" "}
+                                                    Complete your clinic setup
+                                                    and start using Smile Suite!
+                                                </p>
                                             </div>
-                                        </div>
-                                        <div className="ml-3">
-                                            <p className="text-sm text-gray-700">
-                                                <strong>Go Live:</strong>{" "}
-                                                Complete your clinic setup and
-                                                start using Smile Suite!
-                                            </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                <div className="flex">
+                            {/* Important Note */}
+                            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
+                                <div className="flex items-start gap-4">
                                     <div className="flex-shrink-0">
-                                        <svg
-                                            className="h-5 w-5 text-yellow-400"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                                            <AlertTriangle className="w-6 h-6 text-amber-600" />
+                                        </div>
                                     </div>
-                                    <div className="ml-3">
-                                        <h3 className="text-sm font-medium text-yellow-800">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-amber-800 mb-2">
                                             Important Note
                                         </h3>
-                                        <div className="mt-2 text-sm text-yellow-700">
+                                        <div className="text-sm text-amber-700 leading-relaxed">
                                             <p>
                                                 Please check your email (
-                                                {request.email}) for a
-                                                confirmation message. All future
-                                                communications about your
-                                                application will be sent to this
-                                                email address.
+                                                <span className="font-semibold">
+                                                    {request.email}
+                                                </span>
+                                                ) for a confirmation message.
+                                                All future communications about
+                                                your application will be sent to
+                                                this email address.
                                             </p>
                                         </div>
                                     </div>
@@ -220,17 +357,18 @@ export default function ClinicRegisterSuccess({ request }) {
                         </CardContent>
                     </Card>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <Link href="/">
                             <Button
                                 variant="outline"
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto px-8 py-3 text-base font-semibold border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all duration-300"
                             >
                                 ← Back to Home
                             </Button>
                         </Link>
                         <Link href={route("login")}>
-                            <Button className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto px-8 py-3 text-base font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300">
                                 Go to Login
                             </Button>
                         </Link>

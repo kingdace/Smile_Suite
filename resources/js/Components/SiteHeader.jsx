@@ -3,7 +3,6 @@ import { route } from "ziggy-js";
 import {
     LogOut,
     User as UserIcon,
-    Smile,
     LayoutGrid,
     Users,
     Building2,
@@ -65,7 +64,7 @@ export default function SiteHeader() {
     }, [profileDropdownOpen, registerDropdownOpen]);
 
     return (
-        <nav className="bg-white shadow-none border-b border-blue-100 font-inter relative transition-all duration-200">
+        <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200 font-inter sticky top-0 z-50">
             {/* Thin divider bar, no gradient or accent bar */}
             {/* Removed the accent bar for a cleaner look */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,47 +73,52 @@ export default function SiteHeader() {
                     <div className="flex items-center">
                         <Link
                             href="/"
-                            className="flex-shrink-0 flex items-center gap-2 group"
+                            className="flex-shrink-0 flex items-center gap-4 group transition-all duration-200"
                         >
-                            <Smile className="w-8 h-8 text-blue-500 group-hover:scale-110 transition-transform duration-200" />
-                            <h1
-                                className="text-2xl font-extrabold text-blue-600 tracking-tight font-[Montserrat,Inter,sans-serif] group-hover:text-cyan-500 transition-colors duration-200"
-                                style={{
-                                    letterSpacing: "-0.01em",
-                                    fontFamily: "Montserrat,Inter,sans-serif",
-                                }}
-                            >
-                                Smile Suite
-                            </h1>
+                            <div className="relative">
+                                <img
+                                    src="/images/smile-suite-logo.png"
+                                    alt="Smile Suite Logo"
+                                    className="object-contain w-16 h-16 group-hover:opacity-80 transition-opacity duration-200"
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <div className="text-2xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors duration-300">
+                                    Smile Suite
+                                </div>
+                                <div className="text-sm text-gray-600 font-semibold tracking-wide group-hover:text-blue-500 transition-colors duration-300">
+                                    Cloud-based Dental Clinic as a Service
+                                </div>
+                            </div>
                         </Link>
                     </div>
                     {/* Nav links + Register + Avatar right */}
                     <div className="flex items-center space-x-2 md:space-x-6">
                         <Link
                             href="/#features"
-                            className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-[15px] font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Features
                         </Link>
                         <Link
                             href={route("public.clinics.index") || "/clinics"}
-                            className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-[15px] font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Find Clinics
                         </Link>
                         <Link
-                            href="/#about"
-                            className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-[15px] font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            href="/#testimonials"
+                            className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
-                            About
+                            Reviews
                         </Link>
                         {/* Register Dropdown */}
                         <div className="relative" ref={registerDropdownRef}>
                             <button
-                                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-[15px] font-semibold focus:outline-none transition-colors duration-150 focus:ring-2 focus:ring-blue-200"
+                                className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold focus:outline-none transition-all duration-200 focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                                 onClick={() =>
                                     setRegisterDropdownOpen((v) => !v)
@@ -170,7 +174,7 @@ export default function SiteHeader() {
                         {!isLoggedIn && (
                             <Link
                                 href={route("login")}
-                                className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-5 py-2 rounded-lg text-[15px] font-semibold ml-2 shadow-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                                className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 text-white px-6 py-3 rounded-xl text-[15px] font-bold ml-2 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 transform hover:scale-105"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
                                 Login
