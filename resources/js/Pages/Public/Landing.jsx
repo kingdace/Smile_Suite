@@ -842,123 +842,86 @@ export default function Landing() {
                 </div>
             </div>
 
-            {/* Footer */}
+            {/* Enhanced Compact Footer */}
             <footer className="bg-gray-900 z-10 relative">
-                <div className="max-w-7xl mx-auto py-14 px-4 sm:px-6 lg:py-20 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-start">
-                        {/* Left: Logo, description, social */}
-                        <div className="space-y-6">
-                            <h3 className="text-2xl font-bold text-white">
-                                Smile Suite
-                            </h3>
-                            <p className="text-gray-300 text-base max-w-xs">
-                                Cloud-based dental clinic management solution
-                                designed to streamline your practice operations.
-                            </p>
-                            <div className="flex gap-4 mt-2">
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-blue-400 transition-colors"
-                                >
-                                    <Facebook className="w-6 h-6" />
-                                </a>
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-blue-400 transition-colors"
-                                >
-                                    <Twitter className="w-6 h-6" />
-                                </a>
-                                <a
-                                    href="#"
-                                    className="text-gray-400 hover:text-blue-400 transition-colors"
-                                >
-                                    <Instagram className="w-6 h-6" />
-                                </a>
-                            </div>
-                        </div>
-                        {/* Center: Platform/Support links */}
-                        <div className="flex flex-col sm:flex-row gap-10 md:gap-16 justify-center">
-                            <div>
-                                <h4 className="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-3">
-                                    Platform
-                                </h4>
-                                <ul className="space-y-2">
-                                    <li>
-                                        <Link
-                                            href="#features"
-                                            className="text-base text-gray-300 hover:text-white transition"
-                                        >
-                                            Features
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={route("public.clinics.index")}
-                                            className="text-base text-gray-300 hover:text-white transition"
-                                        >
-                                            Find Clinics
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-3">
-                                    Support
-                                </h4>
-                                <ul className="space-y-2">
-                                    <li>
-                                        <Link
-                                            href="#about"
-                                            className="text-base text-gray-300 hover:text-white transition"
-                                        >
-                                            About
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={route("register")}
-                                            className="text-base text-gray-300 hover:text-white transition"
-                                        >
-                                            Register
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={route("login")}
-                                            className="text-base text-gray-300 hover:text-white transition"
-                                        >
-                                            Login
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        {/* Right: Newsletter */}
-                        <div className="space-y-4 max-w-sm w-full">
-                            <h4 className="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-2">
-                                Newsletter
-                            </h4>
-                            <p className="text-gray-400 text-sm mb-2">
-                                Get updates and news from Smile Suite.
-                            </p>
-                            <form className="flex flex-col sm:flex-row gap-2 w-full">
-                                <input
-                                    type="email"
-                                    placeholder="Your email address"
-                                    className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 flex-1"
+                <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                        {/* Logo and Description */}
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <img
+                                    src="/images/smile-suite-logo.png"
+                                    alt="Smile Suite"
+                                    className="w-10 h-10"
                                 />
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition flex items-center gap-2 min-w-[120px] justify-center"
-                                >
-                                    <Mail className="w-5 h-5" />
-                                    Subscribe
-                                </button>
-                            </form>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">
+                                        Smile Suite
+                                    </h3>
+                                    <p className="text-gray-400 text-sm">
+                                        Dental Practice Management Platform
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Navigation Links */}
+                        <div className="flex items-center gap-8">
+                            <Link
+                                href="#features"
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Features
+                            </Link>
+                            <Link
+                                href={route("public.clinics.index")}
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Find Clinics
+                            </Link>
+                            <Link
+                                href={route("register.clinic")}
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Register
+                            </Link>
+                            <Link
+                                href={route("login")}
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Login
+                            </Link>
+                        </div>
+
+                        {/* Social Links */}
+                        <div className="flex items-center gap-4">
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-blue-400 transition-colors"
+                                aria-label="Facebook"
+                            >
+                                <Facebook className="w-5 h-5" />
+                            </a>
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-blue-400 transition-colors"
+                                aria-label="Twitter"
+                            >
+                                <Twitter className="w-5 h-5" />
+                            </a>
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-blue-400 transition-colors"
+                                aria-label="Instagram"
+                            >
+                                <Instagram className="w-5 h-5" />
+                            </a>
                         </div>
                     </div>
-                    <div className="mt-14 border-t border-gray-800 pt-8 text-center">
-                        <p className="text-base text-gray-400">
+
+                    {/* Copyright */}
+                    <div className="mt-6 pt-6 border-t border-gray-800 text-center">
+                        <p className="text-sm text-gray-400">
                             &copy; 2024 Smile Suite. All rights reserved.
                         </p>
                     </div>

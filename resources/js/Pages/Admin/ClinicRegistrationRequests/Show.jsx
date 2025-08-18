@@ -41,6 +41,9 @@ import {
     Calendar,
     Shield,
     Star,
+    Plus,
+    Info,
+    Activity,
 } from "lucide-react";
 import { Tooltip } from "@/Components/ui/tooltip";
 
@@ -350,47 +353,48 @@ export default function Show({ auth, request }) {
             />
 
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white">
-                {/* Compact Enhanced Header Section */}
-                <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 shadow-lg">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                        <div className="flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <Link
-                                    href={route("admin.clinic-requests.index")}
-                                    className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all duration-200"
-                                >
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
+                {/* Modern Header Section */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="bg-gradient-to-r from-white via-blue-50/50 to-cyan-50/50 rounded-2xl border border-blue-200/50 shadow-lg backdrop-blur-sm">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between gap-6">
+                                <div className="flex items-center gap-4">
+                                    <Link
+                                        href={route(
+                                            "admin.clinic-requests.index"
+                                        )}
+                                        className="group inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm hover:shadow-md"
+                                    >
+                                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+                                    </Link>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-md">
+                                            <FileText className="h-5 w-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h1 className="text-xl font-bold text-gray-900">
+                                                {request.clinic_name}
+                                            </h1>
+                                            <div className="flex items-center gap-3 mt-1">
+                                                <p className="text-sm text-gray-600">
+                                                    Clinic Registration Request
+                                                </p>
+                                                <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                                                <p className="text-sm font-mono text-gray-600">
+                                                    #{request.id}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20">
-                                        <FileText className="h-5 w-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <h1 className="text-xl font-bold text-white">
-                                            {request.clinic_name}
-                                        </h1>
-                                        <p className="text-blue-100 text-sm">
-                                            Clinic Registration Request
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500">
+                                            Status
                                         </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="text-right">
-                                    <p className="text-blue-100 text-xs">
-                                        Request ID
-                                    </p>
-                                    <p className="text-white font-mono text-sm font-semibold">
-                                        #{request.id}
-                                    </p>
-                                </div>
-                                <div className="h-8 w-px bg-white/20"></div>
-                                <div className="text-right">
-                                    <p className="text-blue-100 text-xs">
-                                        Status
-                                    </p>
-                                    <div className="mt-1">
-                                        {getStatusBadge(request.status)}
+                                        <div className="mt-1">
+                                            {getStatusBadge(request.status)}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -398,7 +402,7 @@ export default function Show({ auth, request }) {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Content */}
                         <div className="lg:col-span-2 space-y-6">

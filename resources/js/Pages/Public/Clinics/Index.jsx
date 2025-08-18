@@ -22,6 +22,9 @@ import {
     Globe,
     ArrowRight,
     Sparkles,
+    Facebook,
+    Twitter,
+    Instagram,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
 
@@ -214,34 +217,34 @@ export default function ClinicDirectory({ clinics }) {
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-48 translate-y-48"></div>
                 <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16"></div>
 
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="text-center">
-                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm font-medium mb-8">
+                        <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm font-medium mb-6">
                             <Building2 className="w-4 h-4 mr-2" />
                             Clinic Directory
                         </div>
-                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                             Find Your Perfect{" "}
                             <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                                 Dental Clinic
                             </span>
                         </h1>
-                        <p className="text-xl text-blue-100 max-w-4xl mx-auto mb-12 leading-relaxed">
+                        <p className="text-lg text-blue-100 max-w-3xl mx-auto mb-8 leading-relaxed">
                             Discover trusted dental clinics in your area. Browse
                             our network of professional dental practices and
                             find the perfect match for your oral health needs.
                         </p>
 
                         {/* Enhanced Quick Stats */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                                <div className="flex items-center justify-center mb-3">
-                                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                                        <Users className="w-6 h-6" />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                                <div className="flex items-center justify-center mb-2">
+                                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                        <Users className="w-5 h-5" />
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold mb-1">
+                                    <div className="text-xl font-bold mb-1">
                                         {clinics.data?.length || 0}+
                                     </div>
                                     <div className="text-blue-100 text-sm">
@@ -249,14 +252,14 @@ export default function ClinicDirectory({ clinics }) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                                <div className="flex items-center justify-center mb-3">
-                                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center">
-                                        <ShieldCheck className="w-6 h-6" />
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                                <div className="flex items-center justify-center mb-2">
+                                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                                        <ShieldCheck className="w-5 h-5" />
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold mb-1">
+                                    <div className="text-xl font-bold mb-1">
                                         100%
                                     </div>
                                     <div className="text-blue-100 text-sm">
@@ -264,14 +267,14 @@ export default function ClinicDirectory({ clinics }) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                                <div className="flex items-center justify-center mb-3">
-                                    <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
-                                        <Calendar className="w-6 h-6" />
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                                <div className="flex items-center justify-center mb-2">
+                                    <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
+                                        <Calendar className="w-5 h-5" />
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-2xl font-bold mb-1">
+                                    <div className="text-xl font-bold mb-1">
                                         24/7
                                     </div>
                                     <div className="text-blue-100 text-sm">
@@ -282,17 +285,17 @@ export default function ClinicDirectory({ clinics }) {
                         </div>
 
                         {/* Trust indicators */}
-                        <div className="flex flex-wrap justify-center items-center gap-8 text-blue-100">
+                        <div className="flex flex-wrap justify-center items-center gap-6 text-blue-100">
                             <div className="flex items-center">
-                                <CheckCircle className="w-5 h-5 mr-2 text-green-300" />
+                                <CheckCircle className="w-4 h-4 mr-2 text-green-300" />
                                 <span className="text-sm">HIPAA Compliant</span>
                             </div>
                             <div className="flex items-center">
-                                <Award className="w-5 h-5 mr-2 text-yellow-300" />
+                                <Award className="w-4 h-4 mr-2 text-yellow-300" />
                                 <span className="text-sm">Award Winning</span>
                             </div>
                             <div className="flex items-center">
-                                <TrendingUp className="w-5 h-5 mr-2 text-blue-300" />
+                                <TrendingUp className="w-4 h-4 mr-2 text-blue-300" />
                                 <span className="text-sm">Growing Network</span>
                             </div>
                         </div>
@@ -301,16 +304,16 @@ export default function ClinicDirectory({ clinics }) {
             </section>
 
             {/* Enhanced Search and Filters Section */}
-            <section className="relative -mt-8 z-10">
+            <section className="relative -mt-6 z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
                         {/* Search Bar */}
-                        <div className="mb-8">
-                            <div className="relative max-w-3xl mx-auto">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-500" />
+                        <div className="mb-6">
+                            <div className="relative max-w-2xl mx-auto">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500" />
                                 <input
                                     type="text"
-                                    className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                                     placeholder="Search clinics by name, location, or services..."
                                     value={searchTerm}
                                     onChange={(e) =>
@@ -321,9 +324,9 @@ export default function ClinicDirectory({ clinics }) {
                         </div>
 
                         {/* Enhanced Filters and Controls */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-4xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 max-w-3xl mx-auto">
                             <div className="text-center">
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Region
                                 </label>
                                 <select
@@ -333,7 +336,7 @@ export default function ClinicDirectory({ clinics }) {
                                         setSelectedProvince("");
                                         setSelectedCity("");
                                     }}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
                                 >
                                     <option value="">All Regions</option>
                                     {availableRegions.map((region) => (
@@ -345,7 +348,7 @@ export default function ClinicDirectory({ clinics }) {
                             </div>
 
                             <div className="text-center">
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Province
                                 </label>
                                 <select
@@ -354,7 +357,7 @@ export default function ClinicDirectory({ clinics }) {
                                         setSelectedProvince(e.target.value);
                                         setSelectedCity("");
                                     }}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
                                     disabled={!selectedRegion}
                                 >
                                     <option value="">All Provinces</option>
@@ -367,7 +370,7 @@ export default function ClinicDirectory({ clinics }) {
                             </div>
 
                             <div className="text-center">
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
                                     City/Municipality
                                 </label>
                                 <select
@@ -375,7 +378,7 @@ export default function ClinicDirectory({ clinics }) {
                                     onChange={(e) =>
                                         setSelectedCity(e.target.value)
                                     }
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
                                     disabled={!selectedProvince}
                                 >
                                     <option value="">All Cities</option>
@@ -389,9 +392,9 @@ export default function ClinicDirectory({ clinics }) {
                         </div>
 
                         {/* Enhanced Results Counter and Controls */}
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div className="flex items-center gap-4">
-                                <span className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div className="flex items-center gap-3">
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
                                     Showing {sortedClinics.length} of{" "}
                                     {clinics.data?.length || 0} clinics
                                 </span>
@@ -404,7 +407,7 @@ export default function ClinicDirectory({ clinics }) {
                                         onChange={(e) =>
                                             setSortBy(e.target.value)
                                         }
-                                        className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     >
                                         <option value="name">Name</option>
                                         <option value="location">
@@ -422,7 +425,7 @@ export default function ClinicDirectory({ clinics }) {
                                 <div className="flex bg-gray-100 rounded-lg p-1">
                                     <button
                                         onClick={() => setViewMode("grid")}
-                                        className={`p-2 rounded-md transition-colors ${
+                                        className={`p-1.5 rounded-md transition-colors ${
                                             viewMode === "grid"
                                                 ? "bg-white shadow-sm text-blue-600"
                                                 : "text-gray-600 hover:text-gray-900"
@@ -438,7 +441,7 @@ export default function ClinicDirectory({ clinics }) {
                                     </button>
                                     <button
                                         onClick={() => setViewMode("list")}
-                                        className={`p-2 rounded-md transition-colors ${
+                                        className={`p-1.5 rounded-md transition-colors ${
                                             viewMode === "list"
                                                 ? "bg-white shadow-sm text-blue-600"
                                                 : "text-gray-600 hover:text-gray-900"
@@ -747,75 +750,86 @@ export default function ClinicDirectory({ clinics }) {
                 </div>
             </section>
 
-            {/* Footer */}
+            {/* Enhanced Compact Footer */}
             <footer className="bg-gray-900 text-white">
-                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div>
-                            <div className="flex items-center mb-4">
+                <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                        {/* Logo and Description */}
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
                                 <img
                                     src="/images/smile-suite-logo.png"
                                     alt="Smile Suite"
-                                    className="w-8 h-8 mr-3"
+                                    className="w-10 h-10"
                                 />
-                                <h3 className="text-xl font-bold">
-                                    Smile Suite
-                                </h3>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">
+                                        Smile Suite
+                                    </h3>
+                                    <p className="text-gray-400 text-sm">
+                                        Dental Practice Management Platform
+                                    </p>
+                                </div>
                             </div>
-                            <p className="text-gray-300">
-                                Cloud-based dental clinic management solution
-                                designed to streamline your practice operations.
-                            </p>
                         </div>
-                        <div>
-                            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
-                                Platform
-                            </h4>
-                            <ul className="space-y-3">
-                                <li>
-                                    <Link
-                                        href="/#features"
-                                        className="text-gray-300 hover:text-white transition-colors"
-                                    >
-                                        Features
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href="/"
-                                        className="text-gray-300 hover:text-white transition-colors"
-                                    >
-                                        Home
-                                    </Link>
-                                </li>
-                            </ul>
+
+                        {/* Navigation Links */}
+                        <div className="flex items-center gap-8">
+                            <Link
+                                href="/#features"
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Features
+                            </Link>
+                            <Link
+                                href="/"
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Home
+                            </Link>
+                            <Link
+                                href={route("register.clinic")}
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Register
+                            </Link>
+                            <Link
+                                href={route("login")}
+                                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                            >
+                                Login
+                            </Link>
                         </div>
-                        <div>
-                            <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
-                                Support
-                            </h4>
-                            <ul className="space-y-3">
-                                <li>
-                                    <Link
-                                        href="/#about"
-                                        className="text-gray-300 hover:text-white transition-colors"
-                                    >
-                                        About
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={route("login")}
-                                        className="text-gray-300 hover:text-white transition-colors"
-                                    >
-                                        Login
-                                    </Link>
-                                </li>
-                            </ul>
+
+                        {/* Social Links */}
+                        <div className="flex items-center gap-4">
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-blue-400 transition-colors"
+                                aria-label="Facebook"
+                            >
+                                <Facebook className="w-5 h-5" />
+                            </a>
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-blue-400 transition-colors"
+                                aria-label="Twitter"
+                            >
+                                <Twitter className="w-5 h-5" />
+                            </a>
+                            <a
+                                href="#"
+                                className="text-gray-400 hover:text-blue-400 transition-colors"
+                                aria-label="Instagram"
+                            >
+                                <Instagram className="w-5 h-5" />
+                            </a>
                         </div>
                     </div>
-                    <div className="mt-8 pt-8 border-t border-gray-800 text-center">
-                        <p className="text-gray-400">
+
+                    {/* Copyright */}
+                    <div className="mt-6 pt-6 border-t border-gray-800 text-center">
+                        <p className="text-sm text-gray-400">
                             &copy; 2024 Smile Suite. All rights reserved.
                         </p>
                     </div>

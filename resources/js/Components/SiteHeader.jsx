@@ -64,16 +64,14 @@ export default function SiteHeader() {
     }, [profileDropdownOpen, registerDropdownOpen]);
 
     return (
-        <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200 font-inter sticky top-0 z-50">
-            {/* Thin divider bar, no gradient or accent bar */}
-            {/* Removed the accent bar for a cleaner look */}
+        <nav className="bg-gradient-to-br from-slate-50 via-white to-blue-50/40 backdrop-blur-md shadow-sm border-b border-slate-200/60 font-inter sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
+                <div className="flex justify-between items-center h-18">
                     {/* Logo left */}
                     <div className="flex items-center">
                         <Link
                             href="/"
-                            className="flex-shrink-0 flex items-center gap-4 group transition-all duration-200"
+                            className="flex-shrink-0 flex items-center gap-4 group transition-all duration-300"
                         >
                             <div className="relative">
                                 <img
@@ -83,34 +81,42 @@ export default function SiteHeader() {
                                 />
                             </div>
                             <div className="flex flex-col">
-                                <div className="text-2xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors duration-300">
+                                <div
+                                    className="text-3xl font-black bg-gradient-to-r from-slate-900 via-slate-800 to-blue-800 bg-clip-text text-transparent tracking-tight group-hover:from-blue-800 group-hover:via-blue-700 group-hover:to-slate-700 transition-all duration-300 drop-shadow-sm leading-tight"
+                                    style={{
+                                        fontFamily: "Montserrat, sans-serif",
+                                    }}
+                                >
                                     Smile Suite
                                 </div>
-                                <div className="text-sm text-gray-600 font-semibold tracking-wide group-hover:text-blue-500 transition-colors duration-300">
+                                <div
+                                    className="text-xs text-slate-500 font-normal tracking-wide group-hover:text-slate-600 transition-colors duration-300 -mt-1.5"
+                                    style={{ fontFamily: "Inter, sans-serif" }}
+                                >
                                     Cloud-based Dental Clinic as a Service
                                 </div>
                             </div>
                         </Link>
                     </div>
                     {/* Nav links + Register + Avatar right */}
-                    <div className="flex items-center space-x-2 md:space-x-6">
+                    <div className="flex items-center space-x-1 md:space-x-4">
                         <Link
                             href="/#features"
-                            className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
+                            className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Features
                         </Link>
                         <Link
                             href={route("public.clinics.index") || "/clinics"}
-                            className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
+                            className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Find Clinics
                         </Link>
                         <Link
                             href="/#testimonials"
-                            className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
+                            className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Reviews
@@ -118,7 +124,7 @@ export default function SiteHeader() {
                         {/* Register Dropdown */}
                         <div className="relative" ref={registerDropdownRef}>
                             <button
-                                className="text-gray-800 hover:text-blue-600 px-4 py-2 rounded-lg text-[15px] font-semibold focus:outline-none transition-all duration-200 focus:ring-2 focus:ring-blue-200 hover:bg-blue-50"
+                                className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold focus:outline-none transition-all duration-300 focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                                 onClick={() =>
                                     setRegisterDropdownOpen((v) => !v)
@@ -144,7 +150,7 @@ export default function SiteHeader() {
                                 </svg>
                             </button>
                             <div
-                                className={`absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg py-1 z-50 transition-all duration-200 border border-blue-100 ${
+                                className={`absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl py-2 z-50 transition-all duration-300 border border-slate-200/50 ${
                                     registerDropdownOpen
                                         ? "opacity-100 visible scale-100"
                                         : "opacity-0 invisible scale-95"
@@ -154,7 +160,7 @@ export default function SiteHeader() {
                             >
                                 <Link
                                     href={route("register")}
-                                    className="block px-4 py-2 text-base text-gray-700 hover:bg-blue-50 rounded transition"
+                                    className="block px-4 py-3 text-base text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 transition-all duration-200"
                                     style={{ fontFamily: "Inter, sans-serif" }}
                                     role="menuitem"
                                 >
@@ -162,7 +168,7 @@ export default function SiteHeader() {
                                 </Link>
                                 <Link
                                     href={route("register.clinic")}
-                                    className="block px-4 py-2 text-base text-gray-700 hover:bg-blue-50 rounded transition"
+                                    className="block px-4 py-3 text-base text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 transition-all duration-200"
                                     style={{ fontFamily: "Inter, sans-serif" }}
                                     role="menuitem"
                                 >
@@ -174,7 +180,7 @@ export default function SiteHeader() {
                         {!isLoggedIn && (
                             <Link
                                 href={route("login")}
-                                className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 text-white px-6 py-3 rounded-xl text-[15px] font-bold ml-2 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 transform hover:scale-105"
+                                className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-[15px] font-bold ml-3 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/30 focus:ring-offset-2 transform hover:scale-105 border border-blue-500/20"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
                                 Login
@@ -182,14 +188,12 @@ export default function SiteHeader() {
                         )}
                         {isLoggedIn && (
                             <div
-                                className="relative ml-2 flex items-center"
+                                className="relative ml-3 flex items-center"
                                 ref={profileDropdownRef}
                             >
                                 <button
-                                    className="flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white hover:bg-gray-50 focus:outline-none transition min-w-[44px] shadow-sm focus:ring-2 focus:ring-blue-200"
+                                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-slate-200/60 bg-white/80 hover:bg-white backdrop-blur-sm focus:outline-none transition-all duration-300 min-w-[44px] shadow-sm hover:shadow-md focus:ring-2 focus:ring-blue-200/50"
                                     style={{
-                                        boxShadow:
-                                            "0 1px 4px 0 rgba(30,41,59,0.06)",
                                         fontFamily: "Inter, sans-serif",
                                     }}
                                     onClick={() =>
@@ -199,16 +203,16 @@ export default function SiteHeader() {
                                     aria-expanded={profileDropdownOpen}
                                     title="Go to Dashboard"
                                 >
-                                    <Avatar className="h-7 w-7 border border-gray-200 bg-white">
+                                    <Avatar className="h-8 w-8 border border-slate-200 bg-white">
                                         <AvatarFallback className="flex items-center justify-center w-full h-full">
-                                            <UserIcon className="w-4 h-4 text-blue-500" />
+                                            <UserIcon className="w-4 h-4 text-blue-600" />
                                         </AvatarFallback>
                                     </Avatar>
-                                    <span className="font-normal text-gray-800 text-[15px] max-w-[100px] truncate">
+                                    <span className="font-semibold text-slate-700 text-[15px] max-w-[100px] truncate">
                                         {auth.user.name}
                                     </span>
                                     <svg
-                                        className={`w-4 h-4 ml-1 transition-transform ${
+                                        className={`w-4 h-4 ml-1 transition-transform duration-200 ${
                                             profileDropdownOpen
                                                 ? "rotate-180"
                                                 : ""
@@ -225,9 +229,9 @@ export default function SiteHeader() {
                                         />
                                     </svg>
                                 </button>
-                                {/* Dropdown: clean, below button, triangle caret, no blue bar */}
+                                {/* Enhanced Dropdown */}
                                 <div
-                                    className={`absolute right-0 mt-2 w-64 bg-white border border-blue-100 rounded-xl shadow-xl z-50 transition-all duration-200 ${
+                                    className={`absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-xl z-50 transition-all duration-300 ${
                                         profileDropdownOpen
                                             ? "opacity-100 visible translate-y-0 scale-100"
                                             : "opacity-0 invisible -translate-y-2 scale-95"
@@ -237,9 +241,9 @@ export default function SiteHeader() {
                                     aria-label="Profile menu"
                                 >
                                     {/* Triangle caret */}
-                                    <div className="absolute -top-2 right-6 w-4 h-4 bg-white border-l border-t border-blue-100 rotate-45 z-10"></div>
-                                    <div className="py-2">
-                                        <div className="px-4 py-2 text-gray-800 font-medium border-b text-[15px]">
+                                    <div className="absolute -top-2 right-6 w-4 h-4 bg-white/95 backdrop-blur-md border-l border-t border-slate-200/50 rotate-45 z-10"></div>
+                                    <div className="py-3">
+                                        <div className="px-4 py-3 text-slate-800 font-semibold border-b border-slate-100 text-[15px]">
                                             {auth.user.name}
                                         </div>
                                         {/* Admin Dropdown */}
@@ -249,102 +253,92 @@ export default function SiteHeader() {
                                                     href={route(
                                                         "admin.dashboard"
                                                     )}
-                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded text-[15px] transition flex items-center gap-2"
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
                                                     style={{
                                                         fontFamily:
                                                             "Inter, sans-serif",
                                                     }}
                                                     role="menuitem"
                                                 >
-                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />{" "}
+                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
                                                     Admin Dashboard
                                                 </Link>
                                                 <Link
                                                     href={route(
                                                         "admin.users.index"
                                                     )}
-                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded text-[15px] transition flex items-center gap-2"
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
                                                     style={{
                                                         fontFamily:
                                                             "Inter, sans-serif",
                                                     }}
                                                     role="menuitem"
                                                 >
-                                                    <Users className="w-4 h-4 text-blue-500" />{" "}
+                                                    <Users className="w-4 h-4 text-blue-500" />
                                                     Users Management
                                                 </Link>
                                                 <Link
                                                     href={route(
                                                         "admin.clinics.index"
                                                     )}
-                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded text-[15px] transition flex items-center gap-2"
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
                                                     style={{
                                                         fontFamily:
                                                             "Inter, sans-serif",
                                                     }}
                                                     role="menuitem"
                                                 >
-                                                    <Building2 className="w-4 h-4 text-green-500" />{" "}
+                                                    <Building2 className="w-4 h-4 text-green-500" />
                                                     Clinics Management
                                                 </Link>
                                                 <Link
                                                     href={route(
                                                         "admin.clinic-requests.index"
                                                     )}
-                                                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded text-[15px] transition flex items-center gap-2"
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
                                                     style={{
                                                         fontFamily:
                                                             "Inter, sans-serif",
                                                     }}
                                                     role="menuitem"
                                                 >
-                                                    <FileText className="w-4 h-4 text-orange-500" />{" "}
+                                                    <FileText className="w-4 h-4 text-purple-500" />
                                                     Registration Requests
                                                 </Link>
                                             </>
                                         ) : (
-                                            <Link
-                                                href={dashboardRoute}
-                                                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded text-[15px] transition flex items-center gap-2"
+                                            <>
+                                                <Link
+                                                    href={dashboardRoute}
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
+                                                    style={{
+                                                        fontFamily:
+                                                            "Inter, sans-serif",
+                                                    }}
+                                                    role="menuitem"
+                                                >
+                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                                    Dashboard
+                                                </Link>
+                                            </>
+                                        )}
+                                        <div className="border-t border-slate-100 mt-2 pt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    router.post(route("logout"))
+                                                }
+                                                className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50/80 hover:text-red-700 flex items-center gap-3 text-[15px] transition-all duration-200 font-medium rounded-lg mx-2"
                                                 style={{
                                                     fontFamily:
                                                         "Inter, sans-serif",
                                                 }}
                                                 role="menuitem"
                                             >
-                                                <LayoutGrid className="w-4 h-4 text-blue-500" />{" "}
-                                                Dashboard
-                                            </Link>
-                                        )}
-                                        {/* Patient-specific links */}
-                                        {userRole === "patient" && (
-                                            <Link
-                                                href="/patient/profile"
-                                                className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded text-[15px] transition flex items-center gap-2"
-                                                style={{
-                                                    fontFamily:
-                                                        "Inter, sans-serif",
-                                                }}
-                                                role="menuitem"
-                                            >
-                                                <UserIcon className="w-4 h-4 text-blue-500" />{" "}
-                                                Profile
-                                            </Link>
-                                        )}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                router.post(route("logout"))
-                                            }
-                                            className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center gap-2 text-[15px] transition font-medium rounded"
-                                            style={{
-                                                fontFamily: "Inter, sans-serif",
-                                            }}
-                                            role="menuitem"
-                                        >
-                                            <LogOut className="w-4 h-4" /> Log
-                                            Out
-                                        </button>
+                                                <LogOut className="w-4 h-4" />
+                                                Log Out
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

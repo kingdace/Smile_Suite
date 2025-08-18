@@ -32,14 +32,14 @@ const Header = ({
     // Enhanced Admin Header
     if (auth?.user?.role === "admin" && !isClinicPage) {
         return (
-            <nav className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700 border-b border-purple-600/30 shadow-2xl">
+            <nav className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-slate-800 via-blue-900 to-slate-900 border-b border-slate-700/50 shadow-2xl">
                 <div className="max-w-full px-6 py-3">
                     <div className="flex items-center justify-between">
                         {/* Left Side - Logo and Navigation */}
                         <div className="flex items-center gap-8">
                             <div className="flex items-center gap-3">
                                 <div className="relative">
-                                    <div className="w-14 h-14 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-purple-200/50 overflow-hidden">
+                                    <div className="w-14 h-14 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-slate-200/50 overflow-hidden">
                                         <img
                                             src="/images/smile-suite-logo.png"
                                             alt="Smile Suite Logo"
@@ -47,13 +47,13 @@ const Header = ({
                                         />
                                     </div>
                                     {/* Enhanced glow effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-indigo-400/20 rounded-2xl animate-pulse"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-slate-400/20 rounded-2xl animate-pulse"></div>
                                 </div>
                                 <div>
                                     <h1 className="text-xl font-bold text-white">
                                         Smile Suite
                                     </h1>
-                                    <p className="text-xs text-purple-100 font-medium">
+                                    <p className="text-xs text-slate-200 font-medium">
                                         Admin Panel
                                     </p>
                                 </div>
@@ -78,8 +78,8 @@ const Header = ({
                                         !route().current(
                                             "admin.clinic-requests.*"
                                         )
-                                            ? "text-purple-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
-                                            : "text-purple-100 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
+                                            ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
+                                            : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
                                     }`}
                                 >
                                     <LayoutDashboard className="w-4 h-4" />
@@ -90,8 +90,8 @@ const Header = ({
                                     active={route().current("admin.users.*")}
                                     className={`px-4 py-2 font-medium text-sm transition-all duration-300 flex items-center gap-2 hover:scale-105 border rounded-xl ${
                                         route().current("admin.users.*")
-                                            ? "text-purple-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
-                                            : "text-purple-100 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
+                                            ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
+                                            : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
                                     }`}
                                 >
                                     <Users className="w-4 h-4" />
@@ -102,8 +102,8 @@ const Header = ({
                                     active={route().current("admin.clinics.*")}
                                     className={`px-4 py-2 font-medium text-sm transition-all duration-300 flex items-center gap-2 hover:scale-105 border rounded-xl ${
                                         route().current("admin.clinics.*")
-                                            ? "text-purple-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
-                                            : "text-purple-100 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
+                                            ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
+                                            : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
                                     }`}
                                 >
                                     <Building2 className="w-4 h-4" />
@@ -118,8 +118,8 @@ const Header = ({
                                         route().current(
                                             "admin.clinic-requests.*"
                                         )
-                                            ? "text-purple-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
-                                            : "text-purple-100 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
+                                            ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
+                                            : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
                                     }`}
                                 >
                                     <FileText className="w-4 h-4" />
@@ -131,7 +131,7 @@ const Header = ({
                         {/* Right Side - Notifications, User */}
                         <div className="flex items-center gap-4">
                             {/* Notifications */}
-                            <button className="relative p-2.5 text-purple-100 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-105 border border-purple-400/30 shadow-lg hover:border-white/30">
+                            <button className="relative p-2.5 text-slate-200 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-105 border border-slate-600/50 shadow-lg hover:border-white/30">
                                 <Bell className="w-5 h-5" />
                                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse shadow-lg"></span>
                             </button>
@@ -139,27 +139,27 @@ const Header = ({
                             {/* User Menu */}
                             <div className="flex items-center gap-3">
                                 <div className="relative">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-purple-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/50">
-                                        <span className="text-purple-700 text-sm font-bold">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-slate-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/50">
+                                        <span className="text-slate-700 text-sm font-bold">
                                             {auth?.user?.name
                                                 ?.charAt(0)
                                                 ?.toUpperCase() || "A"}
                                         </span>
                                     </div>
                                     {/* Enhanced glow effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-purple-200/30 rounded-full animate-pulse"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-slate-200/30 rounded-full animate-pulse"></div>
                                 </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm font-bold text-white">
                                         {auth?.user?.name}
                                     </p>
-                                    <p className="text-xs text-purple-100">
+                                    <p className="text-xs text-slate-200">
                                         Administrator
                                     </p>
                                 </div>
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <button className="p-1.5 text-purple-100 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-105 border border-purple-400/30 hover:border-white/30">
+                                        <button className="p-1.5 text-slate-200 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-105 border border-slate-600/50 hover:border-white/30">
                                             <ChevronDown className="w-4 h-4" />
                                         </button>
                                     </Dropdown.Trigger>

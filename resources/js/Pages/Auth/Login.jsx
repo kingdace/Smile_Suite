@@ -38,10 +38,10 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 min-h-screen flex flex-col">
+        <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-50 min-h-screen flex flex-col relative overflow-hidden">
             <SiteHeader />
-            <div className="flex flex-1 items-center justify-center py-8">
-                <div className="relative flex w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-gray-800 m-4 sm:m-6 lg:m-8 border border-gray-100">
+            <div className="flex flex-1 items-center justify-center py-8 relative z-10">
+                <div className="relative flex w-full max-w-4xl overflow-hidden rounded-2xl bg-white/95 backdrop-blur-sm shadow-2xl dark:bg-gray-800 m-4 sm:m-6 lg:m-8 border border-white/20">
                     {/* Left side - Enhanced Branding/Marketing */}
                     <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 items-center justify-center p-8 text-white relative overflow-hidden">
                         {/* Enhanced background decorative elements */}
