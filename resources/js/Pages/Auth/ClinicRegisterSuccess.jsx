@@ -202,15 +202,59 @@ export default function ClinicRegisterSuccess({ request }) {
                                                     </span>
                                                 </div>
                                                 <div className="text-right">
-                                                    <span className="text-xl font-bold text-green-600">
-                                                        $
-                                                        {
-                                                            request.subscription_amount
-                                                        }
-                                                    </span>
-                                                    <div className="text-xs text-gray-500">
-                                                        per month
-                                                    </div>
+                                                    {request.subscription_plan ===
+                                                    "basic" ? (
+                                                        <>
+                                                            <span className="text-xl font-bold text-green-600">
+                                                                FREE
+                                                            </span>
+                                                            <div className="text-xs text-gray-500">
+                                                                for 14 days
+                                                            </div>
+                                                            <div className="text-xs text-amber-600 font-medium">
+                                                                Then ₱999/month
+                                                            </div>
+                                                        </>
+                                                    ) : request.subscription_plan ===
+                                                      "pro" ? (
+                                                        <>
+                                                            <span className="text-xl font-bold text-blue-600">
+                                                                ₱1,999
+                                                            </span>
+                                                            <div className="text-xs text-gray-500">
+                                                                per month
+                                                            </div>
+                                                            <div className="text-xs text-blue-600 font-medium">
+                                                                Advanced
+                                                                features
+                                                            </div>
+                                                        </>
+                                                    ) : request.subscription_plan ===
+                                                      "enterprise" ? (
+                                                        <>
+                                                            <span className="text-xl font-bold text-purple-600">
+                                                                ₱4,999
+                                                            </span>
+                                                            <div className="text-xs text-gray-500">
+                                                                per month
+                                                            </div>
+                                                            <div className="text-xs text-purple-600 font-medium">
+                                                                Premium features
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-xl font-bold text-green-600">
+                                                                ₱
+                                                                {
+                                                                    request.subscription_amount
+                                                                }
+                                                            </span>
+                                                            <div className="text-xs text-gray-500">
+                                                                per month
+                                                            </div>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -275,10 +319,27 @@ export default function ClinicRegisterSuccess({ request }) {
                                             <div>
                                                 <p className="text-sm text-gray-700 font-medium">
                                                     <span className="text-blue-700 font-bold">
-                                                        Payment Processing:
+                                                        {request.subscription_plan ===
+                                                        "basic"
+                                                            ? "Trial Setup:"
+                                                            : request.subscription_plan ===
+                                                              "pro"
+                                                            ? "Pro Setup:"
+                                                            : request.subscription_plan ===
+                                                              "enterprise"
+                                                            ? "Enterprise Setup:"
+                                                            : "Payment Processing:"}
                                                     </span>{" "}
-                                                    If approved, you'll receive
-                                                    payment instructions.
+                                                    {request.subscription_plan ===
+                                                    "basic"
+                                                        ? "If approved, you'll receive immediate access to your 14-day free trial."
+                                                        : request.subscription_plan ===
+                                                          "pro"
+                                                        ? "If approved, you'll receive payment instructions for Pro plan features."
+                                                        : request.subscription_plan ===
+                                                          "enterprise"
+                                                        ? "If approved, you'll receive payment instructions for Enterprise plan features."
+                                                        : "If approved, you'll receive payment instructions."}
                                                 </p>
                                             </div>
                                         </div>
@@ -298,9 +359,16 @@ export default function ClinicRegisterSuccess({ request }) {
                                                     <span className="text-blue-700 font-bold">
                                                         Account Setup:
                                                     </span>{" "}
-                                                    After payment, you'll
-                                                    receive an email with setup
-                                                    instructions.
+                                                    {request.subscription_plan ===
+                                                    "basic"
+                                                        ? "Complete your clinic setup and start using Smile Suite immediately!"
+                                                        : request.subscription_plan ===
+                                                          "pro"
+                                                        ? "After payment, you'll receive setup instructions for Pro plan features."
+                                                        : request.subscription_plan ===
+                                                          "enterprise"
+                                                        ? "After payment, you'll receive setup instructions for Enterprise plan features."
+                                                        : "After payment, you'll receive an email with setup instructions."}
                                                 </p>
                                             </div>
                                         </div>
@@ -316,16 +384,366 @@ export default function ClinicRegisterSuccess({ request }) {
                                             <div>
                                                 <p className="text-sm text-gray-700 font-medium">
                                                     <span className="text-blue-700 font-bold">
-                                                        Go Live:
+                                                        {request.subscription_plan ===
+                                                        "basic"
+                                                            ? "Trial Management:"
+                                                            : request.subscription_plan ===
+                                                              "pro"
+                                                            ? "Pro Features:"
+                                                            : request.subscription_plan ===
+                                                              "enterprise"
+                                                            ? "Enterprise Features:"
+                                                            : "Go Live:"}
                                                     </span>{" "}
-                                                    Complete your clinic setup
-                                                    and start using Smile Suite!
+                                                    {request.subscription_plan ===
+                                                    "basic"
+                                                        ? "After 14 days, choose to continue with a paid plan or cancel your subscription."
+                                                        : request.subscription_plan ===
+                                                          "pro"
+                                                        ? "Access advanced features like analytics, multi-location support, and priority support."
+                                                        : request.subscription_plan ===
+                                                          "enterprise"
+                                                        ? "Access premium features like custom integrations, dedicated support, and advanced analytics."
+                                                        : "Complete your clinic setup and start using Smile Suite!"}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Trial Information for Basic Plan */}
+                            {request.subscription_plan === "basic" && (
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0">
+                                            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                                                <span className="text-green-600 font-bold text-lg">
+                                                    🎉
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-bold text-green-800 mb-3">
+                                                14-Day Free Trial - What You Get
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-700">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Full access to all
+                                                            Basic features
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Patient management
+                                                            system
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Appointment
+                                                            scheduling
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Treatment tracking
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Inventory management
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Payment processing
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Email support
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-green-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            No setup fees
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Pro Plan Information */}
+                            {request.subscription_plan === "pro" && (
+                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0">
+                                            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                                                <span className="text-blue-600 font-bold text-lg">
+                                                    🚀
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-bold text-blue-800 mb-3">
+                                                Pro Plan - Advanced Features
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            All Basic features
+                                                            included
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Advanced analytics &
+                                                            reporting
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Multi-location
+                                                            support
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Priority email
+                                                            support
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Custom branding
+                                                            options
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Advanced appointment
+                                                            features
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Enhanced security
+                                                            features
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-blue-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Data export
+                                                            capabilities
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Enterprise Plan Information */}
+                            {request.subscription_plan === "enterprise" && (
+                                <div className="bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 rounded-2xl p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0">
+                                            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                                                <span className="text-purple-600 font-bold text-lg">
+                                                    👑
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-bold text-purple-800 mb-3">
+                                                Enterprise Plan - Premium
+                                                Features
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-700">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            All Pro features
+                                                            included
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Custom integrations
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Dedicated account
+                                                            manager
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            24/7 phone support
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Advanced analytics
+                                                            dashboard
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            Custom training
+                                                            sessions
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>API access</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            SLA guarantees
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Trial End Information for Basic Plan */}
+                            {request.subscription_plan === "basic" && (
+                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0">
+                                            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                                                <Clock className="w-6 h-6 text-amber-600" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-amber-800 mb-2">
+                                                After Your 14-Day Trial
+                                            </h3>
+                                            <div className="text-sm text-amber-700 space-y-2">
+                                                <p>
+                                                    <span className="font-semibold">
+                                                        ₱999/month
+                                                    </span>{" "}
+                                                    - Continue with full access
+                                                    to all Basic plan features
+                                                </p>
+                                                <p>
+                                                    <span className="font-semibold">
+                                                        Easy cancellation
+                                                    </span>{" "}
+                                                    - Cancel anytime before
+                                                    trial ends with no charges
+                                                </p>
+                                                <p>
+                                                    <span className="font-semibold">
+                                                        No surprises
+                                                    </span>{" "}
+                                                    - We'll send you reminders 3
+                                                    days before your trial ends
+                                                </p>
+                                                <p>
+                                                    <span className="font-semibold">
+                                                        Upgrade anytime
+                                                    </span>{" "}
+                                                    - Switch to Premium or
+                                                    Enterprise plans for
+                                                    additional features
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Important Note */}
                             <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">

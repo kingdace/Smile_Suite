@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class ClinicRegistrationRequest extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'clinic_name',
@@ -27,12 +28,18 @@ class ClinicRegistrationRequest extends Model
         'approval_token',
         'approved_at',
         'expires_at',
+        'payment_deadline',
+        'payment_duration_days',
+        'stripe_customer_id',
+        'stripe_payment_intent_id',
+        'deleted_at',
     ];
 
     protected $casts = [
         'subscription_amount' => 'decimal:2',
         'approved_at' => 'datetime',
         'expires_at' => 'datetime',
+        'payment_deadline' => 'datetime',
     ];
 
     protected static function boot()
@@ -48,6 +55,61 @@ class ClinicRegistrationRequest extends Model
     public function isExpired()
     {
         return $this->expires_at && $this->expires_at->isPast();
+    }
+
+    public function isPaymentExpired()
+    {
+        return $this->payment_deadline && $this->payment_deadline->isPast();
+    }
+
+    public function getPaymentRemainingDaysAttribute()
+    {
+        if (!$this->payment_deadline) {
+            return null;
+        }
+
+        $remaining = now()->diffInDays($this->payment_deadline, false);
+        return $remaining > 0 ? $remaining : 0;
+    }
+
+    public function getPaymentRemainingHoursAttribute()
+    {
+        if (!$this->payment_deadline) {
+            return null;
+        }
+
+        $remaining = now()->diffInHours($this->payment_deadline, false);
+        return $remaining > 0 ? $remaining : 0;
+    }
+
+    public function getPaymentStatusTextAttribute()
+    {
+        if ($this->payment_status === 'paid') {
+            return 'Paid';
+        }
+
+        if ($this->payment_status === 'trial') {
+            return 'Free Trial';
+        }
+
+        if ($this->isPaymentExpired()) {
+            return 'Payment Expired';
+        }
+
+        if ($this->payment_deadline) {
+            $days = $this->payment_remaining_days;
+            $hours = $this->payment_remaining_hours;
+
+            if ($days > 0) {
+                return "Due in {$days} day" . ($days > 1 ? 's' : '');
+            } elseif ($hours > 0) {
+                return "Due in {$hours} hour" . ($hours > 1 ? 's' : '');
+            } else {
+                return 'Due Today';
+            }
+        }
+
+        return 'Pending Payment';
     }
 
     public function isApproved()
@@ -85,7 +147,8 @@ class ClinicRegistrationRequest extends Model
         return match($this->payment_status) {
             'pending' => 'bg-yellow-100 text-yellow-800',
             'paid' => 'bg-green-100 text-green-800',
-            'failed' => 'bg-red-100 text-red-800',
+            'trial' => 'bg-blue-100 text-blue-800',
+            'failed', 'payment_failed' => 'bg-orange-100 text-orange-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }
@@ -112,11 +175,11 @@ class ClinicRegistrationRequest extends Model
         $clinic = $this->clinic;
         if ($clinic) {
             $addressParts = [];
-            
+
             if ($clinic->street_address) {
                 $addressParts[] = $clinic->street_address;
             }
-            
+
             if ($clinic->address_details) {
                 $addressParts[] = $clinic->address_details;
             }

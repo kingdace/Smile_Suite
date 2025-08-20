@@ -42,37 +42,45 @@ export default function ClinicRegister() {
         {
             id: "basic",
             name: "Basic",
-            price: 99,
+            price: 999,
             features: [
-                "Up to 500 patients",
-                "Basic appointment scheduling",
-                "Patient records management",
+                "Up to 2 dentist accounts",
+                "Basic patient management",
+                "Appointment scheduling",
+                "Basic reporting",
                 "Email support",
+                "14-day free trial",
             ],
+            hasTrial: true,
         },
         {
             id: "premium",
             name: "Premium",
-            price: 199,
+            price: 1999,
             features: [
-                "Up to 2,000 patients",
-                "Advanced appointment scheduling",
+                "Up to 5 dentist accounts",
+                "Advanced patient management",
                 "Treatment planning",
                 "Inventory management",
+                "Financial reporting",
                 "Priority support",
             ],
+            hasTrial: false,
         },
         {
             id: "enterprise",
             name: "Enterprise",
-            price: 399,
+            price: 2999,
             features: [
-                "Unlimited patients",
-                "Multi-location support",
-                "Advanced reporting",
+                "Unlimited dentist accounts",
+                "Multi-branch management",
+                "Advanced analytics",
+                "Custom reporting",
                 "API access",
-                "Dedicated support",
+                "24/7 priority support",
+                "Training sessions",
             ],
+            hasTrial: false,
         },
     ];
 
@@ -492,10 +500,29 @@ export default function ClinicRegister() {
                                                         )}
                                                     </div>
                                                     <div className="text-2xl font-bold text-gray-900 mb-3">
-                                                        ${plan.price}
-                                                        <span className="text-sm font-normal text-gray-500">
-                                                            /month
-                                                        </span>
+                                                        {plan.hasTrial ? (
+                                                            <>
+                                                                <span className="text-green-600">
+                                                                    FREE
+                                                                </span>
+                                                                <span className="text-sm font-normal text-gray-500">
+                                                                    /14 days
+                                                                    trial
+                                                                </span>
+                                                                <div className="text-sm text-gray-500 line-through mt-1">
+                                                                    Then ₱
+                                                                    {plan.price}
+                                                                    /month
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                ₱{plan.price}
+                                                                <span className="text-sm font-normal text-gray-500">
+                                                                    /month
+                                                                </span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                     <ul className="space-y-2">
                                                         {plan.features.map(
@@ -525,24 +552,51 @@ export default function ClinicRegister() {
                                 </div>
                                 {selectedPlan && (
                                     <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3 mt-2 shadow-lg">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg">
-                                            <Star className="w-5 h-5 text-white fill-current" />
+                                        <div
+                                            className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-lg ${
+                                                selectedPlan.hasTrial
+                                                    ? "bg-gradient-to-br from-green-400 to-emerald-500"
+                                                    : "bg-gradient-to-br from-yellow-400 to-orange-500"
+                                            }`}
+                                        >
+                                            {selectedPlan.hasTrial ? (
+                                                <CheckCircle className="w-5 h-5 text-white fill-current" />
+                                            ) : (
+                                                <Star className="w-5 h-5 text-white fill-current" />
+                                            )}
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="text-base font-bold text-blue-900 mb-1">
                                                 Selected Plan:{" "}
                                                 {selectedPlan.name}
                                             </h4>
-                                            <p className="text-sm text-blue-700 font-medium">
-                                                ${selectedPlan.price}/month
-                                            </p>
+                                            {selectedPlan.hasTrial ? (
+                                                <div>
+                                                    <p className="text-sm text-green-700 font-medium">
+                                                        14-day FREE trial
+                                                    </p>
+                                                    <p className="text-xs text-gray-600">
+                                                        Then ₱
+                                                        {selectedPlan.price}
+                                                        /month
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-blue-700 font-medium">
+                                                    ₱{selectedPlan.price}/month
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xs text-blue-600 mb-1">
-                                                Total for first month
+                                                {selectedPlan.hasTrial
+                                                    ? "Trial period"
+                                                    : "First month payment"}
                                             </p>
                                             <p className="text-xl font-bold text-blue-900">
-                                                ${selectedPlan.price}
+                                                {selectedPlan.hasTrial
+                                                    ? "FREE"
+                                                    : `₱${selectedPlan.price}`}
                                             </p>
                                         </div>
                                     </div>

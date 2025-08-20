@@ -8,15 +8,19 @@ use App\Models\Clinic;
 use App\Models\Inventory;
 use App\Models\Patient;
 use App\Models\Treatment;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function __construct()
+    protected $subscriptionService;
+
+    public function __construct(SubscriptionService $subscriptionService)
     {
         $this->middleware(['auth', 'verified']);
+        $this->subscriptionService = $subscriptionService;
     }
 
     public function index(Request $request, Clinic $clinic)
@@ -60,6 +64,9 @@ class DashboardController extends Controller
             ->whereDate('created_at', today())
             ->get();
 
+        // Get subscription duration information
+        $subscriptionDuration = $this->subscriptionService->getSubscriptionDuration($clinic);
+
         // Calculate statistics
         $stats = [
             'total_patients' => Patient::where('clinic_id', $clinic->id)->count(),
@@ -69,14 +76,24 @@ class DashboardController extends Controller
             'low_stock_items' => $lowStockItems->count(),
         ];
 
+        // Enhanced clinic data with duration information
+        $enhancedClinic = array_merge($clinic->toArray(), [
+            'subscription_duration' => $subscriptionDuration,
+            'trial_days_left' => isset($subscriptionDuration['trial']) ? $subscriptionDuration['trial']['days_left'] : null,
+            'subscription_days_left' => isset($subscriptionDuration['subscription']) ? $subscriptionDuration['subscription']['days_left'] : null,
+            'is_in_grace_period' => isset($subscriptionDuration['subscription']) ? $subscriptionDuration['subscription']['is_in_grace_period'] : false,
+            'is_suspended' => isset($subscriptionDuration['subscription']) ? $subscriptionDuration['subscription']['is_suspended'] : false,
+        ]);
+
         return Inertia::render('Clinic/Dashboard', [
-            'clinic' => $clinic,
+            'clinic' => $enhancedClinic,
             'today_appointments' => $todayAppointments,
             'upcoming_appointments' => $upcomingAppointments,
             'recent_patients' => $recentPatients,
             'lowStockItems' => $lowStockItems,
             'todayTreatments' => $todayTreatments,
             'stats' => $stats,
+            'subscription_duration' => $subscriptionDuration,
         ]);
     }
 }

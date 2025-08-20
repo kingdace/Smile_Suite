@@ -304,9 +304,12 @@
             </div>
 
             <div style="text-align: center; margin: 24px 0;">
-                <a href="{{ route('register.clinic') }}" class="retry-button">
-                    🔄 Submit New Registration
+                <a href="{{ route('payment.process', ['token' => $request->approval_token]) }}" class="retry-button">
+                    🔄 Retry Payment
                 </a>
+                <p style="font-size: 14px; color: #6b7280; margin-top: 12px;">
+                    Click above to try your payment again with the same registration details.
+                </p>
             </div>
 
             <div class="contact-info">
@@ -328,4 +331,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>

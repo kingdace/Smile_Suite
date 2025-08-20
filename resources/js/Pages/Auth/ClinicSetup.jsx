@@ -368,14 +368,50 @@ export default function ClinicSetup({ request, token }) {
                                     <div>
                                         <h3 className="text-sm font-semibold text-emerald-800">
                                             Approved for{" "}
-                                            {request.subscription_plan_name}{" "}
+                                            {request.subscription_plan ===
+                                            "basic"
+                                                ? "Basic Plan (14-Day Free Trial)"
+                                                : request.subscription_plan ===
+                                                  "pro"
+                                                ? "Pro Plan"
+                                                : request.subscription_plan ===
+                                                  "enterprise"
+                                                ? "Enterprise Plan"
+                                                : request.subscription_plan_name}{" "}
                                             Plan
                                         </h3>
                                         <p className="text-sm text-emerald-700">
-                                            Monthly subscription:{" "}
-                                            <strong>
-                                                ${request.subscription_amount}
-                                            </strong>
+                                            {request.subscription_plan ===
+                                            "basic" ? (
+                                                <>
+                                                    <strong>
+                                                        FREE for 14 days
+                                                    </strong>
+                                                    , then ₱999/month
+                                                </>
+                                            ) : request.subscription_plan ===
+                                              "pro" ? (
+                                                <>
+                                                    Monthly subscription:{" "}
+                                                    <strong>₱1,999</strong>
+                                                </>
+                                            ) : request.subscription_plan ===
+                                              "enterprise" ? (
+                                                <>
+                                                    Monthly subscription:{" "}
+                                                    <strong>₱4,999</strong>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Monthly subscription:{" "}
+                                                    <strong>
+                                                        ₱
+                                                        {
+                                                            request.subscription_amount
+                                                        }
+                                                    </strong>
+                                                </>
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -841,16 +877,37 @@ export default function ClinicSetup({ request, token }) {
                                                 <Info className="w-3 h-3 text-white" />
                                             </div>
                                             <div>
-                                                <h3 className="text-sm font-semibold text-blue-800 mb-1">
+                                                <h3 className="text-sm font-semibold text-blue-800 mb-2">
                                                     Important Information
                                                 </h3>
-                                                <p className="text-sm text-blue-700">
-                                                    This will create your clinic
-                                                    admin account. You'll be
-                                                    able to log in immediately
-                                                    after setup and start
-                                                    managing your clinic.
-                                                </p>
+                                                <div className="space-y-2 text-sm text-blue-700">
+                                                    <p>
+                                                        This will create your
+                                                        clinic admin account.
+                                                        You'll be able to log in
+                                                        immediately after setup
+                                                        and start managing your
+                                                        clinic.
+                                                    </p>
+                                                    <p>
+                                                        <strong>
+                                                            Admin Account:
+                                                        </strong>{" "}
+                                                        This will be your
+                                                        primary administrator
+                                                        account with full access
+                                                        to all clinic features.
+                                                    </p>
+                                                    <p>
+                                                        <strong>
+                                                            Address Information:
+                                                        </strong>{" "}
+                                                        This will be used for
+                                                        your clinic's public
+                                                        profile and patient
+                                                        communications.
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -42,7 +42,7 @@ const SUBSCRIPTION_PLANS = [
             "Basic reporting",
             "Email support",
         ],
-        price: "₱2,999/month",
+        price: "₱999/month",
     },
     {
         value: "premium",
@@ -56,7 +56,7 @@ const SUBSCRIPTION_PLANS = [
             "Financial reporting",
             "Priority support",
         ],
-        price: "₱4,999/month",
+        price: "₱1,999/month",
     },
     {
         value: "enterprise",
@@ -71,7 +71,7 @@ const SUBSCRIPTION_PLANS = [
             "24/7 priority support",
             "Training sessions",
         ],
-        price: "₱7,999/month",
+        price: "₱2,999/month",
     },
 ];
 

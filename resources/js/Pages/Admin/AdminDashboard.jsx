@@ -90,6 +90,20 @@ export default function AdminDashboard({ auth, stats }) {
                                             View Requests
                                         </span>
                                     </Link>
+
+                                    <Link
+                                        href={route(
+                                            "admin.subscriptions.index"
+                                        )}
+                                        className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-purple-100/80 rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent hover:border-purple-200/50"
+                                    >
+                                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
+                                            <Shield className="w-5 h-5 text-white" />
+                                        </div>
+                                        <span className="font-semibold text-sm">
+                                            Subscriptions
+                                        </span>
+                                    </Link>
                                 </div>
                             </div>
 

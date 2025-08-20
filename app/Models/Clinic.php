@@ -37,6 +37,9 @@ class Clinic extends Model
         'trial_ends_at',
         'last_payment_at',
         'next_payment_at',
+        'stripe_customer_id',
+        'stripe_subscription_id',
+        'stripe_payment_method_id',
     ];
 
     protected $casts = [

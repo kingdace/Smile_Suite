@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use App\Http\Controllers\PsgcApiController;
 use App\Models\Clinic;
+use Illuminate\Support\Facades\Log;
 
 class PatientController extends Controller
 {
@@ -44,6 +45,32 @@ class PatientController extends Controller
             $query->where('marital_status', $request->marital_status);
         }
 
+        if ($request->blood_type) {
+            $query->where('blood_type', $request->blood_type);
+        }
+
+        if ($request->status) {
+            if ($request->status === 'new') {
+                $query->where(function($q) {
+                    $q->whereNull('last_dental_visit')
+                      ->orWhere('last_dental_visit', '')
+                      ->orWhere('last_dental_visit', 'No previous visit');
+                });
+            } elseif ($request->status === 'active') {
+                $query->where(function($q) {
+                    $q->where('last_dental_visit', 'like', '%Within 3 months%')
+                      ->orWhere('last_dental_visit', 'like', '%Within 6 months%')
+                      ->orWhere('last_dental_visit', 'like', '%Within 1 year%');
+                });
+            } elseif ($request->status === 'inactive') {
+                $query->where('last_dental_visit', 'like', '%More than 1 year%');
+            }
+        }
+
+        if ($request->category) {
+            $query->where('category', $request->category);
+        }
+
         $patients = $query->latest()->paginate(10);
 
         // Transform the data to match the view's expectations
@@ -54,22 +81,88 @@ class PatientController extends Controller
                 'email' => $patient->email,
                 'phone' => $patient->phone_number,
                 'last_visit' => $patient->last_dental_visit,
+                'created_at' => $patient->created_at,
+                'gender' => $patient->gender,
+                'age' => $patient->date_of_birth ? $patient->date_of_birth->age : null,
+                'status' => $this->getPatientStatus($patient),
+                'category' => $patient->category,
+                'blood_type' => $patient->blood_type,
+                'total_appointments' => $patient->appointments->count(),
+                'total_treatments' => $patient->treatments->count(),
+                'total_payments' => $patient->payments->count(),
             ];
         });
 
+        // Calculate statistics
+        $totalPatients = Auth::user()->clinic->patients()->count();
+        $newThisMonth = Auth::user()->clinic->patients()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+        $recentVisits = Auth::user()->clinic->patients()
+            ->where(function($q) {
+                $q->where('last_dental_visit', 'like', '%Within 3 months%')
+                  ->orWhere('last_dental_visit', 'like', '%Within 6 months%');
+            })
+            ->count();
+        $activePatients = Auth::user()->clinic->patients()
+            ->where(function($q) {
+                $q->where('last_dental_visit', 'like', '%Within 3 months%')
+                  ->orWhere('last_dental_visit', 'like', '%Within 6 months%')
+                  ->orWhere('last_dental_visit', 'like', '%Within 1 year%');
+            })
+            ->count();
+
         return Inertia::render('Clinic/Patients/Index', [
             'patients' => $patients,
-            'filters' => $request->only(['search', 'gender', 'marital_status']),
+            'filters' => $request->only(['search', 'gender', 'marital_status', 'blood_type', 'status', 'category']),
+            'statistics' => [
+                'total_patients' => $totalPatients,
+                'new_this_month' => $newThisMonth,
+                'recent_visits' => $recentVisits,
+                'active_patients' => $activePatients,
+            ],
         ]);
+    }
+
+    /**
+     * Get patient status based on last visit
+     */
+    private function getPatientStatus($patient)
+    {
+        if (!$patient->last_dental_visit) {
+            return 'new';
+        }
+
+        // Handle the new string format for last_dental_visit
+        $lastVisitText = $patient->last_dental_visit;
+
+        if ($lastVisitText === 'No previous visit' || empty($lastVisitText)) {
+            return 'new';
+        }
+
+        if (str_contains($lastVisitText, 'Within 3 months')) {
+            return 'active';
+        }
+
+        if (str_contains($lastVisitText, 'Within 6 months') || str_contains($lastVisitText, 'Within 1 year')) {
+            return 'active';
+        }
+
+        if (str_contains($lastVisitText, 'More than 1 year')) {
+            return 'inactive';
+        }
+
+        // Default to active if we can't determine
+        return 'active';
     }
 
     public function create()
     {
         $regions = $this->psgcApi->getRegions()->getData();
+
         return Inertia::render('Clinic/Patients/Create', [
             'regions' => $regions,
-            'auth' => Auth::user(),
-            'clinic' => Auth::user()->clinic_id
         ]);
     }
 
@@ -96,14 +189,25 @@ class PatientController extends Controller
             'emergency_contact_relationship' => 'nullable|string|max:50',
             'insurance_provider' => 'nullable|string|max:255',
             'insurance_policy_number' => 'nullable|string|max:50',
-            'blood_type' => 'nullable|string|max:5',
+            'blood_type' => 'nullable|string|max:10',
             'occupation' => 'nullable|string|max:255',
             'marital_status' => 'nullable|in:single,married,divorced,widowed',
-            'last_dental_visit' => 'nullable|date',
+            'last_dental_visit' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
+            'category' => 'nullable|string|max:50',
+            'tags' => 'nullable|json',
         ]);
 
         $patient = Auth::user()->clinic->patients()->create($validated);
+
+        // Check if the request expects JSON (API request)
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient created successfully.',
+                'patient' => $patient
+            ]);
+        }
 
         return redirect()->route('clinic.patients.show', [
             'clinic' => Auth::user()->clinic_id,
@@ -146,8 +250,6 @@ class PatientController extends Controller
 
         return Inertia::render('Clinic/Patients/Show', [
             'patient' => $patient,
-            'auth' => Auth::user(),
-            'clinic' => Auth::user()->clinic_id
         ]);
     }
 
@@ -157,15 +259,24 @@ class PatientController extends Controller
 
         $regions = $this->psgcApi->getRegions()->getData();
 
+        // Debug: Log the patient data being passed
+        Log::info('Patient data for edit:', [
+            'id' => $patient->id,
+            'region_code' => $patient->region_code,
+            'province_code' => $patient->province_code,
+            'city_municipality_code' => $patient->city_municipality_code,
+            'barangay_code' => $patient->barangay_code,
+            'street_address' => $patient->street_address,
+            'postal_code' => $patient->postal_code,
+        ]);
+
         return Inertia::render('Clinic/Patients/Edit', [
             'patient' => $patient,
             'regions' => $regions,
-            'auth' => Auth::user(),
-            'clinic' => Auth::user()->clinic_id
         ]);
     }
 
-    public function update(Request $request, Patient $patient)
+    public function update(Request $request, $clinic, Patient $patient)
     {
         $this->authorize('update', $patient);
 
@@ -176,6 +287,7 @@ class PatientController extends Controller
             'phone_number' => 'required|string|max:20',
             'date_of_birth' => 'required|date',
             'gender' => 'required|string|in:male,female,other',
+            'street_address' => 'nullable|string|max:255',
             'region_code' => 'nullable|string|max:10',
             'province_code' => 'nullable|string|max:10',
             'city_municipality_code' => 'nullable|string|max:10',
@@ -184,16 +296,32 @@ class PatientController extends Controller
             'address_details' => 'nullable|string',
             'medical_history' => 'nullable|string',
             'allergies' => 'nullable|string',
-            'blood_type' => 'nullable|string|max:5',
+            'emergency_contact_name' => 'nullable|string|max:255',
+            'emergency_contact_number' => 'nullable|string|max:20',
+            'emergency_contact_relationship' => 'nullable|string|max:50',
+            'insurance_provider' => 'nullable|string|max:255',
+            'insurance_policy_number' => 'nullable|string|max:50',
+            'blood_type' => 'nullable|string|max:10',
             'occupation' => 'nullable|string|max:255',
             'marital_status' => 'nullable|string|in:single,married,divorced,widowed',
-            'last_dental_visit' => 'nullable|date',
+            'last_dental_visit' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
+            'category' => 'nullable|string|max:50',
+            'tags' => 'nullable|json',
         ]);
 
         $patient->update($validated);
 
-        return redirect()->route('clinic.patients.show', $patient)
+        // Check if the request expects JSON (API request)
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient updated successfully.',
+                'patient' => $patient
+            ]);
+        }
+
+        return redirect()->route('clinic.patients.show', ['clinic' => $clinic, 'patient' => $patient])
             ->with('success', 'Patient updated successfully.');
     }
 

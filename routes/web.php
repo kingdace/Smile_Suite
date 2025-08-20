@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -26,6 +27,7 @@ use App\Http\Controllers\Admin\ClinicRegistrationRequestController;
 use App\Http\Controllers\Clinic\ClinicUserController;
 use App\Http\Controllers\Clinic\ClinicProfileController;
 use App\Http\Controllers\Patient\PatientDashboardController;
+use Illuminate\Support\Facades\Mail;
 
 // Smile Suite Landing Page (Public Homepage)
 Route::get('/', [ClinicDirectoryController::class, 'landing'])->name('public.landing');
@@ -64,6 +66,12 @@ Route::get('/clinic/setup/{token}', [ClinicRegistrationController::class, 'setup
 Route::post('/clinic/setup/{token}', [ClinicRegistrationController::class, 'completeSetup'])->name('clinic.setup.complete');
 Route::get('/register/clinic/setup/success', [\App\Http\Controllers\Public\ClinicRegistrationController::class, 'setupSuccess'])->name('clinic.setup.success');
 
+// Payment Routes
+Route::get('/payment/{token}', [\App\Http\Controllers\Public\PaymentController::class, 'showPayment'])->name('payment.show');
+Route::post('/payment/{token}/create-intent', [\App\Http\Controllers\Public\PaymentController::class, 'createPaymentIntent'])->name('payment.create-intent');
+Route::post('/payment/{token}/success', [\App\Http\Controllers\Public\PaymentController::class, 'handlePaymentSuccess'])->name('payment.success');
+Route::post('/payment/{token}/failure', [\App\Http\Controllers\Public\PaymentController::class, 'handlePaymentFailure'])->name('payment.failure');
+
 Route::get('/dashboard', function () {
     if (Auth::user()->role === 'admin') {
         return redirect()->route('admin.dashboard');
@@ -92,10 +100,28 @@ Route::middleware('auth')->group(function () {
 
         // Clinic Registration Requests
         Route::get('clinic-requests', [ClinicRegistrationRequestController::class, 'index'])->name('clinic-requests.index');
-        Route::get('clinic-requests/{registrationRequest}', [ClinicRegistrationRequestController::class, 'show'])->name('clinic-requests.show');
-        Route::patch('clinic-requests/{registrationRequest}/approve', [ClinicRegistrationRequestController::class, 'approve'])->name('clinic-requests.approve');
-        Route::patch('clinic-requests/{registrationRequest}/reject', [ClinicRegistrationRequestController::class, 'reject'])->name('clinic-requests.reject');
-        Route::patch('clinic-requests/{registrationRequest}/payment-status', [ClinicRegistrationRequestController::class, 'updatePaymentStatus'])->name('clinic-requests.payment-status');
+        Route::get('clinic-requests/{id}', [ClinicRegistrationRequestController::class, 'show'])->name('clinic-requests.show');
+        Route::post('clinic-requests/{registrationRequest}/approve', [ClinicRegistrationRequestController::class, 'approve'])->name('clinic-requests.approve');
+        Route::post('clinic-requests/{registrationRequest}/reject', [ClinicRegistrationRequestController::class, 'reject'])->name('clinic-requests.reject');
+        Route::post('clinic-requests/{registrationRequest}/payment-status', [ClinicRegistrationRequestController::class, 'updatePaymentStatus'])->name('clinic-requests.payment-status');
+        Route::post('clinic-requests/{registrationRequest}/retry-payment', [ClinicRegistrationRequestController::class, 'retryPayment'])->name('clinic-requests.retry-payment');
+        Route::delete('clinic-requests/{id}/soft-delete', [ClinicRegistrationRequestController::class, 'softDelete'])->name('clinic-requests.soft-delete');
+        Route::delete('clinic-requests/{id}/hard-delete', [ClinicRegistrationRequestController::class, 'hardDelete'])->name('clinic-requests.hard-delete');
+        Route::post('clinic-requests/{id}/restore', [ClinicRegistrationRequestController::class, 'restore'])->name('clinic-requests.restore');
+
+        // Subscription Management
+        Route::get('subscriptions', [App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('subscriptions.index');
+        Route::get('subscriptions/stats', [App\Http\Controllers\Admin\SubscriptionController::class, 'stats'])->name('subscriptions.stats');
+        Route::post('subscriptions/check-expirations', [App\Http\Controllers\Admin\SubscriptionController::class, 'runConsoleCommand'])->name('subscriptions.check-expirations');
+        Route::post('subscriptions/{clinic}/check-status', [App\Http\Controllers\Admin\SubscriptionController::class, 'checkStatus'])->name('subscriptions.check-status');
+        Route::post('subscriptions/{clinic}/start-trial', [App\Http\Controllers\Admin\SubscriptionController::class, 'startTrial'])->name('subscriptions.start-trial');
+        Route::post('subscriptions/{clinic}/activate', [App\Http\Controllers\Admin\SubscriptionController::class, 'activateSubscription'])->name('subscriptions.activate');
+
+        // Enhanced Subscription Management (Duration Management)
+        Route::get('subscriptions/{clinic}/duration-info', [App\Http\Controllers\Admin\SubscriptionController::class, 'getDurationInfo'])->name('subscriptions.duration-info');
+        Route::post('subscriptions/{clinic}/extend-trial', [App\Http\Controllers\Admin\SubscriptionController::class, 'extendTrial'])->name('subscriptions.extend-trial');
+        Route::post('subscriptions/{clinic}/renew-subscription', [App\Http\Controllers\Admin\SubscriptionController::class, 'renewSubscription'])->name('subscriptions.renew-subscription');
+        Route::post('subscriptions/{clinic}/send-notification', [App\Http\Controllers\Admin\SubscriptionController::class, 'sendNotification'])->name('subscriptions.send-notification');
     });
 
     // Clinic Routes
@@ -259,6 +285,19 @@ Route::prefix('api/psgc')->name('psgc.')->group(function () {
     Route::get('/cities', [PsgcApiController::class, 'getCities'])->name('cities');
     Route::get('/municipalities', [PsgcApiController::class, 'getMunicipalities'])->name('municipalities');
     Route::get('/barangays', [PsgcApiController::class, 'getBarangays'])->name('barangays');
+});
+
+// Test email route (remove in production)
+Route::get('/test-email', function () {
+    try {
+        Mail::raw('Test email from Smile Suite', function ($message) {
+            $message->to('kite.gales10@gmail.com')
+                    ->subject('Test Email - Smile Suite');
+        });
+        return 'Test email sent successfully!';
+    } catch (\Exception $e) {
+        return 'Email test failed: ' . $e->getMessage();
+    }
 });
 
 require __DIR__.'/auth.php';

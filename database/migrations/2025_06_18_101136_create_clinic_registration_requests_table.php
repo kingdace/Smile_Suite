@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('message')->nullable();
             $table->enum('subscription_plan', ['basic', 'premium', 'enterprise']);
             $table->decimal('subscription_amount', 10, 2);
-            $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
+            $table->enum('payment_status', ['pending', 'paid', 'failed', 'payment_failed'])->default('pending');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('admin_notes')->nullable();
             $table->string('approval_token')->nullable();

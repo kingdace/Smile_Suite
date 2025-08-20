@@ -40,21 +40,21 @@ import axios from "axios";
 const SUBSCRIPTION_PLANS = {
     basic: {
         label: "Basic Plan",
-        price: "₱2,999/month",
+        price: "₱999/month",
         color: "bg-blue-100 text-blue-700 border-blue-200",
         gradient: "from-blue-500 to-cyan-600",
         icon: "💙",
     },
     premium: {
         label: "Premium Plan",
-        price: "₱4,999/month",
+        price: "₱1,999/month",
         color: "bg-purple-100 text-purple-700 border-purple-200",
         gradient: "from-purple-500 to-indigo-600",
         icon: "💜",
     },
     enterprise: {
         label: "Enterprise Plan",
-        price: "₱7,999/month",
+        price: "₱2,999/month",
         color: "bg-emerald-100 text-emerald-700 border-emerald-200",
         gradient: "from-emerald-500 to-teal-600",
         icon: "💚",

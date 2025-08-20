@@ -25,14 +25,15 @@ class ClinicRegistrationController extends Controller
                 function ($attribute, $value, $fail) {
                     // Check if email exists in clinic_registration_requests
                     $existingRequest = \App\Models\ClinicRegistrationRequest::where('email', $value)->latest()->first();
-                    
+
                     if ($existingRequest) {
-                        // Allow re-registration if previous request was rejected or expired
-                        if ($existingRequest->status === 'rejected' || 
+                        // Allow re-registration if previous request was rejected, expired, or payment failed
+                        if ($existingRequest->status === 'rejected' ||
+                            $existingRequest->payment_status === 'payment_failed' ||
                             ($existingRequest->expires_at && $existingRequest->expires_at < now())) {
                             return; // Allow this email
                         }
-                        
+
                         // Block if there's an active pending or approved request
                         if ($existingRequest->status === 'pending' || $existingRequest->status === 'approved') {
                             $fail('This email address is already associated with an active registration request.');
@@ -48,11 +49,12 @@ class ClinicRegistrationController extends Controller
         ]);
 
         // Calculate subscription amount based on plan
+        // Basic plan has free trial, others require immediate payment
         $subscriptionAmount = match($validated['subscription_plan']) {
-            'basic' => 99.00,
-            'premium' => 199.00,
-            'enterprise' => 399.00,
-            default => 99.00,
+            'basic' => 0.00, // Free trial
+            'premium' => 1999.00,
+            'enterprise' => 2999.00,
+            default => 0.00,
         };
 
         $registrationRequest = ClinicRegistrationRequest::create([

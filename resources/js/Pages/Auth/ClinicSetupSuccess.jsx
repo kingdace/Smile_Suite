@@ -1,6 +1,6 @@
 import React from "react";
 import { Head, Link } from "@inertiajs/react";
-import { CheckCircle, ArrowRight, Home, LogIn } from "lucide-react";
+import { CheckCircle, ArrowRight, Home, LogIn, Info } from "lucide-react";
 
 export default function ClinicSetupSuccess() {
     return (
@@ -175,6 +175,123 @@ export default function ClinicSetupSuccess() {
                                         </span>
                                     </li>
                                 </ul>
+                            </div>
+
+                            {/* Getting Started Guide */}
+                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
+                                <h2 className="text-lg font-semibold text-green-900 mb-4 flex items-center gap-2">
+                                    <CheckCircle className="w-5 h-5" />
+                                    Getting Started Guide:
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-800">
+                                    <div className="space-y-2">
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                📋
+                                            </span>
+                                            <span>
+                                                <strong>Dashboard:</strong>{" "}
+                                                Overview of your clinic's key
+                                                metrics
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                👥
+                                            </span>
+                                            <span>
+                                                <strong>Patients:</strong> Add
+                                                and manage patient records
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                📅
+                                            </span>
+                                            <span>
+                                                <strong>Appointments:</strong>{" "}
+                                                Schedule and track appointments
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                🦷
+                                            </span>
+                                            <span>
+                                                <strong>Treatments:</strong>{" "}
+                                                Record and track treatments
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                📦
+                                            </span>
+                                            <span>
+                                                <strong>Inventory:</strong>{" "}
+                                                Manage dental supplies and
+                                                equipment
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                💰
+                                            </span>
+                                            <span>
+                                                <strong>Payments:</strong>{" "}
+                                                Process patient payments
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                📊
+                                            </span>
+                                            <span>
+                                                <strong>Reports:</strong> View
+                                                clinic performance analytics
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">
+                                                ⚙️
+                                            </span>
+                                            <span>
+                                                <strong>Settings:</strong>{" "}
+                                                Configure clinic preferences
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Support Information */}
+                            <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl p-5 border border-purple-200">
+                                <h2 className="text-lg font-semibold text-purple-900 mb-4 flex items-center gap-2">
+                                    <Info className="w-5 h-5" />
+                                    Need Help?
+                                </h2>
+                                <div className="space-y-2 text-sm text-purple-800">
+                                    <p>
+                                        <strong>Documentation:</strong> Check
+                                        our comprehensive user guides and
+                                        tutorials
+                                    </p>
+                                    <p>
+                                        <strong>Email Support:</strong> Contact
+                                        us at support@smilesuite.com for
+                                        assistance
+                                    </p>
+                                    <p>
+                                        <strong>Video Tutorials:</strong> Watch
+                                        step-by-step setup and usage videos
+                                    </p>
+                                    <p>
+                                        <strong>Community:</strong> Join our
+                                        user community for tips and best
+                                        practices
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Action Buttons */}

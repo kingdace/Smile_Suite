@@ -25,27 +25,143 @@ import {
     AlertDialogTitle,
 } from "@/Components/ui/alert-dialog";
 import {
-    ArrowLeft,
     CheckCircle,
     XCircle,
     Clock,
     DollarSign,
-    MapPin,
-    Phone,
-    Mail,
     FileText,
-    Building2,
     AlertTriangle,
-    TrendingUp,
+    RefreshCw,
+    ArrowLeft,
+    Building2,
+    Mail,
+    Phone,
+    MapPin,
     Users,
-    Calendar,
-    Shield,
     Star,
-    Plus,
-    Info,
-    Activity,
+    TrendingUp,
+    Shield,
+    Calendar,
+    RotateCcw,
 } from "lucide-react";
 import { Tooltip } from "@/Components/ui/tooltip";
+
+// Payment Countdown Component
+const PaymentCountdown = ({ deadline }) => {
+    const [timeLeft, setTimeLeft] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        isExpired: false,
+    });
+
+    useEffect(() => {
+        const calculateTimeLeft = () => {
+            const now = new Date().getTime();
+            const deadlineTime = new Date(deadline).getTime();
+            const difference = deadlineTime - now;
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor(
+                    (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                );
+                const minutes = Math.floor(
+                    (difference % (1000 * 60 * 60)) / (1000 * 60)
+                );
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                setTimeLeft({
+                    days,
+                    hours,
+                    minutes,
+                    seconds,
+                    isExpired: false,
+                });
+            } else {
+                setTimeLeft({
+                    days: 0,
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0,
+                    isExpired: true,
+                });
+            }
+        };
+
+        calculateTimeLeft();
+        const timer = setInterval(calculateTimeLeft, 1000);
+
+        return () => clearInterval(timer);
+    }, [deadline]);
+
+    if (timeLeft.isExpired) {
+        return (
+            <div className="text-center">
+                <p className="text-xs text-red-600 font-semibold">
+                    ⏰ Payment Deadline Expired
+                </p>
+            </div>
+        );
+    }
+
+    // Show urgent warning for less than 24 hours
+    const isUrgent = timeLeft.days === 0 && timeLeft.hours < 24;
+
+    return (
+        <div className="text-center">
+            {isUrgent && (
+                <p className="text-xs text-red-600 font-semibold mb-1">
+                    ⚠️ URGENT: Less than 24 hours remaining!
+                </p>
+            )}
+            <p className="text-xs text-orange-600 font-semibold mb-1">
+                Time Remaining:
+            </p>
+            <div
+                className={`flex justify-center gap-1 ${
+                    isUrgent
+                        ? "bg-red-50 p-2 rounded border border-red-200"
+                        : ""
+                }`}
+            >
+                {timeLeft.days > 0 && (
+                    <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                        {timeLeft.days}d
+                    </span>
+                )}
+                <span
+                    className={`text-xs px-2 py-1 rounded ${
+                        isUrgent
+                            ? "bg-red-100 text-red-800"
+                            : "bg-orange-100 text-orange-800"
+                    }`}
+                >
+                    {timeLeft.hours.toString().padStart(2, "0")}h
+                </span>
+                <span
+                    className={`text-xs px-2 py-1 rounded ${
+                        isUrgent
+                            ? "bg-red-100 text-red-800"
+                            : "bg-orange-100 text-orange-800"
+                    }`}
+                >
+                    {timeLeft.minutes.toString().padStart(2, "0")}m
+                </span>
+                <span
+                    className={`text-xs px-2 py-1 rounded ${
+                        isUrgent
+                            ? "bg-red-100 text-red-800"
+                            : "bg-orange-100 text-orange-800"
+                    }`}
+                >
+                    {timeLeft.seconds.toString().padStart(2, "0")}s
+                </span>
+            </div>
+        </div>
+    );
+};
 
 export default function Show({ auth, request }) {
     const [adminNotes, setAdminNotes] = useState(request.admin_notes || "");
@@ -270,7 +386,9 @@ export default function Show({ auth, request }) {
         const variants = {
             pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
             paid: "bg-emerald-100 text-emerald-700 border-emerald-200",
+            trial: "bg-blue-100 text-blue-700 border-blue-200",
             failed: "bg-red-100 text-red-700 border-red-200",
+            payment_failed: "bg-orange-100 text-orange-700 border-orange-200",
         };
         return (
             <Badge
@@ -279,14 +397,14 @@ export default function Show({ auth, request }) {
                     "bg-gray-100 text-gray-700 border-gray-200"
                 } border font-medium px-2 py-1`}
             >
-                {status}
+                {status === "trial" ? "Free Trial" : status}
             </Badge>
         );
     };
 
     const handleApprove = () => {
         setIsProcessing(true);
-        router.patch(
+        router.post(
             route("admin.clinic-requests.approve", request.id),
             {
                 admin_notes: adminNotes,
@@ -302,7 +420,7 @@ export default function Show({ auth, request }) {
 
     const handleReject = () => {
         setIsProcessing(true);
-        router.patch(
+        router.post(
             route("admin.clinic-requests.reject", request.id),
             {
                 admin_notes: adminNotes,
@@ -323,7 +441,7 @@ export default function Show({ auth, request }) {
         console.log("Is processing:", isProcessing);
 
         setIsProcessing(true);
-        router.patch(
+        router.post(
             route("admin.clinic-requests.payment-status", request.id),
             {
                 payment_status: paymentStatus,
@@ -341,9 +459,28 @@ export default function Show({ auth, request }) {
         );
     };
 
+    const handlePaymentRetry = () => {
+        if (
+            confirm(
+                "Are you sure you want to retry payment for this request? This will send new payment instructions to the user."
+            )
+        ) {
+            router.post(
+                route("admin.clinic-requests.retry-payment", request.id),
+                {},
+                {
+                    onSuccess: () => {
+                        router.reload();
+                    },
+                }
+            );
+        }
+    };
+
     const canBeApproved =
         request.status === "pending" &&
-        request.payment_status === "paid" &&
+        (request.payment_status === "paid" ||
+         (request.subscription_plan === "basic" && request.payment_status === "trial")) &&
         !request.is_expired;
 
     return (
@@ -401,6 +538,47 @@ export default function Show({ auth, request }) {
                         </div>
                     </div>
                 </div>
+
+                {/* Soft Deleted Indicator */}
+                {request.deleted_at && (
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                        <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-xl p-4 shadow-sm">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-red-100">
+                                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-bold text-red-800">
+                                        ⚠️ This Request Has Been Soft Deleted
+                                    </h3>
+                                    <p className="text-red-700 text-sm mt-1">
+                                        This clinic registration request was
+                                        soft deleted on{" "}
+                                        {new Date(
+                                            request.deleted_at
+                                        ).toLocaleDateString()}{" "}
+                                        at{" "}
+                                        {new Date(
+                                            request.deleted_at
+                                        ).toLocaleTimeString()}
+                                        . The data is preserved but hidden from
+                                        the main view. You can restore it from
+                                        the clinic requests list.
+                                    </p>
+                                </div>
+                                <Link
+                                    href={route("admin.clinic-requests.index", {
+                                        show_deleted: "true",
+                                    })}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                                >
+                                    <RotateCcw className="h-4 w-4" />
+                                    View Deleted Requests
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -623,6 +801,10 @@ export default function Show({ auth, request }) {
                                                     <CheckCircle className="h-4 w-4 text-emerald-500" />
                                                 )}
                                                 {request.payment_status ===
+                                                    "trial" && (
+                                                    <Star className="h-4 w-4 text-blue-500" />
+                                                )}
+                                                {request.payment_status ===
                                                     "failed" && (
                                                     <XCircle className="h-4 w-4 text-red-500" />
                                                 )}
@@ -720,8 +902,14 @@ export default function Show({ auth, request }) {
                                                     <SelectItem value="paid">
                                                         Payment Confirmed
                                                     </SelectItem>
+                                                    <SelectItem value="trial">
+                                                        Free Trial
+                                                    </SelectItem>
                                                     <SelectItem value="failed">
                                                         Payment Failed
+                                                    </SelectItem>
+                                                    <SelectItem value="payment_failed">
+                                                        Payment Failed (Expired)
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -748,9 +936,10 @@ export default function Show({ auth, request }) {
                                                 </Button>
                                             </Tooltip>
                                         </div>
-                                        {paymentStatus === "paid" &&
+                                        {(paymentStatus === "paid" ||
+                                            paymentStatus === "trial") &&
                                             request.payment_status !==
-                                                "paid" && (
+                                                paymentStatus && (
                                                 <p className="text-xs text-emerald-600 bg-emerald-50 p-2 rounded-md border border-emerald-200">
                                                     ✓ This will send setup email
                                                     to clinic
@@ -823,39 +1012,64 @@ export default function Show({ auth, request }) {
                                     )}
 
                                     {request.status === "approved" &&
-                                        request.payment_status ===
-                                            "pending" && (
-                                            <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                                                <CheckCircle className="h-10 w-10 text-blue-600 mx-auto mb-2" />
-                                                <p className="text-blue-900 font-bold text-base mb-1">
-                                                    Request Approved
-                                                </p>
-                                                <p className="text-xs text-blue-700 mb-2">
-                                                    Payment instructions sent to{" "}
-                                                    {request.email}
-                                                </p>
-                                                <p className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full inline-block">
-                                                    Waiting for payment
-                                                    confirmation
-                                                </p>
-                                            </div>
-                                        )}
-
-                                    {request.status === "approved" &&
-                                        request.payment_status === "paid" && (
+                                        (request.payment_status === "paid" ||
+                                         (request.subscription_plan === "basic" && request.payment_status === "trial")) && (
                                             <div className="text-center p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-lg border border-emerald-200">
                                                 <CheckCircle className="h-10 w-10 text-emerald-600 mx-auto mb-2" />
                                                 <p className="text-emerald-900 font-bold text-base mb-1">
-                                                    Payment Confirmed
+                                                    {request.subscription_plan === "basic" && request.payment_status === "trial"
+                                                        ? "Trial Approved"
+                                                        : "Payment Confirmed"}
                                                 </p>
                                                 <p className="text-xs text-emerald-700 mb-2">
-                                                    Setup email sent to{" "}
+                                                    {request.subscription_plan === "basic" && request.payment_status === "trial"
+                                                        ? "Free trial setup email sent to"
+                                                        : "Setup email sent to"}{" "}
                                                     {request.email}
                                                 </p>
                                                 <p className="text-xs text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full inline-block">
                                                     Clinic can now complete
                                                     setup
                                                 </p>
+                                            </div>
+                                        )}
+
+                                    {request.status === "approved" &&
+                                        (request.payment_status ===
+                                            "payment_failed" ||
+                                            request.payment_status ===
+                                                "failed") && (
+                                            <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200">
+                                                <AlertTriangle className="h-10 w-10 text-orange-600 mx-auto mb-2" />
+                                                <p className="text-orange-900 font-bold text-base mb-1">
+                                                    Payment Failed
+                                                </p>
+                                                <p className="text-xs text-orange-700 mb-3">
+                                                    Payment processing failed
+                                                    for {request.email}
+                                                </p>
+                                                <div className="space-y-2">
+                                                    <Button
+                                                        onClick={
+                                                            handlePaymentRetry
+                                                        }
+                                                        disabled={isProcessing}
+                                                        className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold shadow-md flex items-center justify-center gap-2 py-2 text-sm"
+                                                    >
+                                                        {isProcessing ? (
+                                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        ) : (
+                                                            <RefreshCw className="h-4 w-4" />
+                                                        )}
+                                                        {isProcessing
+                                                            ? "Processing..."
+                                                            : "Retry Payment"}
+                                                    </Button>
+                                                    <p className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full inline-block">
+                                                        Allows user to retry
+                                                        payment
+                                                    </p>
+                                                </div>
                                             </div>
                                         )}
 
@@ -1093,6 +1307,126 @@ export default function Show({ auth, request }) {
                     </div>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Basic Plan Trial Setup Link */}
+            {request.status === "approved" &&
+                request.subscription_plan === "basic" &&
+                (request.payment_status === "paid" || request.payment_status === "trial") && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                        <div className="flex items-center gap-2 mb-2">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <h3 className="text-lg font-semibold text-green-800">
+                                Basic Plan Trial Setup
+                            </h3>
+                        </div>
+                        <p className="text-green-700 mb-3">
+                            This Basic plan has been approved for a 14-day free
+                            trial. The clinic and admin user have been created
+                            automatically.
+                        </p>
+
+                        <div className="bg-white border border-green-300 rounded-lg p-3">
+                            <label className="block text-sm font-medium text-green-800 mb-2">
+                                Setup Link (Copy and share with clinic):
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={`${window.location.origin}/clinic/setup/${request.approval_token}`}
+                                    readOnly
+                                    className="flex-1 px-3 py-2 border border-green-300 rounded-lg bg-gray-50 text-sm"
+                                />
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(
+                                            `${window.location.origin}/clinic/setup/${request.approval_token}`
+                                        );
+                                        // You can add a toast notification here
+                                    }}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-3 text-sm text-green-600">
+                            <p>
+                                <strong>Note:</strong> If the clinic didn't
+                                receive the email, you can share this link
+                                directly.
+                            </p>
+                            <p>
+                                <strong>Expires:</strong>{" "}
+                                {new Date(
+                                    request.expires_at
+                                ).toLocaleDateString()}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+            {/* Premium/Enterprise Plan Setup Link */}
+            {request.status === "approved" &&
+                (request.subscription_plan === "premium" ||
+                    request.subscription_plan === "enterprise") &&
+                request.payment_status === "paid" && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div className="flex items-center gap-2 mb-2">
+                            <CheckCircle className="w-5 h-5 text-blue-600" />
+                            <h3 className="text-lg font-semibold text-blue-800">
+                                {request.subscription_plan === "premium"
+                                    ? "Premium"
+                                    : "Enterprise"}{" "}
+                                Plan Setup
+                            </h3>
+                        </div>
+                        <p className="text-blue-700 mb-3">
+                            Payment has been confirmed for this{" "}
+                            {request.subscription_plan} plan. The clinic and
+                            admin user have been created successfully.
+                        </p>
+
+                        <div className="bg-white border border-blue-300 rounded-lg p-3">
+                            <label className="block text-sm font-medium text-blue-800 mb-2">
+                                Setup Link (Copy and share with clinic):
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={`${window.location.origin}/clinic/setup/${request.approval_token}`}
+                                    readOnly
+                                    className="flex-1 px-3 py-2 border border-blue-300 rounded-lg bg-gray-50 text-sm"
+                                />
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(
+                                            `${window.location.origin}/clinic/setup/${request.approval_token}`
+                                        );
+                                        // You can add a toast notification here
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-3 text-sm text-blue-600">
+                            <p>
+                                <strong>Note:</strong> If the clinic didn't
+                                receive the email, you can share this link
+                                directly.
+                            </p>
+                            <p>
+                                <strong>Expires:</strong>{" "}
+                                {new Date(
+                                    request.expires_at
+                                ).toLocaleDateString()}
+                            </p>
+                        </div>
+                    </div>
+                )}
         </AuthenticatedLayout>
     );
 }

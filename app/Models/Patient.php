@@ -38,11 +38,12 @@ class Patient extends Model
         'marital_status',
         'last_dental_visit',
         'notes',
+        'category',
+        'tags',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
-        'last_dental_visit' => 'date',
         'medical_history' => 'array',
         'allergies' => 'array',
     ];

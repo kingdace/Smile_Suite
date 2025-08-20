@@ -161,7 +161,7 @@ export default function Landing() {
                                 className="inline-flex items-center justify-center px-10 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 group transform hover:scale-105"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
-                                Start Free Trial
+                                Get Started
                                 <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
                             </Link>
                             <Link
@@ -640,13 +640,13 @@ export default function Landing() {
                             </span>
                         </h2>
                         <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                            Start with a free trial, then choose the plan that
-                            scales with your practice. No hidden fees, cancel
-                            anytime.
+                            Choose the plan that scales with your practice.
+                            Basic plan includes 14-day free trial. No hidden
+                            fees, cancel anytime.
                         </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Basic Plan */}
+                        {/* Starter Plan */}
                         <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-blue-200 hover:scale-105">
                             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                                 <DollarSign className="w-8 h-8 text-white" />
@@ -655,7 +655,7 @@ export default function Landing() {
                                 Starter
                             </h3>
                             <p className="text-4xl font-extrabold text-gray-900 mb-2">
-                                $29{" "}
+                                ₱999{" "}
                                 <span className="text-lg font-medium text-gray-500">
                                     /mo
                                 </span>
@@ -680,10 +680,16 @@ export default function Landing() {
                                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                                     <span>Basic Reporting</span>
                                 </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>14-day Free Trial</span>
+                                </li>
                             </ul>
-                            <button className="w-full px-8 py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                Start Free Trial
-                            </button>
+                            <Link href={route("register.clinic")}>
+                                <button className="w-full px-8 py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    Start Free Trial
+                                </button>
+                            </Link>
                         </div>
 
                         {/* Premium Plan */}
@@ -700,7 +706,7 @@ export default function Landing() {
                                 Professional
                             </h3>
                             <p className="text-4xl font-extrabold text-white mb-2">
-                                $59{" "}
+                                ₱1,999{" "}
                                 <span className="text-lg font-medium text-blue-100">
                                     /mo
                                 </span>
@@ -730,9 +736,11 @@ export default function Landing() {
                                     <span>Advanced Analytics</span>
                                 </li>
                             </ul>
-                            <button className="w-full px-8 py-4 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                Start Free Trial
-                            </button>
+                            <Link href={route("register.clinic")}>
+                                <button className="w-full px-8 py-4 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    Get Started
+                                </button>
+                            </Link>
                         </div>
 
                         {/* Enterprise Plan */}
@@ -744,32 +752,41 @@ export default function Landing() {
                                 Enterprise
                             </h3>
                             <p className="text-4xl font-extrabold text-gray-900 mb-2">
-                                Custom
+                                ₱2,999{" "}
+                                <span className="text-lg font-medium text-gray-500">
+                                    /mo
+                                </span>
                             </p>
                             <p className="text-gray-600 mb-6">
-                                For large organizations
+                                For large practices
                             </p>
                             <ul className="text-gray-600 mb-8 space-y-3 text-left w-full">
                                 <li className="flex items-center gap-3">
                                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>All Professional Features</span>
+                                    <span>Everything in Professional</span>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>Custom Integrations</span>
+                                    <span>Multi-branch Management</span>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>Dedicated Account Manager</span>
+                                    <span>Custom Reporting</span>
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>White-label Solutions</span>
+                                    <span>API Access</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    <span>24/7 Priority Support</span>
                                 </li>
                             </ul>
-                            <button className="w-full px-8 py-4 rounded-xl bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                Contact Sales
-                            </button>
+                            <Link href={route("register.clinic")}>
+                                <button className="w-full px-8 py-4 rounded-xl bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    Get Started
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -802,8 +819,8 @@ export default function Landing() {
                     </h2>
                     <p className="mb-12 text-xl leading-8 text-blue-100 max-w-3xl mx-auto">
                         Join hundreds of dental professionals who have already
-                        modernized their practice with Smile Suite. Start your
-                        free trial today and see the difference.
+                        modernized their practice with Smile Suite. Get started
+                        today and see the difference.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <Link
@@ -811,7 +828,7 @@ export default function Landing() {
                             className="inline-flex items-center justify-center px-10 py-4 border-2 border-white text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
-                            Start Free Trial
+                            Get Started
                             <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
                         </Link>
                         <Link
@@ -832,7 +849,7 @@ export default function Landing() {
                         </div>
                         <div className="flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-green-300" />
-                            <span className="text-sm">14-day free trial</span>
+                            <span className="text-sm">Basic plan trial</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <CheckCircle className="w-5 h-5 text-green-300" />

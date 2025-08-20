@@ -199,6 +199,100 @@
         .payment-method:last-child {
             margin-bottom: 0;
         }
+
+        .payment-button-container {
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .payment-button {
+            display: inline-block;
+            background: #ffffff;
+            color: #166534;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .payment-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-methods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .payment-method-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .payment-method-item:hover {
+            border-color: #22c55e;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+        }
+
+        .method-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0fdf4;
+            border-radius: 8px;
+        }
+
+        .method-info {
+            flex: 1;
+        }
+
+        .method-info strong {
+            display: block;
+            color: #166534;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .method-info span {
+            display: block;
+            color: #15803d;
+            font-size: 12px;
+        }
+
+        .payment-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #166534;
+        }
+
+        .feature-icon {
+            font-size: 16px;
+        }
         .payment-method strong {
             color: #166534;
             display: block;
@@ -289,6 +383,103 @@
             .header h1 {
                 font-size: 24px;
             }
+            .payment-methods-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .payment-features {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .payment-button {
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+        }
+        .payment-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .payment-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .payment-list li:last-child {
+            border-bottom: none;
+        }
+        .payment-list strong {
+            color: #475569;
+            font-weight: 600;
+        }
+        .payment-list span {
+            color: #1e293b;
+            font-weight: 500;
+        }
+        .deadline-warning {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px solid #dc2626;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .deadline-warning h3 {
+            color: #991b1b;
+            margin: 0 0 16px 0;
+            font-size: 20px;
+            text-align: center;
+        }
+        .deadline-alert {
+            background: #dc2626;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .deadline-alert p {
+            margin: 8px 0;
+            font-weight: 600;
+        }
+        .deadline-time {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .deadline-consequences {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .deadline-consequences p {
+            color: #92400e;
+            margin: 8px 0;
+            font-weight: 600;
+        }
+        .deadline-consequences ul {
+            color: #92400e;
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .deadline-consequences li {
+            margin: 4px 0;
+        }
+        .deadline-action {
+            background: #10b981;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .deadline-action p {
+            margin: 0;
+            font-weight: 600;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -345,41 +536,134 @@
                 </ul>
             </div>
 
-            <h3 class="section-title">🚀 Next Steps</h3>
+            <h3 class="section-title">🚀 Quick Setup Process</h3>
             <div class="steps-list">
                 <ol>
-                    <li><strong>Complete Payment:</strong> Process your setup fee using the instructions below</li>
-                    <li><strong>Payment Confirmation:</strong> Our team will verify your payment within 24 hours</li>
-                    <li><strong>Setup Access:</strong> You'll receive setup instructions to complete your clinic configuration</li>
+                    <li><strong>Complete Payment:</strong> Choose your preferred payment method below</li>
+                    <li><strong>Instant Confirmation:</strong> Payment is processed immediately</li>
+                    <li><strong>Setup Email:</strong> Receive clinic setup instructions instantly</li>
                 </ol>
             </div>
 
-            <h3 class="section-title">💳 Payment Instructions</h3>
+            <h3 class="section-title">💳 Complete Your Payment</h3>
             <div class="payment-card">
-                <h3>Choose Your Payment Method</h3>
-                
-                <div class="payment-method">
-                    <strong>🏦 Bank Transfer (BDO)</strong>
-                    <ul>
-                        <li>Account Name: Smile Suite Inc.</li>
-                        <li>Account Number: 1234-5678-9012</li>
-                        <li>Reference Number: <strong>{{ $request->id }}</strong></li>
-                    </ul>
+                <h3>🇵🇭 Philippine Payment Options</h3>
+
+                <p class="payment-description">
+                    Choose your preferred payment method. All options are secure and instant!
+                </p>
+
+                <div class="payment-button-container">
+                    <a href="{{ route('payment.show', ['token' => $request->approval_token]) }}"
+                       class="payment-button">
+                        🚀 Complete Payment - ₱{{ number_format($request->subscription_amount, 2) }}
+                    </a>
                 </div>
 
-                <div class="payment-method">
-                    <strong>📱 GCash</strong>
-                    <ul>
-                        <li>Number: 0917-123-4567</li>
-                        <li>Name: Smile Suite</li>
-                        <li>Reference Number: <strong>{{ $request->id }}</strong></li>
-                    </ul>
+                <div class="payment-methods-grid">
+                    <div class="payment-method-item">
+                        <div class="method-icon">📱</div>
+                        <div class="method-info">
+                            <strong>GCash</strong>
+                            <span>Send to GCash number</span>
+                        </div>
+                    </div>
+                    <div class="payment-method-item">
+                        <div class="method-icon">📱</div>
+                        <div class="method-info">
+                            <strong>PayMaya</strong>
+                            <span>Send to PayMaya number</span>
+                        </div>
+                    </div>
+                    <div class="payment-method-item">
+                        <div class="method-icon">🏦</div>
+                        <div class="method-info">
+                            <strong>Bank Transfer</strong>
+                            <span>Transfer to BDO account</span>
+                        </div>
+                    </div>
+                    <div class="payment-method-item">
+                        <div class="method-icon">💳</div>
+                        <div class="method-info">
+                            <strong>Credit Card</strong>
+                            <span>Secure card processing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-features">
+                    <div class="feature">
+                        <span class="feature-icon">🔒</span>
+                        <span>Bank-level security encryption</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">⚡</span>
+                        <span>Instant payment processing</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📧</span>
+                        <span>Setup email sent immediately</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🎯</span>
+                        <span>Philippine-focused payment</span>
+                    </div>
                 </div>
             </div>
 
             <div class="important-note">
-                <strong>⚠️ Important:</strong> Please include your reference number <strong>{{ $request->id }}</strong> in your payment to ensure proper processing.
+                <strong>⚡ Instant Setup:</strong> Complete your payment now to receive clinic setup instructions immediately. No waiting time!
             </div>
+
+            <div class="payment-details">
+                <h3>💰 Payment Details</h3>
+                <ul class="payment-list">
+                    <li>
+                        <strong>Clinic Name:</strong>
+                        <span>{{ $request->clinic_name }}</span>
+                    </li>
+                    <li>
+                        <strong>Reference Number:</strong>
+                        <span>{{ $request->id }}</span>
+                    </li>
+                    <li>
+                        <strong>Subscription Plan:</strong>
+                        <span>{{ ucfirst($request->subscription_plan) }}</span>
+                    </li>
+                    <li>
+                        <strong>Amount Due:</strong>
+                        <span>₱{{ number_format($request->subscription_amount, 2) }}</span>
+                    </li>
+                    @if($request->payment_deadline)
+                    <li>
+                        <strong>Payment Deadline:</strong>
+                        <span style="color: #dc2626; font-weight: 600;">{{ $request->payment_deadline->format('F j, Y g:i A') }}</span>
+                    </li>
+                    @endif
+                </ul>
+            </div>
+
+            @if($request->payment_deadline)
+            <div class="deadline-warning">
+                <h3>⏰ URGENT: Payment Deadline</h3>
+                <div class="deadline-alert">
+                    <p><strong>⚠️ YOUR PAYMENT MUST BE COMPLETED BY:</strong></p>
+                    <p class="deadline-time">{{ $request->payment_deadline->format('F j, Y g:i A') }}</p>
+                </div>
+                <div class="deadline-consequences">
+                    <p><strong>What happens if you don't pay on time?</strong></p>
+                    <ul>
+                        <li>❌ Your registration will be automatically cancelled</li>
+                        <li>❌ You'll need to submit a new registration request</li>
+                        <li>❌ You may lose your spot in the approval queue</li>
+                        <li>❌ Additional processing time will be required</li>
+                    </ul>
+                </div>
+                <div class="deadline-action">
+                    <p><strong>🚀 ACT NOW:</strong> Complete your payment immediately to secure your clinic registration!</p>
+                </div>
+            </div>
+            @endif
 
             <div class="contact-info">
                 <p>Need help? Contact our support team at <a href="mailto:support@smilesuite.com">support@smilesuite.com</a></p>

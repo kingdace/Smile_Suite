@@ -17,9 +17,177 @@ import {
     User,
     ChevronDown,
     FileText,
+    Settings,
+    Shield,
+    Star,
+    Clock,
+    Crown,
+    Zap,
+    Calendar,
+    AlertTriangle,
 } from "lucide-react";
 import { route } from "ziggy-js";
 import SiteHeader from "@/Components/SiteHeader";
+
+// Subscription Countdown Component
+const SubscriptionCountdown = ({ clinic }) => {
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    // Update time every second for real-time countdown
+    useState(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const getTimeRemaining = () => {
+        if (!clinic?.subscription_end_date && !clinic?.trial_ends_at) {
+            return null;
+        }
+
+        const endDate =
+            clinic.subscription_status === "trial"
+                ? new Date(clinic.trial_ends_at)
+                : new Date(clinic.subscription_end_date);
+
+        const diff = endDate - currentTime;
+
+        if (diff <= 0) {
+            return { expired: true, days: 0, hours: 0, minutes: 0, seconds: 0 };
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+            (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        return { expired: false, days, hours, minutes, seconds };
+    };
+
+    const timeRemaining = getTimeRemaining();
+
+    if (!timeRemaining) {
+        return null;
+    }
+
+    const isExpired = timeRemaining.expired;
+    const isTrial = clinic?.subscription_status === "trial";
+    const isGracePeriod = clinic?.subscription_status === "grace_period";
+    const isSuspended = clinic?.subscription_status === "suspended";
+
+    const getStatusColor = () => {
+        if (isSuspended) return "text-red-400 bg-red-400/10 border-red-400/20";
+        if (isGracePeriod)
+            return "text-orange-400 bg-orange-400/10 border-orange-400/20";
+        if (isExpired) return "text-red-400 bg-red-400/10 border-red-400/20";
+        if (timeRemaining.days <= 3)
+            return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
+        return "text-green-400 bg-green-400/10 border-green-400/20";
+    };
+
+    const getStatusIcon = () => {
+        if (isSuspended) return <AlertTriangle className="w-4 h-4" />;
+        if (isGracePeriod || isExpired)
+            return <AlertTriangle className="w-4 h-4" />;
+        if (timeRemaining.days <= 3) return <Clock className="w-4 h-4" />;
+        return <Calendar className="w-4 h-4" />;
+    };
+
+    return (
+        <div className="flex items-center gap-4">
+            {/* Subscription Status Badge */}
+            <div
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${getStatusColor()} backdrop-blur-sm`}
+            >
+                {getStatusIcon()}
+                <span className="text-xs font-semibold">
+                    {isTrial
+                        ? "Trial"
+                        : isGracePeriod
+                        ? "Grace Period"
+                        : isSuspended
+                        ? "Suspended"
+                        : `${
+                              clinic?.subscription_plan
+                                  ?.charAt(0)
+                                  .toUpperCase() +
+                                  clinic?.subscription_plan?.slice(1) ||
+                              "Active"
+                          }`}
+                </span>
+            </div>
+
+            {/* Countdown */}
+            {!isExpired && (
+                <div className="grid grid-cols-4 gap-4 items-center justify-center">
+                    <div className="text-center">
+                        <div className="text-sm lg:text-lg font-bold text-white">
+                            {timeRemaining.days}
+                        </div>
+                        <div className="text-xs text-blue-100">Days</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-sm lg:text-lg font-bold text-white">
+                            {timeRemaining.hours.toString().padStart(2, "0")}
+                        </div>
+                        <div className="text-xs text-blue-100">Hours</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-sm lg:text-lg font-bold text-white">
+                            {timeRemaining.minutes.toString().padStart(2, "0")}
+                        </div>
+                        <div className="text-xs text-blue-100">Mins</div>
+                    </div>
+                    <div className="text-center">
+                        <div className="text-sm lg:text-lg font-bold text-white">
+                            {timeRemaining.seconds.toString().padStart(2, "0")}
+                        </div>
+                        <div className="text-xs text-blue-100">Secs</div>
+                    </div>
+                </div>
+            )}
+
+            {/* Upgrade Buttons - Always show for demo purposes */}
+            <div className="flex items-center gap-1 lg:gap-2">
+                <Button
+                    size="sm"
+                    onClick={() => {
+                        // TODO: Implement upgrade functionality
+                        alert(
+                            "Upgrade functionality will be implemented here!"
+                        );
+                    }}
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
+                >
+                    <Crown className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Upgrade Now</span>
+                    <span className="sm:hidden">Upgrade</span>
+                </Button>
+                <Button
+                    size="sm"
+                    onClick={() => {
+                        // TODO: Implement extend trial functionality
+                        alert(
+                            "Extend trial functionality will be implemented here!"
+                        );
+                    }}
+                    className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
+                >
+                    <Zap className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">
+                        {isTrial ? "Extend Trial" : "Renew"}
+                    </span>
+                    <span className="sm:hidden">
+                        {isTrial ? "Extend" : "Renew"}
+                    </span>
+                </Button>
+            </div>
+        </div>
+    );
+};
 
 const Header = ({
     auth,
@@ -183,22 +351,157 @@ const Header = ({
         );
     }
 
-    // Original Header for Clinic and other roles
+    // Enhanced Clinic Header
+    if (isClinicPage) {
+        return (
+            <nav className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 shadow-xl border-b-2 border-blue-900/30">
+                <div className="max-w-full px-6 py-3">
+                    <div className="flex items-center justify-between">
+                        {/* Left Side - Logo, Clinic Info, and Menu */}
+                        <div className="flex items-center gap-5">
+                            {/* Enhanced Sidebar Toggle */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                                className="text-white hover:bg-white/25 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:scale-110 border border-white/30 shadow-lg hover:shadow-xl"
+                            >
+                                <Menu className="h-5 w-5" />
+                            </Button>
+
+                            {/* Enhanced Clinic Logo and Info */}
+                            <div className="flex items-center gap-4">
+                                <div className="relative">
+                                    <div className="w-11 h-11 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/60 overflow-hidden">
+                                        <img
+                                            src="/images/smile-suite-logo.png"
+                                            alt="Smile Suite Logo"
+                                            className="w-9 h-9 object-contain"
+                                        />
+                                    </div>
+                                    {/* Enhanced glow effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-2xl animate-pulse"></div>
+                                </div>
+                                <div>
+                                    <h1 className="text-lg font-bold text-white drop-shadow-sm">
+                                        {auth?.clinic?.name || "Clinic"}
+                                    </h1>
+                                    <div className="flex items-center gap-2 -mt-1">
+                                        <p className="text-xs text-blue-100/80 font-medium tracking-wide">
+                                            Powered by Smile Suite
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Center - Subscription Countdown */}
+                        <div className="hidden lg:flex items-center">
+                            <SubscriptionCountdown clinic={auth?.clinic} />
+                        </div>
+
+                        {/* Mobile Subscription Countdown - Shows below header */}
+                        <div className="lg:hidden">
+                            <div className="fixed top-16 left-0 right-0 z-20 bg-gradient-to-r from-blue-600/95 to-indigo-700/95 backdrop-blur-sm border-b border-blue-500/30 px-6 py-2">
+                                <SubscriptionCountdown clinic={auth?.clinic} />
+                            </div>
+                        </div>
+
+                        {/* Right Side - Notifications, User */}
+                        <div className="flex items-center gap-4">
+                            {/* Enhanced Notifications */}
+                            <button className="relative p-2.5 text-white hover:bg-white/25 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:scale-110 border border-white/30 shadow-lg hover:shadow-xl">
+                                <Bell className="w-5 h-5" />
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse shadow-lg border border-white"></span>
+                            </button>
+
+                            {/* Enhanced User Menu */}
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-blue-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/60">
+                                        <span className="text-blue-700 text-sm font-bold">
+                                            {auth?.user?.name
+                                                ?.charAt(0)
+                                                ?.toUpperCase() || "U"}
+                                        </span>
+                                    </div>
+                                    {/* Enhanced glow effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-200/30 rounded-full animate-pulse"></div>
+                                </div>
+                                <div className="hidden md:block">
+                                    <p className="text-sm font-bold text-white">
+                                        {auth?.user?.name}
+                                    </p>
+                                    <p className="text-xs text-blue-100 font-medium">
+                                        {auth?.user?.role === "clinic_admin"
+                                            ? "Clinic Admin"
+                                            : auth?.user?.role === "dentist"
+                                            ? "Dentist"
+                                            : auth?.user?.role === "staff"
+                                            ? "Staff"
+                                            : "User"}
+                                    </p>
+                                </div>
+                                <Dropdown>
+                                    <Dropdown.Trigger>
+                                        <button className="p-1.5 text-white hover:bg-white/25 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:scale-110 border border-white/30 shadow-lg hover:shadow-xl">
+                                            <ChevronDown className="w-4 h-4" />
+                                        </button>
+                                    </Dropdown.Trigger>
+                                    <Dropdown.Content>
+                                        <Dropdown.Link
+                                            href={route("clinic.profile.index")}
+                                            className="flex items-center"
+                                        >
+                                            <User className="w-4 h-4 mr-2" />
+                                            Profile
+                                        </Dropdown.Link>
+                                        {auth?.user?.role ===
+                                            "clinic_admin" && (
+                                            <Dropdown.Link
+                                                href={route(
+                                                    "clinic.users.index"
+                                                )}
+                                                className="flex items-center"
+                                            >
+                                                <Users className="w-4 h-4 mr-2" />
+                                                User Management
+                                            </Dropdown.Link>
+                                        )}
+                                        <Dropdown.Link
+                                            href={route(
+                                                "clinic.settings.index",
+                                                auth?.clinic?.id
+                                            )}
+                                            className="flex items-center"
+                                        >
+                                            <Settings className="w-4 h-4 mr-2" />
+                                            Settings
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route("logout")}
+                                            method="post"
+                                            as="button"
+                                            className="flex items-center text-red-600"
+                                        >
+                                            <LogOut className="w-4 h-4 mr-2" />
+                                            Log Out
+                                        </Dropdown.Link>
+                                    </Dropdown.Content>
+                                </Dropdown>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        );
+    }
+
+    // Original Header for other roles (non-clinic, non-admin)
     return (
         <nav className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-blue-600 to-cyan-700 border-b border-blue-500/20 px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
                 <div className="flex items-center">
-                    {isClinicPage && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="mr-2 text-white hover:bg-white/10"
-                        >
-                            <Menu className="h-6 w-6" />
-                        </Button>
-                    )}
-
                     <div className="shrink-0 flex items-center">
                         <Link href="/">
                             <ClinicLogo
@@ -206,16 +509,6 @@ const Header = ({
                                 className="block h-9 w-auto fill-current text-white"
                             />
                         </Link>
-                        {isClinicPage && auth?.clinic?.name && (
-                            <div className="ml-4 text-white">
-                                <h1 className="text-xl font-bold">
-                                    {auth.clinic.name}
-                                </h1>
-                                <p className="text-xs text-blue-100">
-                                    Powered by Smile Suite
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
 
@@ -249,21 +542,12 @@ const Header = ({
 
                             <Dropdown.Content>
                                 <Dropdown.Link
-                                    href={route("clinic.profile.index")}
+                                    href={route("profile.edit")}
                                     className="flex items-center"
                                 >
                                     <User className="w-4 h-4 mr-2" />
                                     Profile
                                 </Dropdown.Link>
-                                {auth?.user?.role === "clinic_admin" && (
-                                    <Dropdown.Link
-                                        href={route("clinic.users.index")}
-                                        className="flex items-center"
-                                    >
-                                        <Users className="w-4 h-4 mr-2" />
-                                        User Management
-                                    </Dropdown.Link>
-                                )}
                                 <Dropdown.Link
                                     href={route("logout")}
                                     method="post"
@@ -341,7 +625,7 @@ export default function Authenticated({
 
     // --- ALL OTHER ROLES ---
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-sky-100">
             <Header
                 auth={auth}
                 isClinicPage={isClinicPage}
@@ -460,7 +744,11 @@ export default function Authenticated({
                     </div>
                 </div>
             </div>
-            <div className={`flex flex-1 overflow-hidden relative mt-16`}>
+            <div
+                className={`flex flex-1 overflow-hidden relative ${
+                    isClinicPage ? "mt-20 lg:mt-16" : "mt-16"
+                }`}
+            >
                 {isClinicPage && !hideSidebar && (
                     <aside
                         className={`
@@ -489,13 +777,6 @@ export default function Authenticated({
                         }
                     `}
                 >
-                    {/* {header && (
-                        <header className="bg-white shadow">
-                            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                                {header}
-                            </div>
-                        </header>
-                    )} */}
                     {children}
                 </main>
             </div>
