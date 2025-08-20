@@ -16,7 +16,7 @@ class PatientPolicy
      */
     public function viewAny(User $user, Clinic $clinic): bool
     {
-        return ($user->role === 'dentist' || $user->role === 'staff') && $user->clinic_id === $clinic->id;
+        return ($user->role === 'clinic_admin' || $user->role === 'dentist' || $user->role === 'staff') && $user->clinic_id === $clinic->id;
     }
 
     /**
@@ -48,6 +48,25 @@ class PatientPolicy
      */
     public function delete(User $user, Patient $patient): bool
     {
-        return $user->clinic->id === $patient->clinic_id;
+        // Only clinic_admin can delete patients
+        return $user->role === 'clinic_admin' && $user->clinic->id === $patient->clinic_id;
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Patient $patient): bool
+    {
+        // Only clinic_admin can restore patients
+        return $user->role === 'clinic_admin' && $user->clinic->id === $patient->clinic_id;
+    }
+
+    /**
+     * Determine whether the user can delete any models (for bulk operations).
+     */
+    public function deleteAny(User $user): bool
+    {
+        // Only clinic_admin can perform bulk delete operations
+        return $user->role === 'clinic_admin';
     }
 }

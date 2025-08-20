@@ -45,6 +45,16 @@ export default function Index({ auth, patients, filters, statistics }) {
     const [search, setSearch] = useState(filters.search || "");
     const [selectedPatients, setSelectedPatients] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
+    const [showBulkActions, setShowBulkActions] = useState(false);
+
+    // Clear selection when bulk actions are hidden
+    const toggleBulkActions = () => {
+        if (showBulkActions) {
+            setSelectedPatients([]);
+            setSelectAll(false);
+        }
+        setShowBulkActions(!showBulkActions);
+    };
 
     const getCategoryDisplayName = (category) => {
         const categoryMap = {
@@ -105,6 +115,30 @@ export default function Index({ auth, patients, filters, statistics }) {
         }
     };
 
+    const handleDeletePatient = (patientId, patientName) => {
+        if (
+            confirm(
+                `Are you sure you want to delete patient "${patientName}"? This action cannot be undone.`
+            )
+        ) {
+            router.delete(
+                route("clinic.patients.destroy", {
+                    clinic: auth.clinic_id,
+                    patient: patientId,
+                }),
+                {
+                    onSuccess: () => {
+                        // The page will reload automatically due to Inertia
+                    },
+                    onError: (errors) => {
+                        console.error("Delete failed:", errors);
+                        alert("Failed to delete patient. Please try again.");
+                    },
+                }
+            );
+        }
+    };
+
     const handleBulkDelete = () => {
         if (selectedPatients.length === 0) {
             alert("Please select patients to delete");
@@ -113,11 +147,26 @@ export default function Index({ auth, patients, filters, statistics }) {
 
         if (
             confirm(
-                `Are you sure you want to delete ${selectedPatients.length} patient(s)?`
+                `Are you sure you want to delete ${selectedPatients.length} patient(s)? This action cannot be undone.`
             )
         ) {
-            console.log("Bulk delete:", selectedPatients);
-            alert("Bulk delete functionality will be implemented");
+            router.delete(
+                route("clinic.patients.bulk-destroy", {
+                    clinic: auth.clinic_id,
+                }),
+                {
+                    data: { patient_ids: selectedPatients },
+                    onSuccess: () => {
+                        setSelectedPatients([]);
+                        setSelectAll(false);
+                        // The page will reload automatically due to Inertia
+                    },
+                    onError: (errors) => {
+                        console.error("Bulk delete failed:", errors);
+                        alert("Failed to delete patients. Please try again.");
+                    },
+                }
+            );
         }
     };
 
@@ -154,10 +203,33 @@ export default function Index({ auth, patients, filters, statistics }) {
                                     </h1>
                                     <p className="text-blue-100 text-sm font-medium">
                                         Manage and organize your patient records
+                                        {auth.user.role === "clinic_admin" &&
+                                            showBulkActions && (
+                                                <span className="ml-2 inline-flex items-center gap-1 bg-orange-500/20 text-orange-200 px-2 py-1 rounded-full text-xs font-medium">
+                                                    <Trash2 className="h-3 w-3" />
+                                                    Bulk Mode Active
+                                                </span>
+                                            )}
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
+                                {auth.user.role === "clinic_admin" && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={toggleBulkActions}
+                                        className={`gap-2 text-sm px-4 py-2 rounded-xl transition-all duration-300 border backdrop-blur-sm ${
+                                            showBulkActions
+                                                ? "bg-orange-50 border-orange-300 text-orange-700 hover:bg-orange-100"
+                                                : "bg-white/20 border-white/30 text-white hover:bg-white/30"
+                                        }`}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        {showBulkActions
+                                            ? "Hide Bulk Actions"
+                                            : "Show Bulk Actions"}
+                                    </Button>
+                                )}
                                 <Button
                                     onClick={() =>
                                         router.visit(
@@ -588,61 +660,84 @@ export default function Index({ auth, patients, filters, statistics }) {
 
                         <CardContent className="p-0">
                             {/* Bulk Actions */}
-                            {selectedPatients.length > 0 && (
-                                <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-sm font-medium text-blue-700">
-                                                {selectedPatients.length}{" "}
-                                                patient(s) selected
-                                            </span>
+                            {auth.user.role === "clinic_admin" &&
+                                showBulkActions &&
+                                selectedPatients.length > 0 && (
+                                    <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-sm font-medium text-blue-700">
+                                                    {selectedPatients.length}{" "}
+                                                    patient(s) selected
+                                                </span>
+                                                {auth.user.role ===
+                                                    "clinic_admin" && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={
+                                                            handleBulkDelete
+                                                        }
+                                                        className="text-red-600 border-red-300 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        Delete Selected
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={
+                                                        handleExportPatients
+                                                    }
+                                                    className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                                                >
+                                                    <FileText className="h-4 w-4 mr-2" />
+                                                    Export Selected
+                                                </Button>
+                                            </div>
                                             <Button
-                                                variant="outline"
+                                                variant="ghost"
                                                 size="sm"
-                                                onClick={handleBulkDelete}
-                                                className="text-red-600 border-red-300 hover:bg-red-50"
+                                                onClick={() =>
+                                                    setSelectedPatients([])
+                                                }
+                                                className="text-gray-600 hover:text-gray-800"
                                             >
-                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                Delete Selected
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={handleExportPatients}
-                                                className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                                            >
-                                                <FileText className="h-4 w-4 mr-2" />
-                                                Export Selected
+                                                Clear Selection
                                             </Button>
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() =>
-                                                setSelectedPatients([])
-                                            }
-                                            className="text-gray-600 hover:text-gray-800"
-                                        >
-                                            Clear Selection
-                                        </Button>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
                             {/* Patient Records Table */}
                             <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/70">
-                                            <TableHead className="w-12 px-4">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectAll}
-                                                    onChange={handleSelectAll}
-                                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                />
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-gray-700 w-80 px-4">
+                                            {auth.user.role ===
+                                                "clinic_admin" &&
+                                                showBulkActions && (
+                                                    <TableHead className="w-12 px-4">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectAll}
+                                                            onChange={
+                                                                handleSelectAll
+                                                            }
+                                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                    </TableHead>
+                                                )}
+                                            <TableHead
+                                                className={`font-semibold text-gray-700 w-80 ${
+                                                    auth.user.role ===
+                                                        "clinic_admin" &&
+                                                    showBulkActions
+                                                        ? "px-2"
+                                                        : "px-6"
+                                                }`}
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <Users className="h-4 w-4 text-blue-600" />
                                                     Patient Name
@@ -660,7 +755,7 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                     Last Visit
                                                 </div>
                                             </TableHead>
-                                            <TableHead className="font-semibold text-gray-700 w-80 px-4">
+                                            <TableHead className="font-semibold text-gray-700 w-72 px-4">
                                                 <div className="flex items-center gap-2">
                                                     <Activity className="h-4 w-4 text-blue-600" />
                                                     Status & Category
@@ -680,21 +775,33 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                 key={patient.id}
                                                 className="hover:bg-gradient-to-r hover:from-blue-50/60 hover:via-indigo-50/40 hover:to-cyan-50/60 transition-all duration-300 border-b border-gray-100/50 hover:border-blue-200/50"
                                             >
-                                                <TableCell className="w-12 px-4">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedPatients.includes(
-                                                            patient.id
-                                                        )}
-                                                        onChange={() =>
-                                                            handleSelectPatient(
-                                                                patient.id
-                                                            )
-                                                        }
-                                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                    />
-                                                </TableCell>
-                                                <TableCell className="px-2 py-4">
+                                                {auth.user.role ===
+                                                    "clinic_admin" &&
+                                                    showBulkActions && (
+                                                        <TableCell className="w-12 px-4">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedPatients.includes(
+                                                                    patient.id
+                                                                )}
+                                                                onChange={() =>
+                                                                    handleSelectPatient(
+                                                                        patient.id
+                                                                    )
+                                                                }
+                                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                            />
+                                                        </TableCell>
+                                                    )}
+                                                <TableCell
+                                                    className={`py-4 ${
+                                                        auth.user.role ===
+                                                            "clinic_admin" &&
+                                                        showBulkActions
+                                                            ? "px-2"
+                                                            : "px-4"
+                                                    }`}
+                                                >
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105">
                                                             {patient.name
@@ -799,7 +906,7 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                                     ? "secondary"
                                                                     : "outline"
                                                             }
-                                                            className={`text-xs font-semibold px-2 py-1 ${
+                                                            className={`text-xs font-semibold px-1.5 py-0.5 ${
                                                                 patient.status ===
                                                                 "active"
                                                                     ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-300"
@@ -818,14 +925,14 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                                 : "Inactive"}
                                                         </Badge>
                                                         {patient.category && (
-                                                            <div className="text-xs bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-2 py-1 rounded-full capitalize font-semibold border border-purple-200">
+                                                            <div className="text-xs bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-1.5 py-0.5 rounded-full capitalize font-semibold border border-purple-200">
                                                                 {getCategoryDisplayName(
                                                                     patient.category
                                                                 )}
                                                             </div>
                                                         )}
                                                         {patient.blood_type && (
-                                                            <div className="text-xs bg-gradient-to-r from-red-100 to-pink-100 text-red-700 px-2 py-1 rounded-full font-semibold border border-red-200">
+                                                            <div className="text-xs bg-gradient-to-r from-red-100 to-pink-100 text-red-700 px-1.5 py-0.5 rounded-full font-semibold border border-red-200">
                                                                 {
                                                                     patient.blood_type
                                                                 }
@@ -861,6 +968,23 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                         >
                                                             <Pencil className="h-3 w-3" />
                                                         </Button>
+                                                        {auth.user.role ===
+                                                            "clinic_admin" && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    handleDeletePatient(
+                                                                        patient.id,
+                                                                        patient.name
+                                                                    )
+                                                                }
+                                                                className="h-8 w-8 p-0 bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                                                                title="Delete Patient"
+                                                            >
+                                                                <Trash2 className="h-3 w-3" />
+                                                            </Button>
+                                                        )}
                                                         <Button
                                                             variant="outline"
                                                             size="sm"

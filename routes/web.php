@@ -133,6 +133,14 @@ Route::middleware('auth')->group(function () {
         Route::get('clinic/{clinic}/patients/search', [PatientController::class, 'search'])
             ->name('clinic.patients.search');
 
+        // Patient bulk destroy route (must be before resource routes)
+        Route::delete('clinic/{clinic}/patients/bulk-destroy', [PatientController::class, 'bulkDestroy'])
+            ->name('clinic.patients.bulk-destroy');
+
+        // Patient restore route (must be before resource routes)
+        Route::patch('clinic/{clinic}/patients/{patient}/restore', [PatientController::class, 'restore'])
+            ->name('clinic.patients.restore');
+
         // Patient Management Routes
         Route::resource('clinic/{clinic}/patients', PatientController::class)
             ->names([

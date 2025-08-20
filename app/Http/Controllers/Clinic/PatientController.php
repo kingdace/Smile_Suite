@@ -325,25 +325,67 @@ class PatientController extends Controller
             ->with('success', 'Patient updated successfully.');
     }
 
-    public function destroy(Patient $patient)
+    public function destroy(Request $request, $clinic, Patient $patient)
     {
-        $clinic = Auth::user()->clinic;
-        $this->authorize('delete', [$patient, $clinic]);
+        $this->authorize('delete', $patient);
 
         $patient->delete();
 
-        return redirect()->route('clinic.patients.index')
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient deleted successfully.'
+            ]);
+        }
+
+        return redirect()->route('clinic.patients.index', ['clinic' => $clinic])
             ->with('success', 'Patient deleted successfully.');
     }
 
-    public function restore($id)
+    public function bulkDestroy(Request $request, $clinic)
     {
-        $patient = Patient::withTrashed()->findOrFail($id);
+        $this->authorize('deleteAny', Patient::class);
+
+        $validated = $request->validate([
+            'patient_ids' => 'required|array',
+            'patient_ids.*' => 'exists:patients,id'
+        ]);
+
+        $patients = Patient::whereIn('id', $validated['patient_ids'])
+            ->where('clinic_id', Auth::user()->clinic_id)
+            ->get();
+
+        foreach ($patients as $patient) {
+            $this->authorize('delete', $patient);
+            $patient->delete();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => count($patients) . ' patient(s) deleted successfully.'
+            ]);
+        }
+
+        return redirect()->route('clinic.patients.index', ['clinic' => $clinic])
+            ->with('success', count($patients) . ' patient(s) deleted successfully.');
+    }
+
+    public function restore(Request $request, $clinic, $patientId)
+    {
+        $patient = Patient::withTrashed()->findOrFail($patientId);
         $this->authorize('restore', $patient);
 
         $patient->restore();
 
-        return redirect()->route('clinic.patients.show', $patient)
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient restored successfully.'
+            ]);
+        }
+
+        return redirect()->route('clinic.patients.show', ['clinic' => $clinic, 'patient' => $patient])
             ->with('success', 'Patient restored successfully.');
     }
 
