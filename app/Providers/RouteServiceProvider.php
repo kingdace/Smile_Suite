@@ -15,6 +15,9 @@ class RouteServiceProvider extends ServiceProvider
      *
      * Typically, users are redirected here after authentication.
      *
+     * Note: We handle user-specific redirects in AuthenticatedSessionController
+     * to avoid conflicts with the main dashboard route.
+     *
      * @var string
      */
     public const HOME = '/dashboard';

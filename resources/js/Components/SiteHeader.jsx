@@ -33,7 +33,8 @@ export default function SiteHeader() {
             ? route("admin.dashboard")
             : userRole === "patient"
             ? route("patient.dashboard")
-            : ["clinic_admin", "dentist", "staff"].includes(userRole)
+            : ["clinic_admin", "dentist", "staff"].includes(userRole) &&
+              auth?.user?.clinic_id
             ? route("clinic.dashboard", { clinic: auth.user.clinic_id })
             : "/";
 

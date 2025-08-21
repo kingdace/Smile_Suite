@@ -75,6 +75,7 @@ class ClinicUserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
+            'user_type' => User::getUserTypeFromRole($validated['role']),
             'clinic_id' => $clinic->id,
         ]);
         return redirect()->route('clinic.users.index')->with('success', 'User created successfully.');
@@ -110,7 +111,11 @@ class ClinicUserController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|in:dentist,staff,clinic_admin',
         ]);
-        $user->update($validated);
+
+        // Update user with correct user_type
+        $user->update(array_merge($validated, [
+            'user_type' => User::getUserTypeFromRole($validated['role'])
+        ]));
         return redirect()->route('clinic.users.index')->with('success', 'User updated successfully.');
     }
 

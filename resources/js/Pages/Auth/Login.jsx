@@ -237,6 +237,7 @@ export default function Login({ status, canResetPassword }) {
                                         />
                                         <button
                                             type="button"
+                                            tabIndex="-1"
                                             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                                             onClick={() =>
                                                 setShowPassword(!showPassword)

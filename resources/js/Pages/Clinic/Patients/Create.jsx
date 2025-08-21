@@ -19,7 +19,13 @@ import axios from "axios";
 import moment from "moment";
 import { UserPlus } from "lucide-react";
 
-export default function Create({ auth, regions }) {
+export default function Create({
+    auth,
+    regions,
+    categories,
+    bloodTypes,
+    lastVisitOptions,
+}) {
     const { data, setData, post, processing, errors } = useForm({
         first_name: "",
         last_name: "",
@@ -559,33 +565,16 @@ export default function Create({ auth, regions }) {
                                                     <SelectValue placeholder="Select blood type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="unknown">
-                                                        Unknown
-                                                    </SelectItem>
-                                                    <SelectItem value="A+">
-                                                        A+
-                                                    </SelectItem>
-                                                    <SelectItem value="A-">
-                                                        A-
-                                                    </SelectItem>
-                                                    <SelectItem value="B+">
-                                                        B+
-                                                    </SelectItem>
-                                                    <SelectItem value="B-">
-                                                        B-
-                                                    </SelectItem>
-                                                    <SelectItem value="AB+">
-                                                        AB+
-                                                    </SelectItem>
-                                                    <SelectItem value="AB-">
-                                                        AB-
-                                                    </SelectItem>
-                                                    <SelectItem value="O+">
-                                                        O+
-                                                    </SelectItem>
-                                                    <SelectItem value="O-">
-                                                        O-
-                                                    </SelectItem>
+                                                    {Object.entries(
+                                                        bloodTypes
+                                                    ).map(([value, label]) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -616,21 +605,16 @@ export default function Create({ auth, regions }) {
                                                     <SelectValue placeholder="Select last dental visit" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="No previous visit">
-                                                        No previous visit
-                                                    </SelectItem>
-                                                    <SelectItem value="Within 3 months">
-                                                        Within 3 months
-                                                    </SelectItem>
-                                                    <SelectItem value="Within 6 months">
-                                                        Within 6 months
-                                                    </SelectItem>
-                                                    <SelectItem value="Within 1 year">
-                                                        Within 1 year
-                                                    </SelectItem>
-                                                    <SelectItem value="More than 1 year">
-                                                        More than 1 year
-                                                    </SelectItem>
+                                                    {Object.entries(
+                                                        lastVisitOptions
+                                                    ).map(([value, label]) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -657,30 +641,16 @@ export default function Create({ auth, regions }) {
                                                     <SelectValue placeholder="Select category" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="none">
-                                                        No Category
-                                                    </SelectItem>
-                                                    <SelectItem value="regular">
-                                                        Regular Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="vip">
-                                                        VIP Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="emergency">
-                                                        Emergency Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="pediatric">
-                                                        Pediatric Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="senior">
-                                                        Senior Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="new">
-                                                        New Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="returning">
-                                                        Returning Patient
-                                                    </SelectItem>
+                                                    {Object.entries(
+                                                        categories
+                                                    ).map(([value, label]) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>

@@ -18,7 +18,14 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Pencil } from "lucide-react";
 
-export default function Edit({ auth, patient, regions }) {
+export default function Edit({
+    auth,
+    patient,
+    regions,
+    categories,
+    bloodTypes,
+    lastVisitOptions,
+}) {
     // Debug: Log the regions prop
     console.log("Regions prop received:", {
         regions,
@@ -86,6 +93,14 @@ export default function Edit({ auth, patient, regions }) {
             });
 
             try {
+                // Validate patient data exists
+                if (!patient || !patient.region_code) {
+                    console.log(
+                        "No patient data or region code, skipping PSGC fetch"
+                    );
+                    setIsLoadingPsgc(false);
+                    return;
+                }
                 const newPsgcData = { ...psgcData };
                 const promises = [];
 
@@ -95,13 +110,16 @@ export default function Edit({ auth, patient, regions }) {
                         axios
                             .get(route("psgc.regions"))
                             .then((response) => {
-                                const region = response.data.find(
+                                const region = (response.data || []).find(
                                     (r) => r.code === patient.region_code
                                 );
                                 if (region) {
                                     newPsgcData.region = region;
                                 }
-                                return { type: "regions", data: response.data };
+                                return {
+                                    type: "regions",
+                                    data: response.data || [],
+                                };
                             })
                             .catch((error) => {
                                 console.error("Error fetching region:", error);
@@ -122,17 +140,17 @@ export default function Edit({ auth, patient, regions }) {
                             .then((response) => {
                                 // If patient has province_code, find and set it
                                 if (patient.province_code) {
-                                    const province = response.data.find(
+                                    const province = (response.data || []).find(
                                         (p) => p.code === patient.province_code
                                     );
                                     if (province) {
                                         newPsgcData.province = province;
                                     }
                                 }
-                                setProvinces(response.data);
+                                setProvinces(response.data || []);
                                 return {
                                     type: "provinces",
-                                    data: response.data,
+                                    data: response.data || [],
                                 };
                             })
                             .catch((error) => {
@@ -162,17 +180,20 @@ export default function Edit({ auth, patient, regions }) {
                         ])
                             .then(
                                 ([citiesResponse, municipalitiesResponse]) => {
-                                    const city = citiesResponse.data.find(
+                                    const city = (
+                                        citiesResponse.data || []
+                                    ).find(
                                         (c) =>
                                             c.code ===
                                             patient.city_municipality_code
                                     );
-                                    const municipality =
-                                        municipalitiesResponse.data.find(
-                                            (m) =>
-                                                m.code ===
-                                                patient.city_municipality_code
-                                        );
+                                    const municipality = (
+                                        municipalitiesResponse.data || []
+                                    ).find(
+                                        (m) =>
+                                            m.code ===
+                                            patient.city_municipality_code
+                                    );
                                     const cityMunicipality =
                                         city || municipality;
 
@@ -201,7 +222,7 @@ export default function Edit({ auth, patient, regions }) {
                                     combined.sort((a, b) =>
                                         a.name.localeCompare(b.name)
                                     );
-                                    setCities(combined);
+                                    setCities(combined || []);
 
                                     return { type: "cities", data: combined };
                                 }
@@ -240,17 +261,20 @@ export default function Edit({ auth, patient, regions }) {
                                     citiesResponse,
                                     municipalitiesResponse,
                                 ]) => {
-                                    const city = citiesResponse.data.find(
+                                    const city = (
+                                        citiesResponse.data || []
+                                    ).find(
                                         (c) =>
                                             c.code ===
                                             patient.city_municipality_code
                                     );
-                                    const municipality =
-                                        municipalitiesResponse.data.find(
-                                            (m) =>
-                                                m.code ===
-                                                patient.city_municipality_code
-                                        );
+                                    const municipality = (
+                                        municipalitiesResponse.data || []
+                                    ).find(
+                                        (m) =>
+                                            m.code ===
+                                            patient.city_municipality_code
+                                    );
 
                                     let barangayResponse;
                                     if (city) {
@@ -268,17 +292,22 @@ export default function Edit({ auth, patient, regions }) {
                                         );
                                     }
 
-                                    if (barangayResponse) {
-                                        const barangay =
-                                            barangayResponse.data.find(
-                                                (b) =>
-                                                    b.code ===
-                                                    patient.barangay_code
-                                            );
+                                    if (
+                                        barangayResponse &&
+                                        barangayResponse.data
+                                    ) {
+                                        const barangay = (
+                                            barangayResponse.data || []
+                                        ).find(
+                                            (b) =>
+                                                b.code === patient.barangay_code
+                                        );
                                         if (barangay) {
                                             newPsgcData.barangay = barangay;
                                         }
-                                        setBarangays(barangayResponse.data);
+                                        setBarangays(
+                                            barangayResponse.data || []
+                                        );
                                     }
 
                                     return {
@@ -313,6 +342,10 @@ export default function Edit({ auth, patient, regions }) {
                 });
             } catch (error) {
                 console.error("Error fetching PSGC data:", error);
+                // Set empty arrays as fallback
+                setProvinces([]);
+                setCities([]);
+                setBarangays([]);
             } finally {
                 setIsLoadingPsgc(false);
             }
@@ -878,33 +911,16 @@ export default function Edit({ auth, patient, regions }) {
                                                     <SelectValue placeholder="Select blood type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="unknown">
-                                                        Unknown
-                                                    </SelectItem>
-                                                    <SelectItem value="A+">
-                                                        A+
-                                                    </SelectItem>
-                                                    <SelectItem value="A-">
-                                                        A-
-                                                    </SelectItem>
-                                                    <SelectItem value="B+">
-                                                        B+
-                                                    </SelectItem>
-                                                    <SelectItem value="B-">
-                                                        B-
-                                                    </SelectItem>
-                                                    <SelectItem value="AB+">
-                                                        AB+
-                                                    </SelectItem>
-                                                    <SelectItem value="AB-">
-                                                        AB-
-                                                    </SelectItem>
-                                                    <SelectItem value="O+">
-                                                        O+
-                                                    </SelectItem>
-                                                    <SelectItem value="O-">
-                                                        O-
-                                                    </SelectItem>
+                                                    {Object.entries(
+                                                        bloodTypes
+                                                    ).map(([value, label]) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -935,21 +951,16 @@ export default function Edit({ auth, patient, regions }) {
                                                     <SelectValue placeholder="Select last dental visit" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="No previous visit">
-                                                        No previous visit
-                                                    </SelectItem>
-                                                    <SelectItem value="Within 3 months">
-                                                        Within 3 months
-                                                    </SelectItem>
-                                                    <SelectItem value="Within 6 months">
-                                                        Within 6 months
-                                                    </SelectItem>
-                                                    <SelectItem value="Within 1 year">
-                                                        Within 1 year
-                                                    </SelectItem>
-                                                    <SelectItem value="More than 1 year">
-                                                        More than 1 year
-                                                    </SelectItem>
+                                                    {Object.entries(
+                                                        lastVisitOptions
+                                                    ).map(([value, label]) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -976,30 +987,16 @@ export default function Edit({ auth, patient, regions }) {
                                                     <SelectValue placeholder="Select category" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="none">
-                                                        No Category
-                                                    </SelectItem>
-                                                    <SelectItem value="regular">
-                                                        Regular Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="vip">
-                                                        VIP Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="emergency">
-                                                        Emergency Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="pediatric">
-                                                        Pediatric Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="senior">
-                                                        Senior Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="new">
-                                                        New Patient
-                                                    </SelectItem>
-                                                    <SelectItem value="returning">
-                                                        Returning Patient
-                                                    </SelectItem>
+                                                    {Object.entries(
+                                                        categories
+                                                    ).map(([value, label]) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {label}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>

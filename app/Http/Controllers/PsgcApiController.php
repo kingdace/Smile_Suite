@@ -48,6 +48,13 @@ class PsgcApiController extends Controller
             }
 
             $data = $response->json();
+
+            // Ensure data is an array
+            if (!is_array($data)) {
+                Log::error('Invalid data format received from PSGC API', ['data' => $data]);
+                return response()->json([]);
+            }
+
             Log::info('Regions fetched successfully', ['count' => count($data)]);
             return response()->json($data);
         } catch (\Exception $e) {
@@ -93,6 +100,13 @@ class PsgcApiController extends Controller
             }
 
             $data = $response->json();
+
+            // Ensure data is an array
+            if (!is_array($data)) {
+                Log::error('Invalid data format received from PSGC API', ['data' => $data]);
+                return response()->json([]);
+            }
+
             Log::info('Provinces fetched successfully', ['count' => count($data)]);
             return response()->json($data);
         } catch (\Exception $e) {
@@ -138,6 +152,13 @@ class PsgcApiController extends Controller
             }
 
             $data = $response->json();
+
+            // Ensure data is an array
+            if (!is_array($data)) {
+                Log::error('Invalid data format received from PSGC API', ['data' => $data]);
+                return response()->json([]);
+            }
+
             Log::info('Cities fetched successfully', ['count' => count($data)]);
             return response()->json($data);
         } catch (\Exception $e) {
@@ -183,6 +204,13 @@ class PsgcApiController extends Controller
             }
 
             $data = $response->json();
+
+            // Ensure data is an array
+            if (!is_array($data)) {
+                Log::error('Invalid data format received from PSGC API', ['data' => $data]);
+                return response()->json([]);
+            }
+
             Log::info('Municipalities fetched successfully', ['count' => count($data)]);
             return response()->json($data);
         } catch (\Exception $e) {

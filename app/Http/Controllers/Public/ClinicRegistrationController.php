@@ -148,6 +148,7 @@ class ClinicRegistrationController extends Controller
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'role' => 'clinic_admin',
+                'user_type' => User::getUserTypeFromRole('clinic_admin'),
                 'clinic_id' => $clinic->id,
                 'email_verified_at' => now(), // Auto-verify since they came from approved request
             ]);

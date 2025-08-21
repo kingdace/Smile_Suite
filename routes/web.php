@@ -44,10 +44,9 @@ Route::get('/clinics/{clinic}/check-appointment', [\App\Http\Controllers\Public\
 Route::post('/reviews/{review}/helpful', [\App\Http\Controllers\Public\ReviewController::class, 'markHelpful'])->name('public.reviews.helpful');
 Route::post('/reviews/{review}/report', [\App\Http\Controllers\Public\ReviewController::class, 'report'])->name('public.reviews.report');
 
-// Patient Registration (Public) - DEPRECATED
-// Route::get('/register/patient', function () {
-//     return Inertia::render('Auth/PatientRegister');
-// })->name('register.patient');
+// Patient Registration (Public)
+Route::get('/register/patient', [App\Http\Controllers\Public\PatientRegistrationController::class, 'showRegistrationForm'])->name('register.patient');
+Route::post('/register/patient', [App\Http\Controllers\Public\PatientRegistrationController::class, 'register'])->name('register.patient.submit');
 
 // Registration Success Page
 // Route::get('/register/success', function () {
@@ -73,29 +72,55 @@ Route::post('/payment/{token}/success', [\App\Http\Controllers\Public\PaymentCon
 Route::post('/payment/{token}/failure', [\App\Http\Controllers\Public\PaymentController::class, 'handlePaymentFailure'])->name('payment.failure');
 
 Route::get('/dashboard', function () {
-    if (Auth::user()->role === 'admin') {
+    $user = Auth::user();
+
+    if ($user->user_type === 'system_admin' || $user->role === 'admin') {
         return redirect()->route('admin.dashboard');
-    } elseif (Auth::user()->role === 'patient') {
+    } elseif ($user->user_type === 'patient') {
         return redirect()->route('patient.dashboard');
     } else {
-        return redirect()->route('clinic.dashboard', ['clinic' => Auth::user()->clinic_id]);
+        // clinic_staff users
+        return redirect()->route('clinic.dashboard', ['clinic' => $user->clinic_id]);
     }
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+    // Patient Portal Routes (for Smile Suite patients)
+    Route::prefix('patient')->name('patient.')->group(function () {
+        Route::post('/claim-record', [App\Http\Controllers\Public\PatientRegistrationController::class, 'claimRecord'])->name('claim-record');
+        Route::post('/register-with-claiming', [App\Http\Controllers\Public\PatientRegistrationController::class, 'registerWithClaiming'])->name('register-with-claiming');
+        Route::post('/verify-registration', [App\Http\Controllers\Public\PatientRegistrationController::class, 'verifyRegistration'])->name('verify-registration');
+        Route::post('/resend-verification', [App\Http\Controllers\Public\PatientRegistrationController::class, 'resendVerification'])->name('resend-verification');
+    });
+
+    // Patient Dashboard (requires authentication)
+    Route::get('/patient/dashboard', [App\Http\Controllers\Public\PatientRegistrationController::class, 'dashboard'])
+        ->middleware(['auth', 'verified'])
+        ->name('patient.dashboard');
 
 Route::middleware('auth')->group(function () {
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Patient Dashboard Route
-    Route::get('/patient/dashboard', [PatientDashboardController::class, 'index'])->name('patient.dashboard');
+    // Patient Profile Routes
+    Route::prefix('patient')->name('patient.')->group(function () {
+        Route::get('/profile', [App\Http\Controllers\Patient\PatientProfileController::class, 'show'])->name('profile');
+        Route::get('/profile/edit', [App\Http\Controllers\Patient\PatientProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [App\Http\Controllers\Patient\PatientProfileController::class, 'update'])->name('profile.update');
+    });
 
     // Admin routes
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // User bulk delete routes (must be before resource routes)
+        Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
+        Route::delete('users/bulk-hard-delete', [UserController::class, 'bulkHardDelete'])->name('users.bulk-hard-delete');
+
         Route::resource('users', UserController::class);
         Route::resource('clinics', ClinicController::class);
         Route::patch('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::delete('users/{id}/hard-delete', [UserController::class, 'hardDelete'])->name('users.hard-delete');
         Route::patch('clinics/{clinic}/restore', [ClinicController::class, 'restore'])->name('clinics.restore');
 
         // Clinic Registration Requests

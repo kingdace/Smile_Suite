@@ -56,6 +56,10 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'needs_verification' => fn () => $request->session()->get('needs_verification'),
+            'verification_type' => fn () => $request->session()->get('verification_type'),
+            'unlinked_patients_count' => fn () => $request->session()->get('unlinked_patients_count'),
+            'registration_email' => fn () => $request->session()->get('registration_email'),
         ];
     }
 }

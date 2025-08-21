@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,11 +37,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        if ($user->role === 'admin') {
+        // Handle different user types - redirect directly to avoid conflicts
+        if ($user->user_type === 'system_admin' || $user->role === 'admin') {
             return redirect()->route('admin.dashboard');
+        } elseif ($user->user_type === 'patient') {
+            return redirect()->route('patient.dashboard');
+        } else {
+            // clinic_staff users - redirect directly to clinic dashboard
+            return redirect()->route('clinic.dashboard', ['clinic' => $user->clinic_id]);
         }
-
-        return redirect()->route('dashboard');
     }
 
     /**

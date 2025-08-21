@@ -30,6 +30,7 @@ import {
     Mail,
     UserCheck,
     Settings,
+    Clock,
 } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
@@ -65,6 +66,7 @@ export default function Index({ auth, patients, filters, statistics }) {
             senior: "Senior Patient",
             new: "New Patient",
             returning: "Returning Patient",
+            none: "No Category",
         };
         return categoryMap[category] || category.replace("_", " ");
     };
@@ -248,7 +250,7 @@ export default function Index({ auth, patients, filters, statistics }) {
 
                 <div className="max-w-7xl mx-auto px-6 -mt--10 pb-12">
                     {/* Enhanced Key Metrics Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
@@ -346,6 +348,61 @@ export default function Index({ auth, patients, filters, statistics }) {
                                             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
                                             <span className="text-xs text-amber-600 font-medium">
                                                 Within 1 year
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Additional Statistics Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-6 relative">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-4 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                                        <UserPlus className="h-7 w-7 text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm text-gray-600 font-medium mb-1">
+                                            New Patients
+                                        </p>
+                                        <p className="text-3xl font-bold text-gray-900 mb-2">
+                                            {statistics.new_patients || 0}
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                                            <span className="text-xs text-blue-600 font-medium">
+                                                No previous visits
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-6 relative">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-4 bg-gradient-to-br from-gray-500 via-gray-600 to-slate-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                                        <Clock className="h-7 w-7 text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm text-gray-600 font-medium mb-1">
+                                            Inactive Patients
+                                        </p>
+                                        <p className="text-3xl font-bold text-gray-900 mb-2">
+                                            {statistics.inactive_patients || 0}
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                                            <span className="text-xs text-gray-600 font-medium">
+                                                Over 1 year
                                             </span>
                                         </div>
                                     </div>
@@ -924,13 +981,16 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                                 ? "New"
                                                                 : "Inactive"}
                                                         </Badge>
-                                                        {patient.category && (
-                                                            <div className="text-xs bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-1.5 py-0.5 rounded-full capitalize font-semibold border border-purple-200">
-                                                                {getCategoryDisplayName(
-                                                                    patient.category
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                        {patient.category &&
+                                                            patient.category !==
+                                                                "none" && (
+                                                                <div className="text-xs bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-1.5 py-0.5 rounded-full capitalize font-semibold border border-purple-200">
+                                                                    {patient.category_display_name ||
+                                                                        getCategoryDisplayName(
+                                                                            patient.category
+                                                                        )}
+                                                                </div>
+                                                            )}
                                                         {patient.blood_type && (
                                                             <div className="text-xs bg-gradient-to-r from-red-100 to-pink-100 text-red-700 px-1.5 py-0.5 rounded-full font-semibold border border-red-200">
                                                                 {

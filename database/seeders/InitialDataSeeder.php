@@ -21,6 +21,7 @@ class InitialDataSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => Hash::make('Gales123'),
             'role' => 'admin',
+            'user_type' => 'system_admin',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
@@ -64,6 +65,7 @@ class InitialDataSeeder extends Seeder
             'email' => 'staff@staff.com',
             'password' => Hash::make('Gales123'),
             'role' => 'staff',
+            'user_type' => 'clinic_staff',
             'clinic_id' => 1,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
@@ -75,6 +77,7 @@ class InitialDataSeeder extends Seeder
             'email' => 'dentist@dentist.com',
             'password' => Hash::make('Gales123'),
             'role' => 'dentist',
+            'user_type' => 'clinic_staff',
             'clinic_id' => 1,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),

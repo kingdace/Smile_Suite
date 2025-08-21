@@ -25,9 +25,18 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
     const [modalMode, setModalMode] = useState("add");
     const [selectedUser, setSelectedUser] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [hardDeleteDialogOpen, setHardDeleteDialogOpen] = useState(false);
     const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [userToHardDelete, setUserToHardDelete] = useState(null);
     const [userToRestore, setUserToRestore] = useState(null);
+
+    // Bulk delete functionality
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+    const [bulkHardDeleteDialogOpen, setBulkHardDeleteDialogOpen] =
+        useState(false);
 
     // Debounced search function that waits 300ms after the user stops typing
     const debouncedSearch = useCallback(
@@ -123,6 +132,11 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
         setDeleteDialogOpen(true);
     };
 
+    const handleHardDeleteClick = (user) => {
+        setUserToHardDelete(user);
+        setHardDeleteDialogOpen(true);
+    };
+
     const handleRestoreClick = (user) => {
         setUserToRestore(user);
         setRestoreDialogOpen(true);
@@ -139,6 +153,90 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                     console.error("Delete failed:", errors);
                     setDeleteDialogOpen(false);
                     setUserToDelete(null);
+                },
+            });
+        }
+    };
+
+    const confirmHardDelete = () => {
+        if (userToHardDelete) {
+            router.delete(
+                route("admin.users.hard-delete", userToHardDelete.id),
+                {
+                    onSuccess: () => {
+                        setHardDeleteDialogOpen(false);
+                        setUserToHardDelete(null);
+                    },
+                    onError: (errors) => {
+                        console.error("Hard delete failed:", errors);
+                        setHardDeleteDialogOpen(false);
+                        setUserToHardDelete(null);
+                    },
+                }
+            );
+        }
+    };
+
+    // Bulk delete functionality
+    const handleSelectAll = (e) => {
+        const checked = e.target.checked;
+        setSelectAll(checked);
+        if (checked) {
+            setSelectedUsers(users.data.map((user) => user.id));
+        } else {
+            setSelectedUsers([]);
+        }
+    };
+
+    const handleSelectUser = (userId, checked) => {
+        if (checked) {
+            setSelectedUsers((prev) => [...prev, userId]);
+        } else {
+            setSelectedUsers((prev) => prev.filter((id) => id !== userId));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedUsers.length > 0) {
+            setBulkDeleteDialogOpen(true);
+        }
+    };
+
+    const handleBulkHardDelete = () => {
+        if (selectedUsers.length > 0) {
+            setBulkHardDeleteDialogOpen(true);
+        }
+    };
+
+    const confirmBulkDelete = () => {
+        if (selectedUsers.length > 0) {
+            router.delete(route("admin.users.bulk-destroy"), {
+                data: { user_ids: selectedUsers },
+                onSuccess: () => {
+                    setBulkDeleteDialogOpen(false);
+                    setSelectedUsers([]);
+                    setSelectAll(false);
+                },
+                onError: (errors) => {
+                    console.error("Bulk delete failed:", errors);
+                    setBulkDeleteDialogOpen(false);
+                },
+            });
+        }
+    };
+
+    const confirmBulkHardDelete = () => {
+        if (selectedUsers.length > 0) {
+            router.delete(route("admin.users.bulk-hard-delete"), {
+                data: { user_ids: selectedUsers },
+                onSuccess: () => {
+                    setBulkHardDeleteDialogOpen(false);
+                    setSelectedUsers([]);
+                    setSelectAll(false);
+                },
+                onError: (errors) => {
+                    console.error("Bulk hard delete failed:", errors);
+                    setBulkHardDeleteDialogOpen(false);
                 },
             });
         }
@@ -232,6 +330,30 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                     >
                                         + Add New User
                                     </button>
+                                    {selectedUsers.length > 0 && (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={handleBulkDelete}
+                                                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm flex items-center gap-2"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                Bulk Delete (
+                                                {selectedUsers.length})
+                                            </button>
+                                            {show_deleted && (
+                                                <button
+                                                    onClick={
+                                                        handleBulkHardDelete
+                                                    }
+                                                    className="bg-gradient-to-r from-red-700 to-red-800 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm flex items-center gap-2"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    Bulk Hard Delete (
+                                                    {selectedUsers.length})
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="mb-5 bg-gradient-to-r from-blue-50 via-white to-cyan-50/30 backdrop-blur-sm rounded-xl shadow-md border border-blue-200/50 p-4">
@@ -283,6 +405,16 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                     <table className="w-full divide-y divide-blue-100">
                                         <thead className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600">
                                             <tr>
+                                                <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectAll}
+                                                        onChange={
+                                                            handleSelectAll
+                                                        }
+                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                                    />
+                                                </th>
                                                 <th className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                                     <User className="inline w-4 h-4 mr-2" />
                                                     User
@@ -311,7 +443,7 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                             {users.data.length === 0 ? (
                                                 <tr>
                                                     <td
-                                                        colSpan={6}
+                                                        colSpan={7}
                                                         className="text-center py-10 text-gray-500"
                                                     >
                                                         <div className="flex flex-col items-center gap-3">
@@ -344,6 +476,25 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                                                     : "bg-blue-50/20"
                                                             }`}
                                                         >
+                                                            <td className="px-3 py-3">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={selectedUsers.includes(
+                                                                        user.id
+                                                                    )}
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        handleSelectUser(
+                                                                            user.id,
+                                                                            e
+                                                                                .target
+                                                                                .checked
+                                                                        )
+                                                                    }
+                                                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                                                />
+                                                            </td>
                                                             <td className="px-4 py-3">
                                                                 <div className="flex items-center">
                                                                     <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center mr-3 shadow-sm">
@@ -451,17 +602,31 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                                                     </button>
 
                                                                     {user.deleted_at ? (
-                                                                        <button
-                                                                            onClick={() =>
-                                                                                handleRestoreClick(
-                                                                                    user
-                                                                                )
-                                                                            }
-                                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-semibold hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
-                                                                        >
-                                                                            <RotateCcw className="w-3 h-3" />
-                                                                            Restore
-                                                                        </button>
+                                                                        <div className="flex items-center gap-1">
+                                                                            <button
+                                                                                onClick={() =>
+                                                                                    handleRestoreClick(
+                                                                                        user
+                                                                                    )
+                                                                                }
+                                                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-semibold hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                            >
+                                                                                <RotateCcw className="w-3 h-3" />
+                                                                                Restore
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() =>
+                                                                                    handleHardDeleteClick(
+                                                                                        user
+                                                                                    )
+                                                                                }
+                                                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-red-700 to-red-800 text-white text-xs font-semibold hover:from-red-800 hover:to-red-900 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                            >
+                                                                                <Trash2 className="w-3 h-3" />
+                                                                                Hard
+                                                                                Delete
+                                                                            </button>
+                                                                        </div>
                                                                     ) : (
                                                                         <button
                                                                             onClick={() =>
@@ -671,6 +836,198 @@ export default function Index({ auth, users, clinics, show_deleted, filters }) {
                                 </button>
                                 <button
                                     onClick={() => setRestoreDialogOpen(false)}
+                                    className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Hard Delete Confirmation Dialog */}
+            {hardDeleteDialogOpen && userToHardDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in border border-gray-200/50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-700 to-red-800 p-4 text-white relative">
+                            <button
+                                onClick={() => setHardDeleteDialogOpen(false)}
+                                className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors duration-200 focus:outline-none"
+                                aria-label="Close"
+                                type="button"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">
+                                        Permanently Delete User
+                                    </h2>
+                                    <p className="text-red-100 text-xs">
+                                        This action is irreversible
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            <div className="text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Trash2 className="w-6 h-6 text-red-600" />
+                                </div>
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                    Permanently Delete {userToHardDelete.name}?
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    This will permanently delete the user
+                                    account and all associated data from the
+                                    database. This action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 pt-3">
+                                <button
+                                    onClick={confirmHardDelete}
+                                    className="flex-1 bg-gradient-to-r from-red-700 to-red-800 text-white px-4 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 text-sm"
+                                >
+                                    Permanently Delete
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setHardDeleteDialogOpen(false)
+                                    }
+                                    className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Bulk Delete Confirmation Dialog */}
+            {bulkDeleteDialogOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in border border-gray-200/50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 text-white relative">
+                            <button
+                                onClick={() => setBulkDeleteDialogOpen(false)}
+                                className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors duration-200 focus:outline-none"
+                                aria-label="Close"
+                                type="button"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">
+                                        Bulk Delete Users
+                                    </h2>
+                                    <p className="text-red-100 text-xs">
+                                        Soft delete multiple users
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            <div className="text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Trash2 className="w-6 h-6 text-red-600" />
+                                </div>
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                    Delete {selectedUsers.length} Users?
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    This will soft delete {selectedUsers.length}{" "}
+                                    user accounts. The users will no longer be
+                                    able to access the system, but their data
+                                    will be preserved.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 pt-3">
+                                <button
+                                    onClick={confirmBulkDelete}
+                                    className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 text-sm"
+                                >
+                                    Delete {selectedUsers.length} Users
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setBulkDeleteDialogOpen(false)
+                                    }
+                                    className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Bulk Hard Delete Confirmation Dialog */}
+            {bulkHardDeleteDialogOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in border border-gray-200/50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-700 to-red-800 p-4 text-white relative">
+                            <button
+                                onClick={() =>
+                                    setBulkHardDeleteDialogOpen(false)
+                                }
+                                className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors duration-200 focus:outline-none"
+                                aria-label="Close"
+                                type="button"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">
+                                        Bulk Permanently Delete Users
+                                    </h2>
+                                    <p className="text-red-100 text-xs">
+                                        This action is irreversible
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            <div className="text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Trash2 className="w-6 h-6 text-red-600" />
+                                </div>
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                    Permanently Delete {selectedUsers.length}{" "}
+                                    Users?
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    This will permanently delete{" "}
+                                    {selectedUsers.length} user accounts and all
+                                    associated data from the database. This
+                                    action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 pt-3">
+                                <button
+                                    onClick={confirmBulkHardDelete}
+                                    className="flex-1 bg-gradient-to-r from-red-700 to-red-800 text-white px-4 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 text-sm"
+                                >
+                                    Permanently Delete {selectedUsers.length}{" "}
+                                    Users
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setBulkHardDeleteDialogOpen(false)
+                                    }
                                     className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
                                 >
                                     Cancel

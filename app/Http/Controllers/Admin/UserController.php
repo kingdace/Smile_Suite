@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -125,6 +127,7 @@ class UserController extends Controller
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']), // Hash the password
             'role' => $validatedData['role'],
+            'user_type' => User::getUserTypeFromRole($validatedData['role']),
         ];
 
         // Only set clinic_id if it's provided (not for System Admins)
@@ -201,6 +204,7 @@ class UserController extends Controller
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
         $user->role = $validatedData['role'];
+        $user->user_type = User::getUserTypeFromRole($validatedData['role']);
 
         // Handle clinic_id based on role
         if ($validatedData['role'] === 'admin') {
@@ -269,5 +273,159 @@ class UserController extends Controller
 
         // Redirect back to the user index page, potentially keeping the show_deleted filter
         return redirect()->route('admin.users.index', ['show_deleted' => true])->with('success', 'User restored successfully.');
+    }
+
+    /**
+     * Hard delete a user (permanently remove from database).
+     */
+    public function hardDelete($id)
+    {
+        // Check if the authenticated user is an admin
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Find the user (including soft-deleted ones)
+        $userToDelete = User::withTrashed()->find($id);
+
+        if (!$userToDelete) {
+            abort(404, 'User not found.');
+        }
+
+        // Prevent deleting the currently authenticated user
+        if (auth()->user()->id === $userToDelete->id) {
+            return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account.');
+        }
+
+        // Prevent deleting the main admin account (ID 1 or specific admin)
+        if ($userToDelete->id === 1 || ($userToDelete->role === 'admin' && $userToDelete->email === 'admin@admin.com')) {
+            return redirect()->route('admin.users.index')->with('error', 'Cannot delete the main system administrator account.');
+        }
+
+        try {
+            // Handle related records before hard delete
+            // Set user_id to null in patients table (this should happen automatically due to onDelete('set null'))
+            // But we'll do it explicitly to ensure it works
+            \DB::table('patients')->where('user_id', $userToDelete->id)->update(['user_id' => null]);
+
+            // Hard delete the user (permanently remove from database)
+            $userToDelete->forceDelete();
+
+            return redirect()->route('admin.users.index')->with('success', 'User permanently deleted successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Hard delete failed for user ' . $userToDelete->id, [
+                'error' => $e->getMessage(),
+                'user_email' => $userToDelete->email
+            ]);
+
+            return redirect()->route('admin.users.index')->with('error', 'Failed to delete user: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk soft delete users
+     */
+    public function bulkDestroy(Request $request)
+    {
+        // Check if the authenticated user is an admin
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'integer|exists:users,id'
+        ]);
+
+        $userIds = $request->input('user_ids');
+        $currentUserId = auth()->user()->id;
+
+        // Filter out the current user to prevent self-deletion
+        $userIds = array_filter($userIds, function($id) use ($currentUserId) {
+            return $id != $currentUserId;
+        });
+
+        if (empty($userIds)) {
+            return redirect()->route('admin.users.index')->with('error', 'No valid users selected for deletion.');
+        }
+
+        // Get users to delete
+        $usersToDelete = User::whereIn('id', $userIds)->get();
+        $deletedCount = 0;
+
+        foreach ($usersToDelete as $user) {
+            // Prevent deleting the main admin account
+            if ($user->id === 1 || ($user->role === 'admin' && $user->email === 'admin@admin.com')) {
+                continue;
+            }
+
+            $user->delete();
+            $deletedCount++;
+        }
+
+        $message = $deletedCount > 0
+            ? "Successfully soft deleted {$deletedCount} user(s)."
+            : "No users were deleted.";
+
+        return redirect()->route('admin.users.index')->with('success', $message);
+    }
+
+    /**
+     * Bulk hard delete users (permanently remove from database)
+     */
+    public function bulkHardDelete(Request $request)
+    {
+        // Check if the authenticated user is an admin
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'integer|exists:users,id'
+        ]);
+
+        $userIds = $request->input('user_ids');
+        $currentUserId = auth()->user()->id;
+
+        // Filter out the current user to prevent self-deletion
+        $userIds = array_filter($userIds, function($id) use ($currentUserId) {
+            return $id != $currentUserId;
+        });
+
+        if (empty($userIds)) {
+            return redirect()->route('admin.users.index')->with('error', 'No valid users selected for deletion.');
+        }
+
+        // Get users to delete (including soft-deleted ones)
+        $usersToDelete = User::withTrashed()->whereIn('id', $userIds)->get();
+        $deletedCount = 0;
+
+        foreach ($usersToDelete as $user) {
+            // Prevent deleting the main admin account
+            if ($user->id === 1 || ($user->role === 'admin' && $user->email === 'admin@admin.com')) {
+                continue;
+            }
+
+            try {
+                // Handle related records before hard delete
+                DB::table('patients')->where('user_id', $user->id)->update(['user_id' => null]);
+
+                $user->forceDelete();
+                $deletedCount++;
+            } catch (\Exception $e) {
+                Log::error('Bulk hard delete failed for user ' . $user->id, [
+                    'error' => $e->getMessage(),
+                    'user_email' => $user->email
+                ]);
+                // Continue with other users even if one fails
+            }
+        }
+
+        $message = $deletedCount > 0
+            ? "Successfully permanently deleted {$deletedCount} user(s)."
+            : "No users were deleted.";
+
+        return redirect()->route('admin.users.index')->with('success', $message);
     }
 }
