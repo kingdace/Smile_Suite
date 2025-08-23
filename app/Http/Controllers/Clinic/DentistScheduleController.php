@@ -46,7 +46,7 @@ class DentistScheduleController extends Controller
         ]);
     }
 
-    public function getAvailableSlots(Request $request, Clinic $clinic)
+        public function getAvailableSlots(Request $request, Clinic $clinic)
     {
         $validated = $request->validate([
             'dentist_id' => 'required|exists:users,id',
@@ -54,13 +54,17 @@ class DentistScheduleController extends Controller
             'duration' => 'nullable|integer|min:15|max:240',
         ]);
 
-        Log::info('Getting available slots for dentist', [
-            'dentist_id' => $validated['dentist_id'],
-            'date' => $validated['date'],
-            'duration' => $validated['duration'] ?? null
-        ]);
-
         try {
+            // Check if dentist belongs to this clinic
+            $dentist = $clinic->users()->where('id', $validated['dentist_id'])->first();
+
+            if (!$dentist) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Dentist not found in this clinic'
+                ], 404);
+            }
+
             $availableSlots = $this->scheduleService->getAvailableSlots(
                 $validated['dentist_id'],
                 $validated['date'],
@@ -72,18 +76,27 @@ class DentistScheduleController extends Controller
 
             Log::info('Available slots retrieved successfully', [
                 'total_slots' => count($availableSlots),
-                'grouped_slots' => $groupedSlots
+                'grouped_slots' => $groupedSlots,
+                'dentist_id' => $validated['dentist_id'],
+                'date' => $validated['date']
             ]);
 
             return response()->json([
                 'success' => true,
                 'slots' => $groupedSlots,
-                'total_slots' => count($availableSlots)
+                'total_slots' => count($availableSlots),
+                'debug_info' => [
+                    'dentist_id' => $validated['dentist_id'],
+                    'date' => $validated['date'],
+                    'duration' => $validated['duration'] ?? null,
+                    'clinic_id' => $clinic->id
+                ]
             ]);
 
         } catch (\Exception $e) {
             Log::error('Error getting available slots', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
                 'dentist_id' => $validated['dentist_id'],
                 'date' => $validated['date']
             ]);

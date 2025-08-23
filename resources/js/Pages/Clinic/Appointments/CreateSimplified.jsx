@@ -34,80 +34,23 @@ import { useState } from "react";
 import PatientSelector from "@/Components/Appointment/PatientSelector";
 import TimeSlotSelector from "@/Components/Appointment/TimeSlotSelector";
 
-const APPOINTMENT_REASONS = [
-    {
-        id: "cleaning",
-        label: "Teeth Cleaning",
-        icon: "🦷",
-        color: "bg-blue-100 text-blue-700",
-    },
-    {
-        id: "checkup",
-        label: "Regular Checkup",
-        icon: "👁️",
-        color: "bg-green-100 text-green-700",
-    },
-    {
-        id: "whitening",
-        label: "Teeth Whitening",
-        icon: "✨",
-        color: "bg-purple-100 text-purple-700",
-    },
-    {
-        id: "filling",
-        label: "Dental Filling",
-        icon: "🔧",
-        color: "bg-orange-100 text-orange-700",
-    },
-    {
-        id: "extraction",
-        label: "Tooth Extraction",
-        icon: "🦷",
-        color: "bg-red-100 text-red-700",
-    },
-    {
-        id: "root_canal",
-        label: "Root Canal",
-        icon: "🔬",
-        color: "bg-indigo-100 text-indigo-700",
-    },
-    {
-        id: "crown",
-        label: "Dental Crown",
-        icon: "👑",
-        color: "bg-yellow-100 text-yellow-700",
-    },
-    {
-        id: "bridge",
-        label: "Dental Bridge",
-        icon: "🌉",
-        color: "bg-teal-100 text-teal-700",
-    },
-    {
-        id: "denture",
-        label: "Denture",
-        icon: "🦷",
-        color: "bg-pink-100 text-pink-700",
-    },
-    {
-        id: "braces",
-        label: "Braces/Orthodontics",
-        icon: "🦷",
-        color: "bg-cyan-100 text-cyan-700",
-    },
-    {
-        id: "implant",
-        label: "Dental Implant",
-        icon: "🦷",
-        color: "bg-emerald-100 text-emerald-700",
-    },
-    {
-        id: "other",
-        label: "Other",
-        icon: "📋",
-        color: "bg-gray-100 text-gray-700",
-    },
-];
+// Helper function to get service color based on category
+const getServiceColor = (category) => {
+    const colors = {
+        general: "bg-blue-100 text-blue-700",
+        cosmetic: "bg-purple-100 text-purple-700",
+        orthodontics: "bg-indigo-100 text-indigo-700",
+        surgery: "bg-red-100 text-red-700",
+        pediatric: "bg-pink-100 text-pink-700",
+        emergency: "bg-orange-100 text-orange-700",
+        preventive: "bg-green-100 text-green-700",
+        restorative: "bg-teal-100 text-teal-700",
+        endodontics: "bg-cyan-100 text-cyan-700",
+        periodontics: "bg-emerald-100 text-emerald-700",
+        prosthodontics: "bg-gray-100 text-gray-700",
+    };
+    return colors[category] || "bg-gray-100 text-gray-700";
+};
 
 const PAYMENT_STATUSES = [
     {
@@ -142,13 +85,12 @@ export default function CreateSimplified({
     types,
     statuses,
     dentists,
+    services,
 }) {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedDentist, setSelectedDentist] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
-    const [selectedReason, setSelectedReason] = useState("");
-    const [showCustomReason, setShowCustomReason] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -165,6 +107,7 @@ export default function CreateSimplified({
         payment_status: "pending",
         reason: "",
         notes: "",
+        service_id: "",
     });
 
     const handlePatientSelect = (patient) => {
@@ -188,12 +131,6 @@ export default function CreateSimplified({
             const scheduledAt = `${selectedDate}T${time}:00`;
             setData("scheduled_at", scheduledAt);
         }
-    };
-
-    const handleReasonChange = (reason) => {
-        setSelectedReason(reason);
-        setData("reason", reason);
-        setShowCustomReason(reason === "other");
     };
 
     const handleSubmit = (e) => {
@@ -224,7 +161,7 @@ export default function CreateSimplified({
         selectedDentist &&
         selectedDate &&
         selectedTime &&
-        selectedReason;
+        (data.service_id || data.reason);
 
     return (
         <AuthenticatedLayout auth={auth}>
@@ -427,61 +364,178 @@ export default function CreateSimplified({
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-6">
-                                    {/* Appointment Reason */}
+                                    {/* Service Selection */}
                                     <div>
                                         <Label className="text-base font-semibold mb-3 block">
-                                            Appointment Reason
+                                            Select Service
                                         </Label>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                            {APPOINTMENT_REASONS.map(
-                                                (reason) => (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {services && services.length > 0 ? (
+                                                services.map((service) => (
                                                     <button
-                                                        key={reason.id}
+                                                        key={service.id}
                                                         type="button"
-                                                        onClick={() =>
-                                                            handleReasonChange(
-                                                                reason.id
-                                                            )
-                                                        }
+                                                        onClick={() => {
+                                                            setData(
+                                                                "service_id",
+                                                                service.id
+                                                            );
+                                                            setData(
+                                                                "reason",
+                                                                service.name
+                                                            );
+                                                            setData(
+                                                                "duration",
+                                                                service.duration_minutes ||
+                                                                    30
+                                                            );
+                                                        }}
                                                         className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
-                                                            selectedReason ===
-                                                            reason.id
+                                                            data.service_id ===
+                                                            service.id
                                                                 ? "border-blue-500 bg-blue-50 shadow-md"
                                                                 : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
                                                         }`}
                                                     >
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-2xl">
-                                                                {reason.icon}
-                                                            </span>
-                                                            <span className="font-medium text-sm">
-                                                                {reason.label}
-                                                            </span>
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <span
+                                                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getServiceColor(
+                                                                        service.category
+                                                                    )}`}
+                                                                >
+                                                                    {
+                                                                        service.category
+                                                                    }
+                                                                </span>
+                                                                <span className="text-sm font-semibold text-gray-900">
+                                                                    ₱
+                                                                    {
+                                                                        service.price
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="font-semibold text-gray-900 mb-1">
+                                                                    {
+                                                                        service.name
+                                                                    }
+                                                                </h4>
+                                                                {service.description && (
+                                                                    <p className="text-sm text-gray-600 mb-2">
+                                                                        {
+                                                                            service.description
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                                    <span className="flex items-center gap-1">
+                                                                        <Clock className="h-3 w-3" />
+                                                                        {service.duration_minutes ||
+                                                                            30}{" "}
+                                                                        min
+                                                                    </span>
+                                                                    {service.code && (
+                                                                        <span>
+                                                                            Code:{" "}
+                                                                            {
+                                                                                service.code
+                                                                            }
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            {service.dentists &&
+                                                                service.dentists
+                                                                    .length >
+                                                                    0 && (
+                                                                    <div className="pt-2 border-t border-gray-100">
+                                                                        <p className="text-xs text-gray-500 mb-1">
+                                                                            Available
+                                                                            Dentists:
+                                                                        </p>
+                                                                        <div className="flex flex-wrap gap-1">
+                                                                            {service.dentists
+                                                                                .slice(
+                                                                                    0,
+                                                                                    3
+                                                                                )
+                                                                                .map(
+                                                                                    (
+                                                                                        dentist
+                                                                                    ) => (
+                                                                                        <span
+                                                                                            key={
+                                                                                                dentist.id
+                                                                                            }
+                                                                                            className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                                                                                        >
+                                                                                            {
+                                                                                                dentist.name
+                                                                                            }
+                                                                                        </span>
+                                                                                    )
+                                                                                )}
+                                                                            {service
+                                                                                .dentists
+                                                                                .length >
+                                                                                3 && (
+                                                                                <span className="text-xs text-gray-500">
+                                                                                    +
+                                                                                    {service
+                                                                                        .dentists
+                                                                                        .length -
+                                                                                        3}{" "}
+                                                                                    more
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
                                                         </div>
                                                     </button>
-                                                )
+                                                ))
+                                            ) : (
+                                                <div className="col-span-full text-center py-8">
+                                                    <div className="text-gray-400 mb-2">
+                                                        <Stethoscope className="h-12 w-12 mx-auto" />
+                                                    </div>
+                                                    <p className="text-gray-500">
+                                                        No services available
+                                                    </p>
+                                                    <p className="text-sm text-gray-400">
+                                                        Please add services in
+                                                        the Services Management
+                                                        section
+                                                    </p>
+                                                </div>
                                             )}
                                         </div>
-                                        {showCustomReason && (
-                                            <div className="mt-4">
-                                                <Label htmlFor="custom_reason">
-                                                    Custom Reason
-                                                </Label>
-                                                <Input
-                                                    id="custom_reason"
-                                                    value={data.reason}
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "reason",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    placeholder="Enter custom reason..."
-                                                    className="mt-1"
-                                                />
-                                            </div>
-                                        )}
                                     </div>
+
+                                    {/* Custom Reason (if no service selected) */}
+                                    {!data.service_id && (
+                                        <div>
+                                            <Label
+                                                htmlFor="custom_reason"
+                                                className="text-base font-semibold mb-3 block"
+                                            >
+                                                Custom Reason
+                                            </Label>
+                                            <Input
+                                                id="custom_reason"
+                                                value={data.reason}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "reason",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Enter custom reason if no service selected..."
+                                                className="mt-1"
+                                            />
+                                        </div>
+                                    )}
 
                                     {/* Duration */}
                                     <div>

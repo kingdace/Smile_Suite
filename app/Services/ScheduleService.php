@@ -8,6 +8,7 @@ use App\Models\ScheduleTemplate;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class ScheduleService
 {
@@ -55,7 +56,8 @@ class ScheduleService
     private function getSlotsFromProfileWorkingHours(User $dentist, Carbon $date, int $duration = null): array
     {
         if (!$dentist->working_hours || !$dentist->is_active) {
-            return [];
+            // If no working hours set, generate default slots (9 AM to 5 PM)
+            return $this->generateDefaultTimeSlots($date, $duration);
         }
 
         // Check if date is in unavailable dates
@@ -68,7 +70,8 @@ class ScheduleService
         $workingHours = $dentist->working_hours[$dayOfWeek] ?? null;
 
         if (!$workingHours) {
-            return [];
+            // If no working hours for this day, generate default slots
+            return $this->generateDefaultTimeSlots($date, $duration);
         }
 
         // Generate time slots
@@ -93,6 +96,25 @@ class ScheduleService
             ->toArray();
 
         return array_values(array_diff($slots, $bookedSlots));
+    }
+
+    /**
+     * Generate default time slots (9 AM to 5 PM)
+     */
+    private function generateDefaultTimeSlots(Carbon $date, int $duration = null): array
+    {
+        // Include weekends for default slots (many clinics work on weekends)
+        $slotDuration = $duration ?? 30;
+        $slots = [];
+        $startTime = Carbon::parse('09:00');
+        $endTime = Carbon::parse('17:00');
+
+        while ($startTime < $endTime) {
+            $slots[] = $startTime->format('H:i');
+            $startTime->addMinutes($slotDuration);
+        }
+
+        return $slots;
     }
 
     /**

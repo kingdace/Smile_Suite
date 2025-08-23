@@ -90,7 +90,7 @@ class User extends Authenticatable
 
     public function appointments()
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasMany(Appointment::class, 'assigned_to');
     }
 
     public function treatments()

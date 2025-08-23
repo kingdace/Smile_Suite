@@ -609,7 +609,6 @@ export default function Authenticated({
     children,
     hideSidebar = false,
 }) {
-    console.log("AUTH ROLE:", auth?.user?.role);
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);

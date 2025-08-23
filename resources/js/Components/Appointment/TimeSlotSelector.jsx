@@ -50,10 +50,14 @@ export default function TimeSlotSelector({
             const response = await axios.get(
                 route("clinic.dentist-schedules.get-available-slots", {
                     clinic: clinic.id,
-                    dentist_id: selectedDentist,
-                    date: selectedDate,
-                    duration: 30, // Default duration
-                })
+                }),
+                {
+                    params: {
+                        dentist_id: selectedDentist,
+                        date: selectedDate,
+                        duration: 30, // Default duration
+                    },
+                }
             );
 
             if (response.data.success) {

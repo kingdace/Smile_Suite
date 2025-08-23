@@ -26,6 +26,7 @@ class Appointment extends Model
         'recurring_parent_id',
         'appointment_type_id',
         'appointment_status_id',
+        'service_id',
         'created_by',
     ];
 
@@ -63,6 +64,11 @@ class Appointment extends Model
     public function assignedDentist(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
     }
 
     public function treatments()

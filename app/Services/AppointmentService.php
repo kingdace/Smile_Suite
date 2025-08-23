@@ -62,6 +62,7 @@ class AppointmentService
             'payment_status' => $data['payment_status'] ?? 'pending',
             'reason' => $data['reason'] ?? '',
             'notes' => $data['notes'] ?? '',
+            'service_id' => $data['service_id'] ?? null,
             'created_by' => $createdBy,
         ]);
 

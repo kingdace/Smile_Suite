@@ -102,6 +102,23 @@ const navigation = (clinicId) => [
         routeName: "clinic.appointments.*",
         icon: Calendar,
         description: "Schedule management",
+        hasDropdown: true,
+        children: [
+            {
+                name: "List View",
+                href: route("clinic.appointments.index", [clinicId]),
+                routeName: "clinic.appointments.index",
+                icon: Calendar,
+                description: "Appointment list",
+            },
+            {
+                name: "Calendar View",
+                href: route("clinic.appointments.calendar", [clinicId]),
+                routeName: "clinic.appointments.calendar",
+                icon: CalendarCheck,
+                description: "Calendar interface",
+            },
+        ],
     },
     {
         name: "Dentist Schedule",

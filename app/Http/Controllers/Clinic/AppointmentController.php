@@ -9,6 +9,7 @@ use App\Models\AppointmentType;
 use App\Models\Clinic;
 use App\Models\Patient;
 use App\Services\AppointmentService;
+use App\Http\Controllers\PsgcApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -32,7 +33,7 @@ class AppointmentController extends Controller
         $this->authorize('viewAny', [Appointment::class, $clinic]);
 
         $appointments = $clinic->appointments()
-            ->with(['patient', 'type', 'status', 'assignedDentist'])
+            ->with(['patient', 'type', 'status', 'assignedDentist', 'service'])
             ->when($request->input('search'), function ($query, $search) {
                 $query->whereHas('patient', function ($query) use ($search) {
                     $query->where('first_name', 'like', "%{$search}%")
@@ -69,6 +70,45 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function calendar(Request $request, Clinic $clinic)
+    {
+        $this->authorize('viewAny', [Appointment::class, $clinic]);
+
+        $appointments = $clinic->appointments()
+            ->with(['patient', 'type', 'status', 'assignedDentist', 'service'])
+            ->when($request->input('search'), function ($query, $search) {
+                $query->whereHas('patient', function ($query) use ($search) {
+                    $query->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone_number', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->input('status'), function ($query, $status) {
+                $query->whereHas('status', function ($query) use ($status) {
+                    $query->where('name', $status);
+                });
+            })
+            ->when($request->input('dentist'), function ($query, $dentist) {
+                $query->where('assigned_to', $dentist);
+            })
+            ->orderBy('scheduled_at', 'asc')
+            ->get();
+
+        return Inertia::render('Clinic/Appointments/Calendar', [
+            'clinic' => $clinic,
+            'appointments' => ['data' => $appointments],
+            'filters' => $request->only(['search', 'status', 'dentist']),
+            'auth' => [
+                'id' => Auth::user()->id,
+                'name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                'clinic_id' => Auth::user()->clinic_id,
+                'clinic' => Auth::user()->clinic,
+            ],
+        ]);
+    }
+
 
 
     public function createSimplified(Request $request, Clinic $clinic)
@@ -84,13 +124,11 @@ class AppointmentController extends Controller
                 ->where('is_active', true)
                 ->select('id', 'name', 'email')
                 ->get(),
-            'auth' => [
-                'id' => Auth::user()->id,
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => Auth::user()->clinic_id,
-                'clinic' => Auth::user()->clinic,
-            ],
+            'services' => $clinic->services()
+                ->where('is_active', true)
+                ->with('dentists')
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -113,6 +151,7 @@ class AppointmentController extends Controller
                 'payment_status' => 'nullable|in:pending,paid,partial,insurance',
                 'reason' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
+                'service_id' => 'nullable|exists:services,id',
             ]);
 
             Log::info('Appointment Validated Data', $validated);
@@ -151,7 +190,43 @@ class AppointmentController extends Controller
     public function show(Clinic $clinic, Appointment $appointment)
     {
         $this->authorize('view', [$appointment, $clinic]);
-        $appointment->load(['patient', 'type', 'status', 'assignedDentist']);
+        $appointment->load(['patient', 'type', 'status', 'assignedDentist', 'service', 'creator']);
+
+        // Load patient address names if patient exists
+        if ($appointment->patient) {
+            $patient = $appointment->patient;
+
+            // Fetch address data from PSGC API (same logic as PatientController)
+            if ($patient->region_code) {
+                $psgcApi = app(\App\Http\Controllers\PsgcApiController::class);
+                $region = $psgcApi->getRegions()->getData();
+                $patient->region_name = collect($region)->firstWhere('code', $patient->region_code)?->name;
+            }
+
+            if ($patient->province_code) {
+                $psgcApi = app(\App\Http\Controllers\PsgcApiController::class);
+                $request = new \Illuminate\Http\Request(['regionId' => $patient->region_code]);
+                $provinces = $psgcApi->getProvinces($request)->getData();
+                $patient->province_name = collect($provinces)->firstWhere('code', $patient->province_code)?->name;
+            }
+
+            if ($patient->city_municipality_code) {
+                $psgcApi = app(\App\Http\Controllers\PsgcApiController::class);
+                $request = new \Illuminate\Http\Request(['provinceId' => $patient->province_code]);
+                $cities = $psgcApi->getCities($request)->getData();
+                $municipalities = $psgcApi->getMunicipalities($request)->getData();
+                $combined = array_merge($cities, $municipalities);
+                $patient->city_municipality_name = collect($combined)->firstWhere('code', $patient->city_municipality_code)?->name;
+            }
+
+            if ($patient->barangay_code) {
+                $psgcApi = app(\App\Http\Controllers\PsgcApiController::class);
+                $request = new \Illuminate\Http\Request(['cityId' => $patient->city_municipality_code]);
+                $barangays = $psgcApi->getBarangays($request)->getData();
+                $patient->barangay_name = collect($barangays)->firstWhere('code', $patient->barangay_code)?->name;
+            }
+        }
+
         return Inertia::render('Clinic/Appointments/Show', [
             'clinic' => $clinic,
             'appointment' => $appointment,
@@ -168,13 +243,14 @@ class AppointmentController extends Controller
     public function edit(Clinic $clinic, Appointment $appointment)
     {
         $this->authorize('update', [$appointment, $clinic]);
-        $appointment->load(['patient', 'type', 'status', 'assignedDentist']);
+        $appointment->load(['patient', 'type', 'status', 'assignedDentist', 'service']);
         return Inertia::render('Clinic/Appointments/Edit', [
             'clinic' => $clinic,
             'appointment' => $appointment,
             'types' => AppointmentType::all(),
             'statuses' => AppointmentStatus::all(),
             'dentists' => $clinic->users()->where('role', 'dentist')->get(),
+            'services' => $clinic->services()->active()->get(),
             'auth' => [
                 'id' => Auth::user()->id,
                 'name' => Auth::user()->name,
@@ -193,7 +269,7 @@ class AppointmentController extends Controller
             $validated = $request->validate([
                 'appointment_type_id' => ['required', 'exists:appointment_types,id'],
                 'appointment_status_id' => ['required', 'exists:appointment_statuses,id'],
-                'assigned_to' => ['nullable', 'exists:users,id'],
+                'assigned_to' => ['nullable', 'string'],
                 'scheduled_at' => ['required', 'date'],
                 'duration' => ['required', 'integer', 'min:15', 'max:240'],
                 'reason' => ['nullable', 'string', 'max:255'],
@@ -204,7 +280,16 @@ class AppointmentController extends Controller
                 'previous_visit_notes' => ['nullable', 'string'],
                 'notes' => ['nullable', 'string'],
                 'cancellation_reason' => ['nullable', 'required_if:appointment_status_id,4', 'string', 'max:255'],
+                'service_id' => ['nullable', 'string'],
             ]);
+
+            // Handle special values
+            if ($validated['assigned_to'] === 'unassigned') {
+                $validated['assigned_to'] = null;
+            }
+            if ($validated['service_id'] === 'none') {
+                $validated['service_id'] = null;
+            }
 
             // Use the appointment service to update the appointment
             $updatedAppointment = $this->appointmentService->updateAppointment($appointment, $validated);

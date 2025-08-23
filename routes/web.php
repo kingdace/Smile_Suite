@@ -200,6 +200,8 @@ Route::middleware('auth')->group(function () {
         // Appointment Management Routes (without create - using simplified version)
         Route::get('clinic/{clinic}/appointments', [AppointmentController::class, 'index'])
             ->name('clinic.appointments.index');
+        Route::get('clinic/{clinic}/appointments/calendar', [AppointmentController::class, 'calendar'])
+            ->name('clinic.appointments.calendar');
         Route::post('clinic/{clinic}/appointments', [AppointmentController::class, 'store'])
             ->name('clinic.appointments.store');
         Route::get('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'show'])
@@ -312,6 +314,12 @@ Route::middleware('auth')->group(function () {
                 'update' => 'clinic.services.update',
                 'destroy' => 'clinic.services.destroy',
             ]);
+        Route::get('clinic/{clinic}/services/subcategories', [ServiceController::class, 'getSubcategories'])
+            ->name('clinic.services.subcategories');
+        Route::patch('clinic/{clinic}/services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])
+            ->name('clinic.services.toggle-status');
+        Route::patch('clinic/{clinic}/services/sort-order', [ServiceController::class, 'updateSortOrder'])
+            ->name('clinic.services.sort-order');
 
         // Payment Receipt Route
         Route::get('/clinic/{clinic}/payments/{payment}/receipt', [PaymentController::class, 'receipt'])
