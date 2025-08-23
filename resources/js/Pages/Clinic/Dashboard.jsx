@@ -156,17 +156,32 @@ export default function Dashboard({
                                 <Button
                                     variant="secondary"
                                     size="sm"
+                                    asChild
                                     className="gap-2 bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm text-sm px-4 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
-                                    <Activity className="h-4 w-4" />
-                                    Dashboard
+                                    <Link
+                                        href={route(
+                                            "clinic.dashboard.enhanced",
+                                            { clinic: clinic.id }
+                                        )}
+                                    >
+                                        <Activity className="h-4 w-4" />
+                                        Enhanced Dashboard
+                                    </Link>
                                 </Button>
                                 <Button
                                     size="sm"
+                                    asChild
                                     className="gap-2 bg-white text-blue-600 hover:bg-blue-50 text-sm px-4 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
-                                    <Plus className="h-4 w-4" />
-                                    Add Patient
+                                    <Link
+                                        href={route("clinic.patients.create", {
+                                            clinic: clinic.id,
+                                        })}
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Add Patient
+                                    </Link>
                                 </Button>
                             </div>
                         </div>
@@ -478,9 +493,9 @@ export default function Dashboard({
                                                         "T",
                                                         "F",
                                                         "S",
-                                                    ].map((day) => (
+                                                    ].map((day, index) => (
                                                         <div
-                                                            key={day}
+                                                            key={`day-${index}`}
                                                             className="text-center text-gray-500 py-2 font-semibold"
                                                         >
                                                             {day}
@@ -775,7 +790,7 @@ export default function Dashboard({
                                     >
                                         <Link
                                             href={route(
-                                                "clinic.appointments.create",
+                                                "clinic.appointments.create-simplified",
                                                 { clinic: clinic.id }
                                             )}
                                         >

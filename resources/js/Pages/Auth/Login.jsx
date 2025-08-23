@@ -18,7 +18,7 @@ import {
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import SiteHeader from "@/Components/SiteHeader";
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status, canResetPassword, flash }) {
     const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
@@ -173,6 +173,30 @@ export default function Login({ status, canResetPassword }) {
                             )}
 
                             <form onSubmit={submit} className="space-y-6">
+                                {/* Error Message Display */}
+                                {flash?.error && (
+                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center">
+                                                <svg
+                                                    className="w-3 h-3 text-red-600"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm font-medium text-red-800">
+                                                {flash.error}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div>
                                     <Label
                                         htmlFor="email"

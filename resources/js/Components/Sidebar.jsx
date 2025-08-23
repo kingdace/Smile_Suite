@@ -38,6 +38,7 @@ import {
     Settings,
     FileText,
     CalendarClock,
+    CalendarCheck,
     Truck,
     ChevronDown,
     ChevronRight,
@@ -70,6 +71,23 @@ const navigation = (clinicId) => [
         routeName: "clinic.dashboard",
         icon: LayoutDashboard,
         description: "Overview and statistics",
+        hasDropdown: true,
+        children: [
+            {
+                name: "Overview",
+                href: route("clinic.dashboard", [clinicId]),
+                routeName: "clinic.dashboard",
+                icon: LayoutDashboard,
+                description: "Basic dashboard",
+            },
+            {
+                name: "Enhanced Dashboard",
+                href: route("clinic.dashboard.enhanced", [clinicId]),
+                routeName: "clinic.dashboard.enhanced",
+                icon: Activity,
+                description: "Advanced analytics",
+            },
+        ],
     },
     {
         name: "Patients",
@@ -156,11 +174,36 @@ const navigation = (clinicId) => [
 export default function Sidebar({ className, auth }) {
     const clinicId = auth?.clinic?.id;
     const [expandedItems, setExpandedItems] = useState(() => {
-        // Auto-expand Inventory dropdown if on inventory or suppliers pages
-        const isOnInventoryPage =
+        // Auto-expand dropdowns based on current route
+        const expanded = new Set();
+
+        // Inventory dropdown
+        if (
             route().current("clinic.inventory.*") ||
-            route().current("clinic.suppliers.*");
-        return isOnInventoryPage ? new Set(["Inventory"]) : new Set();
+            route().current("clinic.suppliers.*")
+        ) {
+            expanded.add("Inventory");
+        }
+
+        // Dashboard dropdown
+        if (
+            route().current("clinic.dashboard") ||
+            route().current("clinic.dashboard.enhanced")
+        ) {
+            expanded.add("Dashboard");
+        }
+
+        // Dentist Schedule dropdown
+        if (route().current("clinic.dentist-schedules.*")) {
+            expanded.add("Dentist Schedule");
+        }
+
+        // Appointments dropdown
+        if (route().current("clinic.appointments.*")) {
+            expanded.add("Appointments");
+        }
+
+        return expanded;
     });
 
     if (!clinicId) {
@@ -210,6 +253,21 @@ export default function Sidebar({ className, auth }) {
         );
     };
 
+    const isDashboardActive = () => {
+        return (
+            route().current("clinic.dashboard") ||
+            route().current("clinic.dashboard.enhanced")
+        );
+    };
+
+    const isDentistScheduleActive = () => {
+        return route().current("clinic.dentist-schedules.*");
+    };
+
+    const isAppointmentsActive = () => {
+        return route().current("clinic.appointments.*");
+    };
+
     return (
         <>
             <style>{scrollbarStyles}</style>
@@ -225,7 +283,15 @@ export default function Sidebar({ className, auth }) {
                         <div className="space-y-1">
                             {sidebarNavigation.map((item) => {
                                 const isActive = item.hasDropdown
-                                    ? isInventoryActive()
+                                    ? item.name === "Inventory"
+                                        ? isInventoryActive()
+                                        : item.name === "Dashboard"
+                                        ? isDashboardActive()
+                                        : item.name === "Dentist Schedule"
+                                        ? isDentistScheduleActive()
+                                        : item.name === "Appointments"
+                                        ? isAppointmentsActive()
+                                        : false
                                     : isItemActive(item);
                                 const isExpanded = expandedItems.has(item.name);
 

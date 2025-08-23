@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Head, useForm, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/Components/ui/button";
@@ -14,197 +14,205 @@ import {
 } from "@/Components/ui/select";
 import { Switch } from "@/Components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+import { Badge } from "@/Components/ui/badge";
 import { toast } from "sonner";
-import moment from "moment";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
-
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogDescription,
 } from "@/Components/ui/dialog";
 import {
     Plus,
-    Calendar as CalendarIcon,
+    Calendar,
+    CalendarClock,
     List,
     Clock,
     User,
+    Settings,
+    Copy,
+    Trash2,
+    Edit,
+    CheckCircle,
+    XCircle,
+    AlertTriangle,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-const DEFAULT_WORKING_HOURS = {
-    morning: { start: "08:00", end: "11:00" },
-    afternoon: { start: "13:00", end: "17:00" },
-};
-
-const WORKING_DAYS = [1, 2, 3, 4, 5]; // Monday to Friday
-
-const DAYS_OF_WEEK = [
-    { value: 0, label: "Sunday" },
+const WORKING_DAYS = [
     { value: 1, label: "Monday" },
     { value: 2, label: "Tuesday" },
     { value: 3, label: "Wednesday" },
     { value: 4, label: "Thursday" },
     { value: 5, label: "Friday" },
     { value: 6, label: "Saturday" },
+    { value: 0, label: "Sunday" },
 ];
 
-const EXCEPTION_TYPES = [
-    { value: "holiday", label: "Holiday" },
-    { value: "vacation", label: "Vacation" },
-    { value: "training", label: "Training" },
-    { value: "personal", label: "Personal Leave" },
-    { value: "sick", label: "Sick Leave" },
+const SCHEDULE_TEMPLATES = [
+    {
+        id: "standard_week",
+        name: "Standard Week (Mon-Fri)",
+        description: "9 AM - 5 PM, Monday to Friday",
+        schedule: [
+            { day: 1, start: "09:00", end: "17:00" },
+            { day: 2, start: "09:00", end: "17:00" },
+            { day: 3, start: "09:00", end: "17:00" },
+            { day: 4, start: "09:00", end: "17:00" },
+            { day: 5, start: "09:00", end: "17:00" },
+        ],
+    },
+    {
+        id: "extended_hours",
+        name: "Extended Hours (Mon-Sat)",
+        description: "8 AM - 6 PM, Monday to Saturday",
+        schedule: [
+            { day: 1, start: "08:00", end: "18:00" },
+            { day: 2, start: "08:00", end: "18:00" },
+            { day: 3, start: "08:00", end: "18:00" },
+            { day: 4, start: "08:00", end: "18:00" },
+            { day: 5, start: "08:00", end: "18:00" },
+            { day: 6, start: "09:00", end: "14:00" },
+        ],
+    },
 ];
 
 export default function Index({ auth, clinic, schedules, dentists }) {
-    // Log all props to understand what we're receiving
-    console.log("Component Props:", {
-        auth,
-        clinic,
-        schedules,
-        dentists,
-    });
-
-    // Log the structure of schedules if it exists
-    if (schedules) {
-        console.log("Schedules structure:", {
-            isArray: Array.isArray(schedules),
-            isObject: typeof schedules === "object",
-            keys: Object.keys(schedules),
-            sample: Object.entries(schedules)[0],
-        });
-    }
-
-    // Log the structure of dentists if it exists
-    if (dentists) {
-        console.log("Dentists structure:", {
-            isArray: Array.isArray(dentists),
-            length: dentists.length,
-            sample: dentists[0],
-        });
-    }
-
     const [selectedDentist, setSelectedDentist] = useState(null);
-    const [isException, setIsException] = useState(false);
-    const [editingSchedule, setEditingSchedule] = useState(null);
-    const [view, setView] = useState("calendar"); // "calendar" or "list"
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [activeTab, setActiveTab] = useState("list");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+    const [editingSchedule, setEditingSchedule] = useState(null);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [unifiedScheduleInfo, setUnifiedScheduleInfo] = useState(null);
+    const [isLoadingInfo, setIsLoadingInfo] = useState(false);
 
-    const { data, setData, post, put, processing, reset, errors } = useForm({
+    const { data, setData, post, put, processing, errors, reset } = useForm({
         user_id: "",
         day_of_week: "",
         start_time: "",
         end_time: "",
         buffer_time: 15,
+        slot_duration: 30,
         is_available: true,
-        date: "",
-        exception_type: "",
+        schedule_type: "weekly",
+        notes: "",
     });
 
-    const handleQuickSetup = (dentistId) => {
-        const dentist = dentists.find(
-            (d) => String(d.id) === String(dentistId)
-        );
-        if (!dentist) return;
+    const dentistSchedules = selectedDentist
+        ? schedules[selectedDentist] || []
+        : [];
 
-        // Create schedules for each working day
-        const schedules = WORKING_DAYS.map((day) => [
-            {
-                user_id: dentistId,
-                day_of_week: day,
-                start_time: DEFAULT_WORKING_HOURS.morning.start,
-                end_time: DEFAULT_WORKING_HOURS.morning.end,
-                buffer_time: 15,
-                is_available: true,
-                date: null,
-                exception_type: null,
-            },
-            {
-                user_id: dentistId,
-                day_of_week: day,
-                start_time: DEFAULT_WORKING_HOURS.afternoon.start,
-                end_time: DEFAULT_WORKING_HOURS.afternoon.end,
-                buffer_time: 15,
-                is_available: true,
-                date: null,
-                exception_type: null,
-            },
-        ]).flat();
-
-        // Submit each schedule
-        schedules.forEach((schedule) => {
-            post(
-                route("clinic.dentist-schedules.store", { clinic: clinic.id }),
-                {
-                    data: schedule,
-                    onSuccess: () => {
-                        toast.success(
-                            `Schedule created for ${dentist.name} on ${
-                                DAYS_OF_WEEK.find(
-                                    (d) => d.value === schedule.day_of_week
-                                )?.label
-                            }`
-                        );
-                    },
-                    onError: (errors) => {
-                        Object.values(errors).forEach((error) =>
-                            toast.error(error)
-                        );
-                    },
-                }
-            );
-        });
+    const handleDentistSelect = (dentistId) => {
+        setSelectedDentist(dentistId);
+        const dentist = dentists.find((d) => d.id.toString() === dentistId);
+        if (dentist) {
+            toast.success(`Viewing schedules for ${dentist.name}`);
+            loadUnifiedScheduleInfo(dentistId);
+        }
     };
 
-    // Initialize selectedDentist based on data.user_id when dentists or data.user_id changes
-    useEffect(() => {
-        if (data.user_id && dentists.length > 0) {
-            const foundDentist = dentists.find(
-                (d) => String(d.id) === String(data.user_id)
+    const loadUnifiedScheduleInfo = async (dentistId) => {
+        setIsLoadingInfo(true);
+        try {
+            const response = await fetch(
+                route("clinic.dentist-schedules.unified-info", {
+                    clinic: clinic.id,
+                    dentist_id: dentistId,
+                })
             );
-            if (foundDentist) {
-                setSelectedDentist(foundDentist);
+            const data = await response.json();
+            if (data.success) {
+                setUnifiedScheduleInfo(data.info);
             }
-        } else {
-            setSelectedDentist(null);
+        } catch (error) {
+            console.error("Error loading unified schedule info:", error);
+        } finally {
+            setIsLoadingInfo(false);
         }
-    }, [data.user_id, dentists]);
+    };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSyncProfileToSchedule = async () => {
+        if (!selectedDentist) return;
 
-        const submitData = {
-            user_id: data.user_id,
-            start_time: data.start_time,
-            end_time: data.end_time,
-            buffer_time: data.buffer_time,
-            is_available: data.is_available,
+        try {
+            const response = await fetch(
+                route("clinic.dentist-schedules.sync-profile", {
+                    clinic: clinic.id,
+                }),
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                    body: JSON.stringify({
+                        dentist_id: selectedDentist,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+            if (data.success) {
+                toast.success(data.message);
+                // Reload the page to show updated schedules
+                window.location.reload();
+            } else {
+                toast.error(
+                    data.message || "Failed to sync profile to schedule"
+                );
+            }
+        } catch (error) {
+            console.error("Error syncing profile to schedule:", error);
+            toast.error("Failed to sync profile to schedule");
+        }
+    };
+
+    const handleTemplateSelect = (template) => {
+        setSelectedTemplate(template);
+        setIsTemplateDialogOpen(true);
+    };
+
+    const applyTemplate = () => {
+        if (!selectedTemplate || !selectedDentist) return;
+
+        const templateData = {
+            template_key: selectedTemplate.id,
+            dentist_ids: [selectedDentist],
         };
 
-        if (isException) {
-            submitData.date = data.date;
-            submitData.exception_type = data.exception_type;
-            submitData.day_of_week = null;
-        } else {
-            submitData.day_of_week = data.day_of_week;
-            submitData.date = null;
-            submitData.exception_type = null;
-        }
+        post(
+            route("clinic.dentist-schedules.create-from-template", {
+                clinic: clinic.id,
+            }),
+            {
+                data: templateData,
+                onSuccess: () => {
+                    toast.success(
+                        `Applied ${selectedTemplate.name} template successfully`
+                    );
+                    setIsTemplateDialogOpen(false);
+                    setSelectedTemplate(null);
+                },
+                onError: (errors) => {
+                    Object.values(errors).forEach((error) =>
+                        toast.error(error)
+                    );
+                },
+            }
+        );
+    };
 
+    const handleSubmit = () => {
         if (editingSchedule) {
             put(
                 route("clinic.dentist-schedules.update", {
                     clinic: clinic.id,
                     schedule: editingSchedule.id,
                 }),
-                submitData,
                 {
                     onSuccess: () => {
                         toast.success("Schedule updated successfully");
@@ -223,9 +231,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             post(
                 route("clinic.dentist-schedules.store", { clinic: clinic.id }),
                 {
-                    data: submitData,
                     onSuccess: () => {
-                        toast.success("Schedule saved successfully");
+                        toast.success("Schedule created successfully");
                         reset();
                         setIsDialogOpen(false);
                     },
@@ -241,28 +248,18 @@ export default function Index({ auth, clinic, schedules, dentists }) {
 
     const handleEdit = (schedule) => {
         setEditingSchedule(schedule);
-        setIsException(schedule.date !== null);
         setData({
-            user_id: String(schedule.user_id),
-            day_of_week:
-                schedule.day_of_week !== null
-                    ? String(schedule.day_of_week)
-                    : "",
+            user_id: schedule.user_id.toString(),
+            day_of_week: schedule.day_of_week?.toString() || "",
             start_time: schedule.start_time.substring(0, 5),
             end_time: schedule.end_time.substring(0, 5),
-            buffer_time: 15,
+            buffer_time: schedule.buffer_time || 15,
+            slot_duration: schedule.slot_duration || 30,
             is_available: schedule.is_available,
-            date: schedule.date || "",
-            exception_type: schedule.exception_type || "",
+            schedule_type: schedule.schedule_type || "weekly",
+            notes: schedule.notes || "",
         });
         setIsDialogOpen(true);
-    };
-
-    const handleCancelEdit = () => {
-        setEditingSchedule(null);
-        setIsException(false);
-        reset();
-        setIsDialogOpen(false);
     };
 
     const handleDelete = (schedule) => {
@@ -276,831 +273,1144 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                     onSuccess: () => {
                         toast.success("Schedule deleted successfully");
                     },
-                    onError: (error) => {
+                    onError: () => {
                         toast.error("Failed to delete schedule");
-                        console.error(error);
                     },
                 }
             );
         }
     };
 
-    const getSchedulesForDate = (date) => {
-        const formattedDate = moment(date).format("YYYY-MM-DD");
-        return Object.values(schedules)
-            .flat()
-            .filter(
-                (schedule) =>
-                    schedule.date === formattedDate ||
-                    (schedule.day_of_week !== null &&
-                        schedule.day_of_week === date.getDay())
-            );
+    const getDayName = (dayNumber) => {
+        // Convert to number if it's a string
+        const dayNum = parseInt(dayNumber);
+        const foundDay = WORKING_DAYS.find((day) => day.value === dayNum);
+        return foundDay?.label || "Unknown";
     };
 
-    const fullCalendarEvents = useMemo(() => {
-        const events = [];
+    const formatTime = (timeString) => {
+        // Handle both datetime strings and time strings
+        if (timeString.includes("T")) {
+            // It's a datetime string, extract just the time
+            return timeString.split("T")[1].substring(0, 5);
+        }
+        // It's already a time string, return as is
+        return timeString.substring(0, 5);
+    };
 
-        // Log the raw data for debugging
-        console.log("Raw schedules:", schedules);
-        console.log("Raw dentists:", dentists);
+    const getStatusIcon = (isAvailable) => {
+        return isAvailable ? (
+            <CheckCircle className="h-4 w-4 text-green-500" />
+        ) : (
+            <XCircle className="h-4 w-4 text-red-500" />
+        );
+    };
 
-        // Convert schedules object to array and process each schedule
-        Object.entries(schedules).forEach(([userId, userSchedules]) => {
-            // Find the dentist for this user ID
-            const dentist = dentists.find(
-                (d) => String(d.id) === String(userId)
-            );
-            console.log(
-                `Processing schedules for dentist ${dentist?.name || userId}:`,
-                userSchedules
-            );
+    return (
+        <AuthenticatedLayout auth={auth}>
+            <Head title="Dentist Schedule Management" />
 
-            userSchedules.forEach((schedule) => {
-                const startTime = schedule.start_time;
-                const endTime = schedule.end_time;
-                const title = dentist
-                    ? `${dentist.name} (${startTime} - ${endTime})`
-                    : `Dentist ID: ${userId} (${startTime} - ${endTime})`;
-
-                if (schedule.date) {
-                    // Exception schedule
-                    events.push({
-                        id: schedule.id,
-                        title,
-                        start: `${schedule.date}T${startTime}`,
-                        end: `${schedule.date}T${endTime}`,
-                        allDay: false,
-                        extendedProps: {
-                            schedule,
-                            dentist: dentist || {
-                                id: userId,
-                                name: `Dentist ${userId}`,
-                            },
-                        },
-                    });
-                } else {
-                    // Recurring schedule
-                    const dayOfWeek = parseInt(schedule.day_of_week);
-                    const today = new Date();
-                    const daysUntilNext = (dayOfWeek - today.getDay() + 7) % 7;
-                    const nextDate = new Date(today);
-                    nextDate.setDate(today.getDate() + daysUntilNext);
-
-                    events.push({
-                        id: schedule.id,
-                        title,
-                        start: `${
-                            nextDate.toISOString().split("T")[0]
-                        }T${startTime}`,
-                        end: `${
-                            nextDate.toISOString().split("T")[0]
-                        }T${endTime}`,
-                        allDay: false,
-                        extendedProps: {
-                            schedule,
-                            dentist: dentist || {
-                                id: userId,
-                                name: `Dentist ${userId}`,
-                            },
-                        },
-                    });
-                }
-            });
-        });
-
-        console.log("Generated FullCalendar events:", events);
-        return events;
-    }, [schedules, dentists]);
-
-    console.log("FullCalendar events:", fullCalendarEvents);
-
-    const renderCalendarView = () => (
-        <div className="w-full">
-            <style>{`
-                .fc {
-                    max-width: 100%;
-                    background: white;
-                    border-radius: 0.5rem;
-                    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-                }
-                .fc .fc-toolbar {
-                    padding: 1rem;
-                    margin-bottom: 0 !important;
-                    border-bottom: 1px solid #e5e7eb;
-                }
-                .fc .fc-toolbar-title {
-                    font-size: 1.5rem;
-                    font-weight: 600;
-                    color: #1f2937;
-                }
-                .fc .fc-button-primary {
-                    background-color: #6366f1;
-                    border-color: #6366f1;
-                    color: white;
-                    padding: 0.5rem 1rem;
-                    font-size: 0.875rem;
-                    border-radius: 0.375rem;
-                    transition: all 0.2s;
-                }
-                .fc .fc-button-primary:hover {
-                    background-color: #4f46e5;
-                    border-color: #4f46e5;
-                    transform: translateY(-1px);
-                }
-                .fc .fc-button-active {
-                    background-color: #4f46e5;
-                    border-color: #4f46e5;
-                    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
-                }
-                .fc-daygrid-day-frame {
-                    min-height: 150px;
-                    padding: 0.5rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.375rem;
-                    margin: 2px;
-                    transition: all 0.2s;
-                }
-                .fc-daygrid-day-frame:hover {
-                    background-color: #f9fafb;
-                }
-                .fc-day-today .fc-daygrid-day-frame {
-                    background-color: #eff6ff;
-                    border-color: #93c5fd;
-                }
-                .fc-event {
-                    border: none;
-                    margin-bottom: 4px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .fc-event:hover {
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-            `}</style>
-            <div className="w-full">
-                <FullCalendar
-                    plugins={[dayGridPlugin, interactionPlugin]}
-                    initialView="dayGridMonth"
-                    weekends={true}
-                    events={fullCalendarEvents}
-                    height="auto"
-                    headerToolbar={{
-                        left: "prev,next today",
-                        center: "title",
-                        right: "dayGridMonth,listButton",
-                    }}
-                    customButtons={{
-                        listButton: {
-                            text: "List View",
-                            click: () => setView("list"),
-                            className: `fc-button fc-button-primary ${
-                                view === "list" ? "fc-button-active" : ""
-                            }`,
-                        },
-                    }}
-                    eventContent={(arg) => {
-                        const schedule = arg.event.extendedProps.schedule;
-                        const dentist = dentists.find(
-                            (d) => String(d.id) === String(schedule.user_id)
-                        );
-                        const exceptionType = EXCEPTION_TYPES.find(
-                            (t) => t.value === schedule.exception_type
-                        )?.label;
-
-                        return (
-                            <div className="bg-blue-50 border border-blue-200 rounded-md px-2 py-1.5 text-xs overflow-hidden leading-tight flex flex-col items-start w-full hover:bg-blue-100 transition-colors">
-                                <span className="font-semibold text-blue-900">
-                                    {dentist?.name}
-                                </span>
-                                <span className="text-blue-700 font-medium">
-                                    {moment(
-                                        schedule.start_time,
-                                        "HH:mm:ss"
-                                    ).format("HH:mm")}{" "}
-                                    -{" "}
-                                    {moment(
-                                        schedule.end_time,
-                                        "HH:mm:ss"
-                                    ).format("HH:mm")}
-                                </span>
-                                {exceptionType && (
-                                    <span className="text-blue-600 text-[10px] mt-0.5">
-                                        {exceptionType}
-                                    </span>
-                                )}
+            <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+                <div className="max-w-7xl mx-auto px-6 py-8">
+                    {/* Enhanced Header */}
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full shadow-lg">
+                                    <CalendarClock className="h-8 w-8 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-4xl font-bold text-gray-900">
+                                        Dentist Schedule Management
+                                    </h1>
+                                    <p className="text-gray-600 mt-2 text-lg">
+                                        Manage dentist availability and time
+                                        slots
+                                    </p>
+                                </div>
                             </div>
-                        );
-                    }}
-                    eventClick={(info) => {
-                        handleEdit(info.event.extendedProps.schedule);
-                    }}
-                    dateClick={(info) => {
-                        setIsException(false);
-                        setData((prevData) => ({
-                            ...prevData,
-                            date: moment(info.date).format("YYYY-MM-DD"),
-                            user_id: "",
-                            start_time: "",
-                            end_time: "",
-                            day_of_week: moment(info.date).day().toString(),
-                            exception_type: "",
-                        }));
-                        setEditingSchedule(null);
-                        setIsDialogOpen(true);
-                    }}
-                />
-            </div>
-        </div>
-    );
-
-    const renderListView = () => (
-        <div className="space-y-4">
-            {Object.entries(schedules).map(([dentistId, dentistSchedules]) => {
-                const dentist = dentists.find(
-                    (d) => String(d.id) === dentistId
-                );
-                if (!dentist) return null;
-
-                const regularSchedules = dentistSchedules.filter(
-                    (s) => s.day_of_week !== null
-                );
-                const exceptionSchedules = dentistSchedules.filter(
-                    (s) => s.date !== null
-                );
-
-                return (
-                    <Card key={dentistId} className="p-4">
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold">
-                                    {dentist.name}
-                                </h3>
+                            <div className="flex items-center gap-3">
                                 <Button
-                                    variant="outline"
-                                    size="sm"
                                     onClick={() => {
-                                        setSelectedDentist(dentist);
-                                        setData("user_id", String(dentist.id));
-                                        setIsDialogOpen(true);
+                                        setSelectedTemplate(null); // Reset template selection
+                                        setIsTemplateDialogOpen(true);
                                     }}
+                                    variant="outline"
+                                    className="px-6 py-3 bg-white border-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 shadow-sm"
                                 >
-                                    <Plus className="h-4 w-4 mr-2" />
+                                    <Settings className="h-4 w-4 mr-2" />
+                                    Templates
+                                </Button>
+                                <Button
+                                    onClick={() => setIsDialogOpen(true)}
+                                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
+                                    <Plus className="h-5 w-5 mr-2" />
                                     Add Schedule
                                 </Button>
                             </div>
-
-                            {regularSchedules.length > 0 && (
-                                <div className="space-y-2">
-                                    <h4 className="font-medium">
-                                        Regular Schedule
-                                    </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                                        {regularSchedules.map((schedule) => (
-                                            <Card
-                                                key={schedule.id}
-                                                className="p-3"
-                                            >
-                                                <div className="space-y-1">
-                                                    <div className="font-medium">
-                                                        {
-                                                            DAYS_OF_WEEK.find(
-                                                                (d) =>
-                                                                    d.value ===
-                                                                    schedule.day_of_week
-                                                            )?.label
-                                                        }
-                                                    </div>
-                                                    <div className="text-sm text-gray-500">
-                                                        {schedule.start_time} -{" "}
-                                                        {schedule.end_time}
-                                                    </div>
-                                                    <div className="flex space-x-2 mt-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    schedule
-                                                                )
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    schedule
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {exceptionSchedules.length > 0 && (
-                                <div className="space-y-2">
-                                    <h4 className="font-medium">Exceptions</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                                        {exceptionSchedules.map((schedule) => (
-                                            <Card
-                                                key={schedule.id}
-                                                className="p-3"
-                                            >
-                                                <div className="space-y-1">
-                                                    <div className="font-medium">
-                                                        {moment(
-                                                            schedule.date
-                                                        ).format(
-                                                            "MMMM D, YYYY"
-                                                        )}
-                                                    </div>
-                                                    <div className="text-sm text-gray-500">
-                                                        {schedule.start_time} -{" "}
-                                                        {schedule.end_time}
-                                                    </div>
-                                                    <div className="text-sm text-blue-600">
-                                                        {
-                                                            EXCEPTION_TYPES.find(
-                                                                (t) =>
-                                                                    t.value ===
-                                                                    schedule.exception_type
-                                                            )?.label
-                                                        }
-                                                    </div>
-                                                    <div className="flex space-x-2 mt-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    schedule
-                                                                )
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    schedule
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
                         </div>
-                    </Card>
-                );
-            })}
-        </div>
-    );
+                    </div>
 
-    return (
-        <AuthenticatedLayout
-            auth={auth}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Dentist Schedules
-                </h2>
-            }
-        >
-            <Head title="Dentist Schedules" />
-
-            <div className="py-12">
-                <div className="max-w-full mx-auto sm:px-6 lg:px-8">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle>Manage Dentist Schedules</CardTitle>
-                                <div className="flex items-center space-x-4">
-                                    <div className="flex items-center space-x-2">
-                                        <Button
-                                            variant={
-                                                view === "calendar"
-                                                    ? "default"
-                                                    : "outline"
-                                            }
-                                            size="sm"
-                                            onClick={() => setView("calendar")}
-                                        >
-                                            <CalendarIcon className="h-4 w-4 mr-2" />
-                                            Calendar
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Select onValueChange={handleQuickSetup}>
-                                        <SelectTrigger className="w-[200px]">
-                                            <SelectValue placeholder="Quick Setup" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {dentists.map((dentist) => (
-                                                <SelectItem
-                                                    key={dentist.id}
-                                                    value={String(dentist.id)}
-                                                >
-                                                    Set {dentist.name}'s
-                                                    Schedule
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Dialog
-                                        open={isDialogOpen}
-                                        onOpenChange={setIsDialogOpen}
-                                    >
-                                        <DialogTrigger asChild>
-                                            <Button>
-                                                <Plus className="h-4 w-4 mr-2" />
-                                                Add Exception
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[800px]">
-                                            <DialogHeader>
-                                                <DialogTitle>
-                                                    {editingSchedule
-                                                        ? "Edit Schedule"
-                                                        : "Add New Schedule"}
-                                                </DialogTitle>
-                                                <DialogDescription>
-                                                    Manage your dentist's
-                                                    regular working hours or add
-                                                    exceptions for specific
-                                                    dates.
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <form
-                                                onSubmit={handleSubmit}
-                                                className="space-y-6"
-                                            >
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <Label htmlFor="user_id">
-                                                                Dentist
-                                                            </Label>
-                                                            <Select
-                                                                value={
-                                                                    data.user_id
-                                                                }
-                                                                onValueChange={(
-                                                                    value
-                                                                ) =>
-                                                                    setData(
-                                                                        "user_id",
-                                                                        value
-                                                                    )
-                                                                }
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a dentist" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {dentists.map(
-                                                                        (
-                                                                            dentist
-                                                                        ) => (
-                                                                            <SelectItem
-                                                                                key={
-                                                                                    dentist.id
-                                                                                }
-                                                                                value={String(
-                                                                                    dentist.id
-                                                                                )}
-                                                                            >
-                                                                                {
-                                                                                    dentist.name
-                                                                                }
-                                                                            </SelectItem>
-                                                                        )
-                                                                    )}
-                                                                </SelectContent>
-                                                            </Select>
-                                                            {errors.user_id && (
-                                                                <p className="text-sm text-red-500 mt-1">
-                                                                    {
-                                                                        errors.user_id
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="flex items-center space-x-2">
-                                                            <Switch
-                                                                id="is_exception"
-                                                                checked={
-                                                                    isException
-                                                                }
-                                                                onCheckedChange={
-                                                                    setIsException
-                                                                }
-                                                            />
-                                                            <Label htmlFor="is_exception">
-                                                                This is an
-                                                                exception
-                                                                (holiday,
-                                                                vacation, etc.)
-                                                            </Label>
-                                                        </div>
-
-                                                        {isException ? (
-                                                            <>
-                                                                <div>
-                                                                    <Label htmlFor="date">
-                                                                        Date
-                                                                    </Label>
-                                                                    <Input
-                                                                        type="date"
-                                                                        id="date"
-                                                                        value={
-                                                                            data.date
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            setData(
-                                                                                "date",
-                                                                                e
-                                                                                    .target
-                                                                                    .value
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                    {errors.date && (
-                                                                        <p className="text-sm text-red-500 mt-1">
-                                                                            {
-                                                                                errors.date
-                                                                            }
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                                <div>
-                                                                    <Label htmlFor="exception_type">
-                                                                        Exception
-                                                                        Type
-                                                                    </Label>
-                                                                    <Select
-                                                                        value={
-                                                                            data.exception_type
-                                                                        }
-                                                                        onValueChange={(
-                                                                            value
-                                                                        ) =>
-                                                                            setData(
-                                                                                "exception_type",
-                                                                                value
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <SelectTrigger>
-                                                                            <SelectValue placeholder="Select type" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            {EXCEPTION_TYPES.map(
-                                                                                (
-                                                                                    type
-                                                                                ) => (
-                                                                                    <SelectItem
-                                                                                        key={
-                                                                                            type.value
-                                                                                        }
-                                                                                        value={
-                                                                                            type.value
-                                                                                        }
-                                                                                    >
-                                                                                        {
-                                                                                            type.label
-                                                                                        }
-                                                                                    </SelectItem>
-                                                                                )
-                                                                            )}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    {errors.exception_type && (
-                                                                        <p className="text-sm text-red-500 mt-1">
-                                                                            {
-                                                                                errors.exception_type
-                                                                            }
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <div>
-                                                                <Label htmlFor="day_of_week">
-                                                                    Day of Week
-                                                                </Label>
-                                                                <Select
-                                                                    value={
-                                                                        data.day_of_week
-                                                                    }
-                                                                    onValueChange={(
-                                                                        value
-                                                                    ) =>
-                                                                        setData(
-                                                                            "day_of_week",
-                                                                            value
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <SelectTrigger>
-                                                                        <SelectValue placeholder="Select day" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {DAYS_OF_WEEK.map(
-                                                                            (
-                                                                                day
-                                                                            ) => (
-                                                                                <SelectItem
-                                                                                    key={
-                                                                                        day.value
-                                                                                    }
-                                                                                    value={String(
-                                                                                        day.value
-                                                                                    )}
-                                                                                >
-                                                                                    {
-                                                                                        day.label
-                                                                                    }
-                                                                                </SelectItem>
-                                                                            )
-                                                                        )}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                                {errors.day_of_week && (
-                                                                    <p className="text-sm text-red-500 mt-1">
-                                                                        {
-                                                                            errors.day_of_week
-                                                                        }
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <Label htmlFor="start_time">
-                                                                Start Time
-                                                            </Label>
-                                                            <Input
-                                                                type="time"
-                                                                id="start_time"
-                                                                value={
-                                                                    data.start_time
-                                                                }
-                                                                onChange={(e) =>
-                                                                    setData(
-                                                                        "start_time",
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            />
-                                                            {errors.start_time && (
-                                                                <p className="text-sm text-red-500 mt-1">
-                                                                    {
-                                                                        errors.start_time
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </div>
-
-                                                        <div>
-                                                            <Label htmlFor="end_time">
-                                                                End Time
-                                                            </Label>
-                                                            <Input
-                                                                type="time"
-                                                                id="end_time"
-                                                                value={
-                                                                    data.end_time
-                                                                }
-                                                                onChange={(e) =>
-                                                                    setData(
-                                                                        "end_time",
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            />
-                                                            {errors.end_time && (
-                                                                <p className="text-sm text-red-500 mt-1">
-                                                                    {
-                                                                        errors.end_time
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </div>
-
-                                                        <div>
-                                                            <Label htmlFor="buffer_time">
-                                                                Buffer Time
-                                                                (minutes)
-                                                            </Label>
-                                                            <Input
-                                                                type="number"
-                                                                id="buffer_time"
-                                                                value={
-                                                                    data.buffer_time
-                                                                }
-                                                                onChange={(e) =>
-                                                                    setData(
-                                                                        "buffer_time",
-                                                                        parseInt(
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    )
-                                                                }
-                                                                min="0"
-                                                                max="60"
-                                                            />
-                                                            {errors.buffer_time && (
-                                                                <p className="text-sm text-red-500 mt-1">
-                                                                    {
-                                                                        errors.buffer_time
-                                                                    }
-                                                                </p>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="flex items-center space-x-2">
-                                                            <Switch
-                                                                id="is_available"
-                                                                checked={
-                                                                    data.is_available
-                                                                }
-                                                                onCheckedChange={(
-                                                                    checked
-                                                                ) =>
-                                                                    setData(
-                                                                        "is_available",
-                                                                        checked
-                                                                    )
-                                                                }
-                                                            />
-                                                            <Label htmlFor="is_available">
-                                                                Available for
-                                                                appointments
-                                                            </Label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex justify-end space-x-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        onClick={
-                                                            handleCancelEdit
-                                                        }
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                    <Button
-                                                        type="submit"
-                                                        disabled={processing}
-                                                    >
-                                                        {editingSchedule
-                                                            ? "Update"
-                                                            : "Save"}{" "}
-                                                        Schedule
-                                                    </Button>
-                                                </div>
-                                            </form>
-                                        </DialogContent>
-                                    </Dialog>
-                                </div>
-                            </div>
+                    {/* Enhanced Dentist Selection */}
+                    <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+                        <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b">
+                            <CardTitle className="flex items-center gap-3 text-xl">
+                                <User className="h-6 w-6 text-indigo-600" />
+                                Select Dentist
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            {view === "calendar"
-                                ? renderCalendarView()
-                                : renderListView()}
+                        <CardContent className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {dentists.map((dentist) => (
+                                    <Button
+                                        key={dentist.id}
+                                        variant={
+                                            selectedDentist ===
+                                            dentist.id.toString()
+                                                ? "default"
+                                                : "outline"
+                                        }
+                                        onClick={() =>
+                                            handleDentistSelect(
+                                                dentist.id.toString()
+                                            )
+                                        }
+                                        className={`flex flex-col items-center gap-3 h-auto py-6 px-4 transition-all duration-300 ${
+                                            selectedDentist ===
+                                            dentist.id.toString()
+                                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg transform scale-105"
+                                                : "bg-white border-2 border-gray-200 hover:border-indigo-300 hover:shadow-md hover:bg-indigo-50"
+                                        }`}
+                                    >
+                                        <div
+                                            className={`p-3 rounded-full ${
+                                                selectedDentist ===
+                                                dentist.id.toString()
+                                                    ? "bg-white/20"
+                                                    : "bg-indigo-100"
+                                            }`}
+                                        >
+                                            <User
+                                                className={`h-5 w-5 ${
+                                                    selectedDentist ===
+                                                    dentist.id.toString()
+                                                        ? "text-white"
+                                                        : "text-indigo-600"
+                                                }`}
+                                            />
+                                        </div>
+                                        <div className="text-center">
+                                            <span className="font-semibold text-sm">
+                                                {dentist.name}
+                                            </span>
+                                            <p
+                                                className={`text-xs mt-1 ${
+                                                    selectedDentist ===
+                                                    dentist.id.toString()
+                                                        ? "text-white/80"
+                                                        : "text-gray-500"
+                                                }`}
+                                            >
+                                                {dentist.email}
+                                            </p>
+                                        </div>
+                                    </Button>
+                                ))}
+                            </div>
                         </CardContent>
                     </Card>
+
+                    {/* Unified Schedule Information */}
+                    {selectedDentist && unifiedScheduleInfo && (
+                        <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3 text-lg">
+                                    <Settings className="h-5 w-5 text-blue-600" />
+                                    Schedule System Information
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                                        <div
+                                            className={`p-2 rounded-full ${
+                                                unifiedScheduleInfo.has_advanced_schedules
+                                                    ? "bg-green-100"
+                                                    : "bg-yellow-100"
+                                            }`}
+                                        >
+                                            <Calendar
+                                                className={`h-4 w-4 ${
+                                                    unifiedScheduleInfo.has_advanced_schedules
+                                                        ? "text-green-600"
+                                                        : "text-yellow-600"
+                                                }`}
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">
+                                                Advanced Schedules
+                                            </p>
+                                            <p
+                                                className={`text-xs ${
+                                                    unifiedScheduleInfo.has_advanced_schedules
+                                                        ? "text-green-600"
+                                                        : "text-yellow-600"
+                                                }`}
+                                            >
+                                                {unifiedScheduleInfo.has_advanced_schedules
+                                                    ? "Active"
+                                                    : "Not configured"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                                        <div
+                                            className={`p-2 rounded-full ${
+                                                unifiedScheduleInfo.has_profile_hours
+                                                    ? "bg-blue-100"
+                                                    : "bg-gray-100"
+                                            }`}
+                                        >
+                                            <User
+                                                className={`h-4 w-4 ${
+                                                    unifiedScheduleInfo.has_profile_hours
+                                                        ? "text-blue-600"
+                                                        : "text-gray-400"
+                                                }`}
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">
+                                                Profile Hours
+                                            </p>
+                                            <p
+                                                className={`text-xs ${
+                                                    unifiedScheduleInfo.has_profile_hours
+                                                        ? "text-blue-600"
+                                                        : "text-gray-500"
+                                                }`}
+                                            >
+                                                {unifiedScheduleInfo.has_profile_hours
+                                                    ? "Configured"
+                                                    : "Not set"}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                                        <div
+                                            className={`p-2 rounded-full ${
+                                                unifiedScheduleInfo.is_active
+                                                    ? "bg-green-100"
+                                                    : "bg-red-100"
+                                            }`}
+                                        >
+                                            <CheckCircle
+                                                className={`h-4 w-4 ${
+                                                    unifiedScheduleInfo.is_active
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                }`}
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">
+                                                Account Status
+                                            </p>
+                                            <p
+                                                className={`text-xs ${
+                                                    unifiedScheduleInfo.is_active
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                }`}
+                                            >
+                                                {unifiedScheduleInfo.is_active
+                                                    ? "Active"
+                                                    : "Inactive"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Sync Action */}
+                                {unifiedScheduleInfo.has_profile_hours &&
+                                    !unifiedScheduleInfo.has_advanced_schedules && (
+                                        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                                                    <div>
+                                                        <p className="font-medium text-yellow-800">
+                                                            Profile Hours
+                                                            Available
+                                                        </p>
+                                                        <p className="text-sm text-yellow-700">
+                                                            This dentist has
+                                                            working hours set in
+                                                            their profile but no
+                                                            advanced schedules
+                                                            configured.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    onClick={
+                                                        handleSyncProfileToSchedule
+                                                    }
+                                                    className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                                                    size="sm"
+                                                >
+                                                    <Copy className="h-4 w-4 mr-2" />
+                                                    Sync to Advanced Schedule
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                {/* Current Schedule Source */}
+                                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                                    <p className="text-sm text-gray-600">
+                                        <strong>
+                                            Current Schedule Source:
+                                        </strong>{" "}
+                                        {unifiedScheduleInfo.schedule_source ===
+                                        "advanced"
+                                            ? "Advanced Schedule Management"
+                                            : "Profile Working Hours"}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Main Content */}
+                    <Tabs>
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger
+                                active={activeTab === "list"}
+                                onClick={() => setActiveTab("list")}
+                            >
+                                List View
+                            </TabsTrigger>
+                            <TabsTrigger
+                                active={activeTab === "templates"}
+                                onClick={() => setActiveTab("templates")}
+                            >
+                                Templates
+                            </TabsTrigger>
+                        </TabsList>
+
+                        {activeTab === "list" && (
+                            <TabsContent className="space-y-4">
+                                {selectedDentist ? (
+                                    <div className="space-y-6">
+                                        {/* Enhanced Schedule Display */}
+                                        <Card className="border-0 shadow-lg">
+                                            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b">
+                                                <div className="flex items-center justify-between">
+                                                    <CardTitle className="flex items-center gap-3 text-xl">
+                                                        <Calendar className="h-6 w-6 text-indigo-600" />
+                                                        Advanced Schedules for{" "}
+                                                        <span className="text-indigo-600">
+                                                            {
+                                                                dentists.find(
+                                                                    (d) =>
+                                                                        d.id.toString() ===
+                                                                        selectedDentist
+                                                                )?.name
+                                                            }
+                                                        </span>
+                                                    </CardTitle>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            onClick={() =>
+                                                                setIsDialogOpen(
+                                                                    true
+                                                                )
+                                                            }
+                                                            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                                                        >
+                                                            <Plus className="h-4 w-4 mr-2" />
+                                                            Add Schedule
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className="p-6">
+                                                {dentistSchedules.length ===
+                                                0 ? (
+                                                    <div className="text-center py-12">
+                                                        <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                                                            <Clock className="h-8 w-8 text-gray-400" />
+                                                        </div>
+                                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                            No Advanced
+                                                            Schedules
+                                                        </h3>
+                                                        <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                                                            This dentist doesn't
+                                                            have any advanced
+                                                            schedules configured
+                                                            yet. You can add
+                                                            schedules manually
+                                                            or sync from their
+                                                            profile.
+                                                        </p>
+                                                        <div className="flex items-center justify-center gap-3">
+                                                            <Button
+                                                                onClick={() =>
+                                                                    setIsDialogOpen(
+                                                                        true
+                                                                    )
+                                                                }
+                                                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                            >
+                                                                <Plus className="h-4 w-4 mr-2" />
+                                                                Add Schedule
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-4">
+                                                        {/* Schedule Source Info */}
+                                                        {unifiedScheduleInfo?.schedule_source ===
+                                                            "advanced" && (
+                                                            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                                                <div className="flex items-center gap-2">
+                                                                    <CheckCircle className="h-4 w-4 text-green-600" />
+                                                                    <span className="text-sm text-green-700 font-medium">
+                                                                        Using
+                                                                        Advanced
+                                                                        Schedule
+                                                                        Management
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Enhanced Schedule Cards */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            {dentistSchedules.map(
+                                                                (schedule) => (
+                                                                    <div
+                                                                        key={
+                                                                            schedule.id
+                                                                        }
+                                                                        className={`p-4 rounded-lg border-2 transition-all duration-300 hover:shadow-md ${
+                                                                            schedule.is_available
+                                                                                ? "border-green-200 bg-green-50"
+                                                                                : "border-red-200 bg-red-50"
+                                                                        }`}
+                                                                    >
+                                                                        <div className="flex items-start justify-between mb-3">
+                                                                            <div className="flex items-center gap-3">
+                                                                                {getStatusIcon(
+                                                                                    schedule.is_available
+                                                                                )}
+                                                                                <div>
+                                                                                    <h3 className="font-semibold text-gray-900">
+                                                                                        {getDayName(
+                                                                                            schedule.day_of_week
+                                                                                        )}
+                                                                                    </h3>
+                                                                                    <p className="text-sm text-gray-600">
+                                                                                        {schedule.schedule_type ===
+                                                                                        "weekly"
+                                                                                            ? "Weekly Schedule"
+                                                                                            : "Exception"}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <Badge
+                                                                                variant={
+                                                                                    schedule.is_available
+                                                                                        ? "default"
+                                                                                        : "secondary"
+                                                                                }
+                                                                                className={
+                                                                                    schedule.is_available
+                                                                                        ? "bg-green-100 text-green-800"
+                                                                                        : "bg-red-100 text-red-800"
+                                                                                }
+                                                                            >
+                                                                                {schedule.is_available
+                                                                                    ? "Available"
+                                                                                    : "Unavailable"}
+                                                                            </Badge>
+                                                                        </div>
+
+                                                                        <div className="space-y-2 mb-4">
+                                                                            <div className="flex items-center gap-2 text-sm">
+                                                                                <Clock className="h-4 w-4 text-gray-500" />
+                                                                                <span className="font-medium text-gray-700">
+                                                                                    {formatTime(
+                                                                                        schedule.start_time
+                                                                                    )}{" "}
+                                                                                    -{" "}
+                                                                                    {formatTime(
+                                                                                        schedule.end_time
+                                                                                    )}
+                                                                                </span>
+                                                                            </div>
+
+                                                                            {schedule.buffer_time && (
+                                                                                <div className="flex items-center gap-2 text-sm">
+                                                                                    <Settings className="h-4 w-4 text-gray-500" />
+                                                                                    <span className="text-gray-600">
+                                                                                        Buffer:{" "}
+                                                                                        {
+                                                                                            schedule.buffer_time
+                                                                                        }{" "}
+                                                                                        min
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {schedule.slot_duration && (
+                                                                                <div className="flex items-center gap-2 text-sm">
+                                                                                    <Calendar className="h-4 w-4 text-gray-500" />
+                                                                                    <span className="text-gray-600">
+                                                                                        Slot
+                                                                                        Duration:{" "}
+                                                                                        {
+                                                                                            schedule.slot_duration
+                                                                                        }{" "}
+                                                                                        min
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {schedule.notes && (
+                                                                                <div className="text-sm text-gray-600 bg-white p-2 rounded border">
+                                                                                    <strong>
+                                                                                        Notes:
+                                                                                    </strong>{" "}
+                                                                                    {
+                                                                                        schedule.notes
+                                                                                    }
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                onClick={() =>
+                                                                                    handleEdit(
+                                                                                        schedule
+                                                                                    )
+                                                                                }
+                                                                                className="flex-1"
+                                                                            >
+                                                                                <Edit className="h-4 w-4 mr-1" />
+                                                                                Edit
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                onClick={() =>
+                                                                                    handleDelete(
+                                                                                        schedule
+                                                                                    )
+                                                                                }
+                                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+
+                                        {/* Profile Hours Comparison */}
+                                        {unifiedScheduleInfo?.has_profile_hours && (
+                                            <Card className="border-0 shadow-lg bg-blue-50">
+                                                <CardHeader>
+                                                    <CardTitle className="flex items-center gap-3 text-lg text-blue-800">
+                                                        <User className="h-5 w-5" />
+                                                        Profile Working Hours
+                                                        (Reference)
+                                                    </CardTitle>
+                                                    <p className="text-sm text-blue-600">
+                                                        These are the hours set
+                                                        in the dentist's profile
+                                                    </p>
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                        {Object.entries(
+                                                            unifiedScheduleInfo.profile_working_hours
+                                                        ).map(
+                                                            ([day, hours]) => (
+                                                                <div
+                                                                    key={day}
+                                                                    className={`p-3 rounded-lg border ${
+                                                                        hours
+                                                                            ? "bg-white border-blue-200"
+                                                                            : "bg-gray-100 border-gray-200"
+                                                                    }`}
+                                                                >
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="font-medium text-sm capitalize text-gray-700">
+                                                                            {
+                                                                                day
+                                                                            }
+                                                                        </span>
+                                                                        {hours ? (
+                                                                            <span className="text-xs text-blue-600 font-medium">
+                                                                                {
+                                                                                    hours.start
+                                                                                }{" "}
+                                                                                -{" "}
+                                                                                {
+                                                                                    hours.end
+                                                                                }
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="text-xs text-gray-500">
+                                                                                Off
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Card>
+                                        <CardContent className="text-center py-12">
+                                            <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                                                <User className="h-8 w-8 text-gray-400" />
+                                            </div>
+                                            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                Select a Dentist
+                                            </h3>
+                                            <p className="text-gray-500">
+                                                Choose a dentist from the list
+                                                above to view their schedules
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                )}
+                            </TabsContent>
+                        )}
+
+                        {activeTab === "templates" && (
+                            <TabsContent className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Settings className="h-5 w-5 text-indigo-600" />
+                                            Schedule Templates
+                                        </CardTitle>
+                                        <p className="text-sm text-gray-600">
+                                            Pre-configured schedule templates
+                                            for quick setup. Select a template
+                                            to apply to a dentist's schedule.
+                                        </p>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {!selectedDentist ? (
+                                            <div className="text-center py-8">
+                                                <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                                    <User className="h-8 w-8 text-gray-400" />
+                                                </div>
+                                                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                    Select a Dentist First
+                                                </h3>
+                                                <p className="text-gray-500 mb-4">
+                                                    Choose a dentist from the
+                                                    list above to apply
+                                                    templates to their schedule.
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <User className="h-4 w-4 text-blue-600" />
+                                                        <span className="font-medium text-blue-900">
+                                                            Applying to:{" "}
+                                                            {
+                                                                dentists.find(
+                                                                    (d) =>
+                                                                        d.id.toString() ===
+                                                                        selectedDentist
+                                                                )?.name
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm text-blue-700">
+                                                        Select a template below
+                                                        to quickly set up this
+                                                        dentist's schedule.
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {SCHEDULE_TEMPLATES.map(
+                                                        (template) => (
+                                                            <Card
+                                                                key={
+                                                                    template.id
+                                                                }
+                                                                className="hover:shadow-md transition-shadow border-2 hover:border-indigo-200"
+                                                            >
+                                                                <CardContent className="p-4">
+                                                                    <div className="flex items-start justify-between mb-3">
+                                                                        <div>
+                                                                            <h3 className="font-semibold text-gray-900 mb-1">
+                                                                                {
+                                                                                    template.name
+                                                                                }
+                                                                            </h3>
+                                                                            <p className="text-sm text-gray-600">
+                                                                                {
+                                                                                    template.description
+                                                                                }
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="p-2 bg-indigo-100 rounded-full">
+                                                                            <Calendar className="h-4 w-4 text-indigo-600" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="space-y-2 mb-4">
+                                                                        <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
+                                                                            Schedule
+                                                                            Details:
+                                                                        </h4>
+                                                                        <div className="space-y-1">
+                                                                            {template.schedule.map(
+                                                                                (
+                                                                                    day,
+                                                                                    index
+                                                                                ) => (
+                                                                                    <div
+                                                                                        key={
+                                                                                            index
+                                                                                        }
+                                                                                        className="text-xs text-gray-600 flex items-center gap-2"
+                                                                                    >
+                                                                                        <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
+                                                                                        <span className="font-medium">
+                                                                                            {getDayName(
+                                                                                                day.day
+                                                                                            )}
+
+                                                                                            :
+                                                                                        </span>
+                                                                                        <span>
+                                                                                            {
+                                                                                                day.start
+                                                                                            }{" "}
+                                                                                            -{" "}
+                                                                                            {
+                                                                                                day.end
+                                                                                            }
+                                                                                        </span>
+                                                                                    </div>
+                                                                                )
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleTemplateSelect(
+                                                                                template
+                                                                            )
+                                                                        }
+                                                                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                                                                        size="sm"
+                                                                    >
+                                                                        <Settings className="h-4 w-4 mr-2" />
+                                                                        Apply
+                                                                        Template
+                                                                    </Button>
+                                                                </CardContent>
+                                                            </Card>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        )}
+                    </Tabs>
                 </div>
             </div>
+
+            {/* Template Dialog */}
+            <Dialog
+                open={isTemplateDialogOpen}
+                onOpenChange={setIsTemplateDialogOpen}
+            >
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Apply Schedule Template</DialogTitle>
+                        <DialogDescription>
+                            {selectedTemplate ? (
+                                <>
+                                    Apply the{" "}
+                                    <strong>{selectedTemplate.name}</strong>{" "}
+                                    template to{" "}
+                                    {selectedDentist ? (
+                                        <strong>
+                                            {
+                                                dentists.find(
+                                                    (d) =>
+                                                        d.id.toString() ===
+                                                        selectedDentist
+                                                )?.name
+                                            }
+                                        </strong>
+                                    ) : (
+                                        "the selected dentist"
+                                    )}
+                                    . This will create schedules for all days
+                                    defined in the template.
+                                </>
+                            ) : (
+                                "Select a template to apply to the dentist's schedule."
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {!selectedTemplate ? (
+                        // Template Selection Interface
+                        <div className="space-y-4">
+                            {!selectedDentist ? (
+                                <div className="text-center py-8">
+                                    <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                        <User className="h-8 w-8 text-gray-400" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                        Select a Dentist First
+                                    </h3>
+                                    <p className="text-gray-500 mb-4">
+                                        Please select a dentist from the main
+                                        page before applying templates.
+                                    </p>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() =>
+                                            setIsTemplateDialogOpen(false)
+                                        }
+                                    >
+                                        Close
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <User className="h-4 w-4 text-blue-600" />
+                                            <span className="font-medium text-blue-900">
+                                                Applying to:{" "}
+                                                {
+                                                    dentists.find(
+                                                        (d) =>
+                                                            d.id.toString() ===
+                                                            selectedDentist
+                                                    )?.name
+                                                }
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-blue-700">
+                                            Choose a template below to quickly
+                                            set up this dentist's schedule.
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {SCHEDULE_TEMPLATES.map((template) => (
+                                            <Card
+                                                key={template.id}
+                                                className="hover:shadow-md transition-shadow border-2 hover:border-indigo-200 cursor-pointer"
+                                                onClick={() =>
+                                                    setSelectedTemplate(
+                                                        template
+                                                    )
+                                                }
+                                            >
+                                                <CardContent className="p-4">
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <div>
+                                                            <h3 className="font-semibold text-gray-900 mb-1">
+                                                                {template.name}
+                                                            </h3>
+                                                            <p className="text-sm text-gray-600">
+                                                                {
+                                                                    template.description
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                        <div className="p-2 bg-indigo-100 rounded-full">
+                                                            <Calendar className="h-4 w-4 text-indigo-600" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-2 mb-4">
+                                                        <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
+                                                            Schedule Details:
+                                                        </h4>
+                                                        <div className="space-y-1">
+                                                            {template.schedule.map(
+                                                                (
+                                                                    day,
+                                                                    index
+                                                                ) => (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="text-xs text-gray-600 flex items-center gap-2"
+                                                                    >
+                                                                        <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
+                                                                        <span className="font-medium">
+                                                                            {getDayName(
+                                                                                day.day
+                                                                            )}
+                                                                            :
+                                                                        </span>
+                                                                        <span>
+                                                                            {
+                                                                                day.start
+                                                                            }{" "}
+                                                                            -{" "}
+                                                                            {
+                                                                                day.end
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <Button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedTemplate(
+                                                                template
+                                                            );
+                                                        }}
+                                                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                                                        size="sm"
+                                                    >
+                                                        <Settings className="h-4 w-4 mr-2" />
+                                                        Select This Template
+                                                    </Button>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() =>
+                                                setIsTemplateDialogOpen(false)
+                                            }
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    ) : (
+                        // Template Confirmation Interface
+                        <div className="space-y-4">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <h4 className="font-medium text-sm text-gray-900 mb-2">
+                                    Template Details:
+                                </h4>
+                                <div className="space-y-1">
+                                    {selectedTemplate.schedule.map(
+                                        (day, index) => (
+                                            <div
+                                                key={index}
+                                                className="text-sm text-gray-600"
+                                            >
+                                                {getDayName(day.day)}:{" "}
+                                                {day.start} - {day.end}
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSelectedTemplate(null);
+                                    }}
+                                >
+                                    Back to Templates
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        setIsTemplateDialogOpen(false);
+                                        setSelectedTemplate(null);
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={applyTemplate}
+                                    disabled={!selectedDentist || processing}
+                                    className="bg-indigo-600 hover:bg-indigo-700"
+                                >
+                                    {processing
+                                        ? "Applying..."
+                                        : "Apply Template"}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Schedule Form Dialog */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editingSchedule
+                                ? "Edit Schedule"
+                                : "Create Schedule"}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {editingSchedule
+                                ? "Update the schedule details for the selected dentist."
+                                : "Create a new schedule entry for the selected dentist."}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Dentist</Label>
+                            <Select
+                                value={data.user_id}
+                                onValueChange={(value) =>
+                                    setData("user_id", value)
+                                }
+                                disabled={editingSchedule !== null}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select dentist" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {dentists.map((dentist) => (
+                                        <SelectItem
+                                            key={dentist.id}
+                                            value={dentist.id.toString()}
+                                        >
+                                            {dentist.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Day of Week</Label>
+                            <Select
+                                value={data.day_of_week}
+                                onValueChange={(value) =>
+                                    setData("day_of_week", value)
+                                }
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select day" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {WORKING_DAYS.map((day) => (
+                                        <SelectItem
+                                            key={day.value}
+                                            value={day.value.toString()}
+                                        >
+                                            {day.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Start Time</Label>
+                                <Input
+                                    type="time"
+                                    value={data.start_time}
+                                    onChange={(e) =>
+                                        setData("start_time", e.target.value)
+                                    }
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>End Time</Label>
+                                <Input
+                                    type="time"
+                                    value={data.end_time}
+                                    onChange={(e) =>
+                                        setData("end_time", e.target.value)
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <Switch
+                                checked={data.is_available}
+                                onCheckedChange={(checked) =>
+                                    setData("is_available", checked)
+                                }
+                            />
+                            <Label>Available for appointments</Label>
+                        </div>
+
+                        <div className="flex justify-end gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setIsDialogOpen(false);
+                                    reset();
+                                    setEditingSchedule(null);
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={processing}
+                            >
+                                {processing
+                                    ? "Saving..."
+                                    : editingSchedule
+                                    ? "Update"
+                                    : "Create"}
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </AuthenticatedLayout>
     );
 }

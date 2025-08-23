@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ClinicLogo from "@/Components/ClinicLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
@@ -34,7 +34,7 @@ const SubscriptionCountdown = ({ clinic }) => {
     const [currentTime, setCurrentTime] = useState(new Date());
 
     // Update time every second for real-time countdown
-    useState(() => {
+    useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTime(new Date());
         }, 1000);
@@ -450,7 +450,12 @@ const Header = ({
                                     </Dropdown.Trigger>
                                     <Dropdown.Content>
                                         <Dropdown.Link
-                                            href={route("clinic.profile.index")}
+                                            href={route(
+                                                auth?.user?.role ===
+                                                    "clinic_admin"
+                                                    ? "clinic.profile.index"
+                                                    : "clinic.profile"
+                                            )}
                                             className="flex items-center"
                                         >
                                             <User className="w-4 h-4 mr-2" />

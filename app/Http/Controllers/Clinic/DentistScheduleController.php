@@ -5,12 +5,22 @@ namespace App\Http\Controllers\Clinic;
 use App\Http\Controllers\Controller;
 use App\Models\DentistSchedule;
 use App\Models\Clinic;
+use App\Services\ScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class DentistScheduleController extends Controller
 {
+    protected $scheduleService;
+
+    public function __construct(ScheduleService $scheduleService)
+    {
+        $this->scheduleService = $scheduleService;
+    }
+
+
+
     public function index(Clinic $clinic)
     {
         $schedules = DentistSchedule::with('dentist')
@@ -20,15 +30,13 @@ class DentistScheduleController extends Controller
 
         $dentists = $clinic->users()
             ->where('role', 'dentist')
-            ->select('id', 'name', 'email')
+            ->select('id', 'name', 'email', 'role')
             ->get();
 
-        Log::info('DentistScheduleController@index', [
+        Log::info('DentistScheduleController@enhancedIndex', [
             'clinic_id' => $clinic->id,
             'schedules_count' => count($schedules),
             'dentists_count' => count($dentists),
-            'schedules_sample' => $schedules->first(),
-            'dentists_sample' => $dentists->first()
         ]);
 
         return Inertia::render('Clinic/DentistSchedules/Index', [
@@ -43,57 +51,217 @@ class DentistScheduleController extends Controller
         $validated = $request->validate([
             'dentist_id' => 'required|exists:users,id',
             'date' => 'required|date',
+            'duration' => 'nullable|integer|min:15|max:240',
         ]);
 
         Log::info('Getting available slots for dentist', [
             'dentist_id' => $validated['dentist_id'],
-            'date' => $validated['date']
+            'date' => $validated['date'],
+            'duration' => $validated['duration'] ?? null
         ]);
 
-        // Define fixed time slots with start and end times
-        $morningSlots = [
-            ['start' => '08:00', 'end' => '09:00'],
-            ['start' => '09:00', 'end' => '10:00'],
-            ['start' => '10:00', 'end' => '11:00'],
+        try {
+            $availableSlots = $this->scheduleService->getAvailableSlots(
+                $validated['dentist_id'],
+                $validated['date'],
+                $validated['duration'] ?? null
+            );
+
+            // Group slots by period (morning/afternoon)
+            $groupedSlots = $this->groupSlotsByPeriod($availableSlots);
+
+            Log::info('Available slots retrieved successfully', [
+                'total_slots' => count($availableSlots),
+                'grouped_slots' => $groupedSlots
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'slots' => $groupedSlots,
+                'total_slots' => count($availableSlots)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting available slots', [
+                'error' => $e->getMessage(),
+                'dentist_id' => $validated['dentist_id'],
+                'date' => $validated['date']
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to get available slots',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Group time slots by period (morning/afternoon)
+     */
+    private function groupSlotsByPeriod(array $slots): array
+    {
+        $morningSlots = [];
+        $afternoonSlots = [];
+
+        foreach ($slots as $slot) {
+            $hour = (int) explode(':', $slot)[0];
+
+            if ($hour < 12) {
+                $morningSlots[] = $slot;
+            } else {
+                $afternoonSlots[] = $slot;
+            }
+        }
+
+        return [
+            'morning' => $morningSlots,
+            'afternoon' => $afternoonSlots
         ];
+    }
 
-        $afternoonSlots = [
-            ['start' => '13:00', 'end' => '14:00'],
-            ['start' => '14:00', 'end' => '15:00'],
-            ['start' => '15:00', 'end' => '16:00'],
-        ];
+    /**
+     * Create schedule from template
+     */
+    public function createFromTemplate(Request $request, Clinic $clinic)
+    {
+        $validated = $request->validate([
+            'template_key' => 'required|string',
+            'dentist_ids' => 'required|array',
+            'dentist_ids.*' => 'exists:users,id',
+        ]);
 
-        $allSlots = [...$morningSlots, ...$afternoonSlots];
+        try {
+            $results = $this->scheduleService->bulkCreateSchedules(
+                ['template' => $validated['template_key']],
+                $validated['dentist_ids'],
+                $clinic->id
+            );
 
-        // Get existing appointments for this date
-        $existingAppointments = \App\Models\Appointment::where('assigned_to', $validated['dentist_id'])
-            ->whereDate('scheduled_at', $validated['date'])
-            ->get()
-            ->map(function ($appointment) {
-                return \Carbon\Carbon::parse($appointment->scheduled_at)->format('H:i');
-            })
-            ->toArray(); // Convert Collection to array
+            $successCount = count(array_filter($results, fn($r) => $r['success']));
+            $errorCount = count($results) - $successCount;
 
-        Log::info('Existing appointments', ['appointments' => $existingAppointments]);
+            return response()->json([
+                'success' => true,
+                'message' => "Schedules created for {$successCount} dentists. {$errorCount} failed.",
+                'results' => $results
+            ]);
 
-        // Filter out booked morning slots
-        $availableMorningSlots = array_values(array_filter($morningSlots, function ($slot) use ($existingAppointments) {
-            return !in_array($slot['start'], $existingAppointments);
-        }));
+        } catch (\Exception $e) {
+            Log::error('Error creating schedules from template', [
+                'error' => $e->getMessage(),
+                'template' => $validated['template_key'],
+                'dentist_ids' => $validated['dentist_ids']
+            ]);
 
-        // Filter out booked afternoon slots
-        $availableAfternoonSlots = array_values(array_filter($afternoonSlots, function ($slot) use ($existingAppointments) {
-            return !in_array($slot['start'], $existingAppointments);
-        }));
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to create schedules from template',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 
-        // Group slots by period
-        $groupedSlots = [
-            'morning' => $availableMorningSlots,
-            'afternoon' => $availableAfternoonSlots
-        ];
+    /**
+     * Get schedule statistics
+     */
+    public function getStats(Request $request, Clinic $clinic)
+    {
+        $validated = $request->validate([
+            'dentist_id' => 'required|exists:users,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+        ]);
 
-        Log::info('Available slots', ['slots' => $groupedSlots]);
+        try {
+            $stats = $this->scheduleService->getDentistScheduleStats(
+                $validated['dentist_id'],
+                $validated['start_date'],
+                $validated['end_date']
+            );
 
-        return response()->json(['slots' => $groupedSlots]);
+            return response()->json([
+                'success' => true,
+                'stats' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting schedule stats', [
+                'error' => $e->getMessage(),
+                'dentist_id' => $validated['dentist_id']
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to get schedule statistics',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get unified schedule information for a dentist
+     */
+    public function getUnifiedScheduleInfo(Request $request, Clinic $clinic)
+    {
+        $validated = $request->validate([
+            'dentist_id' => 'required|exists:users,id',
+        ]);
+
+        try {
+            $info = $this->scheduleService->getUnifiedScheduleInfo($validated['dentist_id']);
+
+            return response()->json([
+                'success' => true,
+                'info' => $info
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error getting unified schedule info', [
+                'error' => $e->getMessage(),
+                'dentist_id' => $validated['dentist_id']
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to get schedule information',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Sync profile working hours to advanced schedule
+     */
+    public function syncProfileToSchedule(Request $request, Clinic $clinic)
+    {
+        $validated = $request->validate([
+            'dentist_id' => 'required|exists:users,id',
+        ]);
+
+        try {
+            $result = $this->scheduleService->syncProfileToSchedule(
+                $validated['dentist_id'],
+                $clinic->id
+            );
+
+            return response()->json([
+                'success' => $result['success'],
+                'message' => $result['message'],
+                'schedules_created' => $result['schedules'] ?? []
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error syncing profile to schedule', [
+                'error' => $e->getMessage(),
+                'dentist_id' => $validated['dentist_id']
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to sync profile to schedule',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

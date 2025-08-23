@@ -37,6 +37,19 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        // Check if clinic staff user is inactive
+        if ($user->user_type === 'clinic_staff' && !$user->is_active) {
+            // Log out the user
+            Auth::logout();
+
+            // Invalidate session
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // Redirect to login with error message
+            return redirect()->route('login')->with('error', 'Your account has been deactivated. Please contact your clinic administrator.');
+        }
+
         // Handle different user types - redirect directly to avoid conflicts
         if ($user->user_type === 'system_admin' || $user->role === 'admin') {
             return redirect()->route('admin.dashboard');

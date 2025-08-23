@@ -74,6 +74,19 @@ Route::post('/payment/{token}/failure', [\App\Http\Controllers\Public\PaymentCon
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
+    // Check if clinic staff user is inactive
+    if ($user->user_type === 'clinic_staff' && !$user->is_active) {
+        // Log out the user
+        Auth::logout();
+
+        // Invalidate session
+        session()->invalidate();
+        session()->regenerateToken();
+
+        // Redirect to login with error message
+        return redirect()->route('login')->with('error', 'Your account has been deactivated. Please contact your clinic administrator.');
+    }
+
     if ($user->user_type === 'system_admin' || $user->role === 'admin') {
         return redirect()->route('admin.dashboard');
     } elseif ($user->user_type === 'patient') {
@@ -153,6 +166,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/clinic/{clinic}/dashboard', [DashboardController::class, 'index'])
             ->name('clinic.dashboard');
+        Route::get('/clinic/{clinic}/dashboard/enhanced', [DashboardController::class, 'enhanced'])
+            ->name('clinic.dashboard.enhanced');
 
         // Patient search route
         Route::get('clinic/{clinic}/patients/search', [PatientController::class, 'search'])
@@ -178,17 +193,23 @@ Route::middleware('auth')->group(function () {
                 'destroy' => 'clinic.patients.destroy',
             ]);
 
-        // Appointment Management Routes
-        Route::resource('clinic/{clinic}/appointments', AppointmentController::class)
-            ->names([
-                'index' => 'clinic.appointments.index',
-                'create' => 'clinic.appointments.create',
-                'store' => 'clinic.appointments.store',
-                'show' => 'clinic.appointments.show',
-                'edit' => 'clinic.appointments.edit',
-                'update' => 'clinic.appointments.update',
-                'destroy' => 'clinic.appointments.destroy',
-            ]);
+        // Simplified Appointment Creation Route (MUST BE BEFORE RESOURCE ROUTE)
+        Route::get('/clinic/{clinic}/appointments/create-simplified', [AppointmentController::class, 'createSimplified'])
+            ->name('clinic.appointments.create-simplified');
+
+        // Appointment Management Routes (without create - using simplified version)
+        Route::get('clinic/{clinic}/appointments', [AppointmentController::class, 'index'])
+            ->name('clinic.appointments.index');
+        Route::post('clinic/{clinic}/appointments', [AppointmentController::class, 'store'])
+            ->name('clinic.appointments.store');
+        Route::get('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'show'])
+            ->name('clinic.appointments.show');
+        Route::get('clinic/{clinic}/appointments/{appointment}/edit', [AppointmentController::class, 'edit'])
+            ->name('clinic.appointments.edit');
+        Route::put('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'update'])
+            ->name('clinic.appointments.update');
+        Route::delete('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'destroy'])
+            ->name('clinic.appointments.destroy');
 
         // Treatment Management Routes
         Route::resource('clinic/{clinic}/treatments', TreatmentController::class)
@@ -266,6 +287,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/clinic/{clinic}/dentist-schedules/available-slots', [DentistScheduleController::class, 'getAvailableSlots'])
             ->name('clinic.dentist-schedules.available-slots');
 
+        // Schedule API Routes
+        Route::get('clinic/{clinic}/dentist-schedules/get-available-slots', [DentistScheduleController::class, 'getAvailableSlots'])
+            ->name('clinic.dentist-schedules.get-available-slots');
+        Route::post('clinic/{clinic}/dentist-schedules/create-from-template', [DentistScheduleController::class, 'createFromTemplate'])
+            ->name('clinic.dentist-schedules.create-from-template');
+        Route::get('clinic/{clinic}/dentist-schedules/stats', [DentistScheduleController::class, 'getStats'])
+            ->name('clinic.dentist-schedules.stats');
+
+        // Unified Schedule Management Routes
+        Route::get('clinic/{clinic}/dentist-schedules/unified-info', [DentistScheduleController::class, 'getUnifiedScheduleInfo'])
+            ->name('clinic.dentist-schedules.unified-info');
+        Route::post('clinic/{clinic}/dentist-schedules/sync-profile', [DentistScheduleController::class, 'syncProfileToSchedule'])
+            ->name('clinic.dentist-schedules.sync-profile');
+
         // Services Management Routes
         Route::resource('clinic/{clinic}/services', ServiceController::class)
             ->names([
@@ -282,32 +317,42 @@ Route::middleware('auth')->group(function () {
         Route::get('/clinic/{clinic}/payments/{payment}/receipt', [PaymentController::class, 'receipt'])
             ->name('clinic.payments.receipt');
 
+
+
+        // Online Appointment Approval Routes
+        Route::post('/clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])->name('clinic.appointments.approve-online');
+        Route::post('/clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
+
         // Clinic User Management Routes
         Route::middleware(['auth'])->prefix('clinic')->group(function () {
             Route::get('{clinic}/dentists', [\App\Http\Controllers\ClinicUserController::class, 'dentists'])->name('clinic.dentists.index');
+
+            // Users Management (Modal-based)
             Route::get('users', [\App\Http\Controllers\ClinicUserController::class, 'index'])->name('clinic.users.index');
-            Route::get('users/create', [\App\Http\Controllers\ClinicUserController::class, 'create'])->name('clinic.users.create');
             Route::post('users', [\App\Http\Controllers\ClinicUserController::class, 'store'])->name('clinic.users.store');
-            Route::get('users/{user}/edit', [\App\Http\Controllers\ClinicUserController::class, 'edit'])->name('clinic.users.edit');
             Route::put('users/{user}', [\App\Http\Controllers\ClinicUserController::class, 'update'])->name('clinic.users.update');
             Route::delete('users/{user}', [\App\Http\Controllers\ClinicUserController::class, 'destroy'])->name('clinic.users.destroy');
+            Route::patch('users/{user}/toggle-status', [\App\Http\Controllers\ClinicUserController::class, 'toggleStatus'])->name('clinic.users.toggle-status');
+            Route::get('users/{user}/available-slots', [\App\Http\Controllers\ClinicUserController::class, 'getAvailableSlots'])->name('clinic.users.available-slots');
+
+            // User Profile Management (for dentists/staff to manage their own profiles)
+            Route::get('profile', [\App\Http\Controllers\ClinicUserController::class, 'profile'])->name('clinic.profile');
+            Route::get('profile/edit', [\App\Http\Controllers\ClinicUserController::class, 'editProfile'])->name('clinic.profile.edit');
+            Route::put('profile', [\App\Http\Controllers\ClinicUserController::class, 'updateProfile'])->name('clinic.user.profile.update');
+
+            // Clinic Profile Management Route
+            Route::get('profile/index', [\App\Http\Controllers\ClinicProfileController::class, 'index'])->name('clinic.profile.index');
+            Route::post('profile/update', [\App\Http\Controllers\ClinicProfileController::class, 'update'])->name('clinic.profile.update');
+            Route::get('profile/info', [\App\Http\Controllers\ClinicProfileController::class, 'clinicInfo'])->name('clinic.profile.info');
+
+            // Gallery upload/delete
+            Route::post('profile/gallery/upload', [\App\Http\Controllers\ClinicProfileController::class, 'uploadGalleryImage'])->name('clinic.profile.gallery.upload');
+            Route::delete('profile/gallery/{id}/delete', [\App\Http\Controllers\ClinicProfileController::class, 'deleteGalleryImage'])->name('clinic.profile.gallery.delete');
         });
-
-        // Clinic Profile Management Route
-        Route::get('profile', [\App\Http\Controllers\ClinicProfileController::class, 'index'])->name('clinic.profile.index');
-        Route::post('profile', [\App\Http\Controllers\ClinicProfileController::class, 'update'])->name('clinic.profile.update');
-        Route::get('/clinic/profile', [\App\Http\Controllers\ClinicProfileController::class, 'clinicInfo'])->name('clinic.profile.info');
-        // Gallery upload/delete
-        Route::post('profile/gallery/upload', [\App\Http\Controllers\ClinicProfileController::class, 'uploadGalleryImage'])->name('clinic.profile.gallery.upload');
-        Route::delete('profile/gallery/{id}/delete', [\App\Http\Controllers\ClinicProfileController::class, 'deleteGalleryImage'])->name('clinic.profile.gallery.delete');
-
-        // Online Appointment Approval Routes
-        Route::post('clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])->name('clinic.appointments.approve-online');
-        Route::post('clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
-    });
 
     Route::middleware(['auth', 'verified', 'clinic'])->prefix('clinic')->name('clinic.')->group(function () {
         // Route::resource('services', \App\Http\Controllers\Clinic\ServiceController::class)->names('clinic.services'); // This line is removed as per the edit hint
+    });
     });
 });
 

@@ -8,6 +8,7 @@ use App\Models\AppointmentStatus;
 use App\Models\AppointmentType;
 use App\Models\Clinic;
 use App\Models\Patient;
+use App\Services\AppointmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,9 +19,12 @@ use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
-    public function __construct()
+    protected $appointmentService;
+
+    public function __construct(AppointmentService $appointmentService)
     {
         $this->middleware(['auth', 'verified']);
+        $this->appointmentService = $appointmentService;
     }
 
     public function index(Request $request, Clinic $clinic)
@@ -65,16 +69,19 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function create(Request $request, Clinic $clinic)
+
+
+    public function createSimplified(Request $request, Clinic $clinic)
     {
         $this->authorize('create', [Appointment::class, $clinic]);
 
-        return Inertia::render('Clinic/Appointments/Create', [
+        return Inertia::render('Clinic/Appointments/CreateSimplified', [
             'clinic' => $clinic,
             'types' => AppointmentType::all(),
             'statuses' => AppointmentStatus::all(),
             'dentists' => $clinic->users()
                 ->where('role', 'dentist')
+                ->where('is_active', true)
                 ->select('id', 'name', 'email')
                 ->get(),
             'auth' => [
@@ -101,56 +108,21 @@ class AppointmentController extends Controller
                 'patient_id' => 'required|exists:patients,id',
                 'assigned_to' => 'required|exists:users,id',
                 'scheduled_at' => 'required|date',
-                'ended_at' => 'required|date|after:scheduled_at',
+                'duration' => 'nullable|integer|min:15|max:240',
                 'appointment_type_id' => 'required|exists:appointment_types,id',
-                'appointment_status_id' => 'required|exists:appointment_statuses,id',
-                'payment_status' => 'required|in:pending,paid,partial',
-                'reason' => 'required|string|max:255',
+                'payment_status' => 'nullable|in:pending,paid,partial,insurance',
+                'reason' => 'nullable|string|max:255',
                 'notes' => 'nullable|string',
             ]);
 
             Log::info('Appointment Validated Data', $validated);
 
-            // Check for scheduling conflicts
-            $conflict = Appointment::where('assigned_to', $validated['assigned_to'])
-                ->where(function ($query) use ($validated) {
-                    $query->whereBetween('scheduled_at', [$validated['scheduled_at'], $validated['ended_at']])
-                        ->orWhereBetween('ended_at', [$validated['scheduled_at'], $validated['ended_at']])
-                        ->orWhere(function ($q) use ($validated) {
-                            $q->where('scheduled_at', '<=', $validated['scheduled_at'])
-                                ->where('ended_at', '>=', $validated['ended_at']);
-                        });
-                })
-                ->exists();
-
-            if ($conflict) {
-                Log::warning('Appointment Conflict Detected', $validated);
-                return back()->withErrors(['scheduled_at' => 'This time slot conflicts with an existing appointment.']);
-            }
-
-            // After validating, determine the type
-            $type = AppointmentType::find($validated['appointment_type_id']);
-            if ($type && strtolower($type->name) === 'walk-in') {
-                $status = AppointmentStatus::where('name', 'Confirmed')->first();
-                $validated['appointment_status_id'] = $status ? $status->id : null;
-            } elseif ($type && strtolower($type->name) === 'online booking') {
-                $status = AppointmentStatus::where('name', 'Pending')->first();
-                $validated['appointment_status_id'] = $status ? $status->id : null;
-            }
-
-            // Create the appointment
-            $appointment = $clinic->appointments()->create([
-                'patient_id' => $validated['patient_id'],
-                'assigned_to' => $validated['assigned_to'],
-                'scheduled_at' => $validated['scheduled_at'],
-                'ended_at' => $validated['ended_at'],
-                'appointment_type_id' => $validated['appointment_type_id'],
-                'appointment_status_id' => $validated['appointment_status_id'],
-                'payment_status' => $validated['payment_status'],
-                'reason' => $validated['reason'],
-                'notes' => $validated['notes'],
-                'created_by' => Auth::id(),
-            ]);
+            // Use the appointment service to create the appointment
+            $appointment = $this->appointmentService->createAppointment(
+                $validated,
+                $clinic->id,
+                Auth::id()
+            );
 
             Log::info('Appointment Created Successfully', [
                 'appointment_id' => $appointment->id,
@@ -159,6 +131,13 @@ class AppointmentController extends Controller
 
             return redirect()->route('clinic.appointments.index', $clinic)
                 ->with('success', 'Appointment created successfully.');
+
+        } catch (\InvalidArgumentException $e) {
+            Log::warning('Appointment Creation Failed - Validation Error', [
+                'error' => $e->getMessage(),
+                'request' => $request->all()
+            ]);
+            return back()->withErrors(['general' => $e->getMessage()]);
         } catch (\Exception $e) {
             Log::error('Error creating appointment', [
                 'error' => $e->getMessage(),
@@ -209,58 +188,40 @@ class AppointmentController extends Controller
     public function update(Request $request, Clinic $clinic, Appointment $appointment)
     {
         $this->authorize('update', [$appointment, $clinic]);
-        $validated = $request->validate([
-            'appointment_type_id' => ['required', 'exists:appointment_types,id'],
-            'appointment_status_id' => ['required', 'exists:appointment_statuses,id'],
-            'assigned_to' => ['nullable', 'exists:users,id'],
-            'scheduled_at' => ['required', 'date'],
-            'duration' => ['required', 'integer', 'min:15', 'max:240'],
-            'reason' => ['nullable', 'string', 'max:255'],
-            'custom_reason' => ['nullable', 'string', 'max:255'],
-            'payment_status' => ['required', 'string', 'in:pending,partial,paid,insurance'],
-            'is_follow_up' => ['boolean'],
-            'previous_visit_date' => ['nullable', 'required_if:is_follow_up,true', 'date'],
-            'previous_visit_notes' => ['nullable', 'string'],
-            'notes' => ['nullable', 'string'],
-            'cancellation_reason' => ['nullable', 'required_if:appointment_status_id,4', 'string', 'max:255'],
-        ]);
 
-        // Check for scheduling conflicts, excluding the current appointment
-        $scheduledAt = \Carbon\Carbon::parse($validated['scheduled_at']);
-        $endTime = $scheduledAt->copy()->addMinutes($validated['duration']);
-
-        $conflictingAppointment = $clinic->appointments()
-            ->where('id', '!=', $appointment->id)
-            ->where('assigned_to', $validated['assigned_to'])
-            ->where(function ($query) use ($scheduledAt, $endTime) {
-                $query->whereBetween('scheduled_at', [$scheduledAt, $endTime])
-                    ->orWhereBetween('ended_at', [$scheduledAt, $endTime])
-                    ->orWhere(function ($q) use ($scheduledAt, $endTime) {
-                        $q->where('scheduled_at', '<=', $scheduledAt)
-                            ->where('ended_at', '>=', $endTime);
-                    });
-            })
-            ->first();
-
-        if ($conflictingAppointment) {
-            return back()->withErrors([
-                'scheduled_at' => 'The selected time slot conflicts with an existing appointment.',
-            ])->withInput();
-        }
-
-        // Calculate ended_at based on duration
-        $validated['ended_at'] = $endTime;
-
-        $appointment->update($validated);
-
-        if ($request->input('appointment_status_id') == 4) { // Cancelled
-            $appointment->update([
-                'cancelled_at' => now(),
+        try {
+            $validated = $request->validate([
+                'appointment_type_id' => ['required', 'exists:appointment_types,id'],
+                'appointment_status_id' => ['required', 'exists:appointment_statuses,id'],
+                'assigned_to' => ['nullable', 'exists:users,id'],
+                'scheduled_at' => ['required', 'date'],
+                'duration' => ['required', 'integer', 'min:15', 'max:240'],
+                'reason' => ['nullable', 'string', 'max:255'],
+                'custom_reason' => ['nullable', 'string', 'max:255'],
+                'payment_status' => ['required', 'string', 'in:pending,partial,paid,insurance'],
+                'is_follow_up' => ['boolean'],
+                'previous_visit_date' => ['nullable', 'required_if:is_follow_up,true', 'date'],
+                'previous_visit_notes' => ['nullable', 'string'],
+                'notes' => ['nullable', 'string'],
+                'cancellation_reason' => ['nullable', 'required_if:appointment_status_id,4', 'string', 'max:255'],
             ]);
-        }
 
-        return redirect()->route('clinic.appointments.show', [$clinic->id, $appointment->id])
-            ->with('success', 'Appointment updated successfully.');
+            // Use the appointment service to update the appointment
+            $updatedAppointment = $this->appointmentService->updateAppointment($appointment, $validated);
+
+            return redirect()->route('clinic.appointments.show', [$clinic->id, $appointment->id])
+                ->with('success', 'Appointment updated successfully.');
+
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['general' => $e->getMessage()])->withInput();
+        } catch (\Exception $e) {
+            Log::error('Error updating appointment', [
+                'error' => $e->getMessage(),
+                'appointment_id' => $appointment->id,
+                'request' => $request->all()
+            ]);
+            return back()->withErrors(['general' => 'Failed to update appointment: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function destroy(Clinic $clinic, Appointment $appointment)

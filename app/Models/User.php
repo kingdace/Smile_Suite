@@ -37,6 +37,19 @@ class User extends Authenticatable
         'registration_verification_code',
         'registration_verification_expires_at',
         'registration_verified',
+        // Dentist-specific fields
+        'license_number',
+        'specialties',
+        'qualifications',
+        'years_experience',
+        'bio',
+        'profile_photo',
+        'working_hours',
+        'unavailable_dates',
+        'is_active',
+        'last_active_at',
+        'emergency_contact',
+        'emergency_phone',
     ];
 
     /**
@@ -61,6 +74,12 @@ class User extends Authenticatable
             'registration_verification_expires_at' => 'datetime',
             'registration_verified' => 'boolean',
             'password' => 'hashed',
+            'working_hours' => 'array',
+            'unavailable_dates' => 'array',
+            'specialties' => 'array',
+            'qualifications' => 'array',
+            'is_active' => 'boolean',
+            'last_active_at' => 'datetime',
         ];
     }
 
@@ -210,5 +229,194 @@ class User extends Authenticatable
     public function isRegistrationVerificationExpired(): bool
     {
         return $this->registration_verification_expires_at && $this->registration_verification_expires_at->isPast();
+    }
+
+    // ==================== DENTIST-SPECIFIC METHODS ====================
+
+    /**
+     * Check if user is a dentist
+     */
+    public function isDentist(): bool
+    {
+        return $this->role === 'dentist' && $this->user_type === self::TYPE_CLINIC_STAFF;
+    }
+
+    /**
+     * Check if user is clinic admin
+     */
+    public function isClinicAdmin(): bool
+    {
+        return $this->role === 'clinic_admin' && $this->user_type === self::TYPE_CLINIC_STAFF;
+    }
+
+    /**
+     * Check if user is staff
+     */
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff' && $this->user_type === self::TYPE_CLINIC_STAFF;
+    }
+
+    /**
+     * Get dentist specialties as array
+     */
+    public function getSpecialties(): array
+    {
+        return $this->specialties ?? [];
+    }
+
+    /**
+     * Get dentist qualifications as array
+     */
+    public function getQualifications(): array
+    {
+        return $this->qualifications ?? [];
+    }
+
+    /**
+     * Get working hours for a specific day
+     */
+    public function getWorkingHours(string $day): ?array
+    {
+        return $this->working_hours[$day] ?? null;
+    }
+
+    /**
+     * Check if dentist is available on a specific date and time
+     */
+    public function isAvailableOn(string $date, string $time = null): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+
+        // Check if date is in unavailable dates
+        if (in_array($date, $this->unavailable_dates ?? [])) {
+            return false;
+        }
+
+        // Get day of week
+        $dayOfWeek = strtolower(date('l', strtotime($date)));
+
+        // Check working hours for that day
+        $workingHours = $this->getWorkingHours($dayOfWeek);
+        if (!$workingHours) {
+            return false;
+        }
+
+        // If time is provided, check if it's within working hours
+        if ($time) {
+            $timeCarbon = \Carbon\Carbon::parse($time);
+            $startTime = \Carbon\Carbon::parse($workingHours['start']);
+            $endTime = \Carbon\Carbon::parse($workingHours['end']);
+
+            return $timeCarbon->between($startTime, $endTime);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get all dentists for a clinic
+     */
+    public static function getDentistsForClinic(int $clinicId): \Illuminate\Database\Eloquent\Collection
+    {
+        return self::where('clinic_id', $clinicId)
+            ->where('role', 'dentist')
+            ->where('user_type', self::TYPE_CLINIC_STAFF)
+            ->where('is_active', true)
+            ->get();
+    }
+
+    /**
+     * Get available time slots for a dentist on a specific date
+     */
+    public function getAvailableTimeSlots(string $date): array
+    {
+        if (!$this->isAvailableOn($date)) {
+            return [];
+        }
+
+        $dayOfWeek = strtolower(date('l', strtotime($date)));
+        $workingHours = $this->getWorkingHours($dayOfWeek);
+
+        if (!$workingHours) {
+            return [];
+        }
+
+        // Generate time slots (30-minute intervals)
+        $slots = [];
+        $startTime = \Carbon\Carbon::parse($workingHours['start']);
+        $endTime = \Carbon\Carbon::parse($workingHours['end']);
+
+        while ($startTime < $endTime) {
+            $slots[] = $startTime->format('H:i');
+            $startTime->addMinutes(30);
+        }
+
+        // Remove slots that are already booked
+        $bookedSlots = $this->appointments()
+            ->whereDate('scheduled_at', $date)
+            ->pluck('scheduled_at')
+            ->map(function ($datetime) {
+                return \Carbon\Carbon::parse($datetime)->format('H:i');
+            })
+            ->toArray();
+
+        return array_values(array_diff($slots, $bookedSlots));
+    }
+
+    /**
+     * Get profile photo URL
+     */
+    public function getProfilePhotoUrl(): string
+    {
+        if ($this->profile_photo) {
+            return asset('storage/' . $this->profile_photo);
+        }
+
+        // Return default avatar based on role
+        if ($this->isDentist()) {
+            return asset('images/default-dentist-avatar.png');
+        }
+
+        return asset('images/default-avatar.png');
+    }
+
+    /**
+     * Get full name with title based on role
+     */
+    public function getFullNameWithTitle(): string
+    {
+        if ($this->isDentist()) {
+            return "Dr. {$this->name}";
+        }
+
+        return $this->name;
+    }
+
+    /**
+     * Scope to get only active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope to get only dentists
+     */
+    public function scopeDentists($query)
+    {
+        return $query->where('role', 'dentist')
+                    ->where('user_type', self::TYPE_CLINIC_STAFF);
+    }
+
+    /**
+     * Scope to get only clinic staff
+     */
+    public function scopeClinicStaff($query)
+    {
+        return $query->where('user_type', self::TYPE_CLINIC_STAFF);
     }
 }

@@ -125,7 +125,7 @@ export default function Show({ auth, patient }) {
                                 <div className="flex items-center gap-2">
                                     <Link
                                         href={route(
-                                            "clinic.appointments.create",
+                                            "clinic.appointments.create-simplified",
                                             {
                                                 clinic: auth.clinic_id,
                                                 patient_id: patient.id,
@@ -819,7 +819,7 @@ export default function Show({ auth, patient }) {
                                             </div>
                                             <Link
                                                 href={route(
-                                                    "clinic.appointments.create",
+                                                    "clinic.appointments.create-simplified",
                                                     {
                                                         clinic: auth.clinic_id,
                                                         patient_id: patient.id,
@@ -913,7 +913,7 @@ export default function Show({ auth, patient }) {
                                             <div className="flex items-center justify-center gap-4">
                                                 <Link
                                                     href={route(
-                                                        "clinic.appointments.create",
+                                                        "clinic.appointments.create-simplified",
                                                         {
                                                             clinic: auth.clinic_id,
                                                             patient_id:
