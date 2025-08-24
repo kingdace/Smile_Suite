@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -36,7 +37,9 @@ class HandleInertiaRequests extends Middleware
                 $user = $request->user();
                 if ($user) {
                     $user->load('clinic'); // Eager load the clinic relationship
-                    return [
+
+                    // Ensure consistent auth structure across all pages
+                    $authData = [
                         'user' => [
                             'id' => $user->id,
                             'name' => $user->name,
@@ -48,6 +51,8 @@ class HandleInertiaRequests extends Middleware
                         'clinic' => $user->clinic, // Clinic data directly under auth for layout compatibility
                         'clinic_id' => $user->clinic_id, // Direct access for route compatibility
                     ];
+
+                    return $authData;
                 }
                 return null;
             },
@@ -55,6 +60,8 @@ class HandleInertiaRequests extends Middleware
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
+                'conflict_detected' => fn () => $request->session()->get('conflict_detected'),
+                'conflict_data' => fn () => $request->session()->get('conflict_data'),
             ],
             'needs_verification' => fn () => $request->session()->get('needs_verification'),
             'verification_type' => fn () => $request->session()->get('verification_type'),

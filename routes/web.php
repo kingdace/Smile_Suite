@@ -21,6 +21,7 @@ use App\Http\Controllers\Clinic\SettingController;
 use App\Http\Controllers\Clinic\SupplierController;
 use App\Http\Controllers\Clinic\DentistScheduleController;
 use App\Http\Controllers\Clinic\ServiceController;
+use App\Http\Controllers\Clinic\WaitlistController;
 use App\Http\Controllers\Public\ClinicDirectoryController;
 use App\Http\Controllers\Public\ClinicRegistrationController;
 use App\Http\Controllers\Admin\ClinicRegistrationRequestController;
@@ -297,6 +298,30 @@ Route::middleware('auth')->group(function () {
         Route::get('clinic/{clinic}/dentist-schedules/stats', [DentistScheduleController::class, 'getStats'])
             ->name('clinic.dentist-schedules.stats');
 
+        // Waitlist Management Routes
+        Route::resource('clinic/{clinic}/waitlist', WaitlistController::class)
+            ->names([
+                'index' => 'clinic.waitlist.index',
+                'create' => 'clinic.waitlist.create',
+                'store' => 'clinic.waitlist.store',
+                'show' => 'clinic.waitlist.show',
+                'edit' => 'clinic.waitlist.edit',
+                'update' => 'clinic.waitlist.update',
+                'destroy' => 'clinic.waitlist.destroy',
+            ]);
+
+        // Additional Waitlist Routes
+        Route::patch('clinic/{clinic}/waitlist/{waitlist}/mark-contacted', [WaitlistController::class, 'markAsContacted'])
+            ->name('clinic.waitlist.mark-contacted');
+        Route::patch('clinic/{clinic}/waitlist/{waitlist}/mark-scheduled', [WaitlistController::class, 'markAsScheduled'])
+            ->name('clinic.waitlist.mark-scheduled');
+        Route::patch('clinic/{clinic}/waitlist/{waitlist}/mark-cancelled', [WaitlistController::class, 'markAsCancelled'])
+            ->name('clinic.waitlist.mark-cancelled');
+        Route::post('clinic/{clinic}/waitlist/{waitlist}/convert-to-appointment', [WaitlistController::class, 'convertToAppointment'])
+            ->name('clinic.waitlist.convert-to-appointment');
+        Route::get('clinic/{clinic}/waitlist/{waitlist}/available-slots', [WaitlistController::class, 'getAvailableSlots'])
+            ->name('clinic.waitlist.get-available-slots');
+
         // Unified Schedule Management Routes
         Route::get('clinic/{clinic}/dentist-schedules/unified-info', [DentistScheduleController::class, 'getUnifiedScheduleInfo'])
             ->name('clinic.dentist-schedules.unified-info');
@@ -331,6 +356,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])->name('clinic.appointments.approve-online');
         Route::post('/clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
 
+        // Waitlist Integration Routes
+        Route::post('/clinic/{clinic}/appointments/add-to-waitlist', [\App\Http\Controllers\Clinic\AppointmentController::class, 'addToWaitlist'])->name('clinic.appointments.add-to-waitlist');
+
         // Clinic User Management Routes
         Route::middleware(['auth'])->prefix('clinic')->group(function () {
             Route::get('{clinic}/dentists', [\App\Http\Controllers\ClinicUserController::class, 'dentists'])->name('clinic.dentists.index');
@@ -358,9 +386,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('profile/gallery/{id}/delete', [\App\Http\Controllers\ClinicProfileController::class, 'deleteGalleryImage'])->name('clinic.profile.gallery.delete');
         });
 
-    Route::middleware(['auth', 'verified', 'clinic'])->prefix('clinic')->name('clinic.')->group(function () {
-        // Route::resource('services', \App\Http\Controllers\Clinic\ServiceController::class)->names('clinic.services'); // This line is removed as per the edit hint
-    });
+
     });
 });
 

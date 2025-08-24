@@ -189,4 +189,12 @@ class Clinic extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Get the waitlist entries associated with the clinic.
+     */
+    public function waitlist()
+    {
+        return $this->hasMany(Waitlist::class);
+    }
 }

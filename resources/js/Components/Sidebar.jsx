@@ -118,6 +118,13 @@ const navigation = (clinicId) => [
                 icon: CalendarCheck,
                 description: "Calendar interface",
             },
+            {
+                name: "Waitlist",
+                href: route("clinic.waitlist.index", [clinicId]),
+                routeName: "clinic.waitlist.*",
+                icon: Clock,
+                description: "Patient waitlist management",
+            },
         ],
     },
     {

@@ -1,4 +1,4 @@
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
@@ -29,10 +29,17 @@ import {
     Zap,
     Sparkles,
 } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import PatientSelector from "@/Components/Appointment/PatientSelector";
 import TimeSlotSelector from "@/Components/Appointment/TimeSlotSelector";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/Components/ui/dialog";
 
 // Helper function to get service color based on category
 const getServiceColor = (category) => {
@@ -87,12 +94,18 @@ export default function CreateSimplified({
     dentists,
     services,
 }) {
+    const { flash } = usePage().props;
+
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedDentist, setSelectedDentist] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedTime, setSelectedTime] = useState("");
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showConflictModal, setShowConflictModal] = useState(false);
+    const [conflictData, setConflictData] = useState(null);
+    const [waitlistPriority, setWaitlistPriority] = useState("normal");
+    const [contactMethod, setContactMethod] = useState("phone");
 
     const walkInType = types.find((t) => t.name === "Walk-in");
     const confirmedStatus = statuses.find((s) => s.name === "Confirmed");
@@ -679,12 +692,162 @@ export default function CreateSimplified({
                                             )
                                         )}
                                     </ul>
+
+                                    {/* Show waitlist option for conflicts */}
+                                    {flash.conflict_detected && (
+                                        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                            <div className="flex items-center gap-2 text-blue-700 mb-2">
+                                                <Clock className="h-5 w-5" />
+                                                <span className="font-semibold">
+                                                    Alternative Option Available
+                                                </span>
+                                            </div>
+                                            <p className="text-blue-600 mb-3">
+                                                This time slot is already
+                                                booked. Would you like to add
+                                                this patient to our waitlist?
+                                                We'll contact you when a slot
+                                                becomes available.
+                                            </p>
+                                            <Button
+                                                type="button"
+                                                onClick={() => {
+                                                    setConflictData(
+                                                        flash.conflict_data
+                                                    );
+                                                    setShowConflictModal(true);
+                                                }}
+                                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                            >
+                                                <Clock className="h-4 w-4 mr-2" />
+                                                Add to Waitlist
+                                            </Button>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         )}
                     </form>
                 </div>
             </div>
+
+            {/* Conflict Resolution Modal */}
+            <Dialog
+                open={showConflictModal}
+                onOpenChange={setShowConflictModal}
+            >
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Clock className="h-5 w-5 text-blue-600" />
+                            Add to Waitlist
+                        </DialogTitle>
+                        <DialogDescription>
+                            Add this patient to our waitlist. We'll contact you
+                            when a slot becomes available.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4">
+                        {/* Priority Selection */}
+                        <div>
+                            <Label className="text-sm font-medium">
+                                Priority Level
+                            </Label>
+                            <Select
+                                value={waitlistPriority}
+                                onValueChange={setWaitlistPriority}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="urgent">
+                                        Urgent - Emergency cases
+                                    </SelectItem>
+                                    <SelectItem value="high">
+                                        High - Important procedures
+                                    </SelectItem>
+                                    <SelectItem value="normal">
+                                        Normal - Regular checkups
+                                    </SelectItem>
+                                    <SelectItem value="low">
+                                        Low - Cosmetic procedures
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Contact Method */}
+                        <div>
+                            <Label className="text-sm font-medium">
+                                Preferred Contact Method
+                            </Label>
+                            <Select
+                                value={contactMethod}
+                                onValueChange={setContactMethod}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="phone">
+                                        Phone Call
+                                    </SelectItem>
+                                    <SelectItem value="email">Email</SelectItem>
+                                    <SelectItem value="sms">
+                                        SMS/Text
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 pt-4">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowConflictModal(false)}
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={() => {
+                                    if (conflictData) {
+                                        const waitlistData = {
+                                            ...conflictData,
+                                            priority: waitlistPriority,
+                                            preferred_contact_method:
+                                                contactMethod,
+                                        };
+
+                                        router.post(
+                                            route(
+                                                "clinic.appointments.add-to-waitlist",
+                                                clinic.id
+                                            ),
+                                            waitlistData,
+                                            {
+                                                onSuccess: () => {
+                                                    setShowConflictModal(false);
+                                                    setConflictData(null);
+                                                    reset();
+                                                },
+                                            }
+                                        );
+                                    }
+                                }}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                            >
+                                <Clock className="h-4 w-4 mr-2" />
+                                Add to Waitlist
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </AuthenticatedLayout>
     );
 }

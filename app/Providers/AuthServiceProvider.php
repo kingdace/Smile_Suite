@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Service;
 use App\Models\Supplier;
 use App\Models\Treatment;
+use App\Models\Waitlist;
 use App\Policies\AppointmentPolicy;
 use App\Policies\InventoryPolicy;
 use App\Policies\PatientPolicy;
@@ -16,6 +17,7 @@ use App\Policies\PaymentPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\SupplierPolicy;
 use App\Policies\TreatmentPolicy;
+use App\Policies\WaitlistPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -33,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
         Inventory::class => InventoryPolicy::class,
         Supplier::class => SupplierPolicy::class,
         Service::class => ServicePolicy::class,
+        Waitlist::class => WaitlistPolicy::class,
     ];
 
     /**

@@ -99,13 +99,6 @@ class AppointmentController extends Controller
             'clinic' => $clinic,
             'appointments' => ['data' => $appointments],
             'filters' => $request->only(['search', 'status', 'dentist']),
-            'auth' => [
-                'id' => Auth::user()->id,
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => Auth::user()->clinic_id,
-                'clinic' => Auth::user()->clinic,
-            ],
         ]);
     }
 
@@ -176,6 +169,38 @@ class AppointmentController extends Controller
                 'error' => $e->getMessage(),
                 'request' => $request->all()
             ]);
+
+            // Debug: Log the exact error message
+            Log::info('Error message check', [
+                'error_message' => $e->getMessage(),
+                'contains_conflict' => str_contains($e->getMessage(), 'conflicts with an existing appointment'),
+                'contains_conflict_alt' => str_contains($e->getMessage(), 'time slot conflicts'),
+            ]);
+
+            // Check if it's a scheduling conflict and offer waitlist option
+            if (str_contains($e->getMessage(), 'conflicts with an existing appointment') ||
+                str_contains($e->getMessage(), 'time slot conflicts')) {
+
+                Log::info('Conflict detected - setting flash data', [
+                    'patient_id' => $request->input('patient_id'),
+                    'assigned_to' => $request->input('assigned_to'),
+                    'scheduled_at' => $request->input('scheduled_at'),
+                ]);
+
+                return back()
+                    ->withErrors(['general' => $e->getMessage()])
+                    ->with('conflict_detected', true)
+                    ->with('conflict_data', [
+                        'patient_id' => $request->input('patient_id'),
+                        'assigned_to' => $request->input('assigned_to'),
+                        'scheduled_at' => $request->input('scheduled_at'),
+                        'duration' => $request->input('duration'),
+                        'reason' => $request->input('reason'),
+                        'notes' => $request->input('notes'),
+                        'service_id' => $request->input('service_id'),
+                    ]);
+            }
+
             return back()->withErrors(['general' => $e->getMessage()]);
         } catch (\Exception $e) {
             Log::error('Error creating appointment', [
@@ -405,5 +430,59 @@ class AppointmentController extends Controller
             ]);
         }
         return back()->with('success', 'Appointment request denied.');
+    }
+
+    /**
+     * Add appointment to waitlist when there's a conflict
+     */
+    public function addToWaitlist(Request $request, Clinic $clinic)
+    {
+        $this->authorize('create', [Appointment::class, $clinic]);
+
+        $validated = $request->validate([
+            'patient_id' => 'required|exists:patients,id',
+            'assigned_to' => 'required|exists:users,id',
+            'scheduled_at' => 'required|date',
+            'duration' => 'nullable|integer|min:15|max:480',
+            'reason' => 'nullable|string|max:500',
+            'notes' => 'nullable|string|max:1000',
+            'service_id' => 'nullable|exists:services,id',
+            'priority' => 'required|in:urgent,high,normal,low',
+            'preferred_contact_method' => 'required|in:phone,email,sms',
+        ]);
+
+        try {
+            // Create waitlist entry
+            $waitlist = $clinic->waitlist()->create([
+                'patient_id' => $validated['patient_id'],
+                'assigned_dentist_id' => $validated['assigned_to'],
+                'preferred_date' => $validated['scheduled_at'],
+                'preferred_time' => \Carbon\Carbon::parse($validated['scheduled_at'])->format('H:i'),
+                'duration' => $validated['duration'] ?? 30,
+                'reason' => $validated['reason'],
+                'notes' => $validated['notes'],
+                'service_id' => $validated['service_id'],
+                'priority' => $validated['priority'],
+                'preferred_contact_method' => $validated['preferred_contact_method'],
+                'status' => 'active',
+                'created_by' => Auth::id(),
+            ]);
+
+            Log::info('Waitlist entry created from appointment conflict', [
+                'waitlist_id' => $waitlist->id,
+                'patient_id' => $validated['patient_id'],
+                'preferred_date' => $validated['scheduled_at'],
+            ]);
+
+            return redirect()->route('clinic.waitlist.index', $clinic)
+                ->with('success', 'Patient added to waitlist successfully. We will contact you when a slot becomes available.');
+
+        } catch (\Exception $e) {
+            Log::error('Error adding to waitlist', [
+                'error' => $e->getMessage(),
+                'request' => $request->all()
+            ]);
+            return back()->withErrors(['general' => 'Failed to add to waitlist: ' . $e->getMessage()]);
+        }
     }
 }

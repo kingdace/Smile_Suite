@@ -420,7 +420,7 @@ const Header = ({
                                 <div className="relative">
                                     <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-blue-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/60">
                                         <span className="text-blue-700 text-sm font-bold">
-                                            {auth?.user?.name
+                                            {(auth?.user?.name || auth?.name)
                                                 ?.charAt(0)
                                                 ?.toUpperCase() || "U"}
                                         </span>
@@ -430,14 +430,17 @@ const Header = ({
                                 </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm font-bold text-white">
-                                        {auth?.user?.name}
+                                        {auth?.user?.name || auth?.name}
                                     </p>
                                     <p className="text-xs text-blue-100 font-medium">
-                                        {auth?.user?.role === "clinic_admin"
+                                        {(auth?.user?.role || auth?.role) ===
+                                        "clinic_admin"
                                             ? "Clinic Admin"
-                                            : auth?.user?.role === "dentist"
+                                            : (auth?.user?.role ||
+                                                  auth?.role) === "dentist"
                                             ? "Dentist"
-                                            : auth?.user?.role === "staff"
+                                            : (auth?.user?.role ||
+                                                  auth?.role) === "staff"
                                             ? "Staff"
                                             : "User"}
                                     </p>
@@ -474,10 +477,18 @@ const Header = ({
                                             </Dropdown.Link>
                                         )}
                                         <Dropdown.Link
-                                            href={route(
-                                                "clinic.settings.index",
-                                                auth?.clinic?.id
-                                            )}
+                                            href={(() => {
+                                                const clinicId =
+                                                    auth?.clinic_id ||
+                                                    auth?.clinic?.id ||
+                                                    auth?.user?.clinic_id;
+                                                return clinicId
+                                                    ? route(
+                                                          "clinic.settings.index",
+                                                          clinicId
+                                                      )
+                                                    : "#";
+                                            })()}
                                             className="flex items-center"
                                         >
                                             <Settings className="w-4 h-4 mr-2" />
@@ -538,7 +549,7 @@ const Header = ({
                                         type="button"
                                         className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white hover:text-blue-100 focus:outline-none transition ease-in-out duration-150"
                                     >
-                                        {auth?.user?.name}
+                                        {auth?.user?.name || auth?.name}
 
                                         <ChevronDown className="ml-2 -mr-0.5 h-4 w-4" />
                                     </button>
@@ -596,11 +607,8 @@ function hasRoute(name) {
 
 // Helper to determine if user is a clinic user
 function isClinicUser(auth) {
-    return (
-        auth?.user?.role === "clinic_admin" ||
-        auth?.user?.role === "dentist" ||
-        auth?.user?.role === "staff"
-    );
+    const role = auth?.user?.role || auth?.role;
+    return role === "clinic_admin" || role === "dentist" || role === "staff";
 }
 
 export default function Authenticated({
@@ -609,13 +617,24 @@ export default function Authenticated({
     children,
     hideSidebar = false,
 }) {
+    // Debug auth data
+    console.log("=== AUTH DEBUG ===");
+    console.log("Auth data:", auth);
+    console.log("Auth user:", auth?.user);
+    console.log("Auth user role:", auth?.user?.role);
+    console.log("Auth clinic_id:", auth?.clinic_id);
+    console.log("Auth clinic:", auth?.clinic);
+    console.log("User name:", auth?.user?.name || auth?.name);
+    console.log("Current route:", route().current());
+    console.log("==================");
+
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     // Check if we're in a clinic page
     const isClinicPage = route().current().startsWith("clinic.");
-    const isPatient = auth?.user?.role === "patient";
+    const isPatient = (auth?.user?.role || auth?.role) === "patient";
 
     // --- GUARANTEED PATIENT LAYOUT ---
     if (isPatient) {
@@ -656,36 +675,37 @@ export default function Authenticated({
                     )}
 
                     {/* Admin Mobile Navigation Links */}
-                    {auth?.user?.role === "admin" && !isClinicPage && (
-                        <>
-                            <ResponsiveNavLink
-                                href={route("admin.dashboard")}
-                                active={route().current("admin.dashboard")}
-                                className="flex items-center"
-                            >
-                                <LayoutDashboard className="w-4 h-4 mr-2" />
-                                Admin Dashboard
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route("admin.users.index")}
-                                active={route().current("admin.users.*")}
-                                className="flex items-center"
-                            >
-                                <Users className="w-4 h-4 mr-2" />
-                                Users
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route("admin.clinics.index")}
-                                active={route().current("admin.clinics.*")}
-                                className="flex items-center"
-                            >
-                                <Building2 className="w-4 h-4 mr-2" />
-                                Clinics
-                            </ResponsiveNavLink>
-                        </>
-                    )}
+                    {(auth?.user?.role || auth?.role) === "admin" &&
+                        !isClinicPage && (
+                            <>
+                                <ResponsiveNavLink
+                                    href={route("admin.dashboard")}
+                                    active={route().current("admin.dashboard")}
+                                    className="flex items-center"
+                                >
+                                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                                    Admin Dashboard
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route("admin.users.index")}
+                                    active={route().current("admin.users.*")}
+                                    className="flex items-center"
+                                >
+                                    <Users className="w-4 h-4 mr-2" />
+                                    Users
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route("admin.clinics.index")}
+                                    active={route().current("admin.clinics.*")}
+                                    className="flex items-center"
+                                >
+                                    <Building2 className="w-4 h-4 mr-2" />
+                                    Clinics
+                                </ResponsiveNavLink>
+                            </>
+                        )}
 
-                    {auth?.user?.role === "clinic_admin" && (
+                    {(auth?.user?.role || auth?.role) === "clinic_admin" && (
                         <ResponsiveNavLink
                             href={route("clinic.users.index")}
                             className="flex items-center"
@@ -694,9 +714,9 @@ export default function Authenticated({
                             User Management
                         </ResponsiveNavLink>
                     )}
-                    {(auth?.user?.role === "clinic_admin" ||
-                        auth?.user?.role === "dentist" ||
-                        auth?.user?.role === "staff") && (
+                    {((auth?.user?.role || auth?.role) === "clinic_admin" ||
+                        (auth?.user?.role || auth?.role) === "dentist" ||
+                        (auth?.user?.role || auth?.role) === "staff") && (
                         <ResponsiveNavLink
                             href={route("clinic.profile.index")}
                             className="flex items-center"
@@ -710,10 +730,10 @@ export default function Authenticated({
                 <div className="pt-4 pb-1 border-t border-gray-200">
                     <div className="px-4">
                         <div className="font-medium text-base text-gray-800">
-                            {auth?.user?.name}
+                            {auth?.user?.name || auth?.name}
                         </div>
                         <div className="font-medium text-sm text-gray-500">
-                            {auth?.user?.email}
+                            {auth?.user?.email || auth?.email}
                         </div>
                     </div>
 
