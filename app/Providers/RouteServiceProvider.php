@@ -7,6 +7,8 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use App\Models\Treatment;
+use App\Models\Clinic;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,10 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureRateLimiting();
+
+        // Configure route model bindings
+        Route::model('treatment', Treatment::class);
+        Route::model('clinic', Clinic::class);
 
         $this->routes(function () {
             Route::middleware('api')

@@ -582,12 +582,42 @@ export default function Dashboard({
                                                                             <div className="flex items-center gap-2 mt-1">
                                                                                 <Clock className="h-3 w-3 text-blue-500" />
                                                                                 <p className="text-xs text-gray-600">
-                                                                                    {format(
-                                                                                        new Date(
-                                                                                            `${appointment.appointment_date} ${appointment.appointment_time}`
-                                                                                        ),
-                                                                                        "h:mm a"
-                                                                                    )}{" "}
+                                                                                    {(() => {
+                                                                                        try {
+                                                                                            const dateStr =
+                                                                                                appointment.appointment_date;
+                                                                                            const timeStr =
+                                                                                                appointment.appointment_time;
+
+                                                                                            if (
+                                                                                                !dateStr ||
+                                                                                                !timeStr
+                                                                                            ) {
+                                                                                                return "Time not set";
+                                                                                            }
+
+                                                                                            const dateTimeStr = `${dateStr} ${timeStr}`;
+                                                                                            const dateObj =
+                                                                                                new Date(
+                                                                                                    dateTimeStr
+                                                                                                );
+
+                                                                                            if (
+                                                                                                isNaN(
+                                                                                                    dateObj.getTime()
+                                                                                                )
+                                                                                            ) {
+                                                                                                return "Invalid time";
+                                                                                            }
+
+                                                                                            return format(
+                                                                                                dateObj,
+                                                                                                "h:mm a"
+                                                                                            );
+                                                                                        } catch (error) {
+                                                                                            return "Time not set";
+                                                                                        }
+                                                                                    })()}{" "}
                                                                                     •{" "}
                                                                                     {appointment
                                                                                         .appointment_type
@@ -890,12 +920,35 @@ export default function Dashboard({
                                                                     }
                                                                 </p>
                                                                 <p className="text-xs text-gray-600">
-                                                                    {format(
-                                                                        new Date(
-                                                                            patient.created_at
-                                                                        ),
-                                                                        "MMM d, yyyy"
-                                                                    )}
+                                                                    {(() => {
+                                                                        try {
+                                                                            if (
+                                                                                !patient.created_at
+                                                                            ) {
+                                                                                return "Date not available";
+                                                                            }
+
+                                                                            const dateObj =
+                                                                                new Date(
+                                                                                    patient.created_at
+                                                                                );
+
+                                                                            if (
+                                                                                isNaN(
+                                                                                    dateObj.getTime()
+                                                                                )
+                                                                            ) {
+                                                                                return "Invalid date";
+                                                                            }
+
+                                                                            return format(
+                                                                                dateObj,
+                                                                                "MMM d, yyyy"
+                                                                            );
+                                                                        } catch (error) {
+                                                                            return "Date not available";
+                                                                        }
+                                                                    })()}
                                                                 </p>
                                                             </div>
                                                         </div>
