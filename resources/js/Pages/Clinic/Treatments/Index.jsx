@@ -108,8 +108,8 @@ export default function Index({ auth, treatments, services, filters }) {
         }
         const newFilters = {
             ...filterState,
-                sort_by: column,
-                sort_direction: direction,
+            sort_by: column,
+            sort_direction: direction,
         };
         setFilterState(newFilters);
         router.reload({
@@ -469,9 +469,9 @@ export default function Index({ auth, treatments, services, filters }) {
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                                         <div className="relative">
-                                        <Input
-                                            type="text"
-                                            placeholder="Search treatments..."
+                                            <Input
+                                                type="text"
+                                                placeholder="Search treatments..."
                                                 value={search}
                                                 onChange={handleInputChange}
                                                 className="pl-10 pr-4 h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -607,8 +607,8 @@ export default function Index({ auth, treatments, services, filters }) {
                                 )}
 
                             <div className="overflow-x-auto">
-                            <Table>
-                                <TableHeader>
+                                <Table>
+                                    <TableHeader>
                                         <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
                                             {showBulkActions && (
                                                 <TableHead className="w-12">
@@ -620,9 +620,9 @@ export default function Index({ auth, treatments, services, filters }) {
                                                         }
                                                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                                     />
-                                        </TableHead>
+                                                </TableHead>
                                             )}
-                                        <TableHead
+                                            <TableHead
                                                 className="cursor-pointer hover:bg-gray-100/50 transition-colors"
                                                 onClick={() =>
                                                     handleSort("patient_id")
@@ -633,10 +633,10 @@ export default function Index({ auth, treatments, services, filters }) {
                                                     Patient
                                                     {getSortIcon("patient_id")}
                                                 </div>
-                                        </TableHead>
-                                        <TableHead
+                                            </TableHead>
+                                            <TableHead
                                                 className="cursor-pointer hover:bg-gray-100/50 transition-colors"
-                                            onClick={() =>
+                                                onClick={() =>
                                                     handleSort("service_id")
                                                 }
                                             >
@@ -645,10 +645,10 @@ export default function Index({ auth, treatments, services, filters }) {
                                                     Service
                                                     {getSortIcon("service_id")}
                                                 </div>
-                                        </TableHead>
-                                        <TableHead
+                                            </TableHead>
+                                            <TableHead
                                                 className="cursor-pointer hover:bg-gray-100/50 transition-colors"
-                                            onClick={() =>
+                                                onClick={() =>
                                                     handleSort("status")
                                                 }
                                             >
@@ -657,10 +657,10 @@ export default function Index({ auth, treatments, services, filters }) {
                                                     Status
                                                     {getSortIcon("status")}
                                                 </div>
-                                        </TableHead>
-                                        <TableHead
+                                            </TableHead>
+                                            <TableHead
                                                 className="cursor-pointer hover:bg-gray-100/50 transition-colors"
-                                            onClick={() =>
+                                                onClick={() =>
                                                     handleSort("payment_status")
                                                 }
                                             >
@@ -671,10 +671,10 @@ export default function Index({ auth, treatments, services, filters }) {
                                                         "payment_status"
                                                     )}
                                                 </div>
-                                        </TableHead>
-                                        <TableHead
+                                            </TableHead>
+                                            <TableHead
                                                 className="cursor-pointer hover:bg-gray-100/50 transition-colors"
-                                            onClick={() =>
+                                                onClick={() =>
                                                     handleSort("cost")
                                                 }
                                             >
@@ -683,10 +683,10 @@ export default function Index({ auth, treatments, services, filters }) {
                                                     Cost
                                                     {getSortIcon("cost")}
                                                 </div>
-                                        </TableHead>
-                                        <TableHead
+                                            </TableHead>
+                                            <TableHead
                                                 className="cursor-pointer hover:bg-gray-100/50 transition-colors"
-                                            onClick={() =>
+                                                onClick={() =>
                                                     handleSort("start_date")
                                                 }
                                             >
@@ -695,13 +695,13 @@ export default function Index({ auth, treatments, services, filters }) {
                                                     Date
                                                     {getSortIcon("start_date")}
                                                 </div>
-                                        </TableHead>
+                                            </TableHead>
                                             <TableHead className="text-right">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
+                                                Actions
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
                                         {treatments.data.length === 0 ? (
                                             <TableRow>
                                                 <TableCell
@@ -815,13 +815,13 @@ export default function Index({ auth, treatments, services, filters }) {
                                                     <TableCell>
                                                         <Badge
                                                             className={`${getStatusColor(
-                                                            treatment.status
+                                                                treatment.status
                                                             )} px-3 py-1 rounded-full text-xs font-medium`}
                                                         >
                                                             {treatment.status.replace(
-                                                                    "_",
-                                                                    " "
-                                                                )}
+                                                                "_",
+                                                                " "
+                                                            )}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>
@@ -843,21 +843,21 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                     treatment.cost ||
                                                                         0
                                                                 ).toLocaleString()}
-                                                    </span>
+                                                            </span>
                                                             {treatment.payment_status ===
                                                                 "completed" && (
                                                                 <CheckCircle className="h-4 w-4 text-green-500" />
                                                             )}
                                                         </div>
-                                                </TableCell>
+                                                    </TableCell>
                                                     <TableCell>
                                                         <div>
                                                             <p className="font-medium text-gray-900">
-                                                    {treatment.start_date
-                                                        ? format(
-                                                              new Date(
-                                                                  treatment.start_date
-                                                              ),
+                                                                {treatment.start_date
+                                                                    ? format(
+                                                                          new Date(
+                                                                              treatment.start_date
+                                                                          ),
                                                                           "MMM dd, yyyy"
                                                                       )
                                                                     : "No date"}
@@ -869,50 +869,50 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                     : "No duration"}
                                                             </div>
                                                         </div>
-                                                </TableCell>
+                                                    </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center gap-2 justify-end">
-                                                    <Link
-                                                        href={route(
-                                                            "clinic.treatments.show",
-                                                            {
-                                                                clinic: auth.clinic_id,
-                                                                treatment:
-                                                                    treatment.id,
-                                                            }
-                                                        )}
-                                                    >
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
+                                                            <Link
+                                                                href={route(
+                                                                    "clinic.treatments.show",
+                                                                    {
+                                                                        clinic: auth.clinic_id,
+                                                                        treatment:
+                                                                            treatment.id,
+                                                                    }
+                                                                )}
+                                                            >
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
                                                                     className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-300"
-                                                        >
+                                                                >
                                                                     <Eye className="h-4 w-4" />
-                                                        </Button>
-                                                    </Link>
-                                                    <Link
-                                                        href={route(
-                                                            "clinic.treatments.edit",
-                                                            {
-                                                                clinic: auth.clinic_id,
-                                                                treatment:
-                                                                    treatment.id,
-                                                            }
-                                                        )}
-                                                    >
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
+                                                                </Button>
+                                                            </Link>
+                                                            <Link
+                                                                href={route(
+                                                                    "clinic.treatments.edit",
+                                                                    {
+                                                                        clinic: auth.clinic_id,
+                                                                        treatment:
+                                                                            treatment.id,
+                                                                    }
+                                                                )}
+                                                            >
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
                                                                     className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-300"
-                                                        >
+                                                                >
                                                                     <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                    </Link>
+                                                                </Button>
+                                                            </Link>
                                                             {auth.user.role ===
                                                                 "clinic_admin" && (
-                                                    <Button
+                                                                <Button
                                                                     variant="outline"
-                                                        size="sm"
+                                                                    size="sm"
                                                                     className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-300 text-red-600"
                                                                     onClick={() =>
                                                                         handleDeleteTreatment(
@@ -925,15 +925,15 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                     }
                                                                 >
                                                                     <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                                </Button>
                                                             )}
                                                         </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
                             </div>
 
                             {/* Enhanced Pagination */}

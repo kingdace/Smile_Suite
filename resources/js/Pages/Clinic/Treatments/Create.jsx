@@ -198,9 +198,9 @@ export default function Create({
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             Back to Treatments
                         </Link>
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                             Create New Treatment
-                </h2>
+                        </h2>
                     </div>
                 </div>
             }
@@ -217,7 +217,7 @@ export default function Create({
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h1 className="text-2xl font-bold text-blue-800 mb-1">
-                                    New Treatment Record
+                                            New Treatment Record
                                         </h1>
                                         <p className="text-blue-600 text-sm">
                                             Create a comprehensive treatment
@@ -269,108 +269,108 @@ export default function Create({
                                     <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200 py-4">
                                         <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                                             <Users className="h-5 w-5 text-blue-600" />
-                                        Patient & Dentist Information
+                                            Patient & Dentist Information
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-4">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        {/* Patient Select */}
+                                            {/* Patient Select */}
                                             <div className="space-y-2">
-                                            <Label
-                                                htmlFor="patient_id"
+                                                <Label
+                                                    htmlFor="patient_id"
                                                     className="font-medium text-gray-700 text-sm"
-                                            >
+                                                >
                                                     Patient *
-                                            </Label>
-                                            <Select
-                                                onValueChange={(value) =>
+                                                </Label>
+                                                <Select
+                                                    onValueChange={(value) =>
                                                         setData(
                                                             "patient_id",
                                                             value
                                                         )
-                                                }
-                                                value={data.patient_id}
-                                            >
+                                                    }
+                                                    value={data.patient_id}
+                                                >
                                                     <SelectTrigger className="w-full h-10 text-sm">
-                                                    <SelectValue placeholder="Select a patient" />
-                                                </SelectTrigger>
-                                                <SelectContent>
+                                                        <SelectValue placeholder="Select a patient" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
                                                         {patients &&
                                                             patients.map(
                                                                 (patient) => (
-                                                        <SelectItem
+                                                                    <SelectItem
                                                                         key={
                                                                             patient.id
                                                                         }
-                                                            value={patient.id.toString()}
+                                                                        value={patient.id.toString()}
                                                                         className="text-sm"
-                                                        >
-                                                            {patient.user
+                                                                    >
+                                                                        {patient.user
                                                                             ? patient
                                                                                   .user
-                                                                      .name
-                                                                : `${
-                                                                      patient.first_name ||
-                                                                      ""
-                                                                  } ${
-                                                                      patient.last_name ||
-                                                                      ""
-                                                                  }`}
-                                                        </SelectItem>
+                                                                                  .name
+                                                                            : `${
+                                                                                  patient.first_name ||
+                                                                                  ""
+                                                                              } ${
+                                                                                  patient.last_name ||
+                                                                                  ""
+                                                                              }`}
+                                                                    </SelectItem>
                                                                 )
                                                             )}
-                                                </SelectContent>
-                                            </Select>
-                                            <InputError
-                                                message={errors.patient_id}
-                                                className="mt-2"
-                                            />
-                                        </div>
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError
+                                                    message={errors.patient_id}
+                                                    className="mt-2"
+                                                />
+                                            </div>
 
-                                        {/* Dentist Select */}
+                                            {/* Dentist Select */}
                                             <div className="space-y-2">
-                                            <Label
-                                                htmlFor="dentist_id"
+                                                <Label
+                                                    htmlFor="dentist_id"
                                                     className="font-medium text-gray-700 text-sm"
-                                            >
+                                                >
                                                     Dentist *
-                                            </Label>
-                                            <Select
-                                                onValueChange={(value) =>
+                                                </Label>
+                                                <Select
+                                                    onValueChange={(value) =>
                                                         setData(
                                                             "dentist_id",
                                                             value
                                                         )
-                                                }
-                                                value={data.dentist_id}
-                                            >
+                                                    }
+                                                    value={data.dentist_id}
+                                                >
                                                     <SelectTrigger className="w-full h-10 text-sm">
-                                                    <SelectValue placeholder="Select a dentist" />
-                                                </SelectTrigger>
-                                                <SelectContent>
+                                                        <SelectValue placeholder="Select a dentist" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
                                                         {dentists &&
                                                             dentists.map(
                                                                 (dentist) => (
-                                                        <SelectItem
+                                                                    <SelectItem
                                                                         key={
                                                                             dentist.id
                                                                         }
-                                                            value={dentist.id.toString()}
-                                                        >
+                                                                        value={dentist.id.toString()}
+                                                                    >
                                                                         {
                                                                             dentist.name
                                                                         }
-                                                        </SelectItem>
+                                                                    </SelectItem>
                                                                 )
                                                             )}
-                                                </SelectContent>
-                                            </Select>
-                                            <InputError
-                                                message={errors.dentist_id}
-                                                className="mt-2"
-                                            />
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError
+                                                    message={errors.dentist_id}
+                                                    className="mt-2"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
                                     </CardContent>
                                 </Card>
 
@@ -411,7 +411,7 @@ export default function Create({
                                                         message={errors.name}
                                                         className="mt-2"
                                                     />
-                                </div>
+                                                </div>
 
                                                 {/* Cost */}
                                                 <div className="space-y-3">
@@ -517,67 +517,67 @@ export default function Create({
                                     </CardHeader>
                                     <CardContent className="p-8">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                {/* Related Appointment */}
+                                            {/* Related Appointment */}
                                             <div className="space-y-3">
-                                        <Label
-                                            htmlFor="appointment_id"
+                                                <Label
+                                                    htmlFor="appointment_id"
                                                     className="font-semibold text-gray-700 text-base"
-                                        >
+                                                >
                                                     Related Appointment
-                                        </Label>
-                                        <Select
-                                            onValueChange={(value) =>
+                                                </Label>
+                                                <Select
+                                                    onValueChange={(value) =>
                                                         setData(
                                                             "appointment_id",
                                                             value
                                                         )
-                                            }
-                                            value={data.appointment_id}
-                                        >
+                                                    }
+                                                    value={data.appointment_id}
+                                                >
                                                     <SelectTrigger className="w-full h-10 text-sm">
-                                                <SelectValue placeholder="Select an appointment" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {appointments &&
+                                                        <SelectValue placeholder="Select an appointment" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {appointments &&
                                                             appointments.length >
                                                                 0 &&
-                                                    appointments.map(
+                                                            appointments.map(
                                                                 (
                                                                     appointment
                                                                 ) => (
-                                                            <SelectItem
-                                                                key={
-                                                                    appointment.id
-                                                                }
-                                                                value={appointment.id.toString()}
-                                                            >
-                                                                {format(
-                                                                    new Date(
-                                                                        appointment.scheduled_at
-                                                                    ),
-                                                                    "PPP"
-                                                                )}{" "}
-                                                                -{" "}
-                                                                {appointment
-                                                                    .patient
-                                                                    ?.name ||
-                                                                    "Unknown Patient"}{" "}
-                                                                (
-                                                                {appointment.type ||
-                                                                    "No Type"}
+                                                                    <SelectItem
+                                                                        key={
+                                                                            appointment.id
+                                                                        }
+                                                                        value={appointment.id.toString()}
+                                                                    >
+                                                                        {format(
+                                                                            new Date(
+                                                                                appointment.scheduled_at
+                                                                            ),
+                                                                            "PPP"
+                                                                        )}{" "}
+                                                                        -{" "}
+                                                                        {appointment
+                                                                            .patient
+                                                                            ?.name ||
+                                                                            "Unknown Patient"}{" "}
+                                                                        (
+                                                                        {appointment.type ||
+                                                                            "No Type"}
+                                                                        )
+                                                                    </SelectItem>
                                                                 )
-                                                            </SelectItem>
-                                                        )
-                                                    )}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError
+                                                            )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError
                                                     message={
                                                         errors.appointment_id
                                                     }
-                                            className="mt-2"
-                                        />
-                                    </div>
+                                                    className="mt-2"
+                                                />
+                                            </div>
 
                                             {/* Service Selection */}
                                             <div className="space-y-3">
@@ -660,7 +660,7 @@ export default function Create({
                                                                                 }
                                                                                 min
                                                                             </span>
-                                </div>
+                                                                        </div>
                                                                     </SelectItem>
                                                                 )
                                                             )
@@ -712,55 +712,55 @@ export default function Create({
                                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                                 {/* Allergies */}
                                                 <div className="space-y-3">
-                                            <Label
+                                                    <Label
                                                         htmlFor="allergies"
                                                         className="font-semibold text-gray-700 text-base"
-                                            >
+                                                    >
                                                         Allergies
-                                            </Label>
+                                                    </Label>
                                                     <Textarea
                                                         id="allergies"
                                                         value={
                                                             data.allergies || ""
                                                         }
-                                                onChange={(e) =>
-                                                    setData(
+                                                        onChange={(e) =>
+                                                            setData(
                                                                 "allergies",
-                                                        e.target.value
-                                                    )
-                                                }
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="w-full text-base"
                                                         rows="3"
                                                         placeholder="Enter patient allergies..."
-                                            />
-                                            <InputError
+                                                    />
+                                                    <InputError
                                                         message={
                                                             errors.allergies
                                                         }
-                                                className="mt-2"
-                                            />
-                                        </div>
+                                                        className="mt-2"
+                                                    />
+                                                </div>
 
                                                 {/* Medical History */}
                                                 <div className="space-y-3">
-                                            <Label
+                                                    <Label
                                                         htmlFor="medical_history"
                                                         className="font-semibold text-gray-700 text-base"
-                                            >
+                                                    >
                                                         Medical History
-                                            </Label>
+                                                    </Label>
                                                     <Textarea
                                                         id="medical_history"
                                                         value={
                                                             data.medical_history ||
                                                             ""
                                                         }
-                                                    onChange={(e) =>
-                                                        setData(
+                                                        onChange={(e) =>
+                                                            setData(
                                                                 "medical_history",
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="w-full text-base"
                                                         rows="3"
                                                         placeholder="Enter relevant medical history..."
@@ -770,8 +770,8 @@ export default function Create({
                                                             errors.medical_history
                                                         }
                                                         className="mt-2"
-                                                />
-                                            </div>
+                                                    />
+                                                </div>
                                             </div>
 
                                             {/* Treatment Status */}
@@ -818,27 +818,27 @@ export default function Create({
                                                             </SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                            <InputError
+                                                    <InputError
                                                         message={
                                                             errors.treatment_phase
                                                         }
-                                                className="mt-2"
-                                            />
-                                        </div>
+                                                        className="mt-2"
+                                                    />
+                                                </div>
 
                                                 {/* Outcome */}
                                                 <div className="space-y-3">
-                                            <Label
+                                                    <Label
                                                         htmlFor="outcome"
                                                         className="font-semibold text-gray-700 text-base"
-                                            >
+                                                    >
                                                         Outcome
-                                            </Label>
+                                                    </Label>
                                                     <Select
                                                         onValueChange={(
                                                             value
                                                         ) =>
-                                                    setData(
+                                                            setData(
                                                                 "outcome",
                                                                 value
                                                             )
@@ -908,13 +908,13 @@ export default function Create({
                                                             </SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                            <InputError
+                                                    <InputError
                                                         message={
                                                             errors.payment_status
                                                         }
-                                                className="mt-2"
-                                            />
-                                        </div>
+                                                        className="mt-2"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -1325,36 +1325,36 @@ export default function Create({
 
                                             {/* Follow-up Notes */}
                                             <div className="space-y-3">
-                                            <Label
+                                                <Label
                                                     htmlFor="follow_up_notes"
                                                     className="font-semibold text-gray-700 text-base"
-                                            >
+                                                >
                                                     Follow-up Notes
-                                            </Label>
-                                            <Textarea
+                                                </Label>
+                                                <Textarea
                                                     id="follow_up_notes"
                                                     value={
                                                         data.follow_up_notes ||
                                                         ""
                                                     }
-                                                onChange={(e) =>
-                                                    setData(
+                                                    onChange={(e) =>
+                                                        setData(
                                                             "follow_up_notes",
-                                                        e.target.value
-                                                    )
-                                                }
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     className="w-full text-base"
                                                     rows="3"
                                                     placeholder="Enter follow-up instructions..."
-                                            />
-                                            <InputError
+                                                />
+                                                <InputError
                                                     message={
                                                         errors.follow_up_notes
                                                     }
-                                                className="mt-2"
-                                            />
+                                                    className="mt-2"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
                                     </CardContent>
                                 </Card>
 
@@ -1363,32 +1363,32 @@ export default function Create({
                                     <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200 py-4">
                                         <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                                             <CalendarDays className="h-5 w-5 text-blue-600" />
-                                        Scheduling & Status
+                                            Scheduling & Status
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-8">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                             {/* Status */}
                                             <div className="space-y-3">
-                                            <Label
-                                                htmlFor="status"
+                                                <Label
+                                                    htmlFor="status"
                                                     className="font-semibold text-gray-700 text-base"
-                                            >
-                                                Status
-                                            </Label>
-                                            <Select
-                                                onValueChange={(value) =>
-                                                    setData("status", value)
-                                                }
-                                                value={data.status}
-                                            >
+                                                >
+                                                    Status
+                                                </Label>
+                                                <Select
+                                                    onValueChange={(value) =>
+                                                        setData("status", value)
+                                                    }
+                                                    value={data.status}
+                                                >
                                                     <SelectTrigger className="w-full h-10 text-sm">
-                                                    <SelectValue placeholder="Select status" />
-                                                </SelectTrigger>
-                                                <SelectContent>
+                                                        <SelectValue placeholder="Select status" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
                                                         {statuses.map(
                                                             (status) => (
-                                                        <SelectItem
+                                                                <SelectItem
                                                                     key={
                                                                         status.value
                                                                     }
@@ -1399,96 +1399,96 @@ export default function Create({
                                                                     {
                                                                         status.label
                                                                     }
-                                                        </SelectItem>
+                                                                </SelectItem>
                                                             )
                                                         )}
-                                                </SelectContent>
-                                            </Select>
-                                            <InputError
-                                                message={errors.status}
-                                                className="mt-2"
-                                            />
-                                        </div>
+                                                    </SelectContent>
+                                                </Select>
+                                                <InputError
+                                                    message={errors.status}
+                                                    className="mt-2"
+                                                />
+                                            </div>
 
-                                        {/* Dates */}
+                                            {/* Dates */}
                                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                 <div className="space-y-3">
-                                                <Label
-                                                    htmlFor="start_date"
+                                                    <Label
+                                                        htmlFor="start_date"
                                                         className="font-semibold text-gray-700 text-base"
-                                                >
-                                                    Start Date
-                                                </Label>
-                                                <Input
-                                                    id="start_date"
-                                                    type="date"
-                                                    value={
-                                                        data.start_date
-                                                            ? format(
-                                                                  new Date(
-                                                                      data.start_date
-                                                                  ),
-                                                                  "yyyy-MM-dd"
-                                                              )
-                                                            : ""
-                                                    }
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "start_date",
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                    >
+                                                        Start Date
+                                                    </Label>
+                                                    <Input
+                                                        id="start_date"
+                                                        type="date"
+                                                        value={
+                                                            data.start_date
+                                                                ? format(
+                                                                      new Date(
+                                                                          data.start_date
+                                                                      ),
+                                                                      "yyyy-MM-dd"
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "start_date",
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="w-full h-10 text-sm"
-                                                />
-                                                <InputError
+                                                    />
+                                                    <InputError
                                                         message={
                                                             errors.start_date
                                                         }
-                                                    className="mt-2"
-                                                />
-                                            </div>
+                                                        className="mt-2"
+                                                    />
+                                                </div>
                                                 <div className="space-y-3">
-                                                <Label
-                                                    htmlFor="end_date"
+                                                    <Label
+                                                        htmlFor="end_date"
                                                         className="font-semibold text-gray-700 text-base"
-                                                >
-                                                    End Date
-                                                </Label>
-                                                <Input
-                                                    id="end_date"
-                                                    type="date"
-                                                    value={
-                                                        data.end_date
-                                                            ? format(
-                                                                  new Date(
-                                                                      data.end_date
-                                                                  ),
-                                                                  "yyyy-MM-dd"
-                                                              )
-                                                            : ""
-                                                    }
-                                                    onChange={(e) =>
-                                                        setData(
-                                                            "end_date",
-                                                            e.target.value
-                                                        )
-                                                    }
+                                                    >
+                                                        End Date
+                                                    </Label>
+                                                    <Input
+                                                        id="end_date"
+                                                        type="date"
+                                                        value={
+                                                            data.end_date
+                                                                ? format(
+                                                                      new Date(
+                                                                          data.end_date
+                                                                      ),
+                                                                      "yyyy-MM-dd"
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "end_date",
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="w-full h-10 text-sm"
-                                                />
-                                                <InputError
+                                                    />
+                                                    <InputError
                                                         message={
                                                             errors.end_date
                                                         }
-                                                    className="mt-2"
-                                                />
-                                            </div>
+                                                        className="mt-2"
+                                                    />
+                                                </div>
                                                 <div className="space-y-3">
-                                            <Label
+                                                    <Label
                                                         htmlFor="next_appointment_date"
                                                         className="font-semibold text-gray-700 text-base"
-                                            >
+                                                    >
                                                         Next Appointment
-                                            </Label>
+                                                    </Label>
                                                     <Input
                                                         id="next_appointment_date"
                                                         type="date"
@@ -1502,23 +1502,23 @@ export default function Create({
                                                                   )
                                                                 : ""
                                                         }
-                                                onChange={(e) =>
-                                                    setData(
+                                                        onChange={(e) =>
+                                                            setData(
                                                                 "next_appointment_date",
-                                                        e.target.value
-                                                    )
-                                                }
+                                                                e.target.value
+                                                            )
+                                                        }
                                                         className="w-full h-10 text-sm"
-                                            />
-                                            <InputError
+                                                    />
+                                                    <InputError
                                                         message={
                                                             errors.next_appointment_date
                                                         }
-                                                className="mt-2"
-                                            />
+                                                        className="mt-2"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
                                     </CardContent>
                                 </Card>
 
@@ -1527,98 +1527,98 @@ export default function Create({
                                     <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200 py-4">
                                         <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                                             <ClipboardList className="h-5 w-5 text-blue-600" />
-                                        Procedures Details
+                                            Procedures Details
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-8">
                                         <div className="space-y-4">
                                             {data.procedures_details &&
                                                 data.procedures_details.map(
-                                            (procedure, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border rounded-lg bg-gray-50 relative shadow-sm"
-                                                >
+                                                    (procedure, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border rounded-lg bg-gray-50 relative shadow-sm"
+                                                        >
                                                             <div className="flex-1 space-y-4 w-full">
-                                                        <div>
-                                                            <Label
-                                                                htmlFor={`procedure-step-${index}`}
+                                                                <div>
+                                                                    <Label
+                                                                        htmlFor={`procedure-step-${index}`}
                                                                         className="text-sm font-medium mb-2 block"
-                                                            >
+                                                                    >
                                                                         Step{" "}
                                                                         {index +
                                                                             1}
-                                                            </Label>
-                                                            <Input
-                                                                id={`procedure-step-${index}`}
-                                                                type="text"
-                                                                value={
-                                                                    procedure.step ||
-                                                                    ""
-                                                                }
-                                                                onChange={(
-                                                                    e
-                                                                ) => {
-                                                                    const newProcedures =
-                                                                        [
+                                                                    </Label>
+                                                                    <Input
+                                                                        id={`procedure-step-${index}`}
+                                                                        type="text"
+                                                                        value={
+                                                                            procedure.step ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            const newProcedures =
+                                                                                [
                                                                                     ...(data.procedures_details ||
                                                                                         []),
-                                                                        ];
-                                                                    newProcedures[
-                                                                        index
-                                                                    ].step =
-                                                                        e.target.value;
-                                                                    setData(
-                                                                        "procedures_details",
-                                                                        newProcedures
-                                                                    );
-                                                                }}
-                                                                placeholder="e.g., Dental Cleaning"
+                                                                                ];
+                                                                            newProcedures[
+                                                                                index
+                                                                            ].step =
+                                                                                e.target.value;
+                                                                            setData(
+                                                                                "procedures_details",
+                                                                                newProcedures
+                                                                            );
+                                                                        }}
+                                                                        placeholder="e.g., Dental Cleaning"
                                                                         className="w-full h-12 text-base"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Label
-                                                                htmlFor={`procedure-notes-${index}`}
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <Label
+                                                                        htmlFor={`procedure-notes-${index}`}
                                                                         className="text-sm font-medium mb-2 block"
-                                                            >
-                                                                Notes
-                                                            </Label>
-                                                            <Textarea
-                                                                id={`procedure-notes-${index}`}
-                                                                value={
-                                                                    procedure.notes ||
-                                                                    ""
-                                                                }
-                                                                onChange={(
-                                                                    e
-                                                                ) => {
-                                                                    const newProcedures =
-                                                                        [
+                                                                    >
+                                                                        Notes
+                                                                    </Label>
+                                                                    <Textarea
+                                                                        id={`procedure-notes-${index}`}
+                                                                        value={
+                                                                            procedure.notes ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            const newProcedures =
+                                                                                [
                                                                                     ...(data.procedures_details ||
                                                                                         []),
-                                                                        ];
-                                                                    newProcedures[
-                                                                        index
-                                                                    ].notes =
-                                                                        e.target.value;
-                                                                    setData(
-                                                                        "procedures_details",
-                                                                        newProcedures
-                                                                    );
-                                                                }}
-                                                                placeholder="Detailed notes for this step"
-                                                                rows="3"
+                                                                                ];
+                                                                            newProcedures[
+                                                                                index
+                                                                            ].notes =
+                                                                                e.target.value;
+                                                                            setData(
+                                                                                "procedures_details",
+                                                                                newProcedures
+                                                                            );
+                                                                        }}
+                                                                        placeholder="Detailed notes for this step"
+                                                                        rows="3"
                                                                         className="w-full text-base"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <Button
-                                                        type="button"
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        onClick={() => {
-                                                            const newProcedures =
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="destructive"
+                                                                size="icon"
+                                                                onClick={() => {
+                                                                    const newProcedures =
                                                                         (
                                                                             data.procedures_details ||
                                                                             []
@@ -1627,25 +1627,25 @@ export default function Create({
                                                                                 _,
                                                                                 i
                                                                             ) =>
-                                                                        i !==
-                                                                        index
-                                                                );
-                                                            setData(
-                                                                "procedures_details",
-                                                                newProcedures
-                                                            );
-                                                        }}
+                                                                                i !==
+                                                                                index
+                                                                        );
+                                                                    setData(
+                                                                        "procedures_details",
+                                                                        newProcedures
+                                                                    );
+                                                                }}
                                                                 className="flex-shrink-0 mt-4 sm:mt-0 h-10 w-10 rounded-full"
-                                                    >
+                                                            >
                                                                 <X className="h-5 w-5" />
-                                                    </Button>
-                                                </div>
-                                            )
-                                        )}
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() =>
+                                                            </Button>
+                                                        </div>
+                                                    )
+                                                )}
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() =>
                                                     setData(
                                                         "procedures_details",
                                                         [
@@ -1661,13 +1661,13 @@ export default function Create({
                                                 className="w-full flex items-center justify-center gap-2 text-blue-600 border-blue-200 hover:bg-blue-50 py-3 h-12 text-base"
                                             >
                                                 <PlusCircle className="h-5 w-5" />
-                                            Add Procedure Step
-                                        </Button>
-                                    </div>
-                                    <InputError
-                                        message={errors.procedures_details}
-                                        className="mt-2"
-                                    />
+                                                Add Procedure Step
+                                            </Button>
+                                        </div>
+                                        <InputError
+                                            message={errors.procedures_details}
+                                            className="mt-2"
+                                        />
                                     </CardContent>
                                 </Card>
 
@@ -1676,7 +1676,7 @@ export default function Create({
                                     <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200 py-4">
                                         <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                                             <Image className="h-5 w-5 text-blue-600" />
-                                        Treatment Images
+                                            Treatment Images
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-8">
@@ -1700,11 +1700,11 @@ export default function Create({
                                                     {data.images &&
                                                         data.images.map(
                                                             (url, index) => (
-                                            <div
-                                                key={index}
+                                                                <div
+                                                                    key={index}
                                                                     className="flex gap-2"
                                                                 >
-                                                    <Input
+                                                                    <Input
                                                                         value={
                                                                             url
                                                                         }
@@ -1719,21 +1719,21 @@ export default function Create({
                                                                             newImages[
                                                                                 index
                                                                             ] =
-                                                                e.target.value;
-                                                            setData(
-                                                                "images",
-                                                                newImages
-                                                            );
-                                                        }}
+                                                                                e.target.value;
+                                                                            setData(
+                                                                                "images",
+                                                                                newImages
+                                                                            );
+                                                                        }}
                                                                         placeholder="Enter image URL"
                                                                         className="flex-1"
                                                                     />
-                                                <Button
-                                                    type="button"
+                                                                    <Button
+                                                                        type="button"
                                                                         variant="outline"
                                                                         size="sm"
-                                                    onClick={() => {
-                                                        const newImages =
+                                                                        onClick={() => {
+                                                                            const newImages =
                                                                                 (
                                                                                     data.images ||
                                                                                     []
@@ -1744,40 +1744,40 @@ export default function Create({
                                                                                     ) =>
                                                                                         i !==
                                                                                         index
-                                                            );
-                                                        setData(
-                                                            "images",
-                                                            newImages
-                                                        );
-                                                    }}
-                                                >
+                                                                                );
+                                                                            setData(
+                                                                                "images",
+                                                                                newImages
+                                                                            );
+                                                                        }}
+                                                                    >
                                                                         <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                                                    </Button>
+                                                                </div>
                                                             )
                                                         )}
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() =>
-                                                setData("images", [
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            setData("images", [
                                                                 ...(data.images ||
                                                                     []),
-                                                    "",
-                                                ])
-                                            }
+                                                                "",
+                                                            ])
+                                                        }
                                                         className="flex items-center gap-2"
-                                        >
+                                                    >
                                                         <PlusCircle className="h-4 w-4" />
-                                            Add Image URL
-                                        </Button>
-                                    </div>
+                                                        Add Image URL
+                                                    </Button>
+                                                </div>
                                             )}
 
-                                    <InputError
-                                        message={errors.images}
-                                        className="mt-2"
-                                    />
+                                        <InputError
+                                            message={errors.images}
+                                            className="mt-2"
+                                        />
                                     </CardContent>
                                 </Card>
 
@@ -1791,36 +1791,36 @@ export default function Create({
                                     </CardHeader>
                                     <CardContent className="p-8">
                                         <div className="space-y-8">
-                                {/* Recommendations */}
+                                            {/* Recommendations */}
                                             <div className="space-y-3">
-                                    <Label
-                                        htmlFor="recommendations"
+                                                <Label
+                                                    htmlFor="recommendations"
                                                     className="font-semibold text-gray-700 text-base"
-                                    >
-                                        Recommendations
-                                    </Label>
-                                    <Textarea
-                                        id="recommendations"
+                                                >
+                                                    Recommendations
+                                                </Label>
+                                                <Textarea
+                                                    id="recommendations"
                                                     value={
                                                         data.recommendations ||
                                                         ""
                                                     }
-                                        onChange={(e) =>
-                                            setData(
-                                                "recommendations",
-                                                e.target.value
-                                            )
-                                        }
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "recommendations",
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     className="w-full text-sm"
                                                     rows="4"
-                                        placeholder="Enter post-treatment recommendations..."
-                                    />
-                                    <InputError
+                                                    placeholder="Enter post-treatment recommendations..."
+                                                />
+                                                <InputError
                                                     message={
                                                         errors.recommendations
                                                     }
-                                        className="mt-2"
-                                    />
+                                                    className="mt-2"
+                                                />
                                             </div>
 
                                             {/* Notes */}
@@ -1849,34 +1849,34 @@ export default function Create({
                                                     className="mt-2"
                                                 />
                                             </div>
-                                </div>
-                            </CardContent>
+                                        </div>
+                                    </CardContent>
                                 </Card>
 
                                 {/* Action Buttons */}
                                 <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-                                <Link
-                                    href={route("clinic.treatments.index", {
-                                        clinic: auth.clinic_id,
-                                    })}
+                                    <Link
+                                        href={route("clinic.treatments.index", {
+                                            clinic: auth.clinic_id,
+                                        })}
                                         className="inline-flex items-center px-6 py-3 bg-gray-100 border border-gray-300 rounded-lg font-semibold text-sm text-gray-700 uppercase tracking-wider shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition ease-in-out duration-150"
-                                >
+                                    >
                                         <ArrowLeft className="h-4 w-4 mr-2" />
-                                    Cancel
-                                </Link>
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
+                                        Cancel
+                                    </Link>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
                                         className="inline-flex items-center px-8 py-3 bg-blue-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-wider shadow-md hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                                >
-                                    {processing && (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    )}
+                                    >
+                                        {processing && (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        )}
                                         <Save className="h-4 w-4 mr-2" />
-                                    Create Treatment
-                                </Button>
-                            </div>
-                        </form>
+                                        Create Treatment
+                                    </Button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
