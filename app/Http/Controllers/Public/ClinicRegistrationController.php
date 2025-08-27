@@ -41,8 +41,20 @@ class ClinicRegistrationController extends Controller
                     }
                 }
             ],
-            'phone' => 'required|string|max:20',
-            'license_number' => 'required|string|max:50',
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^(\+63|0)9\d{9}$/', // Philippine mobile format
+            ],
+            'license_number' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[A-Z0-9-]+$/', // Only letters, numbers, and hyphens
+                'unique:clinics,license_number',
+                'unique:clinic_registration_requests,license_number'
+            ],
             'description' => 'nullable|string',
             'message' => 'nullable|string',
             'subscription_plan' => 'required|string|in:basic,premium,enterprise',

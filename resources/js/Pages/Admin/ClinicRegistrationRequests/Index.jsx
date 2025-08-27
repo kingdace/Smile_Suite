@@ -210,10 +210,12 @@ export default function Index({ auth, requests, filters }) {
     const getPaymentStatusBadge = (status) => {
         const variants = {
             pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+            pending_verification:
+                "bg-orange-100 text-orange-700 border-orange-200",
             paid: "bg-green-100 text-green-700 border-green-200",
             trial: "bg-blue-100 text-blue-700 border-blue-200",
             failed: "bg-red-100 text-red-700 border-red-200",
-            payment_failed: "bg-orange-100 text-orange-700 border-orange-200",
+            payment_failed: "bg-red-100 text-red-700 border-red-200",
         };
         return (
             <Badge
@@ -222,7 +224,11 @@ export default function Index({ auth, requests, filters }) {
                     "bg-gray-100 text-gray-700 border-gray-200"
                 } text-xs font-medium px-2 py-1`}
             >
-                {status === "trial" ? "Free Trial" : status}
+                {status === "trial"
+                    ? "Free Trial"
+                    : status === "pending_verification"
+                    ? "Pending Verification"
+                    : status}
             </Badge>
         );
     };

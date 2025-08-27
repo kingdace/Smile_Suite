@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Clinic;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
+use App\Models\Patient;
+use App\Models\Treatment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\Clinic;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
@@ -18,15 +22,25 @@ class PaymentController extends Controller
 
     public function index(Request $request, Clinic $clinic)
     {
-        $query = $clinic->payments()->with(['patient', 'treatment']);
+        $query = $clinic->payments()->with(['patient', 'treatment', 'receivedBy']);
 
+        // Advanced search functionality
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('reference_number', 'like', "%{$request->search}%")
-                    ->orWhere('notes', 'like', "%{$request->search}%");
+                    ->orWhere('notes', 'like', "%{$request->search}%")
+                    ->orWhere('transaction_id', 'like', "%{$request->search}%")
+                    ->orWhereHas('patient', function ($patientQuery) use ($request) {
+                        $patientQuery->where('first_name', 'like', "%{$request->search}%")
+                                    ->orWhere('last_name', 'like', "%{$request->search}%");
+                    })
+                    ->orWhereHas('treatment', function ($treatmentQuery) use ($request) {
+                        $treatmentQuery->where('name', 'like', "%{$request->search}%");
+                    });
             });
         }
 
+        // Advanced filtering
         if ($request->status) {
             $query->where('status', $request->status);
         }
@@ -35,7 +49,43 @@ class PaymentController extends Controller
             $query->where('payment_method', $request->payment_method);
         }
 
-        $payments = $query->latest()->paginate(10);
+        if ($request->category) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->patient_id) {
+            $query->where('patient_id', $request->patient_id);
+        }
+
+        if ($request->treatment_id) {
+            $query->where('treatment_id', $request->treatment_id);
+        }
+
+        if ($request->date_from && $request->date_to) {
+            $query->whereBetween('payment_date', [$request->date_from, $request->date_to]);
+        } elseif ($request->date_from) {
+            $query->where('payment_date', '>=', $request->date_from);
+        } elseif ($request->date_to) {
+            $query->where('payment_date', '<=', $request->date_to);
+        }
+
+        if ($request->amount_min) {
+            $query->where('amount', '>=', $request->amount_min);
+        }
+
+        if ($request->amount_max) {
+            $query->where('amount', '<=', $request->amount_max);
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort_by', 'payment_date');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $query->orderBy($sortBy, $sortDirection);
+
+        $payments = $query->paginate($request->get('per_page', 15));
+
+        // Enhanced summary data
+        $summary = $this->getPaymentSummary($clinic->id, $request);
 
         // Fetch patients and treatments for the modal dropdowns
         $patients = $clinic->patients()
@@ -47,26 +97,27 @@ class PaymentController extends Controller
             });
         $treatments = $clinic->treatments()->select('id', 'name')->get();
 
-        // Summary data
-        $total_revenue = $clinic->payments()->where('status', 'completed')->sum('amount');
-        $total_balance = $clinic->patients()->sum('balance'); // Assuming you have a balance field on patients
-        $payments_this_month = $clinic->payments()->where('status', 'completed')
-            ->whereMonth('payment_date', now()->month)
-            ->whereYear('payment_date', now()->year)
-            ->sum('amount');
-        $pending_payments = $clinic->payments()->where('status', 'pending')->sum('amount');
+        // Get payment methods and categories for filters
+        $paymentMethods = Payment::where('clinic_id', $clinic->id)
+            ->distinct()
+            ->pluck('payment_method')
+            ->filter()
+            ->values();
+
+        $categories = Payment::where('clinic_id', $clinic->id)
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->values();
 
         return Inertia::render('Clinic/Payments/Index', [
             'payments' => $payments,
-            'filters' => $request->only(['search', 'status', 'payment_method']),
-            'summary' => [
-                'total_revenue' => $total_revenue,
-                'total_balance' => $total_balance,
-                'payments_this_month' => $payments_this_month,
-                'pending_payments' => $pending_payments,
-            ],
+            'filters' => $request->only(['search', 'status', 'payment_method', 'category', 'patient_id', 'treatment_id', 'date_from', 'date_to', 'amount_min', 'amount_max', 'sort_by', 'sort_direction', 'per_page']),
+            'summary' => $summary,
             'patients' => $patients,
             'treatments' => $treatments,
+            'paymentMethods' => $paymentMethods,
+            'categories' => $categories,
         ]);
     }
 
@@ -89,6 +140,7 @@ class PaymentController extends Controller
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'clinic_id' => $clinic->id,
+                'clinic' => $clinic,
             ],
         ]);
     }
@@ -100,11 +152,17 @@ class PaymentController extends Controller
             'treatment_id' => 'nullable|exists:treatments,id',
             'amount' => 'required|numeric|min:0',
             'payment_date' => 'required|date',
-            'payment_method' => 'required|string|in:cash,credit_card,debit_card,insurance,other',
-            'status' => 'required|string|in:pending,completed,failed,refunded',
+            'payment_method' => 'required|string|in:cash,credit_card,debit_card,insurance,gcash,bank_transfer,check,other',
+            'status' => 'required|string|in:pending,completed,failed,refunded,cancelled',
             'reference_number' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
+            'category' => 'nullable|string|in:consultation,treatment,medication,laboratory,imaging,surgery,emergency,other',
+            'currency' => 'nullable|string|max:3',
+            'gcash_reference' => 'nullable|string|max:255',
         ]);
+
+        $validated['received_by'] = Auth::id();
+        $validated['currency'] = $validated['currency'] ?? 'PHP';
 
         $payment = $clinic->payments()->create($validated);
 
@@ -121,10 +179,21 @@ class PaymentController extends Controller
     public function show(Clinic $clinic, Payment $payment)
     {
         $this->authorize('view', $payment);
-        $payment->load(['patient', 'treatment']);
+        $payment->load(['patient', 'treatment', 'receivedBy']);
+
+        // Get related payments for this patient
+        $relatedPayments = $clinic->payments()
+            ->where('patient_id', $payment->patient_id)
+            ->where('id', '!=', $payment->id)
+            ->with(['treatment'])
+            ->latest()
+            ->take(5)
+            ->get();
+
         return Inertia::render('Clinic/Payments/Show', [
             'clinic' => $clinic,
             'payment' => $payment,
+            'relatedPayments' => $relatedPayments,
             'auth' => [
                 'id' => Auth::id(),
                 'name' => Auth::user()->name,
@@ -168,12 +237,18 @@ class PaymentController extends Controller
             'treatment_id' => 'nullable|exists:treatments,id',
             'amount' => 'required|numeric|min:0',
             'payment_date' => 'required|date',
-            'payment_method' => 'required|string|in:cash,credit_card,debit_card,insurance,other',
-            'status' => 'required|string|in:pending,completed,failed,refunded',
+            'payment_method' => 'required|string|in:cash,credit_card,debit_card,insurance,gcash,bank_transfer,check,other',
+            'status' => 'required|string|in:pending,completed,failed,refunded,cancelled',
             'reference_number' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
+            'category' => 'nullable|string|in:consultation,treatment,medication,laboratory,imaging,surgery,emergency,other',
+            'currency' => 'nullable|string|max:3',
+            'gcash_reference' => 'nullable|string|max:255',
         ]);
+
+        $validated['currency'] = $validated['currency'] ?? 'PHP';
         $payment->update($validated);
+
         return redirect()->route('clinic.payments.show', [$clinic->id, $payment->id])
             ->with('success', 'Payment updated successfully.');
     }
@@ -186,18 +261,239 @@ class PaymentController extends Controller
             ->with('success', 'Payment deleted successfully.');
     }
 
+    public function bulkDestroy(Request $request, Clinic $clinic)
+    {
+        $this->authorize('deleteAny', Payment::class);
+
+        $validated = $request->validate([
+            'payment_ids' => 'required|array',
+            'payment_ids.*' => 'exists:payments,id'
+        ]);
+
+        $payments = Payment::whereIn('id', $validated['payment_ids'])
+            ->where('clinic_id', $clinic->id)
+            ->get();
+
+        foreach ($payments as $payment) {
+            $this->authorize('delete', $payment);
+            $payment->delete();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => count($payments) . ' payment(s) deleted successfully.'
+            ]);
+        }
+
+        return redirect()->route('clinic.payments.index', [$clinic->id])
+            ->with('success', count($payments) . ' payment(s) deleted successfully.');
+    }
+
+    public function bulkUpdate(Request $request, Clinic $clinic)
+    {
+        $this->authorize('updateAny', Payment::class);
+
+        $validated = $request->validate([
+            'payment_ids' => 'required|array',
+            'payment_ids.*' => 'exists:payments,id',
+            'status' => 'required|string|in:pending,completed,failed,refunded,cancelled',
+        ]);
+
+        $payments = Payment::whereIn('id', $validated['payment_ids'])
+            ->where('clinic_id', $clinic->id)
+            ->get();
+
+        foreach ($payments as $payment) {
+            $this->authorize('update', $payment);
+            $payment->update(['status' => $validated['status']]);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => count($payments) . ' payment(s) updated successfully.'
+            ]);
+        }
+
+        return redirect()->route('clinic.payments.index', [$clinic->id])
+            ->with('success', count($payments) . ' payment(s) updated successfully.');
+    }
+
+    public function statistics(Request $request, Clinic $clinic)
+    {
+        $dateFrom = $request->get('date_from', now()->subDays(30)->format('Y-m-d'));
+        $dateTo = $request->get('date_to', now()->format('Y-m-d'));
+
+        $statistics = [
+            'total_payments' => $clinic->payments()
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->count(),
+            'total_revenue' => $clinic->payments()
+                ->where('status', Payment::STATUS_COMPLETED)
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->sum('amount'),
+            'pending_amount' => $clinic->payments()
+                ->where('status', Payment::STATUS_PENDING)
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->sum('amount'),
+            'failed_amount' => $clinic->payments()
+                ->where('status', Payment::STATUS_FAILED)
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->sum('amount'),
+            'refunded_amount' => $clinic->payments()
+                ->where('status', Payment::STATUS_REFUNDED)
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->sum('amount'),
+            'payment_methods_distribution' => Payment::getPaymentMethodsDistribution($clinic->id, $dateFrom, $dateTo),
+            'categories_distribution' => Payment::getCategoriesDistribution($clinic->id, $dateFrom, $dateTo),
+            'top_patients' => Payment::getTopPatients($clinic->id, 5, $dateFrom, $dateTo),
+            'payment_trends' => Payment::getPaymentTrends($clinic->id, 30),
+            'daily_average' => $clinic->payments()
+                ->where('status', Payment::STATUS_COMPLETED)
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->avg('amount'),
+            'largest_payment' => $clinic->payments()
+                ->where('status', Payment::STATUS_COMPLETED)
+                ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                ->max('amount'),
+        ];
+
+        return response()->json($statistics);
+    }
+
+    public function export(Request $request, Clinic $clinic)
+    {
+        $query = $clinic->payments()->with(['patient', 'treatment']);
+
+        // Apply filters
+        if ($request->date_from && $request->date_to) {
+            $query->whereBetween('payment_date', [$request->date_from, $request->date_to]);
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->payment_method) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        $payments = $query->get();
+
+        $filename = 'payments_' . $clinic->id . '_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($payments) {
+            $file = fopen('php://output', 'w');
+
+            // CSV headers
+            fputcsv($file, [
+                'ID', 'Reference Number', 'Patient Name', 'Treatment', 'Amount',
+                'Payment Method', 'Status', 'Category', 'Payment Date', 'Notes'
+            ]);
+
+            foreach ($payments as $payment) {
+                fputcsv($file, [
+                    $payment->id,
+                    $payment->reference_number,
+                    $payment->patient ? $payment->patient->first_name . ' ' . $payment->patient->last_name : 'N/A',
+                    $payment->treatment ? $payment->treatment->name : 'N/A',
+                    $payment->amount,
+                    $payment->payment_method,
+                    $payment->status,
+                    $payment->category,
+                    $payment->payment_date,
+                    $payment->notes,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function receipt(Clinic $clinic, Payment $payment)
     {
-        $payment->load(['patient', 'treatment']);
-        $clinicInfo = [
-            'name' => $clinic->name,
-            'address' => $clinic->address ?? '123 Smile St, City',
-            'phone' => $clinic->phone ?? '(123) 456-7890',
-            'logo_url' => asset('images/clinic-logo.png'), // You can update this path
-        ];
+        $this->authorize('view', $payment);
+        $payment->load(['patient', 'treatment', 'receivedBy']);
+
         return Inertia::render('Clinic/Payments/Receipt', [
-            'clinic' => $clinicInfo,
+            'clinic' => $clinic,
             'payment' => $payment,
         ]);
+    }
+
+    public function refund(Request $request, Clinic $clinic, Payment $payment)
+    {
+        $this->authorize('update', $payment);
+
+        if (!$payment->canBeRefunded()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This payment cannot be refunded.'
+            ], 400);
+        }
+
+        $validated = $request->validate([
+            'refund_amount' => 'required|numeric|min:0|max:' . $payment->amount,
+            'refund_reason' => 'required|string|max:500',
+        ]);
+
+        DB::transaction(function () use ($payment, $validated) {
+            // Create refund payment record
+            $refundPayment = $payment->clinic->payments()->create([
+                'patient_id' => $payment->patient_id,
+                'treatment_id' => $payment->treatment_id,
+                'amount' => $validated['refund_amount'],
+                'payment_method' => $payment->payment_method,
+                'status' => Payment::STATUS_REFUNDED,
+                'payment_date' => now(),
+                'notes' => 'Refund: ' . $validated['refund_reason'] . ' (Original Payment: ' . $payment->reference_number . ')',
+                'reference_number' => 'REF-' . now()->format('Ymd') . '-' . str_pad($payment->id, 4, '0', STR_PAD_LEFT),
+                'received_by' => Auth::id(),
+                'currency' => $payment->currency,
+            ]);
+
+            // Update original payment status if full refund
+            if ($validated['refund_amount'] >= $payment->amount) {
+                $payment->update(['status' => Payment::STATUS_REFUNDED]);
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Refund processed successfully.'
+        ]);
+    }
+
+    private function getPaymentSummary($clinicId, Request $request)
+    {
+        $query = Payment::where('clinic_id', $clinicId);
+
+        // Apply date filters if provided
+        if ($request->date_from && $request->date_to) {
+            $query->whereBetween('payment_date', [$request->date_from, $request->date_to]);
+        }
+
+        $total_revenue = (clone $query)->where('status', Payment::STATUS_COMPLETED)->sum('amount');
+        $total_balance = Patient::where('clinic_id', $clinicId)->sum('balance') ?? 0;
+        $payments_this_month = (clone $query)->where('status', Payment::STATUS_COMPLETED)
+            ->whereMonth('payment_date', now()->month)
+            ->whereYear('payment_date', now()->year)
+            ->sum('amount');
+        $pending_payments = (clone $query)->where('status', Payment::STATUS_PENDING)->sum('amount');
+
+        return [
+            'total_revenue' => $total_revenue,
+            'total_balance' => $total_balance,
+            'payments_this_month' => $payments_this_month,
+            'pending_payments' => $pending_payments,
+        ];
     }
 }

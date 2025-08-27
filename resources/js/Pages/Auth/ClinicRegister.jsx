@@ -265,7 +265,7 @@ export default function ClinicRegister() {
                                     <div>
                                         <Label
                                             htmlFor="clinic_name"
-                                            className="text-sm font-semibold text-gray-900 mb-2 block"
+                                            className="text-base font-semibold text-gray-900 mb-3 block"
                                         >
                                             Clinic Name{" "}
                                             <span className="text-red-500">
@@ -282,7 +282,7 @@ export default function ClinicRegister() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="h-10 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-sm shadow-sm hover:shadow-md transition-all duration-200 bg-white"
+                                            className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-base"
                                             required
                                         />
                                         {errors.clinic_name && (
@@ -368,6 +368,9 @@ export default function ClinicRegister() {
                                             className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-base"
                                             required
                                         />
+                                        <p className="text-sm text-gray-600 mt-2">
+                                            Format: +639XXXXXXXXX or 09XXXXXXXXX
+                                        </p>
                                         {errors.phone && (
                                             <p className="text-sm text-red-600 mt-2">
                                                 {errors.phone}
@@ -396,6 +399,10 @@ export default function ClinicRegister() {
                                         className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-base"
                                         required
                                     />
+                                    <p className="text-sm text-gray-600 mt-2">
+                                        Format: Letters, numbers, and hyphens
+                                        only (e.g., DENT-123456)
+                                    </p>
                                     {errors.license_number && (
                                         <p className="text-sm text-red-600 mt-2">
                                             {errors.license_number}

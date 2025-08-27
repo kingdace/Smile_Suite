@@ -373,10 +373,13 @@ export default function ClinicSetup({ request, token }) {
                                                 ? "Basic Plan (14-Day Free Trial)"
                                                 : request.subscription_plan ===
                                                   "pro"
-                                                ? "Pro Plan"
+                                                ? "Premium Plan"
                                                 : request.subscription_plan ===
                                                   "enterprise"
                                                 ? "Enterprise Plan"
+                                                : request.subscription_plan ===
+                                                  "premium"
+                                                ? "Premium"
                                                 : request.subscription_plan_name}{" "}
                                             Plan
                                         </h3>
@@ -390,7 +393,7 @@ export default function ClinicSetup({ request, token }) {
                                                     , then ₱999/month
                                                 </>
                                             ) : request.subscription_plan ===
-                                              "pro" ? (
+                                              "premium" ? (
                                                 <>
                                                     Monthly subscription:{" "}
                                                     <strong>₱1,999</strong>
@@ -399,7 +402,7 @@ export default function ClinicSetup({ request, token }) {
                                               "enterprise" ? (
                                                 <>
                                                     Monthly subscription:{" "}
-                                                    <strong>₱4,999</strong>
+                                                    <strong>₱2,999</strong>
                                                 </>
                                             ) : (
                                                 <>

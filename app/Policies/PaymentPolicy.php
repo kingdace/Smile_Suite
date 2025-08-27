@@ -34,4 +34,30 @@ class PaymentPolicy
     {
         return $user->clinic->id === $payment->clinic_id;
     }
+
+    public function deleteAny(User $user): bool
+    {
+        return $user->role === 'clinic_admin' || $user->role === 'admin';
+    }
+
+    public function updateAny(User $user): bool
+    {
+        return $user->role === 'clinic_admin' || $user->role === 'admin';
+    }
+
+    public function refund(User $user, Payment $payment): bool
+    {
+        return $user->clinic->id === $payment->clinic_id &&
+               ($user->role === 'clinic_admin' || $user->role === 'admin');
+    }
+
+    public function export(User $user): bool
+    {
+        return true;
+    }
+
+    public function viewStatistics(User $user): bool
+    {
+        return true;
+    }
 }

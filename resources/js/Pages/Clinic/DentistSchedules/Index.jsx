@@ -310,7 +310,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
         <AuthenticatedLayout auth={auth}>
             <Head title="Dentist Schedule Management" />
 
-            <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+            <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
                 <div className="max-w-7xl mx-auto px-6 py-8">
                     {/* Enhanced Header */}
                     <div className="mb-8">

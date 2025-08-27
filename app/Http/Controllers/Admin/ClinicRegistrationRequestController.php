@@ -218,7 +218,7 @@ class ClinicRegistrationRequestController extends Controller
         $newPaymentStatus = $request->input('payment_status');
 
         // Validate the payment status
-        if (!in_array($newPaymentStatus, ['pending', 'paid', 'failed', 'payment_failed', 'trial'])) {
+        if (!in_array($newPaymentStatus, ['pending', 'pending_verification', 'paid', 'failed', 'payment_failed', 'trial'])) {
             Log::error('Invalid payment status provided', ['status' => $newPaymentStatus]);
             return back()->with('error', 'Invalid payment status provided.');
         }
@@ -257,6 +257,37 @@ class ClinicRegistrationRequestController extends Controller
         }
 
         return back()->with('success', 'Payment status updated successfully.');
+    }
+
+    /**
+     * Verify payment and mark as paid
+     */
+    public function verifyPayment(Request $request, ClinicRegistrationRequest $registrationRequest)
+    {
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->route('dashboard');
+        }
+
+        try {
+            // Use the subscription service to verify payment
+            $subscriptionService = app(\App\Services\SubscriptionService::class);
+            $result = $subscriptionService->verifyPayment($registrationRequest->id);
+
+            if ($result) {
+                Log::info('Payment verified by admin', [
+                    'request_id' => $registrationRequest->id,
+                    'admin_user' => Auth::user()->email,
+                    'clinic_name' => $registrationRequest->clinic_name,
+                ]);
+
+                return back()->with('success', 'Payment verified successfully! Setup email sent to ' . $registrationRequest->email);
+            } else {
+                return back()->with('error', 'Failed to verify payment. Please try again.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Payment verification failed: ' . $e->getMessage());
+            return back()->with('error', 'Payment verification failed: ' . $e->getMessage());
+        }
     }
 
     public function retryPayment(ClinicRegistrationRequest $registrationRequest)

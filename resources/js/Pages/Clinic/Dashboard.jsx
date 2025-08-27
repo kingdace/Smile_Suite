@@ -154,33 +154,34 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center gap-3">
                                 <Button
-                                    variant="secondary"
                                     size="sm"
                                     asChild
-                                    className="gap-2 bg-white/25 text-white border-white/40 hover:bg-white/35 backdrop-blur-sm text-sm px-4 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                                    className="gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm text-sm px-4 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
                                     <Link
-                                        href={route(
-                                            "clinic.dashboard.enhanced",
-                                            { clinic: clinic.id }
-                                        )}
+                                        href={route("clinic.reports.index", {
+                                            clinic: clinic.id,
+                                        })}
                                     >
-                                        <Activity className="h-4 w-4" />
-                                        Enhanced Dashboard
+                                        <BarChart3 className="h-4 w-4" />
+                                        View Reports
                                     </Link>
                                 </Button>
                                 <Button
                                     size="sm"
                                     asChild
-                                    className="gap-2 bg-white text-blue-600 hover:bg-blue-50 text-sm px-4 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                                    className="gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm text-sm px-4 py-2.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
                                     <Link
-                                        href={route("clinic.patients.create", {
-                                            clinic: clinic.id,
-                                        })}
+                                        href={route(
+                                            "clinic.appointments.calendar",
+                                            {
+                                                clinic: clinic.id,
+                                            }
+                                        )}
                                     >
-                                        <Plus className="h-4 w-4" />
-                                        Add Patient
+                                        <Calendar className="h-4 w-4" />
+                                        Calendar View
                                     </Link>
                                 </Button>
                             </div>
@@ -191,23 +192,23 @@ export default function Dashboard({
                 <div className="max-w-7xl mx-auto px-6 pt-8 pb-12">
                     {/* Enhanced Key Metrics Row */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <Card className="group border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-10 translate-x-10 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <Card className="group border-0 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-20 group-hover:opacity-30 transition-opacity"></div>
                             <CardContent className="p-6 relative">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
                                         <Users className="h-7 w-7 text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600 font-medium">
+                                        <p className="text-sm text-slate-600 font-medium">
                                             Patients Today
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900">
+                                        <p className="text-3xl font-bold text-slate-800">
                                             {today_appointments?.length || 0}
                                         </p>
                                         <div className="flex items-center gap-1 mt-1">
                                             <TrendingUp className="h-3 w-3 text-green-500" />
-                                            <span className="text-xs text-green-600">
+                                            <span className="text-xs text-green-600 font-medium">
                                                 +12% from yesterday
                                             </span>
                                         </div>
@@ -216,23 +217,23 @@ export default function Dashboard({
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full -translate-y-10 translate-x-10 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <Card className="group border-0 shadow-xl bg-gradient-to-br from-emerald-50 to-green-50 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full -translate-y-12 translate-x-12 opacity-20 group-hover:opacity-30 transition-opacity"></div>
                             <CardContent className="p-6 relative">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
                                         <Users className="h-7 w-7 text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600 font-medium">
+                                        <p className="text-sm text-slate-600 font-medium">
                                             Total Patients
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900">
+                                        <p className="text-3xl font-bold text-slate-800">
                                             {stats?.total_patients || 0}
                                         </p>
                                         <div className="flex items-center gap-1 mt-1">
                                             <TrendingUp className="h-3 w-3 text-green-500" />
-                                            <span className="text-xs text-green-600">
+                                            <span className="text-xs text-green-600 font-medium">
                                                 +8% this month
                                             </span>
                                         </div>
@@ -241,23 +242,23 @@ export default function Dashboard({
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full -translate-y-10 translate-x-10 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <Card className="group border-0 shadow-xl bg-gradient-to-br from-purple-50 to-indigo-50 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full -translate-y-12 translate-x-12 opacity-20 group-hover:opacity-30 transition-opacity"></div>
                             <CardContent className="p-6 relative">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
                                         <Stethoscope className="h-7 w-7 text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600 font-medium">
+                                        <p className="text-sm text-slate-600 font-medium">
                                             Today's Treatments
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900">
+                                        <p className="text-3xl font-bold text-slate-800">
                                             {todayTreatments?.length || 0}
                                         </p>
                                         <div className="flex items-center gap-1 mt-1">
                                             <TrendingUp className="h-3 w-3 text-green-500" />
-                                            <span className="text-xs text-green-600">
+                                            <span className="text-xs text-green-600 font-medium">
                                                 +15% from yesterday
                                             </span>
                                         </div>
@@ -266,23 +267,23 @@ export default function Dashboard({
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full -translate-y-10 translate-x-10 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <Card className="group border-0 shadow-xl bg-gradient-to-br from-orange-50 to-red-50 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full -translate-y-12 translate-x-12 opacity-20 group-hover:opacity-30 transition-opacity"></div>
                             <CardContent className="p-6 relative">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
                                         <FileText className="h-7 w-7 text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600 font-medium">
+                                        <p className="text-sm text-slate-600 font-medium">
                                             Pending Requests
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900">
+                                        <p className="text-3xl font-bold text-slate-800">
                                             0
                                         </p>
                                         <div className="flex items-center gap-1 mt-1">
                                             <TrendingDown className="h-3 w-3 text-red-500" />
-                                            <span className="text-xs text-red-600">
+                                            <span className="text-xs text-red-600 font-medium">
                                                 -5% from yesterday
                                             </span>
                                         </div>
@@ -782,97 +783,155 @@ export default function Dashboard({
                         {/* Right Column - Quick Actions & Latest Patients */}
                         <div className="space-y-6">
                             {/* Quick Actions */}
-                            <Card className="border-0 shadow-sm bg-white">
-                                <CardHeader className="pb-4">
+                            <Card className="border-0 shadow-xl bg-gradient-to-br from-purple-50 to-indigo-50 overflow-hidden">
+                                <CardHeader className="pb-4 bg-gradient-to-r from-cyan-700 to-indigo-700 text-white">
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-purple-100 rounded-lg">
-                                            <Zap className="h-5 w-5 text-purple-600" />
+                                        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                                            <Zap className="h-6 w-6 text-white" />
                                         </div>
                                         <div>
-                                            <CardTitle className="text-lg">
+                                            <CardTitle className="text-xl text-white">
                                                 Quick Actions
                                             </CardTitle>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-purple-100">
                                                 Common tasks and shortcuts
                                             </p>
                                         </div>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <Button
-                                        asChild
-                                        className="w-full justify-start gap-3 h-12 bg-blue-600 hover:bg-blue-700 text-white"
-                                    >
-                                        <Link
-                                            href={route(
-                                                "clinic.patients.create",
-                                                { clinic: clinic.id }
-                                            )}
+                                <CardContent className="p-6 space-y-4">
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <Button
+                                            asChild
+                                            className="w-full justify-start gap-3 h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                                         >
-                                            <UserCheck className="h-4 w-4" />
-                                            Add New Patient
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        asChild
-                                        variant="outline"
-                                        className="w-full justify-start gap-3 h-12"
-                                    >
-                                        <Link
-                                            href={route(
-                                                "clinic.appointments.create-simplified",
-                                                { clinic: clinic.id }
-                                            )}
+                                            <Link
+                                                href={route(
+                                                    "clinic.patients.create",
+                                                    { clinic: clinic.id }
+                                                )}
+                                            >
+                                                <UserCheck className="h-5 w-5" />
+                                                <div className="text-left">
+                                                    <div className="font-semibold">
+                                                        Add New Patient
+                                                    </div>
+                                                    <div className="text-xs opacity-90">
+                                                        Register a new patient
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            className="w-full justify-start gap-3 h-14 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                                         >
-                                            <Calendar className="h-4 w-4" />
-                                            Schedule Appointment
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        asChild
-                                        variant="outline"
-                                        className="w-full justify-start gap-3 h-12"
-                                    >
-                                        <Link
-                                            href={route(
-                                                "clinic.treatments.create",
-                                                { clinic: clinic.id }
-                                            )}
+                                            <Link
+                                                href={route(
+                                                    "clinic.appointments.create-simplified",
+                                                    { clinic: clinic.id }
+                                                )}
+                                            >
+                                                <Calendar className="h-5 w-5" />
+                                                <div className="text-left">
+                                                    <div className="font-semibold">
+                                                        Schedule Appointment
+                                                    </div>
+                                                    <div className="text-xs opacity-90">
+                                                        Book a new appointment
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            className="w-full justify-start gap-3 h-14 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                                         >
-                                            <Stethoscope className="h-4 w-4" />
-                                            Record Treatment
-                                        </Link>
-                                    </Button>
-                                    <Button
-                                        asChild
-                                        variant="outline"
-                                        className="w-full justify-start gap-3 h-12"
-                                    >
-                                        <Link
-                                            href={route(
-                                                "clinic.inventory.create",
-                                                { clinic: clinic.id }
-                                            )}
+                                            <Link
+                                                href={route(
+                                                    "clinic.treatments.create",
+                                                    { clinic: clinic.id }
+                                                )}
+                                            >
+                                                <Stethoscope className="h-5 w-5" />
+                                                <div className="text-left">
+                                                    <div className="font-semibold">
+                                                        Record Treatment
+                                                    </div>
+                                                    <div className="text-xs opacity-90">
+                                                        Log a new treatment
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            className="w-full justify-start gap-3 h-14 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                                         >
-                                            <Package className="h-4 w-4" />
-                                            Add Inventory
-                                        </Link>
-                                    </Button>
+                                            <Link
+                                                href={route(
+                                                    "clinic.inventory.create",
+                                                    { clinic: clinic.id }
+                                                )}
+                                            >
+                                                <Package className="h-5 w-5" />
+                                                <div className="text-left">
+                                                    <div className="font-semibold">
+                                                        Add Inventory
+                                                    </div>
+                                                    <div className="text-xs opacity-90">
+                                                        Add new stock items
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            className="w-full justify-start gap-3 h-14 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                                        >
+                                            <Link
+                                                href={route(
+                                                    "clinic.payments.create",
+                                                    { clinic: clinic.id }
+                                                )}
+                                            >
+                                                <DollarSign className="h-5 w-5" />
+                                                <div className="text-left">
+                                                    <div className="font-semibold">
+                                                        Record Payment
+                                                    </div>
+                                                    <div className="text-xs opacity-90">
+                                                        Process a payment
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </Button>
+                                    </div>
                                 </CardContent>
                             </Card>
 
                             {/* Latest Patients */}
-                            <Card className="border-0 shadow-sm bg-white">
-                                <CardHeader className="pb-4">
+                            <Card className="border-0 shadow-xl bg-gradient-to-br from-emerald-50 to-green-50 overflow-hidden">
+                                <CardHeader className="pb-4 bg-gradient-to-r from-emerald-600 to-green-600 text-white">
                                     <div className="flex items-center justify-between">
-                                        <CardTitle className="text-lg">
-                                            Latest Patients
-                                        </CardTitle>
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                                <Users className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-lg text-white">
+                                                    Latest Patients
+                                                </CardTitle>
+                                                <p className="text-emerald-100 text-sm">
+                                                    Recently registered patients
+                                                </p>
+                                            </div>
+                                        </div>
                                         <Button
                                             asChild
                                             variant="ghost"
                                             size="sm"
-                                            className="text-emerald-600 hover:text-emerald-700"
+                                            className="text-white hover:bg-white/20"
                                         >
                                             <Link
                                                 href={route(
@@ -895,11 +954,11 @@ export default function Dashboard({
                                                 .map((patient, index) => (
                                                     <div
                                                         key={patient.id}
-                                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                        className="flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-emerald-100 hover:border-emerald-200 hover:bg-white/90 transition-all duration-300 shadow-sm hover:shadow-md"
                                                     >
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
-                                                                <span className="text-xs font-semibold text-emerald-600">
+                                                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                                                                <span className="text-sm font-bold text-white">
                                                                     {(
                                                                         patient.first_name ||
                                                                         "P"

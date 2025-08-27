@@ -32,6 +32,7 @@ class ClinicRegistrationRequest extends Model
         'payment_duration_days',
         'stripe_customer_id',
         'stripe_payment_intent_id',
+        'payment_details',
         'deleted_at',
     ];
 
@@ -40,6 +41,7 @@ class ClinicRegistrationRequest extends Model
         'approved_at' => 'datetime',
         'expires_at' => 'datetime',
         'payment_deadline' => 'datetime',
+        'payment_details' => 'array',
     ];
 
     protected static function boot()
@@ -86,6 +88,10 @@ class ClinicRegistrationRequest extends Model
     {
         if ($this->payment_status === 'paid') {
             return 'Paid';
+        }
+
+        if ($this->payment_status === 'pending_verification') {
+            return 'Pending Verification';
         }
 
         if ($this->payment_status === 'trial') {
@@ -146,9 +152,10 @@ class ClinicRegistrationRequest extends Model
     {
         return match($this->payment_status) {
             'pending' => 'bg-yellow-100 text-yellow-800',
+            'pending_verification' => 'bg-orange-100 text-orange-800',
             'paid' => 'bg-green-100 text-green-800',
             'trial' => 'bg-blue-100 text-blue-800',
-            'failed', 'payment_failed' => 'bg-orange-100 text-orange-800',
+            'failed', 'payment_failed' => 'bg-red-100 text-red-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }
@@ -210,5 +217,36 @@ class ClinicRegistrationRequest extends Model
 
         // Fallback to a generic message
         return 'Address information not available';
+    }
+
+    /**
+     * Get formatted payment details for display
+     */
+    public function getFormattedPaymentDetailsAttribute()
+    {
+        if (!$this->payment_details) {
+            return null;
+        }
+
+        $details = $this->payment_details;
+        $formatted = [];
+
+        if (isset($details['sender_name'])) {
+            $formatted['Sender Name'] = $details['sender_name'];
+        }
+
+        if (isset($details['sender_phone'])) {
+            $formatted['Sender Phone'] = $details['sender_phone'];
+        }
+
+        if (isset($details['transaction_reference'])) {
+            $formatted['Transaction Reference'] = $details['transaction_reference'];
+        }
+
+        if (isset($details['payment_amount'])) {
+            $formatted['Payment Amount'] = '₱' . number_format($details['payment_amount'], 2);
+        }
+
+        return $formatted;
     }
 }

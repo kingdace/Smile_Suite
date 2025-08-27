@@ -62,6 +62,7 @@ import {
     Clock,
     CheckCircle,
     AlertCircle,
+    ShoppingCart,
 } from "lucide-react";
 
 const navigation = (clinicId) => [
@@ -71,23 +72,7 @@ const navigation = (clinicId) => [
         routeName: "clinic.dashboard",
         icon: LayoutDashboard,
         description: "Overview and statistics",
-        hasDropdown: true,
-        children: [
-            {
-                name: "Overview",
-                href: route("clinic.dashboard", [clinicId]),
-                routeName: "clinic.dashboard",
-                icon: LayoutDashboard,
-                description: "Basic dashboard",
-            },
-            {
-                name: "Enhanced Dashboard",
-                href: route("clinic.dashboard.enhanced", [clinicId]),
-                routeName: "clinic.dashboard.enhanced",
-                icon: Activity,
-                description: "Advanced analytics",
-            },
-        ],
+        hasDropdown: false,
     },
     {
         name: "Patients",
@@ -164,6 +149,13 @@ const navigation = (clinicId) => [
                 description: "Manage stock items",
             },
             {
+                name: "Purchase Orders",
+                href: route("clinic.purchase-orders.index", [clinicId]),
+                routeName: "clinic.purchase-orders.*",
+                icon: ShoppingCart,
+                description: "Manage purchase orders",
+            },
+            {
                 name: "Suppliers",
                 href: route("clinic.suppliers.index", [clinicId]),
                 routeName: "clinic.suppliers.*",
@@ -210,10 +202,7 @@ export default function Sidebar({ className, auth }) {
         }
 
         // Dashboard dropdown
-        if (
-            route().current("clinic.dashboard") ||
-            route().current("clinic.dashboard.enhanced")
-        ) {
+        if (route().current("clinic.dashboard")) {
             expanded.add("Dashboard");
         }
 
@@ -278,10 +267,7 @@ export default function Sidebar({ className, auth }) {
     };
 
     const isDashboardActive = () => {
-        return (
-            route().current("clinic.dashboard") ||
-            route().current("clinic.dashboard.enhanced")
-        );
+        return route().current("clinic.dashboard");
     };
 
     const isDentistScheduleActive = () => {

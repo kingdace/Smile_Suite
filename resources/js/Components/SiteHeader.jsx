@@ -1,13 +1,6 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import {
-    LogOut,
-    User as UserIcon,
-    LayoutGrid,
-    Users,
-    Building2,
-    FileText,
-} from "lucide-react";
+import { LogOut, User as UserIcon, LayoutGrid } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar";
 
@@ -244,85 +237,23 @@ export default function SiteHeader() {
                                     {/* Triangle caret */}
                                     <div className="absolute -top-2 right-6 w-4 h-4 bg-white/95 backdrop-blur-md border-l border-t border-slate-200/50 rotate-45 z-10"></div>
                                     <div className="py-3">
-                                        <div className="px-4 py-3 text-slate-800 font-semibold border-b border-slate-100 text-[15px]">
+                                        {/* <div className="px-4 py-3 text-slate-800 font-semibold border-b border-slate-100 text-[15px]">
                                             {auth.user.name}
-                                        </div>
-                                        {/* Admin Dropdown */}
-                                        {userRole === "admin" ? (
-                                            <>
-                                                <Link
-                                                    href={route(
-                                                        "admin.dashboard"
-                                                    )}
-                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
-                                                    style={{
-                                                        fontFamily:
-                                                            "Inter, sans-serif",
-                                                    }}
-                                                    role="menuitem"
-                                                >
-                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
-                                                    Admin Dashboard
-                                                </Link>
-                                                <Link
-                                                    href={route(
-                                                        "admin.users.index"
-                                                    )}
-                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
-                                                    style={{
-                                                        fontFamily:
-                                                            "Inter, sans-serif",
-                                                    }}
-                                                    role="menuitem"
-                                                >
-                                                    <Users className="w-4 h-4 text-blue-500" />
-                                                    Users Management
-                                                </Link>
-                                                <Link
-                                                    href={route(
-                                                        "admin.clinics.index"
-                                                    )}
-                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
-                                                    style={{
-                                                        fontFamily:
-                                                            "Inter, sans-serif",
-                                                    }}
-                                                    role="menuitem"
-                                                >
-                                                    <Building2 className="w-4 h-4 text-green-500" />
-                                                    Clinics Management
-                                                </Link>
-                                                <Link
-                                                    href={route(
-                                                        "admin.clinic-requests.index"
-                                                    )}
-                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
-                                                    style={{
-                                                        fontFamily:
-                                                            "Inter, sans-serif",
-                                                    }}
-                                                    role="menuitem"
-                                                >
-                                                    <FileText className="w-4 h-4 text-purple-500" />
-                                                    Registration Requests
-                                                </Link>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Link
-                                                    href={dashboardRoute}
-                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
-                                                    style={{
-                                                        fontFamily:
-                                                            "Inter, sans-serif",
-                                                    }}
-                                                    role="menuitem"
-                                                >
-                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
-                                                    Dashboard
-                                                </Link>
-                                            </>
-                                        )}
+                                        </div> */}
+                                        {/* Minimal Navigation Dropdown */}
+                                        <Link
+                                            href={dashboardRoute}
+                                            className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
+                                            style={{
+                                                fontFamily: "Inter, sans-serif",
+                                            }}
+                                            role="menuitem"
+                                        >
+                                            <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                            {userRole === "admin"
+                                                ? "Admin Dashboard"
+                                                : "Dashboard"}
+                                        </Link>
                                         <div className="border-t border-slate-100 mt-2 pt-2">
                                             <button
                                                 type="button"

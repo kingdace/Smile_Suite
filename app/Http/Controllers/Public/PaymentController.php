@@ -83,6 +83,14 @@ class PaymentController extends Controller
         try {
             $paymentIntentId = $request->input('payment_intent_id');
             $paymentMethod = $request->input('payment_method', 'simulation');
+            $paymentDetails = $request->input('payment_details');
+
+            // Store payment details if provided (for QR code payments)
+            if ($paymentDetails) {
+                $registrationRequest->update([
+                    'payment_details' => $paymentDetails,
+                ]);
+            }
 
             // Simulate payment processing
             $result = $this->subscriptionService->simulatePayment($paymentIntentId, $paymentMethod);

@@ -205,4 +205,20 @@ class Clinic extends Model
     {
         return $this->hasMany(Waitlist::class);
     }
+
+    /**
+     * Get the inventory transactions associated with the clinic.
+     */
+    public function inventoryTransactions()
+    {
+        return $this->hasMany(InventoryTransaction::class);
+    }
+
+    /**
+     * Get the purchase orders associated with the clinic.
+     */
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
 }

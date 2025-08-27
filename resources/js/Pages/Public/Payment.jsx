@@ -30,6 +30,13 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
     const [success, setSuccess] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [paymentIntentId, setPaymentIntentId] = useState(null);
+    const [showPaymentForm, setShowPaymentForm] = useState(false);
+    const [paymentDetails, setPaymentDetails] = useState({
+        sender_name: "",
+        sender_phone: "",
+        transaction_reference: "",
+        payment_amount: request.subscription_amount,
+    });
 
     const handlePaymentMethodSelect = async (method) => {
         setSelectedMethod(method);
@@ -53,6 +60,17 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
             return;
         }
 
+        // For QR code payments, show the payment form first
+        if (selectedMethod.has_qr) {
+            setShowPaymentForm(true);
+            return;
+        }
+
+        // For other payment methods, proceed directly
+        await processPayment();
+    };
+
+    const processPayment = async () => {
         setLoading(true);
         setError(null);
 
@@ -61,6 +79,7 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
             await axios.post(route("payment.success", { token }), {
                 payment_intent_id: paymentIntentId,
                 payment_method: selectedMethod.key,
+                payment_details: showPaymentForm ? paymentDetails : null,
             });
 
             setSuccess(true);
@@ -71,6 +90,22 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
         }
 
         setLoading(false);
+    };
+
+    const handlePaymentFormSubmit = async (e) => {
+        e.preventDefault();
+
+        // Validate required fields
+        if (
+            !paymentDetails.sender_name.trim() ||
+            !paymentDetails.sender_phone.trim() ||
+            !paymentDetails.transaction_reference.trim()
+        ) {
+            setError("Please fill in all required fields.");
+            return;
+        }
+
+        await processPayment();
     };
 
     if (success) {
@@ -86,11 +121,11 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                 </div>
 
                 <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                    🎉 Payment Successful!
+                    🎉 Payment Confirmed!
                 </h2>
                 <p className="text-gray-600 mb-8 text-lg">
-                    Welcome to the Smile Suite family! Your clinic setup is
-                    ready.
+                    Thank you for confirming your payment! Our admin will verify
+                    and send you setup instructions shortly.
                 </p>
 
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-8">
@@ -103,7 +138,15 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                     <div className="space-y-3 text-sm text-green-700">
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>Setup instructions sent to your email</span>
+                            <span>
+                                Admin will verify your payment (within 24 hours)
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span>
+                                Setup instructions will be sent to your email
+                            </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -116,17 +159,20 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                     </div>
                 </div>
 
-                <Button
-                    onClick={() =>
-                        (window.location.href = route("clinic.setup", {
-                            token,
-                        }))
-                    }
-                    className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                >
-                    <span>Continue to Setup</span>
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+                <div className="space-y-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <p className="text-sm text-blue-800 text-center">
+                            📧 Check your email for payment verification updates
+                        </p>
+                    </div>
+                    <Button
+                        onClick={() => (window.location.href = "/")}
+                        className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                        <span>Return to Homepage</span>
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                </div>
             </div>
         );
     }
@@ -165,13 +211,29 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
 
                             <div className="flex items-center gap-4">
                                 <div
-                                    className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl shadow-md ${
+                                    className={`w-16 h-16 rounded-xl flex items-center justify-center shadow-md ${
                                         selectedMethod?.key === key
                                             ? "bg-gradient-to-br from-blue-500 to-cyan-600"
                                             : "bg-gradient-to-br from-gray-100 to-gray-200"
                                     }`}
                                 >
-                                    {method.icon}
+                                    {key === "gcash" ? (
+                                        <img
+                                            src="/icons/gcash.png"
+                                            alt="GCash"
+                                            className="w-50 h-50 object-contain"
+                                        />
+                                    ) : key === "paymaya" ? (
+                                        <img
+                                            src="/icons/paymaya.png"
+                                            alt="PayMaya"
+                                            className="w-30 h-30 object-contain"
+                                        />
+                                    ) : (
+                                        <span className="text-3xl">
+                                            {method.icon}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-bold text-gray-900 text-lg mb-1">
@@ -216,6 +278,37 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                         </p>
                     </div>
 
+                    {/* QR Code Display for GCash and PayMaya */}
+                    {selectedMethod.has_qr && (
+                        <div className="bg-white rounded-lg p-6 border border-blue-100 mb-4">
+                            <div className="text-center">
+                                <h5 className="font-semibold text-gray-900 mb-3">
+                                    📱 Scan QR Code to Pay
+                                </h5>
+                                <div className="flex justify-center">
+                                    <div className="relative">
+                                        <img
+                                            src={selectedMethod.qr_code}
+                                            alt={`${selectedMethod.name} QR Code`}
+                                            className="w-48 h-48 object-contain border-2 border-gray-200 rounded-lg shadow-md"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-2">
+                                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full flex items-center justify-center">
+                                                    <Smartphone className="w-4 h-4 text-white" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-3">
+                                    Open your {selectedMethod.name} app and scan
+                                    this QR code
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white rounded-lg p-4 border border-blue-100">
                             <div className="flex items-center gap-2 mb-2">
@@ -240,6 +333,26 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                             </p>
                         </div>
                     </div>
+
+                    {/* Payment Confirmation Section */}
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mt-4">
+                        <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-sm text-green-800 font-medium mb-1">
+                                    ✅ After Payment Confirmation
+                                </p>
+                                <p className="text-xs text-green-700">
+                                    Once you've completed the payment, click the
+                                    button below to confirm. Our admin will
+                                    verify your payment and send you setup
+                                    instructions.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -249,6 +362,164 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                         <AlertCircle className="w-4 h-4" />
                     </div>
                     <span className="font-medium">{error}</span>
+                </div>
+            )}
+
+            {/* Payment Confirmation Form for QR Code Payments */}
+            {showPaymentForm && selectedMethod && (
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center">
+                            <Smartphone className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-blue-900 text-lg">
+                                📱 Payment Confirmation Details
+                            </h4>
+                            <p className="text-blue-700 text-sm">
+                                Please provide your payment details for
+                                verification
+                            </p>
+                        </div>
+                    </div>
+
+                    <form
+                        onSubmit={handlePaymentFormSubmit}
+                        className="space-y-4"
+                    >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Sender's Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={paymentDetails.sender_name}
+                                    onChange={(e) =>
+                                        setPaymentDetails({
+                                            ...paymentDetails,
+                                            sender_name: e.target.value,
+                                        })
+                                    }
+                                    placeholder="Your name as it appears in the app"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    {selectedMethod.name} Number *
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={paymentDetails.sender_phone}
+                                    onChange={(e) =>
+                                        setPaymentDetails({
+                                            ...paymentDetails,
+                                            sender_phone: e.target.value,
+                                        })
+                                    }
+                                    placeholder={`Your ${selectedMethod.name} number`}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Transaction Reference Number *
+                            </label>
+                            <input
+                                type="text"
+                                value={paymentDetails.transaction_reference}
+                                onChange={(e) =>
+                                    setPaymentDetails({
+                                        ...paymentDetails,
+                                        transaction_reference: e.target.value,
+                                    })
+                                }
+                                placeholder="Reference number from your payment app"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                required
+                            />
+                            <p className="text-xs text-gray-600 mt-1">
+                                This is the reference number you received after
+                                completing the payment
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                Payment Amount *
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={paymentDetails.payment_amount}
+                                onChange={(e) =>
+                                    setPaymentDetails({
+                                        ...paymentDetails,
+                                        payment_amount: parseFloat(
+                                            e.target.value
+                                        ),
+                                    })
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                required
+                            />
+                            <p className="text-xs text-gray-600 mt-1">
+                                Amount you sent (should match ₱
+                                {request.subscription_amount})
+                            </p>
+                        </div>
+
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <AlertCircle className="w-3 h-3 text-yellow-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-yellow-800 mb-1">
+                                        ⚠️ Important Verification Notice
+                                    </p>
+                                    <p className="text-xs text-yellow-700">
+                                        Our admin will verify these details
+                                        against the actual payment received.
+                                        Please ensure all information is
+                                        accurate to avoid delays in processing.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <Button
+                                type="button"
+                                onClick={() => setShowPaymentForm(false)}
+                                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Confirming...
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        Confirm Payment
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </form>
                 </div>
             )}
 
@@ -278,12 +549,12 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                 {loading ? (
                     <>
                         <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                        Processing Payment...
+                        Confirming Payment...
                     </>
                 ) : (
                     <>
-                        <Zap className="w-5 h-5 mr-3" />
-                        Complete Payment - ₱{request.subscription_amount}
+                        <CheckCircle className="w-5 h-5 mr-3" />
+                        Confirm Payment - ₱{request.subscription_amount}
                     </>
                 )}
             </Button>

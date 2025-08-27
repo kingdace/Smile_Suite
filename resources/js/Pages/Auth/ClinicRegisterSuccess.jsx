@@ -216,7 +216,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             </div>
                                                         </>
                                                     ) : request.subscription_plan ===
-                                                      "pro" ? (
+                                                      "premium" ? (
                                                         <>
                                                             <span className="text-xl font-bold text-blue-600">
                                                                 ₱1,999
@@ -233,7 +233,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                       "enterprise" ? (
                                                         <>
                                                             <span className="text-xl font-bold text-purple-600">
-                                                                ₱4,999
+                                                                ₱2,999
                                                             </span>
                                                             <div className="text-xs text-gray-500">
                                                                 per month
@@ -334,8 +334,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                     "basic"
                                                         ? "If approved, you'll receive immediate access to your 14-day free trial."
                                                         : request.subscription_plan ===
-                                                          "pro"
-                                                        ? "If approved, you'll receive payment instructions for Pro plan features."
+                                                          "premium"
+                                                        ? "If approved, you'll receive payment instructions for Premium plan features."
                                                         : request.subscription_plan ===
                                                           "enterprise"
                                                         ? "If approved, you'll receive payment instructions for Enterprise plan features."
@@ -363,8 +363,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                     "basic"
                                                         ? "Complete your clinic setup and start using Smile Suite immediately!"
                                                         : request.subscription_plan ===
-                                                          "pro"
-                                                        ? "After payment, you'll receive setup instructions for Pro plan features."
+                                                          "premium"
+                                                        ? "After payment, you'll receive setup instructions for Premium plan features."
                                                         : request.subscription_plan ===
                                                           "enterprise"
                                                         ? "After payment, you'll receive setup instructions for Enterprise plan features."
@@ -388,8 +388,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                         "basic"
                                                             ? "Trial Management:"
                                                             : request.subscription_plan ===
-                                                              "pro"
-                                                            ? "Pro Features:"
+                                                              "premium"
+                                                            ? "Premium Features:"
                                                             : request.subscription_plan ===
                                                               "enterprise"
                                                             ? "Enterprise Features:"
@@ -399,7 +399,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                     "basic"
                                                         ? "After 14 days, choose to continue with a paid plan or cancel your subscription."
                                                         : request.subscription_plan ===
-                                                          "pro"
+                                                          "premium"
                                                         ? "Access advanced features like analytics, multi-location support, and priority support."
                                                         : request.subscription_plan ===
                                                           "enterprise"
@@ -505,8 +505,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                 </div>
                             )}
 
-                            {/* Pro Plan Information */}
-                            {request.subscription_plan === "pro" && (
+                            {/* Premium Plan Information */}
+                            {request.subscription_plan === "premium" && (
                                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
                                     <div className="flex items-start gap-4">
                                         <div className="flex-shrink-0">
@@ -518,7 +518,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-lg font-bold text-blue-800 mb-3">
-                                                Pro Plan - Advanced Features
+                                                Premium Plan - Advanced Features
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
                                                 <div className="space-y-2">

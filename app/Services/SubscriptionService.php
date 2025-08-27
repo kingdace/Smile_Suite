@@ -16,8 +16,10 @@ class SubscriptionService
     public function createPaymentIntent(ClinicRegistrationRequest $request)
     {
         try {
-            // Generate a unique payment reference
-            $paymentReference = 'PAY-' . now()->format('Ymd') . '-' . str_pad($request->id, 4, '0', STR_PAD_LEFT);
+            // Generate a unique payment reference based on method
+            $date = now()->format('Ymd');
+            $requestId = str_pad($request->id, 4, '0', STR_PAD_LEFT);
+            $paymentReference = 'PAY-' . $date . '-' . $requestId;
 
             // Store payment intent in session or cache for simulation
             $paymentIntent = [
@@ -28,6 +30,9 @@ class SubscriptionService
                 'metadata' => [
                     'clinic_registration_id' => $request->id,
                     'subscription_plan' => $request->subscription_plan,
+                    'clinic_name' => $request->clinic_name,
+                    'contact_person' => $request->contact_person,
+                    'email' => $request->email,
                 ],
                 'payment_methods' => [
                     'gcash' => [
@@ -35,24 +40,28 @@ class SubscriptionService
                         'icon' => '📱',
                         'description' => 'Pay using your GCash wallet',
                         'simulation_number' => '0917-123-4567',
+                        'reference_number' => 'GCASH-' . $date . '-' . $requestId,
                     ],
                     'paymaya' => [
                         'name' => 'PayMaya',
                         'icon' => '📱',
                         'description' => 'Pay using your PayMaya wallet',
                         'simulation_number' => '0918-987-6543',
+                        'reference_number' => 'PAYMAYA-' . $date . '-' . $requestId,
                     ],
                     'bank_transfer' => [
                         'name' => 'Bank Transfer',
                         'icon' => '🏦',
                         'description' => 'Direct bank transfer',
                         'simulation_account' => 'BDO: 1234-5678-9012',
+                        'reference_number' => 'BANK-' . $date . '-' . $requestId,
                     ],
                     'credit_card' => [
                         'name' => 'Credit/Debit Card',
                         'icon' => '💳',
                         'description' => 'Visa, Mastercard, and other cards',
                         'simulation_card' => '4242 4242 4242 4242',
+                        'reference_number' => 'CARD-' . $date . '-' . $requestId,
                     ],
                 ],
             ];
@@ -109,22 +118,20 @@ class SubscriptionService
             $request = ClinicRegistrationRequest::find($registrationId);
 
             if ($request) {
-                // Update payment status
+                // Update payment status to pending verification
                 $request->update([
-                    'payment_status' => 'paid',
+                    'payment_status' => 'pending_verification',
                     'stripe_payment_intent_id' => $paymentIntentId,
                 ]);
 
-                // Log the successful payment
-                Log::info("Payment simulation successful", [
+                // Log the payment confirmation
+                Log::info("Payment confirmation received", [
                     'payment_intent_id' => $paymentIntentId,
                     'payment_method' => $paymentMethod,
                     'amount' => $paymentIntent['amount'],
                     'clinic_registration_id' => $registrationId,
+                    'status' => 'pending_verification',
                 ]);
-
-                // Send setup email
-                $this->sendSetupEmail($request);
 
                 // Clear the payment intent from cache
                 Cache::forget("payment_intent_{$paymentIntentId}");
@@ -135,6 +142,42 @@ class SubscriptionService
             return null;
         } catch (\Exception $e) {
             Log::error('Payment handling failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Admin verifies payment and marks as paid
+     */
+    public function verifyPayment($registrationId)
+    {
+        try {
+            $request = ClinicRegistrationRequest::find($registrationId);
+
+            if (!$request) {
+                Log::error('Registration request not found: ' . $registrationId);
+                return null;
+            }
+
+            // Update payment status to paid
+            $request->update([
+                'payment_status' => 'paid',
+            ]);
+
+            // Send setup email
+            $this->sendSetupEmail($request);
+
+            // Log the payment verification
+            Log::info("Payment verified by admin", [
+                'registration_id' => $registrationId,
+                'clinic_name' => $request->clinic_name,
+                'email' => $request->email,
+                'amount' => $request->subscription_amount,
+            ]);
+
+            return $request;
+        } catch (\Exception $e) {
+            Log::error('Payment verification failed: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -506,29 +549,39 @@ class SubscriptionService
                 'name' => 'GCash',
                 'icon' => '📱',
                 'description' => 'Pay using your GCash wallet',
-                'instructions' => 'Send payment to GCash number: 0917-123-4567',
+                'instructions' => 'Scan the QR code below with your GCash app to complete payment',
+                'qr_code' => '/icons/gcashqr.png',
+                'reference_format' => 'GCASH-{DATE}-{ID}',
                 'color' => 'bg-green-500',
+                'has_qr' => true,
             ],
             'paymaya' => [
                 'name' => 'PayMaya',
                 'icon' => '📱',
                 'description' => 'Pay using your PayMaya wallet',
-                'instructions' => 'Send payment to PayMaya number: 0918-987-6543',
+                'instructions' => 'Scan the QR code below with your PayMaya app to complete payment',
+                'qr_code' => '/icons/paymayaqr.png',
+                'reference_format' => 'PAYMAYA-{DATE}-{ID}',
                 'color' => 'bg-blue-500',
+                'has_qr' => true,
             ],
             'bank_transfer' => [
                 'name' => 'Bank Transfer',
                 'icon' => '🏦',
                 'description' => 'Direct bank transfer',
                 'instructions' => 'Transfer to BDO Account: 1234-5678-9012',
+                'reference_format' => 'BANK-{DATE}-{ID}',
                 'color' => 'bg-purple-500',
+                'has_qr' => false,
             ],
             'credit_card' => [
                 'name' => 'Credit/Debit Card',
                 'icon' => '💳',
                 'description' => 'Visa, Mastercard, and other cards',
                 'instructions' => 'Enter your card details securely',
+                'reference_format' => 'CARD-{DATE}-{ID}',
                 'color' => 'bg-gray-500',
+                'has_qr' => false,
             ],
         ];
     }

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('appointments', function (Blueprint $table) {
-            $table->softDeletes();
+        Schema::table('clinic_registration_requests', function (Blueprint $table) {
+            $table->json('payment_details')->nullable()->after('stripe_payment_intent_id');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('appointments', function (Blueprint $table) {
-            $table->dropSoftDeletes();
+        Schema::table('clinic_registration_requests', function (Blueprint $table) {
+            $table->dropColumn('payment_details');
         });
     }
 };

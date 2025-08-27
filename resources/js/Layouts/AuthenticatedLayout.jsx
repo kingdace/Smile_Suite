@@ -433,16 +433,17 @@ const Header = ({
                                         {auth?.user?.name || auth?.name}
                                     </p>
                                     <p className="text-xs text-blue-100 font-medium">
-                                        {(auth?.user?.role || auth?.role) ===
-                                        "clinic_admin"
-                                            ? "Clinic Admin"
-                                            : (auth?.user?.role ||
-                                                  auth?.role) === "dentist"
-                                            ? "Dentist"
-                                            : (auth?.user?.role ||
-                                                  auth?.role) === "staff"
-                                            ? "Staff"
-                                            : "User"}
+                                        {(auth?.user?.role || auth?.role)
+                                            ?.replace("_", " ")
+                                            ?.split(" ")
+                                            ?.map(
+                                                (word) =>
+                                                    word
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                    word.slice(1)
+                                            )
+                                            ?.join(" ") || "User"}
                                     </p>
                                 </div>
                                 <Dropdown>

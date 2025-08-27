@@ -58,7 +58,9 @@ Route::post('/register/patient', [App\Http\Controllers\Public\PatientRegistratio
 Route::get('/register/clinic', function () {
     return Inertia::render('Auth/ClinicRegister');
 })->name('register.clinic');
-Route::post('/register/clinic', [ClinicRegistrationController::class, 'store'])->name('register.clinic.request');
+Route::post('/register/clinic', [ClinicRegistrationController::class, 'store'])
+    ->middleware('throttle:clinic-registration')
+    ->name('register.clinic.request');
 Route::get('/register/clinic/success/{id}', [\App\Http\Controllers\Public\ClinicRegistrationController::class, 'success'])->name('register.clinic.success');
 
 // Clinic Setup (After Approval)
@@ -143,6 +145,7 @@ Route::middleware('auth')->group(function () {
         Route::post('clinic-requests/{registrationRequest}/approve', [ClinicRegistrationRequestController::class, 'approve'])->name('clinic-requests.approve');
         Route::post('clinic-requests/{registrationRequest}/reject', [ClinicRegistrationRequestController::class, 'reject'])->name('clinic-requests.reject');
         Route::post('clinic-requests/{registrationRequest}/payment-status', [ClinicRegistrationRequestController::class, 'updatePaymentStatus'])->name('clinic-requests.payment-status');
+        Route::post('clinic-requests/{registrationRequest}/verify-payment', [ClinicRegistrationRequestController::class, 'verifyPayment'])->name('clinic-requests.verify-payment');
         Route::post('clinic-requests/{registrationRequest}/retry-payment', [ClinicRegistrationRequestController::class, 'retryPayment'])->name('clinic-requests.retry-payment');
         Route::delete('clinic-requests/{id}/soft-delete', [ClinicRegistrationRequestController::class, 'softDelete'])->name('clinic-requests.soft-delete');
         Route::delete('clinic-requests/{id}/hard-delete', [ClinicRegistrationRequestController::class, 'hardDelete'])->name('clinic-requests.hard-delete');
@@ -167,8 +170,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/clinic/{clinic}/dashboard', [DashboardController::class, 'index'])
             ->name('clinic.dashboard');
-        Route::get('/clinic/{clinic}/dashboard/enhanced', [DashboardController::class, 'enhanced'])
-            ->name('clinic.dashboard.enhanced');
 
         // Patient search route
         Route::get('clinic/{clinic}/patients/search', [PatientController::class, 'search'])
@@ -238,6 +239,46 @@ Route::middleware('auth')->group(function () {
                 'destroy' => 'clinic.inventory.destroy',
             ]);
 
+        // Inventory Transaction Routes
+        Route::get('clinic/{clinic}/inventory/transactions', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'index'])
+            ->name('clinic.inventory.transactions.index');
+        Route::get('clinic/{clinic}/inventory/transactions/create', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'create'])
+            ->name('clinic.inventory.transactions.create');
+        Route::post('clinic/{clinic}/inventory/transactions', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'store'])
+            ->name('clinic.inventory.transactions.store');
+        Route::get('clinic/{clinic}/inventory/transactions/{transaction}', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'show'])
+            ->name('clinic.inventory.transactions.show');
+        Route::get('clinic/{clinic}/inventory/{inventory}/transactions', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'history'])
+            ->name('clinic.inventory.transactions.history');
+        Route::get('clinic/{clinic}/inventory/transactions/statistics', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'statistics'])
+            ->name('clinic.inventory.transactions.statistics');
+
+        // Inventory Quick Actions
+        Route::patch('clinic/{clinic}/inventory/{inventory}/adjust-quantity', [InventoryController::class, 'adjustQuantity'])
+            ->name('clinic.inventory.adjust-quantity');
+        Route::get('clinic/{clinic}/inventory/statistics', [InventoryController::class, 'statistics'])
+            ->name('clinic.inventory.statistics');
+
+        // Purchase Order Management Routes
+        Route::resource('clinic/{clinic}/purchase-orders', \App\Http\Controllers\Clinic\PurchaseOrderController::class)
+            ->names([
+                'index' => 'clinic.purchase-orders.index',
+                'create' => 'clinic.purchase-orders.create',
+                'store' => 'clinic.purchase-orders.store',
+                'show' => 'clinic.purchase-orders.show',
+                'edit' => 'clinic.purchase-orders.edit',
+                'update' => 'clinic.purchase-orders.update',
+                'destroy' => 'clinic.purchase-orders.destroy',
+            ]);
+
+        // Purchase Order Workflow Routes
+        Route::post('clinic/{clinic}/purchase-orders/{purchaseOrder}/approve', [\App\Http\Controllers\Clinic\PurchaseOrderController::class, 'approve'])
+            ->name('clinic.purchase-orders.approve');
+        Route::post('clinic/{clinic}/purchase-orders/{purchaseOrder}/mark-ordered', [\App\Http\Controllers\Clinic\PurchaseOrderController::class, 'markAsOrdered'])
+            ->name('clinic.purchase-orders.mark-ordered');
+        Route::post('clinic/{clinic}/purchase-orders/{purchaseOrder}/items/{item}/receive', [\App\Http\Controllers\Clinic\PurchaseOrderController::class, 'receiveItem'])
+            ->name('clinic.purchase-orders.receive-item');
+
         // Payment Management Routes
         Route::resource('clinic/{clinic}/payments', PaymentController::class)
             ->names([
@@ -250,6 +291,20 @@ Route::middleware('auth')->group(function () {
                 'destroy' => 'clinic.payments.destroy',
             ]);
 
+        // Payment Bulk Operations Routes
+        Route::delete('clinic/{clinic}/payments/bulk-destroy', [PaymentController::class, 'bulkDestroy'])
+            ->name('clinic.payments.bulk-destroy');
+        Route::patch('clinic/{clinic}/payments/bulk-update', [PaymentController::class, 'bulkUpdate'])
+            ->name('clinic.payments.bulk-update');
+
+        // Payment Advanced Features Routes
+        Route::get('clinic/{clinic}/payments/statistics', [PaymentController::class, 'statistics'])
+            ->name('clinic.payments.statistics');
+        Route::get('clinic/{clinic}/payments/export', [PaymentController::class, 'export'])
+            ->name('clinic.payments.export');
+        Route::post('clinic/{clinic}/payments/{payment}/refund', [PaymentController::class, 'refund'])
+            ->name('clinic.payments.refund');
+
         // Reports Routes
         Route::get('clinic/{clinic}/reports', [ReportController::class, 'index'])
             ->name('clinic.reports.index');
@@ -259,6 +314,10 @@ Route::middleware('auth')->group(function () {
             ->name('clinic.reports.appointments');
         Route::get('clinic/{clinic}/reports/revenue', [ReportController::class, 'revenue'])
             ->name('clinic.reports.revenue');
+        Route::get('clinic/{clinic}/reports/inventory', [ReportController::class, 'inventory'])
+            ->name('clinic.reports.inventory');
+        Route::get('clinic/{clinic}/reports/treatments', [ReportController::class, 'treatments'])
+            ->name('clinic.reports.treatments');
 
         // Settings Routes
         Route::get('clinic/{clinic}/settings', [SettingController::class, 'index'])
