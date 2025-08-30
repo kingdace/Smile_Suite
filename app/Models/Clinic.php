@@ -37,6 +37,8 @@ class Clinic extends Model
         'trial_ends_at',
         'last_payment_at',
         'next_payment_at',
+        'testing_mode',
+        'testing_expiry',
         'stripe_customer_id',
         'stripe_subscription_id',
         'stripe_payment_method_id',
@@ -50,6 +52,8 @@ class Clinic extends Model
         'trial_ends_at' => 'datetime',
         'last_payment_at' => 'datetime',
         'next_payment_at' => 'datetime',
+        'testing_mode' => 'boolean',
+        'testing_expiry' => 'datetime',
     ];
 
     /**
@@ -165,15 +169,30 @@ class Clinic extends Model
         ]);
     }
 
+    /**
+     * Calculate subscription duration in days for consistent 30-day billing cycles
+     */
+    private function calculateSubscriptionDays($durationInMonths = 1)
+    {
+        // Ensure minimum 1 month
+        $durationInMonths = max(1, $durationInMonths);
+
+        // Calculate 30-day billing cycles (30 days per month)
+        return $durationInMonths * 30;
+    }
+
     public function activateSubscription($plan, $durationInMonths = 1)
     {
+        // Calculate 30-day billing cycles using helper method
+        $totalDays = $this->calculateSubscriptionDays($durationInMonths);
+
         $this->update([
             'subscription_status' => 'active',
             'subscription_plan' => $plan,
             'subscription_start_date' => now(),
-            'subscription_end_date' => now()->addMonths($durationInMonths),
+            'subscription_end_date' => now()->addDays($totalDays),
             'last_payment_at' => now(),
-            'next_payment_at' => now()->addMonths($durationInMonths),
+            'next_payment_at' => now()->addDays($totalDays),
         ]);
     }
 

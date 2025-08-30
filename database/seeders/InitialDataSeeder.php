@@ -54,7 +54,7 @@ class InitialDataSeeder extends Seeder
             'subscription_status' => 'active',
             'subscription_plan' => 'basic',
             'subscription_start_date' => Carbon::now(),
-            'subscription_end_date' => Carbon::now()->addYear(),
+            'subscription_end_date' => Carbon::now()->addDays(30), // 30-day billing cycle
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

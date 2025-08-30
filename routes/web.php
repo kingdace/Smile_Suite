@@ -74,6 +74,11 @@ Route::post('/payment/{token}/create-intent', [\App\Http\Controllers\Public\Paym
 Route::post('/payment/{token}/success', [\App\Http\Controllers\Public\PaymentController::class, 'handlePaymentSuccess'])->name('payment.success');
 Route::post('/payment/{token}/failure', [\App\Http\Controllers\Public\PaymentController::class, 'handlePaymentFailure'])->name('payment.failure');
 
+// Subscription Payment Routes
+Route::get('/subscription/payment/{token}', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'showPayment'])->name('subscription.payment');
+Route::post('/subscription/payment/{token}/success', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'handlePaymentSuccess'])->name('subscription.payment.success');
+Route::get('/subscription/payment/{token}/success', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'showPaymentSuccess'])->name('subscription.payment.success.show');
+
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
@@ -138,6 +143,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
         Route::delete('users/{id}/hard-delete', [UserController::class, 'hardDelete'])->name('users.hard-delete');
         Route::patch('clinics/{clinic}/restore', [ClinicController::class, 'restore'])->name('clinics.restore');
+        Route::delete('clinics/{id}/hard-delete', [ClinicController::class, 'hardDelete'])->name('clinics.hard-delete');
 
         // Clinic Registration Requests
         Route::get('clinic-requests', [ClinicRegistrationRequestController::class, 'index'])->name('clinic-requests.index');
@@ -163,10 +169,23 @@ Route::middleware('auth')->group(function () {
         Route::get('subscriptions/{clinic}/duration-info', [App\Http\Controllers\Admin\SubscriptionController::class, 'getDurationInfo'])->name('subscriptions.duration-info');
         Route::post('subscriptions/{clinic}/extend-trial', [App\Http\Controllers\Admin\SubscriptionController::class, 'extendTrial'])->name('subscriptions.extend-trial');
         Route::post('subscriptions/{clinic}/renew-subscription', [App\Http\Controllers\Admin\SubscriptionController::class, 'renewSubscription'])->name('subscriptions.renew-subscription');
-        Route::post('subscriptions/{clinic}/send-notification', [App\Http\Controllers\Admin\SubscriptionController::class, 'sendNotification'])->name('subscriptions.send-notification');
+            Route::post('subscriptions/{clinic}/send-notification', [App\Http\Controllers\Admin\SubscriptionController::class, 'sendNotification'])->name('subscriptions.send-notification');
+        Route::post('subscriptions/{clinic}/override-status', [App\Http\Controllers\Admin\SubscriptionController::class, 'overrideStatus'])->name('subscriptions.override-status');
+
+        // Admin Subscription Request Management Routes
+        Route::get('subscription-requests', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'index'])->name('subscription-requests.index');
+        Route::get('subscription-requests/{subscriptionRequest}', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'show'])->name('subscription-requests.show');
+        Route::post('subscription-requests/{subscriptionRequest}/approve', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'approve'])->name('subscription-requests.approve');
+        Route::post('subscription-requests/{subscriptionRequest}/reject', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'reject'])->name('subscription-requests.reject');
+        Route::post('subscription-requests/{subscriptionRequest}/complete', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'complete'])->name('subscription-requests.complete');
+                        Route::post('subscription-requests/{subscriptionRequest}/verify-payment', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'verifyPayment'])->name('subscription-requests.verify-payment');
+                Route::post('subscription-requests/{subscriptionRequest}/update-payment-status', [App\Http\Controllers\Admin\SubscriptionRequestController::class, 'updatePaymentStatus'])->name('subscription-requests.update-payment-status');
+
+        // Test route for subscription access control
+        Route::get('test-subscription-access', [App\Http\Controllers\Clinic\TestController::class, 'testSubscriptionAccess'])->name('test.subscription-access');
     });
 
-    // Clinic Routes
+    // Clinic Routes (Subscription access control handled in controllers)
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/clinic/{clinic}/dashboard', [DashboardController::class, 'index'])
             ->name('clinic.dashboard');
@@ -416,7 +435,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
 
         // Waitlist Integration Routes
-        Route::post('/clinic/{clinic}/appointments/add-to-waitlist', [\App\Http\Controllers\Clinic\AppointmentController::class, 'addToWaitlist'])->name('clinic.appointments.add-to-waitlist');
+        Route::post('/clinic/{clinic}/appointments/add-to-waitlist', [\App\Http\Controllers\Clinic\AppointmentController::class, 'addToWaitlist'])
+            ->name('clinic.appointments.add-to-waitlist');
+
+        // Subscription Management Route
+        Route::get('subscription', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'index'])->name('clinic.subscription.index');
+        Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])->name('clinic.subscription.upgrade');
+        Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])->name('clinic.subscription.renew');
+        Route::get('subscription/quick-renewal', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'quickRenewal'])->name('clinic.subscription.quick-renewal');
 
         // Clinic User Management Routes
         Route::middleware(['auth'])->prefix('clinic')->group(function () {
@@ -444,8 +470,6 @@ Route::middleware('auth')->group(function () {
             Route::post('profile/gallery/upload', [\App\Http\Controllers\ClinicProfileController::class, 'uploadGalleryImage'])->name('clinic.profile.gallery.upload');
             Route::delete('profile/gallery/{id}/delete', [\App\Http\Controllers\ClinicProfileController::class, 'deleteGalleryImage'])->name('clinic.profile.gallery.delete');
         });
-
-
     });
 });
 

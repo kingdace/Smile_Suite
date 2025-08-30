@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionController extends Controller
 {
@@ -309,6 +310,107 @@ class SubscriptionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to check expirations: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Admin override subscription status
+     */
+    public function overrideStatus(Request $request, Clinic $clinic)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'subscription_status' => 'required|in:trial,active,grace_period,suspended,inactive',
+            'reason' => 'nullable|string|max:500',
+            'extend_days' => 'nullable|integer|min:0|max:365',
+            'extend_hours' => 'nullable|integer|min:0|max:23',
+            'extend_minutes' => 'nullable|integer|min:0|max:59',
+            'testing_mode' => 'nullable|boolean',
+        ]);
+
+        try {
+            $oldStatus = $clinic->subscription_status;
+            $newStatus = $request->subscription_status;
+            $extendDays = $request->extend_days ?? 0;
+            $extendHours = $request->extend_hours ?? 0;
+            $extendMinutes = $request->extend_minutes ?? 0;
+            $testingMode = $request->testing_mode ?? false;
+
+            // Calculate total duration
+            $totalDuration = now()
+                ->addDays($extendDays)
+                ->addHours($extendHours)
+                ->addMinutes($extendMinutes);
+
+            // Update subscription status
+            $updateData = [
+                'subscription_status' => $newStatus,
+            ];
+
+            // If in testing mode, add a special flag
+            if ($testingMode) {
+                $updateData['testing_mode'] = true;
+                $updateData['testing_expiry'] = $totalDuration;
+            }
+
+            // Handle status-specific updates
+            switch ($newStatus) {
+                case 'trial':
+                    $updateData['trial_ends_at'] = $totalDuration;
+                    $updateData['subscription_end_date'] = $totalDuration;
+                    break;
+                case 'active':
+                    $updateData['subscription_end_date'] = $totalDuration;
+                    $updateData['last_payment_at'] = now();
+                    $updateData['next_payment_at'] = $totalDuration;
+                    $updateData['is_active'] = true;
+                    break;
+                case 'grace_period':
+                    $updateData['subscription_end_date'] = $totalDuration;
+                    break;
+                case 'suspended':
+                    $updateData['is_active'] = false;
+                    break;
+                case 'inactive':
+                    $updateData['is_active'] = false;
+                    break;
+            }
+
+            $clinic->update($updateData);
+
+            // Log the override
+            Log::info("Admin subscription status override", [
+                'clinic_id' => $clinic->id,
+                'clinic_name' => $clinic->name,
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'admin_user' => Auth::user()->email,
+                'reason' => $request->reason,
+                'extend_days' => $extendDays,
+                'extend_hours' => $extendHours,
+                'extend_minutes' => $extendMinutes,
+                'total_duration' => $totalDuration->toDateTimeString(),
+                'testing_mode' => $testingMode,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Subscription status updated to {$newStatus}",
+                'clinic' => $clinic->fresh(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Subscription status override failed', [
+                'clinic_id' => $clinic->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update subscription status: ' . $e->getMessage(),
             ], 500);
         }
     }

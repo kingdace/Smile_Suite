@@ -119,7 +119,26 @@ class ClinicRegistrationController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) use ($registrationRequest) {
+                    // Allow the email from the registration request
+                    if ($value === $registrationRequest->email) {
+                        return; // Allow this email
+                    }
+
+                    // Check if email exists in users table
+                    if (\App\Models\User::where('email', $value)->exists()) {
+                        $fail('This email address is already taken.');
+                    }
+
+                    // Check if email exists in clinics table
+                    if (\App\Models\Clinic::where('email', $value)->exists()) {
+                        $fail('This email address is already associated with another clinic.');
+                    }
+                }
+            ],
             'password' => 'required|string|min:8|confirmed',
             'street_address' => 'nullable|string|max:255',
             'region_code' => 'nullable|string|max:10',
@@ -131,20 +150,38 @@ class ClinicRegistrationController extends Controller
         ]);
 
         DB::transaction(function () use ($registrationRequest, $validated) {
+            // Generate a unique slug from the clinic name
+            $baseSlug = Str::slug($registrationRequest->clinic_name);
+            $slug = $baseSlug;
+            $counter = 1;
+
+            // Ensure slug uniqueness
+            while (Clinic::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+
+            // Determine subscription details based on plan
+            $subscriptionStatus = $registrationRequest->subscription_plan === 'basic' ? 'trial' : 'active';
+            $subscriptionEndDate = $registrationRequest->subscription_plan === 'basic'
+                ? now()->addDays(14) // 14-day trial for Basic
+                : now()->addDays(30); // 30-day billing cycle for others
+
             // Create the clinic
             $clinic = Clinic::create([
                 'name' => $registrationRequest->clinic_name,
                 'street_address' => $validated['street_address'] ?? null,
                 'contact_number' => $registrationRequest->phone,
-                'email' => $registrationRequest->email,
+                'email' => $validated['email'], // Use the email from setup form, not registration request
                 'license_number' => $registrationRequest->license_number,
                 'description' => $registrationRequest->description,
-                'slug' => Str::slug($registrationRequest->clinic_name),
+                'slug' => $slug,
                 'logo_url' => '/images/clinic-logo.png',
                 'subscription_plan' => $registrationRequest->subscription_plan,
-                'subscription_status' => 'active',
+                'subscription_status' => $subscriptionStatus,
                 'subscription_start_date' => now(),
-                'subscription_end_date' => now()->addYear(),
+                'subscription_end_date' => $subscriptionEndDate,
+                'trial_ends_at' => $registrationRequest->subscription_plan === 'basic' ? now()->addDays(14) : null,
                 'is_active' => true,
                 'region_code' => $validated['region_code'] ?? null,
                 'province_code' => $validated['province_code'] ?? null,
@@ -165,9 +202,10 @@ class ClinicRegistrationController extends Controller
                 'email_verified_at' => now(), // Auto-verify since they came from approved request
             ]);
 
-            // Mark the registration request as completed
+            // Mark the registration request as completed and link to clinic
             $registrationRequest->update([
                 'status' => 'completed',
+                'clinic_id' => $clinic->id,
             ]);
         });
 

@@ -33,6 +33,7 @@ class ClinicRegistrationRequest extends Model
         'stripe_customer_id',
         'stripe_payment_intent_id',
         'payment_details',
+        'clinic_id',
         'deleted_at',
     ];
 
@@ -165,7 +166,7 @@ class ClinicRegistrationRequest extends Model
      */
     public function clinic()
     {
-        return $this->hasOne(Clinic::class, 'email', 'email');
+        return $this->belongsTo(Clinic::class);
     }
 
     /**

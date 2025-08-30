@@ -11,11 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Traits\SubscriptionAccessControl;
 
 class ServiceController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function index(Request $request, Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $this->authorize('viewAny', Service::class);
 
         $query = $clinic->services()->with(['dentists']);

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Clinic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 
@@ -270,5 +272,53 @@ class ClinicController extends Controller
         return redirect()
             ->route('admin.clinics.show', $clinic)
             ->with('success', 'Clinic subscription updated successfully.');
+    }
+
+    /**
+     * Permanently delete a clinic (hard delete).
+     */
+    public function hardDelete($id)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Find the clinic (including soft-deleted ones)
+        $clinicToDelete = Clinic::withTrashed()->find($id);
+
+        if (!$clinicToDelete) {
+            abort(404, 'Clinic not found.');
+        }
+
+        try {
+            // Handle related records before hard delete
+            // Delete all users associated with this clinic
+            DB::table('users')->where('clinic_id', $clinicToDelete->id)->delete();
+
+            // Delete all patients associated with this clinic
+            DB::table('patients')->where('clinic_id', $clinicToDelete->id)->delete();
+
+            // Delete all appointments associated with this clinic
+            DB::table('appointments')->where('clinic_id', $clinicToDelete->id)->delete();
+
+            // Delete all treatments associated with this clinic
+            DB::table('treatments')->where('clinic_id', $clinicToDelete->id)->delete();
+
+            // Delete all services associated with this clinic
+            DB::table('services')->where('clinic_id', $clinicToDelete->id)->delete();
+
+            // Hard delete the clinic (permanently remove from database)
+            $clinicToDelete->forceDelete();
+
+            return redirect()->route('admin.clinics.index')->with('success', 'Clinic permanently deleted successfully.');
+        } catch (\Exception $e) {
+            Log::error('Hard delete failed for clinic ' . $clinicToDelete->id, [
+                'error' => $e->getMessage(),
+                'clinic_name' => $clinicToDelete->name,
+                'clinic_email' => $clinicToDelete->email
+            ]);
+
+            return redirect()->route('admin.clinics.index')->with('error', 'Failed to delete clinic: ' . $e->getMessage());
+        }
     }
 }

@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Traits\SubscriptionAccessControl;
 
 class SettingController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -16,6 +19,9 @@ class SettingController extends Controller
 
     public function index()
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         return Inertia::render('Clinic/Settings/Index', [
             'clinic' => Auth::user()->clinic
         ]);

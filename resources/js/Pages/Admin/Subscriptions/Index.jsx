@@ -42,6 +42,15 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from "@/Components/ui/dialog";
+import { Label } from "@/Components/ui/label";
+import { Textarea } from "@/Components/ui/textarea";
 
 const STATUS_COLORS = {
     active: "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-200 shadow-green-100",
@@ -85,6 +94,16 @@ export default function SubscriptionsIndex({ auth, stats, clinics }) {
     const [sortBy, setSortBy] = useState("name");
     const [sortOrder, setSortOrder] = useState("asc");
     const [expandedRows, setExpandedRows] = useState(new Set());
+    const [overrideDialogOpen, setOverrideDialogOpen] = useState(false);
+    const [selectedClinic, setSelectedClinic] = useState(null);
+    const [overrideData, setOverrideData] = useState({
+        subscription_status: "active",
+        reason: "",
+        extend_days: 0,
+        extend_hours: 0,
+        extend_minutes: 0,
+        testing_mode: false,
+    });
 
     const handleCheckStatus = async (clinicId) => {
         setRefreshing(true);
@@ -121,6 +140,45 @@ export default function SubscriptionsIndex({ auth, stats, clinics }) {
             console.error("Failed to run console command:", error);
         }
         setRefreshing(false);
+    };
+
+    const handleOverrideStatus = async () => {
+        if (!selectedClinic) return;
+
+        setLoading(true);
+        try {
+            await axios.post(
+                route("admin.subscriptions.override-status", selectedClinic.id),
+                overrideData
+            );
+            setOverrideDialogOpen(false);
+            setSelectedClinic(null);
+            setOverrideData({
+                subscription_status: "active",
+                reason: "",
+                extend_days: 0,
+                extend_hours: 0,
+                extend_minutes: 0,
+                testing_mode: false,
+            });
+            window.location.reload();
+        } catch (error) {
+            console.error("Failed to override status:", error);
+        }
+        setLoading(false);
+    };
+
+    const openOverrideDialog = (clinic) => {
+        setSelectedClinic(clinic);
+        setOverrideData({
+            subscription_status: clinic.subscription_status,
+            reason: "",
+            extend_days: 0,
+            extend_hours: 0,
+            extend_minutes: 0,
+            testing_mode: false,
+        });
+        setOverrideDialogOpen(true);
     };
 
     const toggleExpandedRow = (clinicId) => {
@@ -320,6 +378,19 @@ export default function SubscriptionsIndex({ auth, stats, clinics }) {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() =>
+                                            router.visit(
+                                                route(
+                                                    "admin.subscription-requests.index"
+                                                )
+                                            )
+                                        }
+                                        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm flex items-center gap-2"
+                                    >
+                                        <Bell className="w-4 h-4" />
+                                        View Requests
+                                    </button>
                                     <button
                                         onClick={handleRunConsoleCommand}
                                         disabled={refreshing}
@@ -761,6 +832,21 @@ export default function SubscriptionsIndex({ auth, stats, clinics }) {
                                                                             e
                                                                         ) => {
                                                                             e.stopPropagation();
+                                                                            openOverrideDialog(
+                                                                                clinic
+                                                                            );
+                                                                        }}
+                                                                        className="hover:bg-orange-50 border-orange-200 text-orange-700 hover:border-orange-300 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                                    >
+                                                                        <Settings className="w-3 h-3" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        onClick={(
+                                                                            e
+                                                                        ) => {
+                                                                            e.stopPropagation();
                                                                             router.visit(
                                                                                 route(
                                                                                     "admin.clinics.show",
@@ -982,6 +1068,231 @@ export default function SubscriptionsIndex({ auth, stats, clinics }) {
                     </Card>
                 </div>
             </div>
+
+            {/* Override Status Dialog */}
+            <Dialog
+                open={overrideDialogOpen}
+                onOpenChange={setOverrideDialogOpen}
+            >
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Override Subscription Status</DialogTitle>
+                        <DialogDescription>
+                            Change the subscription status for{" "}
+                            {selectedClinic?.name}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="status">Subscription Status</Label>
+                            <select
+                                id="status"
+                                value={overrideData.subscription_status}
+                                onChange={(e) =>
+                                    setOverrideData({
+                                        ...overrideData,
+                                        subscription_status: e.target.value,
+                                    })
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="trial">Trial</option>
+                                <option value="active">Active</option>
+                                <option value="grace_period">
+                                    Grace Period
+                                </option>
+                                <option value="suspended">Suspended</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                            <div>
+                                <Label htmlFor="extend_days">Days</Label>
+                                <input
+                                    id="extend_days"
+                                    type="number"
+                                    min="0"
+                                    max="365"
+                                    value={overrideData.extend_days}
+                                    onChange={(e) =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_days:
+                                                parseInt(e.target.value) || 0,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="extend_hours">Hours</Label>
+                                <input
+                                    id="extend_hours"
+                                    type="number"
+                                    min="0"
+                                    max="23"
+                                    value={overrideData.extend_hours}
+                                    onChange={(e) =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_hours:
+                                                parseInt(e.target.value) || 0,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="extend_minutes">Minutes</Label>
+                                <input
+                                    id="extend_minutes"
+                                    type="number"
+                                    min="0"
+                                    max="59"
+                                    value={overrideData.extend_minutes}
+                                    onChange={(e) =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_minutes:
+                                                parseInt(e.target.value) || 0,
+                                        })
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Quick Test Presets */}
+                        <div>
+                            <Label className="text-sm text-gray-600 mb-2 block">
+                                Quick Test Presets
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_days: 0,
+                                            extend_hours: 0,
+                                            extend_minutes: 1,
+                                            testing_mode: true,
+                                        })
+                                    }
+                                    className="text-xs"
+                                >
+                                    1 Minute (Test)
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_days: 0,
+                                            extend_hours: 1,
+                                            extend_minutes: 0,
+                                            testing_mode: true,
+                                        })
+                                    }
+                                    className="text-xs"
+                                >
+                                    1 Hour (Test)
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_days: 1,
+                                            extend_hours: 0,
+                                            extend_minutes: 0,
+                                            testing_mode: true,
+                                        })
+                                    }
+                                    className="text-xs"
+                                >
+                                    1 Day (Test)
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setOverrideData({
+                                            ...overrideData,
+                                            extend_days: 14,
+                                            extend_hours: 0,
+                                            extend_minutes: 0,
+                                            testing_mode: false,
+                                        })
+                                    }
+                                    className="text-xs"
+                                >
+                                    14 Days
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Testing Mode Toggle */}
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="testing_mode"
+                                checked={overrideData.testing_mode}
+                                onChange={(e) =>
+                                    setOverrideData({
+                                        ...overrideData,
+                                        testing_mode: e.target.checked,
+                                    })
+                                }
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <Label htmlFor="testing_mode" className="text-sm">
+                                Testing Mode (Allows short durations without
+                                auto-suspension)
+                            </Label>
+                        </div>
+                        <div>
+                            <Label htmlFor="reason">Reason (Optional)</Label>
+                            <Textarea
+                                id="reason"
+                                value={overrideData.reason}
+                                onChange={(e) =>
+                                    setOverrideData({
+                                        ...overrideData,
+                                        reason: e.target.value,
+                                    })
+                                }
+                                placeholder="Reason for status change..."
+                                className="w-full"
+                                rows={3}
+                            />
+                        </div>
+                        <div className="flex gap-2 pt-4">
+                            <Button
+                                onClick={handleOverrideStatus}
+                                disabled={loading}
+                                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                            >
+                                {loading ? "Updating..." : "Update Status"}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setOverrideDialogOpen(false)}
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </AuthenticatedLayout>
     );
 }

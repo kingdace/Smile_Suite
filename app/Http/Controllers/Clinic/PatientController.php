@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Clinic\PatientRequest;
 use App\Models\Patient;
 use App\Services\PatientLinkingService;
+use App\Traits\SubscriptionAccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Log;
 
 class PatientController extends Controller
 {
+    use SubscriptionAccessControl;
+
     protected $psgcApi;
     protected $patientLinkingService;
 
@@ -28,6 +31,9 @@ class PatientController extends Controller
 
     public function index(Request $request)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $query = Auth::user()->clinic->patients()
             ->with(['appointments', 'treatments', 'payments']);
 
@@ -145,15 +151,15 @@ class PatientController extends Controller
     public function store(PatientRequest $request)
     {
         $validated = $request->validated();
-        
+
         // Use the patient linking service to handle creation
         $result = $this->patientLinkingService->handleManualPatientCreation(
-            $validated, 
+            $validated,
             Auth::user()->clinic
         );
-        
+
         $patient = $result['patient'];
-        
+
         // Check if the request expects JSON (API request)
         if ($request->expectsJson()) {
             return response()->json([

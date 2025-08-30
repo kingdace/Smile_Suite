@@ -8,9 +8,12 @@ use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Traits\SubscriptionAccessControl;
 
 class InventoryController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -18,6 +21,9 @@ class InventoryController extends Controller
 
     public function index(Request $request, Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $user = Auth::user();
 
         // Check if user belongs to this clinic

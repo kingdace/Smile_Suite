@@ -10,9 +10,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Traits\SubscriptionAccessControl;
 
 class TreatmentController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -20,6 +23,9 @@ class TreatmentController extends Controller
 
     public function index(Request $request)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $clinicId = Auth::user()->clinic->id;
 
         $query = Treatment::where('clinic_id', $clinicId)

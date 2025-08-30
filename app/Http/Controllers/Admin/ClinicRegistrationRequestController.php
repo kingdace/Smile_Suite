@@ -128,17 +128,12 @@ class ClinicRegistrationRequestController extends Controller
             ]);
 
             try {
-                // First, try to send the email immediately
+                // Send the setup email (clinic will be created during setup completion)
                 Log::info('Attempting to send TrialSetupEmail to: ' . $registrationRequest->email);
 
-                // Send the email first (before creating clinic to avoid transaction issues)
                 Mail::to($registrationRequest->email)->send(new TrialSetupEmail($registrationRequest));
                 Log::info('Free trial setup email sent successfully to: ' . $registrationRequest->email);
                 $emailStatus = 'Email sent successfully';
-
-                // Then create clinic and user
-                $this->createClinicFromRequest($registrationRequest);
-                Log::info('Clinic and user created successfully for Basic plan');
 
                 // Generate setup link
                 $setupLink = route('clinic.setup', ['token' => $registrationRequest->approval_token]);
@@ -512,7 +507,8 @@ class ClinicRegistrationRequestController extends Controller
                     'name' => $request->clinic_name,
                     'slug' => $slug,
                     'email' => $request->email,
-                    'phone' => $request->phone,
+                    'contact_number' => $request->phone,
+                    'license_number' => $request->license_number,
                     'description' => $request->description,
                     'subscription_plan' => $request->subscription_plan,
                     'subscription_status' => 'trial',

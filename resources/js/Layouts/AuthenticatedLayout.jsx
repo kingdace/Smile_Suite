@@ -28,10 +28,14 @@ import {
 } from "lucide-react";
 import { route } from "ziggy-js";
 import SiteHeader from "@/Components/SiteHeader";
+import CompactSubscriptionStatus from "@/Components/CompactSubscriptionStatus";
+import SubscriptionRequestDialog from "@/Components/SubscriptionRequestDialog";
 
 // Subscription Countdown Component
 const SubscriptionCountdown = ({ clinic }) => {
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogType, setDialogType] = useState(null);
 
     // Update time every second for real-time countdown
     useEffect(() => {
@@ -96,6 +100,88 @@ const SubscriptionCountdown = ({ clinic }) => {
         return <Calendar className="w-4 h-4" />;
     };
 
+    const handleUpgradeClick = () => {
+        setDialogType("upgrade");
+        setDialogOpen(true);
+    };
+
+    const handleRenewClick = () => {
+        setDialogType("renew");
+        setDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+        setDialogType(null);
+    };
+
+    const handleUpgradeSubmit = async () => {
+        // Determine the next available plan for upgrade
+        let nextPlan = "premium"; // Default
+        if (clinic?.subscription_plan === "basic") {
+            nextPlan = "premium"; // Basic -> Premium
+        } else if (clinic?.subscription_plan === "premium") {
+            nextPlan = "enterprise"; // Premium -> Enterprise
+        } else if (clinic?.subscription_plan === "enterprise") {
+            // If already enterprise, show error
+            return {
+                success: false,
+                message: "You are already on the highest plan available.",
+            };
+        }
+
+        const response = await fetch(route("clinic.subscription.upgrade"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({
+                new_plan: nextPlan,
+                duration_months: 1,
+                message: `Requested upgrade from ${
+                    clinic?.subscription_plan || "Basic"
+                } to ${nextPlan} via main header Upgrade button`,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return errorData;
+        }
+
+        const result = await response.json();
+        return result;
+    };
+
+    const handleRenewSubmit = async () => {
+        const response = await fetch(route("clinic.subscription.renew"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+            body: JSON.stringify({
+                duration_months: 1,
+                message: `Requested via main header ${
+                    isTrial ? "Extend Trial" : "Renew"
+                } button`,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return errorData;
+        }
+
+        const result = await response.json();
+        return result;
+    };
+
     return (
         <div className="flex items-center gap-4">
             {/* Subscription Status Badge */}
@@ -154,12 +240,7 @@ const SubscriptionCountdown = ({ clinic }) => {
             <div className="flex items-center gap-1 lg:gap-2">
                 <Button
                     size="sm"
-                    onClick={() => {
-                        // TODO: Implement upgrade functionality
-                        alert(
-                            "Upgrade functionality will be implemented here!"
-                        );
-                    }}
+                    onClick={handleUpgradeClick}
                     className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
                 >
                     <Crown className="w-3 h-3 mr-1" />
@@ -168,12 +249,7 @@ const SubscriptionCountdown = ({ clinic }) => {
                 </Button>
                 <Button
                     size="sm"
-                    onClick={() => {
-                        // TODO: Implement extend trial functionality
-                        alert(
-                            "Extend trial functionality will be implemented here!"
-                        );
-                    }}
+                    onClick={handleRenewClick}
                     className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
                 >
                     <Zap className="w-3 h-3 mr-1" />
@@ -185,6 +261,20 @@ const SubscriptionCountdown = ({ clinic }) => {
                     </span>
                 </Button>
             </div>
+
+            {/* Custom Dialog */}
+            <SubscriptionRequestDialog
+                isOpen={dialogOpen}
+                onClose={handleDialogClose}
+                requestType={dialogType}
+                onSubmit={
+                    dialogType === "upgrade"
+                        ? handleUpgradeSubmit
+                        : handleRenewSubmit
+                }
+                isTrial={isTrial}
+                clinic={clinic}
+            />
         </div>
     );
 };
@@ -477,6 +567,15 @@ const Header = ({
                                                 User Management
                                             </Dropdown.Link>
                                         )}
+                                        <Dropdown.Link
+                                            href={route(
+                                                "clinic.subscription.index"
+                                            )}
+                                            className="flex items-center"
+                                        >
+                                            <Crown className="w-4 h-4 mr-2" />
+                                            Subscription
+                                        </Dropdown.Link>
                                         <Dropdown.Link
                                             href={(() => {
                                                 const clinicId =

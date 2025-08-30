@@ -10,6 +10,7 @@ use App\Models\Clinic;
 use App\Models\Patient;
 use App\Services\AppointmentService;
 use App\Http\Controllers\PsgcApiController;
+use App\Traits\SubscriptionAccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
+    use SubscriptionAccessControl;
+
     protected $appointmentService;
 
     public function __construct(AppointmentService $appointmentService)
@@ -30,6 +33,9 @@ class AppointmentController extends Controller
 
     public function index(Request $request, Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $this->authorize('viewAny', [Appointment::class, $clinic]);
 
         $appointments = $clinic->appointments()

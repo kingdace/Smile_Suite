@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Models\Clinic;
 use Carbon\Carbon;
+use App\Traits\SubscriptionAccessControl;
 
 class PaymentController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -22,6 +25,9 @@ class PaymentController extends Controller
 
     public function index(Request $request, Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $query = $clinic->payments()->with(['patient', 'treatment', 'receivedBy']);
 
         // Advanced search functionality

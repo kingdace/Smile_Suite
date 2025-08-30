@@ -9,12 +9,15 @@ use App\Models\Inventory;
 use App\Models\Patient;
 use App\Models\Treatment;
 use App\Services\SubscriptionService;
+use App\Traits\SubscriptionAccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    use SubscriptionAccessControl;
+
     protected $subscriptionService;
 
     public function __construct(SubscriptionService $subscriptionService)
@@ -25,6 +28,9 @@ class DashboardController extends Controller
 
     public function index(Request $request, Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $user = Auth::user();
 
         // Check if user is inactive

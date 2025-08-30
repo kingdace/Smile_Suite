@@ -1713,6 +1713,13 @@ export default function Show({ auth, request, flash }) {
                 onOpenChange={setVerifyPaymentDialogOpen}
             >
                 <AlertDialogContent className="max-w-md bg-white border-0 shadow-2xl rounded-2xl overflow-hidden">
+                    <AlertDialogTitle className="sr-only">
+                        Verify Payment
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="sr-only">
+                        Confirm payment verification for clinic
+                    </AlertDialogDescription>
+
                     {/* Header Section */}
                     <div className="bg-gradient-to-br from-orange-500 to-yellow-600 px-6 py-4 text-center relative overflow-hidden">
                         {/* Background Pattern */}

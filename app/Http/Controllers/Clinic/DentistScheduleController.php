@@ -9,9 +9,12 @@ use App\Services\ScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Traits\SubscriptionAccessControl;
 
 class DentistScheduleController extends Controller
 {
+    use SubscriptionAccessControl;
+
     protected $scheduleService;
 
     public function __construct(ScheduleService $scheduleService)
@@ -19,10 +22,11 @@ class DentistScheduleController extends Controller
         $this->scheduleService = $scheduleService;
     }
 
-
-
     public function index(Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $schedules = DentistSchedule::with('dentist')
             ->where('clinic_id', $clinic->id)
             ->get()

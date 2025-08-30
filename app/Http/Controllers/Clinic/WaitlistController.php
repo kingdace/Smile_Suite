@@ -13,11 +13,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use App\Traits\SubscriptionAccessControl;
 
 class WaitlistController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function index(Request $request, Clinic $clinic)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $this->authorize('viewAny', [Waitlist::class, $clinic]);
 
         $waitlist = $clinic->waitlist()

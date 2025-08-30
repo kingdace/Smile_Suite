@@ -34,8 +34,10 @@ export default function Index({
     const [searchValue, setSearchValue] = useState(filters.search || "");
     const [statusFilter, setStatusFilter] = useState(filters.status || "all");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [hardDeleteDialogOpen, setHardDeleteDialogOpen] = useState(false);
     const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
     const [clinicToDelete, setClinicToDelete] = useState(null);
+    const [clinicToHardDelete, setClinicToHardDelete] = useState(null);
     const [clinicToRestore, setClinicToRestore] = useState(null);
 
     const handleSearchChange = (e) => {
@@ -93,6 +95,11 @@ export default function Index({
         setRestoreDialogOpen(true);
     };
 
+    const handleHardDeleteClick = (clinic) => {
+        setClinicToHardDelete(clinic);
+        setHardDeleteDialogOpen(true);
+    };
+
     const confirmDelete = () => {
         if (clinicToDelete) {
             router.delete(route("admin.clinics.destroy", clinicToDelete.id), {
@@ -123,6 +130,25 @@ export default function Index({
                         console.error("Restore failed:", errors);
                         setRestoreDialogOpen(false);
                         setClinicToRestore(null);
+                    },
+                }
+            );
+        }
+    };
+
+    const confirmHardDelete = () => {
+        if (clinicToHardDelete) {
+            router.delete(
+                route("admin.clinics.hard-delete", clinicToHardDelete.id),
+                {
+                    onSuccess: () => {
+                        setHardDeleteDialogOpen(false);
+                        setClinicToHardDelete(null);
+                    },
+                    onError: (errors) => {
+                        console.error("Hard delete failed:", errors);
+                        setHardDeleteDialogOpen(false);
+                        setClinicToHardDelete(null);
                     },
                 }
             );
@@ -425,17 +451,31 @@ export default function Index({
                                                                     </button>
 
                                                                     {clinic.deleted_at ? (
-                                                                        <button
-                                                                            onClick={() =>
-                                                                                handleRestoreClick(
-                                                                                    clinic
-                                                                                )
-                                                                            }
-                                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-semibold hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
-                                                                        >
-                                                                            <RotateCcw className="w-3 h-3" />
-                                                                            Restore
-                                                                        </button>
+                                                                        <div className="flex gap-1">
+                                                                            <button
+                                                                                onClick={() =>
+                                                                                    handleRestoreClick(
+                                                                                        clinic
+                                                                                    )
+                                                                                }
+                                                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-semibold hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                            >
+                                                                                <RotateCcw className="w-3 h-3" />
+                                                                                Restore
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() =>
+                                                                                    handleHardDeleteClick(
+                                                                                        clinic
+                                                                                    )
+                                                                                }
+                                                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white text-xs font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
+                                                                            >
+                                                                                <Trash2 className="w-3 h-3" />
+                                                                                Hard
+                                                                                Delete
+                                                                            </button>
+                                                                        </div>
                                                                     ) : (
                                                                         <button
                                                                             onClick={() =>
@@ -646,6 +686,70 @@ export default function Index({
                                 </button>
                                 <button
                                     onClick={() => setRestoreDialogOpen(false)}
+                                    className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Hard Delete Confirmation Dialog */}
+            {hardDeleteDialogOpen && clinicToHardDelete && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm relative animate-fade-in border border-gray-200/50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-red-600 to-red-700 p-4 text-white relative">
+                            <button
+                                onClick={() => setHardDeleteDialogOpen(false)}
+                                className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors duration-200 focus:outline-none"
+                                aria-label="Close"
+                                type="button"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">
+                                        Permanently Delete Clinic
+                                    </h2>
+                                    <p className="text-red-100 text-xs">
+                                        This action cannot be undone
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            <div className="text-center">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <AlertCircle className="w-6 h-6 text-red-600" />
+                                </div>
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                    Permanently Delete {clinicToHardDelete.name}
+                                    ?
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    This will permanently delete the clinic and
+                                    all associated data including users,
+                                    patients, appointments, treatments, and
+                                    services. This action cannot be undone.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 pt-3">
+                                <button
+                                    onClick={confirmHardDelete}
+                                    className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 text-sm"
+                                >
+                                    Permanently Delete
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setHardDeleteDialogOpen(false)
+                                    }
                                     className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
                                 >
                                     Cancel

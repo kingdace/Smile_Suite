@@ -13,9 +13,12 @@ use App\Models\Patient;
 use App\Models\Appointment;
 use App\Models\Treatment;
 use App\Models\Inventory;
+use App\Traits\SubscriptionAccessControl;
 
 class ReportController extends Controller
 {
+    use SubscriptionAccessControl;
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -23,6 +26,9 @@ class ReportController extends Controller
 
     public function index(Request $request)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $clinic = Auth::user()->clinic;
 
         // Get date range for filtering

@@ -56,7 +56,7 @@ class RouteServiceProvider extends ServiceProvider
 
         // Rate limiting for clinic registration
         RateLimiter::for('clinic-registration', function (Request $request) {
-            return Limit::perHour(3)->by($request->ip());
+            return Limit::perHour(20)->by($request->ip()); // Increased for development/testing
         });
     }
 }
