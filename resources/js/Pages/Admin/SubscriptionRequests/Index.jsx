@@ -50,6 +50,8 @@ import {
     Clock3,
     User,
     Building2,
+    Hash,
+    FileText,
 } from "lucide-react";
 import React, { useState } from "react";
 import axios from "axios";
@@ -110,6 +112,9 @@ export default function SubscriptionRequestsIndex({
         admin_notes: "",
         payment_verification_notes: "",
     });
+    const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+    const [selectedRequestForDetails, setSelectedRequestForDetails] =
+        useState(null);
 
     const filteredRequests = (requests || [])
         .filter((request) => {
@@ -208,6 +213,11 @@ export default function SubscriptionRequestsIndex({
         setExpandedRows(newExpanded);
     };
 
+    const handleViewDetails = (request) => {
+        setSelectedRequestForDetails(request);
+        setDetailsModalOpen(true);
+    };
+
     const getStatusIcon = (status) => {
         const IconComponent = STATUS_ICONS[status];
         return IconComponent ? <IconComponent className="w-4 h-4" /> : null;
@@ -225,19 +235,19 @@ export default function SubscriptionRequestsIndex({
             <div className="py-8">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {/* Header */}
-                    <div className="mb-8">
-                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
+                    <div className="mb-6">
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <div className="flex items-center gap-4 mb-3">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                                            <Building2 className="w-8 h-8 text-white" />
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                            <Building2 className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+                                            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
                                                 Subscription Requests
                                             </h1>
-                                            <p className="text-blue-600 text-lg font-medium mt-1">
+                                            <p className="text-blue-600 text-base font-medium mt-1">
                                                 Manage upgrade and renewal
                                                 requests from clinics
                                             </p>
@@ -248,11 +258,11 @@ export default function SubscriptionRequestsIndex({
                                     <Button
                                         onClick={() => router.reload()}
                                         disabled={refreshing}
-                                        size="lg"
+                                        size="default"
                                         className="bg-white text-blue-600 border-2 border-blue-200 hover:bg-blue-50 hover:border-blue-300 shadow-lg hover:shadow-xl transition-all duration-200"
                                     >
                                         <RefreshCw
-                                            className={`w-5 h-5 mr-2 ${
+                                            className={`w-4 h-4 mr-2 ${
                                                 refreshing ? "animate-spin" : ""
                                             }`}
                                         />
@@ -264,27 +274,27 @@ export default function SubscriptionRequestsIndex({
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl overflow-hidden">
-                            <CardContent className="p-6 relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl overflow-hidden">
+                            <CardContent className="p-4 relative">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -translate-y-12 translate-x-12"></div>
                                 <div className="relative z-10">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                                            <BarChart3 className="w-6 h-6 text-white" />
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <BarChart3 className="w-5 h-5 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-white text-opacity-80 text-sm font-medium">
+                                            <p className="text-white text-opacity-80 text-xs font-medium">
                                                 Total Requests
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-4xl font-bold text-white mb-2">
+                                    <p className="text-3xl font-bold text-white mb-2">
                                         {stats?.total || 0}
                                     </p>
-                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
+                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-1.5">
                                         <div
-                                            className="bg-white h-2 rounded-full"
+                                            className="bg-white h-1.5 rounded-full"
                                             style={{ width: "100%" }}
                                         ></div>
                                     </div>
@@ -292,26 +302,26 @@ export default function SubscriptionRequestsIndex({
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 shadow-xl bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl overflow-hidden">
-                            <CardContent className="p-6 relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl overflow-hidden">
+                            <CardContent className="p-4 relative">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -translate-y-12 translate-x-12"></div>
                                 <div className="relative z-10">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                                            <Clock className="w-6 h-6 text-white" />
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <Clock className="w-5 h-5 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-white text-opacity-80 text-sm font-medium">
+                                            <p className="text-white text-opacity-80 text-xs font-medium">
                                                 Pending
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-4xl font-bold text-white mb-2">
+                                    <p className="text-3xl font-bold text-white mb-2">
                                         {stats?.pending || 0}
                                     </p>
-                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
+                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-1.5">
                                         <div
-                                            className="bg-white h-2 rounded-full"
+                                            className="bg-white h-1.5 rounded-full"
                                             style={{ width: "100%" }}
                                         ></div>
                                     </div>
@@ -319,26 +329,26 @@ export default function SubscriptionRequestsIndex({
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 shadow-xl bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl overflow-hidden">
-                            <CardContent className="p-6 relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl overflow-hidden">
+                            <CardContent className="p-4 relative">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -translate-y-12 translate-x-12"></div>
                                 <div className="relative z-10">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                                            <Crown className="w-6 h-6 text-white" />
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <Crown className="w-5 h-5 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-white text-opacity-80 text-sm font-medium">
+                                            <p className="text-white text-opacity-80 text-xs font-medium">
                                                 Upgrades
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-4xl font-bold text-white mb-2">
+                                    <p className="text-3xl font-bold text-white mb-2">
                                         {stats?.upgrades || 0}
                                     </p>
-                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
+                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-1.5">
                                         <div
-                                            className="bg-white h-2 rounded-full"
+                                            className="bg-white h-1.5 rounded-full"
                                             style={{ width: "100%" }}
                                         ></div>
                                     </div>
@@ -346,26 +356,26 @@ export default function SubscriptionRequestsIndex({
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 shadow-xl bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl overflow-hidden">
-                            <CardContent className="p-6 relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl overflow-hidden">
+                            <CardContent className="p-4 relative">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -translate-y-12 translate-x-12"></div>
                                 <div className="relative z-10">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-                                            <RefreshCw className="w-6 h-6 text-white" />
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <RefreshCw className="w-5 h-5 text-white" />
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-white text-opacity-80 text-sm font-medium">
+                                            <p className="text-white text-opacity-80 text-xs font-medium">
                                                 Renewals
                                             </p>
                                         </div>
                                     </div>
-                                    <p className="text-4xl font-bold text-white mb-2">
+                                    <p className="text-3xl font-bold text-white mb-2">
                                         {stats?.renewals || 0}
                                     </p>
-                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
+                                    <div className="w-full bg-white bg-opacity-20 rounded-full h-1.5">
                                         <div
-                                            className="bg-white h-2 rounded-full"
+                                            className="bg-white h-1.5 rounded-full"
                                             style={{ width: "100%" }}
                                         ></div>
                                     </div>
@@ -375,13 +385,13 @@ export default function SubscriptionRequestsIndex({
                     </div>
 
                     {/* Filters and Search */}
-                    <Card className="border-0 shadow-xl bg-white mb-8 rounded-2xl">
-                        <CardContent className="p-8">
-                            <div className="flex flex-col lg:flex-row gap-6">
+                    <Card className="border-0 shadow-lg bg-white mb-6 rounded-xl">
+                        <CardContent className="p-6">
+                            <div className="flex flex-col lg:flex-row gap-4">
                                 <div className="flex-1">
                                     <div className="relative">
-                                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                                            <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                            <div className="w-7 h-7 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
                                                 <Search className="w-4 h-4 text-blue-600" />
                                             </div>
                                         </div>
@@ -391,18 +401,18 @@ export default function SubscriptionRequestsIndex({
                                             onChange={(e) =>
                                                 setSearchTerm(e.target.value)
                                             }
-                                            className="pl-16 pr-6 py-4 text-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-xl bg-gray-50 focus:bg-white transition-all duration-200"
+                                            className="pl-12 pr-4 py-3 text-base border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg bg-gray-50 focus:bg-white transition-all duration-200"
                                         />
                                     </div>
                                 </div>
-                                <div className="flex gap-4">
+                                <div className="flex gap-3">
                                     <div className="relative">
                                         <select
                                             value={statusFilter}
                                             onChange={(e) =>
                                                 setStatusFilter(e.target.value)
                                             }
-                                            className="appearance-none px-6 py-4 pr-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 bg-gray-50 focus:bg-white transition-all duration-200 text-lg font-medium"
+                                            className="appearance-none px-4 py-3 pr-10 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50 focus:bg-white transition-all duration-200 text-base font-medium"
                                         >
                                             <option value="all">
                                                 All Status
@@ -420,8 +430,8 @@ export default function SubscriptionRequestsIndex({
                                                 Completed
                                             </option>
                                         </select>
-                                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                            <ChevronDown className="w-4 h-4 text-gray-400" />
                                         </div>
                                     </div>
                                     <div className="relative">
@@ -430,7 +440,7 @@ export default function SubscriptionRequestsIndex({
                                             onChange={(e) =>
                                                 setTypeFilter(e.target.value)
                                             }
-                                            className="appearance-none px-6 py-4 pr-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 bg-gray-50 focus:bg-white transition-all duration-200 text-lg font-medium"
+                                            className="appearance-none px-4 py-3 pr-10 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50 focus:bg-white transition-all duration-200 text-base font-medium"
                                         >
                                             <option value="all">
                                                 All Types
@@ -442,8 +452,8 @@ export default function SubscriptionRequestsIndex({
                                                 Renewals
                                             </option>
                                         </select>
-                                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                            <ChevronDown className="w-4 h-4 text-gray-400" />
                                         </div>
                                     </div>
                                 </div>
@@ -452,633 +462,311 @@ export default function SubscriptionRequestsIndex({
                     </Card>
 
                     {/* Requests Table */}
-                    <Card className="border-0 shadow-xl bg-white rounded-2xl overflow-hidden">
-                        <CardHeader className="border-b-2 border-gray-100 bg-gradient-to-r from-gray-50 to-blue-50 p-8">
-                            <CardTitle className="flex items-center justify-between text-2xl">
-                                <span className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                                        <Activity className="w-6 h-6 text-white" />
-                                    </div>
-                                    <div>
-                                        <span className="font-bold text-gray-800">
-                                            Subscription Requests
-                                        </span>
-                                        <span className="ml-3 text-lg font-medium text-blue-600 bg-blue-100 px-4 py-2 rounded-full">
-                                            {filteredRequests.length} requests
-                                        </span>
-                                    </div>
-                                </span>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            {filteredRequests.length === 0 ? (
-                                <div className="text-center py-16">
-                                    <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                    <h3 className="text-xl font-medium text-gray-900 mb-2">
-                                        No requests found
-                                    </h3>
-                                    <p className="text-gray-500">
-                                        No subscription requests match your
-                                        current filters.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead className="bg-gradient-to-r from-gray-50 to-blue-50">
-                                            <tr className="border-b-2 border-gray-200">
-                                                <th className="text-left py-6 px-8 font-bold text-gray-800 text-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
-                                                            <Building2 className="w-5 h-5 text-blue-600" />
-                                                        </div>
-                                                        <span>
-                                                            Clinic Information
-                                                        </span>
+                    <div className="bg-gradient-to-br from-blue-50 via-white to-cyan-50/30 rounded-xl shadow-lg border border-blue-200/50 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full divide-y divide-blue-100">
+                                <thead className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider min-w-[220px]">
+                                            <Building2 className="inline w-4 h-4 mr-2" />
+                                            Clinic Name
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider min-w-[120px]">
+                                            <Target className="inline w-4 h-4 mr-2" />
+                                            Type
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider min-w-[120px]">
+                                            <Crown className="inline w-4 h-4 mr-2" />
+                                            Plan
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider min-w-[120px]">
+                                            <DollarSign className="inline w-4 h-4 mr-2" />
+                                            Amount
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider min-w-[120px]">
+                                            <Activity className="inline w-4 h-4 mr-2" />
+                                            Status
+                                        </th>
+                                        <th className="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider min-w-[100px]">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-blue-100">
+                                    {filteredRequests.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan={6}
+                                                className="text-center py-16 text-gray-500"
+                                            >
+                                                <div className="flex flex-col items-center gap-4">
+                                                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center">
+                                                        <Bell className="w-8 h-8 text-blue-400" />
                                                     </div>
-                                                </th>
-                                                <th className="text-left py-6 px-8 font-bold text-gray-800 text-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center">
-                                                            <Target className="w-5 h-5 text-purple-600" />
-                                                        </div>
-                                                        <span>
-                                                            Request Details
-                                                        </span>
+                                                    <div>
+                                                        <p className="text-lg font-semibold text-gray-700 mb-2">
+                                                            No Requests Found
+                                                        </p>
+                                                        <p className="text-sm text-gray-500 max-w-md">
+                                                            No subscription
+                                                            requests match your
+                                                            current filters.
+                                                        </p>
                                                     </div>
-                                                </th>
-                                                <th className="text-left py-6 px-8 font-bold text-gray-800 text-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
-                                                            <DollarSign className="w-5 h-5 text-green-600" />
-                                                        </div>
-                                                        <span>
-                                                            Payment Info
-                                                        </span>
-                                                    </div>
-                                                </th>
-                                                <th className="text-left py-6 px-8 font-bold text-gray-800 text-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center">
-                                                            <CalendarDays className="w-5 h-5 text-orange-600" />
-                                                        </div>
-                                                        <span>Date & Time</span>
-                                                    </div>
-                                                </th>
-                                                <th className="text-left py-6 px-8 font-bold text-gray-800 text-lg">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center">
-                                                            <Settings className="w-5 h-5 text-red-600" />
-                                                        </div>
-                                                        <span>Actions</span>
-                                                    </div>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {filteredRequests.map(
-                                                (request, index) => (
-                                                    <tr
-                                                        key={request.id}
-                                                        className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 ${
-                                                            index % 2 === 0
-                                                                ? "bg-white"
-                                                                : "bg-gray-50"
-                                                        }`}
-                                                    >
-                                                        {/* Clinic Information */}
-                                                        <td className="py-8 px-8">
-                                                            <div className="flex items-start space-x-4">
-                                                                <div className="flex-shrink-0">
-                                                                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                                                                        <Building2 className="w-8 h-8 text-white" />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-                                                                        <p className="text-lg font-bold text-gray-900 mb-2">
-                                                                            {
-                                                                                request
-                                                                                    .clinic
-                                                                                    .name
-                                                                            }
-                                                                        </p>
-                                                                        <div className="flex items-center gap-2 text-blue-600">
-                                                                            <Mail className="w-4 h-4" />
-                                                                            <p className="text-sm font-medium">
-                                                                                {
-                                                                                    request
-                                                                                        .clinic
-                                                                                        .email
-                                                                                }
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredRequests.map(
+                                            (request, index) => (
+                                                <tr
+                                                    key={request.id}
+                                                    className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-cyan-50/50 transition-all duration-300 ${
+                                                        index % 2 === 0
+                                                            ? "bg-white"
+                                                            : "bg-blue-50/20"
+                                                    }`}
+                                                >
+                                                    {/* Clinic Name */}
+                                                    <td className="px-4 py-3">
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="flex-shrink-0">
+                                                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-sm">
+                                                                    <Building2 className="w-4 h-4 text-white" />
                                                                 </div>
                                                             </div>
-                                                        </td>
-
-                                                        {/* Request Details */}
-                                                        <td className="py-8 px-8">
-                                                            <div className="space-y-4">
-                                                                {/* Request Type Badge */}
-                                                                <div className="flex justify-center">
-                                                                    <Badge
-                                                                        className={`${
-                                                                            REQUEST_TYPE_COLORS[
-                                                                                request
-                                                                                    .request_type
-                                                                            ]
-                                                                        } border-0 px-6 py-3 text-lg font-bold rounded-xl shadow-lg`}
-                                                                    >
-                                                                        <div className="flex items-center gap-2">
-                                                                            {getRequestTypeIcon(
-                                                                                request.request_type
-                                                                            )}
-                                                                            <span>
-                                                                                {request.request_type
-                                                                                    .charAt(
-                                                                                        0
-                                                                                    )
-                                                                                    .toUpperCase() +
-                                                                                    request.request_type.slice(
-                                                                                        1
-                                                                                    )}
-                                                                            </span>
-                                                                        </div>
-                                                                    </Badge>
-                                                                </div>
-
-                                                                {/* Plan Details */}
-                                                                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 shadow-lg">
-                                                                    <h4 className="text-lg font-bold text-purple-800 mb-4 flex items-center gap-2">
-                                                                        <Target className="w-5 h-5" />
-                                                                        Plan
-                                                                        Information
-                                                                    </h4>
-                                                                    <div className="space-y-3">
-                                                                        <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-purple-100">
-                                                                            <span className="text-purple-700 font-medium">
-                                                                                Current
-                                                                                Plan:
-                                                                            </span>
-                                                                            <span className="font-bold text-purple-900 bg-purple-100 px-3 py-1 rounded-lg">
-                                                                                {request.current_plan
-                                                                                    .charAt(
-                                                                                        0
-                                                                                    )
-                                                                                    .toUpperCase() +
-                                                                                    request.current_plan.slice(
-                                                                                        1
-                                                                                    )}
-                                                                            </span>
-                                                                        </div>
-                                                                        {request.requested_plan && (
-                                                                            <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-purple-100">
-                                                                                <span className="text-purple-700 font-medium">
-                                                                                    New
-                                                                                    Plan:
-                                                                                </span>
-                                                                                <span className="font-bold text-purple-900 bg-purple-100 px-3 py-1 rounded-lg">
-                                                                                    {request.requested_plan
-                                                                                        .charAt(
-                                                                                            0
-                                                                                        )
-                                                                                        .toUpperCase() +
-                                                                                        request.requested_plan.slice(
-                                                                                            1
-                                                                                        )}
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
-                                                                        <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-purple-100">
-                                                                            <span className="text-purple-700 font-medium">
-                                                                                Duration:
-                                                                            </span>
-                                                                            <span className="font-bold text-purple-900 bg-purple-100 px-3 py-1 rounded-lg">
-                                                                                {
-                                                                                    request.duration_months
-                                                                                }{" "}
-                                                                                month(s)
-                                                                            </span>
-                                                                        </div>
-                                                                        {request.calculated_amount && (
-                                                                            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white">
-                                                                                <span className="font-medium">
-                                                                                    Total
-                                                                                    Amount:
-                                                                                </span>
-                                                                                <span className="font-bold text-xl">
-                                                                                    ₱
-                                                                                    {parseFloat(
-                                                                                        request.calculated_amount
-                                                                                    ).toLocaleString()}
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Status Badges */}
-                                                                <div className="flex flex-wrap gap-3 justify-center">
-                                                                    <Badge
-                                                                        className={`${
-                                                                            STATUS_COLORS[
-                                                                                request
-                                                                                    .status
-                                                                            ]
-                                                                        } border-0 px-4 py-2 text-base font-bold rounded-xl shadow-lg`}
-                                                                    >
-                                                                        <span className="flex items-center gap-2">
-                                                                            {getStatusIcon(
-                                                                                request.status
-                                                                            )}
-                                                                            <span>
-                                                                                {request.status
-                                                                                    .replace(
-                                                                                        "_",
-                                                                                        " "
-                                                                                    )
-                                                                                    .charAt(
-                                                                                        0
-                                                                                    )
-                                                                                    .toUpperCase() +
-                                                                                    request.status
-                                                                                        .replace(
-                                                                                            "_",
-                                                                                            " "
-                                                                                        )
-                                                                                        .slice(
-                                                                                            1
-                                                                                        )}
-                                                                            </span>
-                                                                        </span>
-                                                                    </Badge>
-
-                                                                    {/* Payment Status Badges */}
-                                                                    {request.payment_status ===
-                                                                        "pending_verification" && (
-                                                                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 px-4 py-2 text-base font-bold rounded-xl shadow-lg">
-                                                                            <DollarSign className="w-4 h-4 mr-1" />
-                                                                            Payment
-                                                                            Pending
-                                                                            Verification
-                                                                        </Badge>
-                                                                    )}
-
-                                                                    {request.payment_status ===
-                                                                        "verified" && (
-                                                                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 px-4 py-2 text-base font-bold rounded-xl shadow-lg">
-                                                                            <DollarSign className="w-4 h-4 mr-1" />
-                                                                            Payment
-                                                                            Verified
-                                                                        </Badge>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </td>
-
-                                                        {/* Payment Information */}
-                                                        <td className="py-8 px-8">
-                                                            <div className="space-y-4">
-                                                                {/* Payment Method & Reference */}
-                                                                {request.payment_method && (
-                                                                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100 shadow-lg">
-                                                                        <div className="flex items-center gap-3 mb-4">
-                                                                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                                                                                <CreditCard className="w-5 h-5 text-white" />
-                                                                            </div>
-                                                                            <span className="text-lg font-bold text-green-800">
-                                                                                Payment
-                                                                                Details
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="space-y-3">
-                                                                            <div className="flex justify-between">
-                                                                                <span className="text-blue-600">
-                                                                                    Method:
-                                                                                </span>
-                                                                                <span className="font-medium text-blue-900">
-                                                                                    {request.payment_method
-                                                                                        .replace(
-                                                                                            "_",
-                                                                                            " "
-                                                                                        )
-                                                                                        .charAt(
-                                                                                            0
-                                                                                        )
-                                                                                        .toUpperCase() +
-                                                                                        request.payment_method
-                                                                                            .replace(
-                                                                                                "_",
-                                                                                                " "
-                                                                                            )
-                                                                                            .slice(
-                                                                                                1
-                                                                                            )}
-                                                                                </span>
-                                                                            </div>
-                                                                            {request.reference_number && (
-                                                                                <div className="flex justify-between">
-                                                                                    <span className="text-blue-600">
-                                                                                        Reference:
-                                                                                    </span>
-                                                                                    <span className="font-mono font-medium text-blue-900">
-                                                                                        {
-                                                                                            request.reference_number
-                                                                                        }
-                                                                                    </span>
-                                                                                </div>
-                                                                            )}
-                                                                            {request.sender_name && (
-                                                                                <div className="flex justify-between">
-                                                                                    <span className="text-blue-600">
-                                                                                        Sender:
-                                                                                    </span>
-                                                                                    <span className="font-medium text-blue-900">
-                                                                                        {
-                                                                                            request.sender_name
-                                                                                        }
-                                                                                    </span>
-                                                                                </div>
-                                                                            )}
-                                                                            {request.amount_sent && (
-                                                                                <div className="flex justify-between">
-                                                                                    <span className="text-blue-600">
-                                                                                        Amount
-                                                                                        Sent:
-                                                                                    </span>
-                                                                                    <span className="font-medium text-blue-900">
-                                                                                        ₱
-                                                                                        {request.amount_sent.toLocaleString()}
-                                                                                    </span>
-                                                                                </div>
-                                                                            )}
-                                                                            {request.payment_received_at && (
-                                                                                <div className="flex justify-between">
-                                                                                    <span className="text-blue-600">
-                                                                                        Received:
-                                                                                    </span>
-                                                                                    <span className="font-medium text-blue-900">
-                                                                                        {new Date(
-                                                                                            request.payment_received_at
-                                                                                        ).toLocaleDateString()}
-                                                                                    </span>
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Payment Details for Verification */}
-                                                                {request.payment_details &&
-                                                                    request.payment_status ===
-                                                                        "pending_verification" && (
-                                                                        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-3">
-                                                                            <div className="flex items-center gap-2 mb-3">
-                                                                                <DollarSign className="h-4 w-4 text-orange-600" />
-                                                                                <span className="text-sm font-semibold text-orange-800">
-                                                                                    Verification
-                                                                                    Required
-                                                                                </span>
-                                                                            </div>
-                                                                            <div className="space-y-2 text-xs">
-                                                                                {request
-                                                                                    .payment_details
-                                                                                    .sender_name && (
-                                                                                    <div className="flex justify-between items-center p-2 bg-white rounded border border-orange-100">
-                                                                                        <span className="font-medium text-orange-700">
-                                                                                            Sender:
-                                                                                        </span>
-                                                                                        <span className="text-orange-900 font-semibold">
-                                                                                            {
-                                                                                                request
-                                                                                                    .payment_details
-                                                                                                    .sender_name
-                                                                                            }
-                                                                                        </span>
-                                                                                    </div>
-                                                                                )}
-                                                                                {request
-                                                                                    .payment_details
-                                                                                    .sender_phone && (
-                                                                                    <div className="flex justify-between items-center p-2 bg-white rounded border border-orange-100">
-                                                                                        <span className="font-medium text-orange-700">
-                                                                                            Phone:
-                                                                                        </span>
-                                                                                        <span className="text-orange-900 font-mono font-semibold">
-                                                                                            {
-                                                                                                request
-                                                                                                    .payment_details
-                                                                                                    .sender_phone
-                                                                                            }
-                                                                                        </span>
-                                                                                    </div>
-                                                                                )}
-                                                                                {request
-                                                                                    .payment_details
-                                                                                    .transaction_reference && (
-                                                                                    <div className="flex justify-between items-center p-2 bg-white rounded border border-orange-100">
-                                                                                        <span className="font-medium text-orange-700">
-                                                                                            Reference:
-                                                                                        </span>
-                                                                                        <span className="text-orange-900 font-mono font-semibold">
-                                                                                            {
-                                                                                                request
-                                                                                                    .payment_details
-                                                                                                    .transaction_reference
-                                                                                            }
-                                                                                        </span>
-                                                                                    </div>
-                                                                                )}
-                                                                                {request
-                                                                                    .payment_details
-                                                                                    .payment_amount && (
-                                                                                    <div className="flex justify-between items-center p-2 bg-white rounded border border-orange-100">
-                                                                                        <span className="font-medium text-orange-700">
-                                                                                            Amount:
-                                                                                        </span>
-                                                                                        <span className="text-orange-900 font-semibold">
-                                                                                            ₱
-                                                                                            {parseFloat(
-                                                                                                request
-                                                                                                    .payment_details
-                                                                                                    .payment_amount
-                                                                                            ).toLocaleString(
-                                                                                                "en-US",
-                                                                                                {
-                                                                                                    minimumFractionDigits: 2,
-                                                                                                    maximumFractionDigits: 2,
-                                                                                                }
-                                                                                            )}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                            </div>
-                                                        </td>
-
-                                                        {/* Date */}
-                                                        <td className="py-8 px-8">
-                                                            <div className="text-sm text-gray-600 space-y-1">
-                                                                <div className="flex items-center gap-2">
-                                                                    <CalendarDays className="w-4 h-4 text-gray-400" />
-                                                                    <span className="font-medium">
-                                                                        {new Date(
-                                                                            request.created_at
-                                                                        ).toLocaleDateString()}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <span className="font-semibold text-gray-900 truncate">
+                                                                        {
+                                                                            request
+                                                                                .clinic
+                                                                                .name
+                                                                        }
                                                                     </span>
                                                                 </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <Clock3 className="w-4 h-4 text-gray-400" />
-                                                                    <span>
-                                                                        {new Date(
-                                                                            request.created_at
-                                                                        ).toLocaleTimeString()}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-
-                                                        {/* Actions */}
-                                                        <td className="py-8 px-8">
-                                                            <div className="flex flex-col gap-2">
-                                                                {/* View Details Button */}
-                                                                <Button
-                                                                    onClick={() =>
-                                                                        toggleRowExpansion(
+                                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                                    <span className="flex-shrink-0">
+                                                                        ID:{" "}
+                                                                        {
                                                                             request.id
-                                                                        )
-                                                                    }
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    className="w-full justify-start text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                                                                >
-                                                                    <Eye className="w-4 h-4 mr-2" />
-                                                                    View Details
-                                                                </Button>
-
-                                                                {/* Action Buttons */}
-                                                                {request.status ===
-                                                                    "pending" && (
-                                                                    <div className="space-y-2">
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleAction(
-                                                                                    request,
-                                                                                    "approve"
-                                                                                )
-                                                                            }
-                                                                            size="sm"
-                                                                            className="w-full bg-green-600 hover:bg-green-700 text-white"
-                                                                        >
-                                                                            <CheckCircle className="w-4 h-4 mr-2" />
-                                                                            Approve
-                                                                        </Button>
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleAction(
-                                                                                    request,
-                                                                                    "reject"
-                                                                                )
-                                                                            }
-                                                                            variant="destructive"
-                                                                            size="sm"
-                                                                            className="w-full"
-                                                                        >
-                                                                            <XCircle className="w-4 h-4 mr-2" />
-                                                                            Reject
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
-
-                                                                {request.status ===
-                                                                    "approved" &&
-                                                                    request.payment_status ===
-                                                                        "pending_verification" && (
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleAction(
-                                                                                    request,
-                                                                                    "verify-payment"
-                                                                                )
-                                                                            }
-                                                                            size="sm"
-                                                                            className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                                                                        >
-                                                                            <DollarSign className="w-4 h-4 mr-2" />
-                                                                            Verify
-                                                                            Payment
-                                                                        </Button>
-                                                                    )}
-
-                                                                {request.status ===
-                                                                    "approved" &&
-                                                                    request.payment_status ===
-                                                                        "verified" && (
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleAction(
-                                                                                    request,
-                                                                                    "complete"
-                                                                                )
-                                                                            }
-                                                                            size="sm"
-                                                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                                                                        >
-                                                                            <CheckCircle className="w-4 h-4 mr-2" />
-                                                                            Complete
-                                                                        </Button>
-                                                                    )}
-
-                                                                {request.status ===
-                                                                    "payment_received" && (
-                                                                    <div className="space-y-2">
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleAction(
-                                                                                    request,
-                                                                                    "complete"
-                                                                                )
-                                                                            }
-                                                                            size="sm"
-                                                                            className="w-full bg-green-600 hover:bg-green-700 text-white"
-                                                                        >
-                                                                            <CheckCircle className="w-4 h-4 mr-2" />
-                                                                            Verify
-                                                                            &
-                                                                            Complete
-                                                                        </Button>
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleAction(
-                                                                                    request,
-                                                                                    "reject"
-                                                                                )
-                                                                            }
-                                                                            variant="destructive"
-                                                                            size="sm"
-                                                                            className="w-full"
-                                                                        >
-                                                                            <XCircle className="w-4 h-4 mr-2" />
-                                                                            Reject
-                                                                            Payment
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
+                                                                        }
+                                                                    </span>
+                                                                </div>
                                                             </div>
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                                        </div>
+                                                    </td>
+
+                                                    {/* Type */}
+                                                    <td className="px-3 py-3">
+                                                        <Badge
+                                                            className={`${
+                                                                REQUEST_TYPE_COLORS[
+                                                                    request
+                                                                        .request_type
+                                                                ]
+                                                            } border-0 px-3 py-1 text-xs font-bold flex items-center gap-1 w-fit`}
+                                                        >
+                                                            {getRequestTypeIcon(
+                                                                request.request_type
+                                                            )}
+                                                            {request.request_type
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                request.request_type.slice(
+                                                                    1
+                                                                )}
+                                                        </Badge>
+                                                    </td>
+
+                                                    {/* Plan */}
+                                                    <td className="px-3 py-3">
+                                                        <div className="space-y-1">
+                                                            <div className="text-xs text-gray-500">
+                                                                Current:{" "}
+                                                                {request.current_plan
+                                                                    .charAt(0)
+                                                                    .toUpperCase() +
+                                                                    request.current_plan.slice(
+                                                                        1
+                                                                    )}
+                                                            </div>
+                                                            {request.requested_plan && (
+                                                                <div className="text-xs text-gray-500">
+                                                                    New:{" "}
+                                                                    {request.requested_plan
+                                                                        .charAt(
+                                                                            0
+                                                                        )
+                                                                        .toUpperCase() +
+                                                                        request.requested_plan.slice(
+                                                                            1
+                                                                        )}
+                                                                </div>
+                                                            )}
+                                                            <div className="text-xs text-gray-500">
+                                                                {
+                                                                    request.duration_months
+                                                                }{" "}
+                                                                month(s)
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                    {/* Amount */}
+                                                    <td className="px-3 py-3">
+                                                        {request.calculated_amount ? (
+                                                            <span className="font-semibold text-green-700">
+                                                                ₱
+                                                                {parseFloat(
+                                                                    request.calculated_amount
+                                                                ).toLocaleString()}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-gray-400">
+                                                                -
+                                                            </span>
+                                                        )}
+                                                    </td>
+
+                                                    {/* Status */}
+                                                    <td className="px-3 py-3">
+                                                        <div className="space-y-1">
+                                                            <Badge
+                                                                className={`${
+                                                                    STATUS_COLORS[
+                                                                        request
+                                                                            .status
+                                                                    ]
+                                                                } border-0 px-2 py-1 text-xs font-bold`}
+                                                            >
+                                                                {getStatusIcon(
+                                                                    request.status
+                                                                )}
+                                                                {request.status
+                                                                    .replace(
+                                                                        "_",
+                                                                        " "
+                                                                    )
+                                                                    .charAt(0)
+                                                                    .toUpperCase() +
+                                                                    request.status
+                                                                        .replace(
+                                                                            "_",
+                                                                            " "
+                                                                        )
+                                                                        .slice(
+                                                                            1
+                                                                        )}
+                                                            </Badge>
+                                                            {request.payment_status ===
+                                                                "pending_verification" && (
+                                                                <Badge className="bg-orange-100 text-orange-700 border-0 px-2 py-1 text-xs font-bold">
+                                                                    Payment
+                                                                    Pending
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    </td>
+
+                                                    {/* Actions */}
+                                                    <td className="px-3 py-3">
+                                                        <div className="flex flex-col gap-2">
+                                                            <Button
+                                                                onClick={() =>
+                                                                    handleViewDetails(
+                                                                        request
+                                                                    )
+                                                                }
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white border-0 font-semibold rounded-lg px-3 py-1 text-xs flex items-center gap-1 hover:shadow-md transition-all duration-300"
+                                                            >
+                                                                <Eye className="h-3 w-3" />
+                                                                View
+                                                            </Button>
+
+                                                            {request.status ===
+                                                                "pending" && (
+                                                                <div className="space-y-1">
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleAction(
+                                                                                request,
+                                                                                "approve"
+                                                                            )
+                                                                        }
+                                                                        size="sm"
+                                                                        className="w-full bg-green-600 hover:bg-green-700 text-white text-xs"
+                                                                    >
+                                                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                                                        Approve
+                                                                    </Button>
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleAction(
+                                                                                request,
+                                                                                "reject"
+                                                                            )
+                                                                        }
+                                                                        variant="destructive"
+                                                                        size="sm"
+                                                                        className="w-full text-xs"
+                                                                    >
+                                                                        <XCircle className="w-3 h-3 mr-1" />
+                                                                        Reject
+                                                                    </Button>
+                                                                </div>
+                                                            )}
+
+                                                            {request.status ===
+                                                                "approved" &&
+                                                                request.payment_status ===
+                                                                    "pending_verification" && (
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleAction(
+                                                                                request,
+                                                                                "verify-payment"
+                                                                            )
+                                                                        }
+                                                                        size="sm"
+                                                                        className="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs"
+                                                                    >
+                                                                        <DollarSign className="w-3 h-3 mr-1" />
+                                                                        Verify
+                                                                        Payment
+                                                                    </Button>
+                                                                )}
+
+                                                            {request.status ===
+                                                                "approved" &&
+                                                                request.payment_status ===
+                                                                    "verified" && (
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleAction(
+                                                                                request,
+                                                                                "complete"
+                                                                            )
+                                                                        }
+                                                                        size="sm"
+                                                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs"
+                                                                    >
+                                                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                                                        Complete
+                                                                    </Button>
+                                                                )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1243,6 +931,348 @@ export default function SubscriptionRequestsIndex({
                                 : "Complete"}
                         </Button>
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Details Modal */}
+            <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                <Building2 className="w-5 h-5 text-white" />
+                            </div>
+                            <span>Subscription Request Details</span>
+                        </DialogTitle>
+                        <DialogDescription>
+                            Detailed information for subscription request #
+                            {selectedRequestForDetails?.id}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {selectedRequestForDetails && (
+                        <div className="space-y-6">
+                            {/* Clinic Information */}
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                                <h3 className="text-lg font-bold text-blue-800 mb-4 flex items-center gap-2">
+                                    <Building2 className="w-5 h-5" />
+                                    Clinic Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-white rounded-lg p-4 border border-blue-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Building2 className="w-4 h-4 text-blue-600" />
+                                            <span className="font-semibold text-blue-800">
+                                                Clinic Name
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-900">
+                                            {
+                                                selectedRequestForDetails.clinic
+                                                    .name
+                                            }
+                                        </p>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-4 border border-blue-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Mail className="w-4 h-4 text-blue-600" />
+                                            <span className="font-semibold text-blue-800">
+                                                Email
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-900">
+                                            {
+                                                selectedRequestForDetails.clinic
+                                                    .email
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Request Details */}
+                            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                                <h3 className="text-lg font-bold text-purple-800 mb-4 flex items-center gap-2">
+                                    <Target className="w-5 h-5" />
+                                    Request Details
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-white rounded-lg p-4 border border-purple-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Target className="w-4 h-4 text-purple-600" />
+                                            <span className="font-semibold text-purple-800">
+                                                Request Type
+                                            </span>
+                                        </div>
+                                        <Badge
+                                            className={`${
+                                                REQUEST_TYPE_COLORS[
+                                                    selectedRequestForDetails
+                                                        .request_type
+                                                ]
+                                            } border-0 px-3 py-1`}
+                                        >
+                                            {getRequestTypeIcon(
+                                                selectedRequestForDetails.request_type
+                                            )}
+                                            {selectedRequestForDetails.request_type
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                                selectedRequestForDetails.request_type.slice(
+                                                    1
+                                                )}
+                                        </Badge>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-4 border border-purple-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Crown className="w-4 h-4 text-purple-600" />
+                                            <span className="font-semibold text-purple-800">
+                                                Current Plan
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-900">
+                                            {selectedRequestForDetails.current_plan
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                                selectedRequestForDetails.current_plan.slice(
+                                                    1
+                                                )}
+                                        </p>
+                                    </div>
+                                    {selectedRequestForDetails.requested_plan && (
+                                        <div className="bg-white rounded-lg p-4 border border-purple-200">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Crown className="w-4 h-4 text-purple-600" />
+                                                <span className="font-semibold text-purple-800">
+                                                    New Plan
+                                                </span>
+                                            </div>
+                                            <p className="text-gray-900">
+                                                {selectedRequestForDetails.requested_plan
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    selectedRequestForDetails.requested_plan.slice(
+                                                        1
+                                                    )}
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div className="bg-white rounded-lg p-4 border border-purple-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Calendar className="w-4 h-4 text-purple-600" />
+                                            <span className="font-semibold text-purple-800">
+                                                Duration
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-900">
+                                            {
+                                                selectedRequestForDetails.duration_months
+                                            }{" "}
+                                            month(s)
+                                        </p>
+                                    </div>
+                                    {selectedRequestForDetails.calculated_amount && (
+                                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white col-span-1 md:col-span-2">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <DollarSign className="w-5 h-5" />
+                                                <span className="font-semibold">
+                                                    Total Amount
+                                                </span>
+                                            </div>
+                                            <p className="text-2xl font-bold">
+                                                ₱
+                                                {parseFloat(
+                                                    selectedRequestForDetails.calculated_amount
+                                                ).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Payment Information */}
+                            {selectedRequestForDetails.payment_method && (
+                                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+                                    <h3 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
+                                        <CreditCard className="w-5 h-5" />
+                                        Payment Information
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <CreditCard className="w-4 h-4 text-green-600" />
+                                                <span className="font-semibold text-green-800">
+                                                    Payment Method
+                                                </span>
+                                            </div>
+                                            <p className="text-gray-900">
+                                                {selectedRequestForDetails.payment_method
+                                                    .replace("_", " ")
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    selectedRequestForDetails.payment_method
+                                                        .replace("_", " ")
+                                                        .slice(1)}
+                                            </p>
+                                        </div>
+                                        {selectedRequestForDetails.reference_number && (
+                                            <div className="bg-white rounded-lg p-4 border border-green-200">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Hash className="w-4 h-4 text-green-600" />
+                                                    <span className="font-semibold text-green-800">
+                                                        Reference Number
+                                                    </span>
+                                                </div>
+                                                <p className="font-mono text-gray-900">
+                                                    {
+                                                        selectedRequestForDetails.reference_number
+                                                    }
+                                                </p>
+                                            </div>
+                                        )}
+                                        {selectedRequestForDetails.sender_name && (
+                                            <div className="bg-white rounded-lg p-4 border border-green-200">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <User className="w-4 h-4 text-green-600" />
+                                                    <span className="font-semibold text-green-800">
+                                                        Sender Name
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-900">
+                                                    {
+                                                        selectedRequestForDetails.sender_name
+                                                    }
+                                                </p>
+                                            </div>
+                                        )}
+                                        {selectedRequestForDetails.amount_sent && (
+                                            <div className="bg-white rounded-lg p-4 border border-green-200">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <DollarSign className="w-4 h-4 text-green-600" />
+                                                    <span className="font-semibold text-green-800">
+                                                        Amount Sent
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-900">
+                                                    ₱
+                                                    {selectedRequestForDetails.amount_sent.toLocaleString()}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Status Information */}
+                            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-100">
+                                <h3 className="text-lg font-bold text-amber-800 mb-4 flex items-center gap-2">
+                                    <Activity className="w-5 h-5" />
+                                    Status Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-white rounded-lg p-4 border border-amber-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Clock className="w-4 h-4 text-amber-600" />
+                                            <span className="font-semibold text-amber-800">
+                                                Request Status
+                                            </span>
+                                        </div>
+                                        <Badge
+                                            className={`${
+                                                STATUS_COLORS[
+                                                    selectedRequestForDetails
+                                                        .status
+                                                ]
+                                            } border-0 px-3 py-1`}
+                                        >
+                                            {getStatusIcon(
+                                                selectedRequestForDetails.status
+                                            )}
+                                            {selectedRequestForDetails.status
+                                                .replace("_", " ")
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                                selectedRequestForDetails.status
+                                                    .replace("_", " ")
+                                                    .slice(1)}
+                                        </Badge>
+                                    </div>
+                                    {selectedRequestForDetails.payment_status && (
+                                        <div className="bg-white rounded-lg p-4 border border-amber-200">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <DollarSign className="w-4 h-4 text-amber-600" />
+                                                <span className="font-semibold text-amber-800">
+                                                    Payment Status
+                                                </span>
+                                            </div>
+                                            <Badge
+                                                className={`${
+                                                    selectedRequestForDetails.payment_status ===
+                                                    "pending_verification"
+                                                        ? "bg-orange-100 text-orange-700"
+                                                        : selectedRequestForDetails.payment_status ===
+                                                          "verified"
+                                                        ? "bg-green-100 text-green-700"
+                                                        : "bg-gray-100 text-gray-700"
+                                                } border-0 px-3 py-1`}
+                                            >
+                                                {selectedRequestForDetails.payment_status
+                                                    .replace("_", " ")
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    selectedRequestForDetails.payment_status
+                                                        .replace("_", " ")
+                                                        .slice(1)}
+                                            </Badge>
+                                        </div>
+                                    )}
+                                    <div className="bg-white rounded-lg p-4 border border-amber-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Calendar className="w-4 h-4 text-amber-600" />
+                                            <span className="font-semibold text-amber-800">
+                                                Created Date
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-900">
+                                            {new Date(
+                                                selectedRequestForDetails.created_at
+                                            ).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-4 border border-amber-200">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Clock className="w-4 h-4 text-amber-600" />
+                                            <span className="font-semibold text-amber-800">
+                                                Created Time
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-900">
+                                            {new Date(
+                                                selectedRequestForDetails.created_at
+                                            ).toLocaleTimeString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Admin Notes */}
+                            {selectedRequestForDetails.admin_notes && (
+                                <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-6 border border-gray-100">
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                        <FileText className="w-5 h-5" />
+                                        Admin Notes
+                                    </h3>
+                                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                        <p className="text-gray-900">
+                                            {
+                                                selectedRequestForDetails.admin_notes
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         </AuthenticatedLayout>
