@@ -293,7 +293,7 @@ export default function SubscriptionWarningBanner({ clinic, className = "" }) {
         setDialogType(null);
     };
 
-    const handleUpgradeSubmit = async () => {
+    const handleUpgradeSubmit = async (selectedPlan = "premium") => {
         const response = await fetch(route("clinic.subscription.upgrade"), {
             method: "POST",
             headers: {
@@ -303,7 +303,7 @@ export default function SubscriptionWarningBanner({ clinic, className = "" }) {
                     .getAttribute("content"),
             },
             body: JSON.stringify({
-                new_plan: "premium",
+                new_plan: selectedPlan,
                 duration_months: 1,
                 message: "Requested via subscription warning banner",
             }),
@@ -373,15 +373,13 @@ export default function SubscriptionWarningBanner({ clinic, className = "" }) {
                             >
                                 {statusInfo.action}
                             </button>
-                            {statusInfo.actionType === "upgrade" ||
-                            statusInfo.actionType === "renew" ? (
-                                <button
-                                    className="px-4 py-2 text-xs font-medium rounded-lg transition-colors duration-200 bg-gray-600 hover:bg-gray-700 text-white"
-                                    onClick={() => setShowSupportModal(true)}
-                                >
-                                    Need Help?
-                                </button>
-                            ) : null}
+                            {/* Show Need Help button for all action types */}
+                            <button
+                                className="px-4 py-2 text-xs font-medium rounded-lg transition-colors duration-200 bg-gray-600 hover:bg-gray-700 text-white"
+                                onClick={() => setShowSupportModal(true)}
+                            >
+                                Need Help?
+                            </button>
                         </div>
                     </div>
                 </div>

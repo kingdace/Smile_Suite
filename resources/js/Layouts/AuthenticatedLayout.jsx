@@ -115,19 +115,23 @@ const SubscriptionCountdown = ({ clinic }) => {
         setDialogType(null);
     };
 
-    const handleUpgradeSubmit = async () => {
-        // Determine the next available plan for upgrade
-        let nextPlan = "premium"; // Default
-        if (clinic?.subscription_plan === "basic") {
-            nextPlan = "premium"; // Basic -> Premium
-        } else if (clinic?.subscription_plan === "premium") {
-            nextPlan = "enterprise"; // Premium -> Enterprise
-        } else if (clinic?.subscription_plan === "enterprise") {
-            // If already enterprise, show error
-            return {
-                success: false,
-                message: "You are already on the highest plan available.",
-            };
+    const handleUpgradeSubmit = async (selectedPlan = null) => {
+        // Use selected plan if provided, otherwise determine next available plan
+        let nextPlan = selectedPlan;
+
+        if (!nextPlan) {
+            // Fallback logic for backward compatibility
+            if (clinic?.subscription_plan === "basic") {
+                nextPlan = "premium"; // Basic -> Premium
+            } else if (clinic?.subscription_plan === "premium") {
+                nextPlan = "enterprise"; // Premium -> Enterprise
+            } else if (clinic?.subscription_plan === "enterprise") {
+                // If already enterprise, show error
+                return {
+                    success: false,
+                    message: "You are already on the highest plan available.",
+                };
+            }
         }
 
         const response = await fetch(route("clinic.subscription.upgrade"), {
@@ -283,19 +287,18 @@ const SubscriptionCountdown = ({ clinic }) => {
                     <span className="hidden sm:inline">Upgrade Now</span>
                     <span className="sm:hidden">Upgrade</span>
                 </Button>
-                <Button
-                    size="sm"
-                    onClick={handleRenewClick}
-                    className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
-                >
-                    <Zap className="w-3 h-3 mr-1" />
-                    <span className="hidden sm:inline">
-                        {isTrial ? "Extend Trial" : "Renew"}
-                    </span>
-                    <span className="sm:hidden">
-                        {isTrial ? "Extend" : "Renew"}
-                    </span>
-                </Button>
+                {/* Show Renew button only for non-trial accounts */}
+                {!isTrial && (
+                    <Button
+                        size="sm"
+                        onClick={handleRenewClick}
+                        className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
+                    >
+                        <Zap className="w-3 h-3 mr-1" />
+                        <span className="hidden sm:inline">Renew</span>
+                        <span className="sm:hidden">Renew</span>
+                    </Button>
+                )}
             </div>
 
             {/* Custom Dialog */}

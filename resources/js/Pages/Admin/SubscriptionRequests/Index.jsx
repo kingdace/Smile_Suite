@@ -115,6 +115,8 @@ export default function SubscriptionRequestsIndex({
     const [detailsModalOpen, setDetailsModalOpen] = useState(false);
     const [selectedRequestForDetails, setSelectedRequestForDetails] =
         useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const filteredRequests = (requests || [])
         .filter((request) => {
@@ -151,6 +153,18 @@ export default function SubscriptionRequestsIndex({
                 return aValue < bValue ? 1 : -1;
             }
         });
+
+    // Pagination logic
+    const totalItems = filteredRequests.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
+
+    // Reset to first page when filters change
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter, typeFilter, sortBy, sortOrder, itemsPerPage]);
 
     const handleAction = async (request, type) => {
         setSelectedRequest(request);
@@ -493,7 +507,7 @@ export default function SubscriptionRequestsIndex({
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-blue-100">
-                                    {filteredRequests.length === 0 ? (
+                                    {paginatedRequests.length === 0 ? (
                                         <tr>
                                             <td
                                                 colSpan={6}
@@ -505,19 +519,21 @@ export default function SubscriptionRequestsIndex({
                                                     </div>
                                                     <div>
                                                         <p className="text-lg font-semibold text-gray-700 mb-2">
-                                                            No Requests Found
+                                                            {totalItems === 0
+                                                                ? "No Requests Found"
+                                                                : "No Results on This Page"}
                                                         </p>
                                                         <p className="text-sm text-gray-500 max-w-md">
-                                                            No subscription
-                                                            requests match your
-                                                            current filters.
+                                                            {totalItems === 0
+                                                                ? "No subscription requests match your current filters."
+                                                                : "Try adjusting your filters or go to the first page."}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
                                     ) : (
-                                        filteredRequests.map(
+                                        paginatedRequests.map(
                                             (request, index) => (
                                                 <tr
                                                     key={request.id}
@@ -767,6 +783,154 @@ export default function SubscriptionRequestsIndex({
                             </table>
                         </div>
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="mt-6 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="text-sm text-gray-700">
+                                    Showing{" "}
+                                    <span className="font-medium">
+                                        {startIndex + 1}
+                                    </span>{" "}
+                                    to{" "}
+                                    <span className="font-medium">
+                                        {Math.min(endIndex, totalItems)}
+                                    </span>{" "}
+                                    of{" "}
+                                    <span className="font-medium">
+                                        {totalItems}
+                                    </span>{" "}
+                                    results
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-700">
+                                        Show:
+                                    </span>
+                                    <select
+                                        value={itemsPerPage}
+                                        onChange={(e) => {
+                                            setItemsPerPage(
+                                                parseInt(e.target.value)
+                                            );
+                                            setCurrentPage(1); // Reset to first page when changing page size
+                                        }}
+                                        className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    >
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                        <option value={25}>25</option>
+                                        <option value={50}>50</option>
+                                    </select>
+                                    <span className="text-sm text-gray-700">
+                                        per page
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 text-sm border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronDown className="w-4 h-4 rotate-90" />
+                                    First
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setCurrentPage(currentPage - 1)
+                                    }
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 text-sm border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronDown className="w-4 h-4 rotate-90" />
+                                    Previous
+                                </Button>
+
+                                {/* Page Numbers */}
+                                <div className="flex items-center gap-1">
+                                    {Array.from(
+                                        { length: totalPages },
+                                        (_, i) => i + 1
+                                    )
+                                        .filter((page) => {
+                                            // Show first page, last page, current page, and pages around current
+                                            if (
+                                                page === 1 ||
+                                                page === totalPages
+                                            )
+                                                return true;
+                                            if (
+                                                page >= currentPage - 1 &&
+                                                page <= currentPage + 1
+                                            )
+                                                return true;
+                                            return false;
+                                        })
+                                        .map((page, index, array) => {
+                                            // Add ellipsis if there's a gap
+                                            const showEllipsis =
+                                                index > 0 &&
+                                                page - array[index - 1] > 1;
+                                            return (
+                                                <React.Fragment key={page}>
+                                                    {showEllipsis && (
+                                                        <span className="px-2 text-gray-500">
+                                                            ...
+                                                        </span>
+                                                    )}
+                                                    <Button
+                                                        variant={
+                                                            currentPage === page
+                                                                ? "default"
+                                                                : "outline"
+                                                        }
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            setCurrentPage(page)
+                                                        }
+                                                        className={`px-3 py-2 text-sm min-w-[40px] ${
+                                                            currentPage === page
+                                                                ? "bg-blue-600 text-white hover:bg-blue-700"
+                                                                : "border-gray-300 hover:bg-gray-50"
+                                                        }`}
+                                                    >
+                                                        {page}
+                                                    </Button>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                </div>
+
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setCurrentPage(currentPage + 1)
+                                    }
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 text-sm border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronDown className="w-4 h-4 -rotate-90" />
+                                    Next
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 text-sm border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronDown className="w-4 h-4 -rotate-90" />
+                                    Last
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
