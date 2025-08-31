@@ -35,6 +35,37 @@ class SubscriptionController extends Controller
     }
 
     /**
+     * Test endpoint to verify basic functionality
+     */
+    public function test()
+    {
+        try {
+            $clinic = Auth::user()->clinic;
+
+            if (!$clinic) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No clinic found for this user.'
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Test endpoint working',
+                'clinic_id' => $clinic->id,
+                'subscription_plan' => $clinic->subscription_plan,
+                'user_id' => Auth::id()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Test endpoint failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Test endpoint failed: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Get subscription plan pricing information
      */
     private function getPlanPricing()
@@ -82,6 +113,21 @@ class SubscriptionController extends Controller
     {
         $clinic = Auth::user()->clinic;
 
+        // Debug logging
+        Log::info('Upgrade request started', [
+            'user_id' => Auth::id(),
+            'clinic_id' => $clinic ? $clinic->id : null,
+            'clinic_exists' => $clinic ? true : false
+        ]);
+
+        if (!$clinic) {
+            Log::error('No clinic found for user', ['user_id' => Auth::id()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'No clinic found for this user.'
+            ], 400);
+        }
+
         $validated = $request->validate([
             'new_plan' => 'required|in:basic,premium,enterprise',
             'duration_months' => 'required|integer|min:1|max:12',
@@ -102,11 +148,20 @@ class SubscriptionController extends Controller
             // Get plan pricing
             $planPricing = $this->getPlanPricing();
             $requestedPlan = $planPricing[$validated['new_plan']];
-            
+
             // Calculate total amount
             $totalAmount = $requestedPlan['price'] * $validated['duration_months'];
 
             // Store the upgrade request in database
+            Log::info('Creating subscription request', [
+                'clinic_id' => $clinic->id,
+                'request_type' => 'upgrade',
+                'current_plan' => $clinic->subscription_plan,
+                'requested_plan' => $validated['new_plan'],
+                'duration_months' => $validated['duration_months'],
+                'calculated_amount' => $totalAmount,
+            ]);
+
             $subscriptionRequest = SubscriptionRequest::create([
                 'clinic_id' => $clinic->id,
                 'request_type' => 'upgrade',
@@ -118,15 +173,33 @@ class SubscriptionController extends Controller
                 'calculated_amount' => $totalAmount,
             ]);
 
+            Log::info('Subscription request created successfully', [
+                'request_id' => $subscriptionRequest->id
+            ]);
+
             // Send upgrade request email to admin
-            Mail::to(config('mail.admin_email', 'admin@smilesuite.com'))->send(
-                new SubscriptionUpgradeRequest($clinic, $validated)
-            );
+            Log::info('Sending upgrade request email to admin');
+            try {
+                Mail::to(config('mail.admin_email', 'admin@smilesuite.com'))->send(
+                    new SubscriptionUpgradeRequest($clinic, $validated)
+                );
+                Log::info('Admin email sent successfully');
+            } catch (\Exception $mailError) {
+                Log::error('Failed to send admin email: ' . $mailError->getMessage());
+                // Don't fail the entire request if email fails
+            }
 
             // Send confirmation email to clinic
-            Mail::to($clinic->email)->send(
-                new \App\Mail\SubscriptionUpgradeConfirmation($clinic, $validated)
-            );
+            Log::info('Sending confirmation email to clinic');
+            try {
+                Mail::to($clinic->email)->send(
+                    new \App\Mail\SubscriptionUpgradeConfirmation($clinic, $validated)
+                );
+                Log::info('Clinic confirmation email sent successfully');
+            } catch (\Exception $mailError) {
+                Log::error('Failed to send clinic confirmation email: ' . $mailError->getMessage());
+                // Don't fail the entire request if email fails
+            }
 
             Log::info('Subscription upgrade request sent', [
                 'clinic_id' => $clinic->id,
@@ -164,6 +237,21 @@ class SubscriptionController extends Controller
     {
         $clinic = Auth::user()->clinic;
 
+        // Debug logging
+        Log::info('Renewal request started', [
+            'user_id' => Auth::id(),
+            'clinic_id' => $clinic ? $clinic->id : null,
+            'clinic_exists' => $clinic ? true : false
+        ]);
+
+        if (!$clinic) {
+            Log::error('No clinic found for user', ['user_id' => Auth::id()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'No clinic found for this user.'
+            ], 400);
+        }
+
         $validated = $request->validate([
             'duration_months' => 'required|integer|min:1|max:12',
             'message' => 'nullable|string|max:500',
@@ -173,14 +261,14 @@ class SubscriptionController extends Controller
             // Get current plan pricing
             $planPricing = $this->getPlanPricing();
             $currentPlan = $planPricing[$clinic->subscription_plan];
-            
+
             // Calculate total amount
             $totalAmount = $currentPlan['price'] * $validated['duration_months'];
 
             // Calculate new end date by adding to existing duration
             $currentEndDate = $clinic->subscription_end_date;
             $newDurationDays = $validated['duration_months'] * 30;
-            
+
             // If subscription is expired, start from today
             if ($currentEndDate && $currentEndDate->isPast()) {
                 $newEndDate = now()->addDays($newDurationDays);
@@ -190,6 +278,14 @@ class SubscriptionController extends Controller
             }
 
             // Store the renewal request in database
+            Log::info('Creating renewal request', [
+                'clinic_id' => $clinic->id,
+                'request_type' => 'renewal',
+                'current_plan' => $clinic->subscription_plan,
+                'duration_months' => $validated['duration_months'],
+                'calculated_amount' => $totalAmount,
+            ]);
+
             $subscriptionRequest = SubscriptionRequest::create([
                 'clinic_id' => $clinic->id,
                 'request_type' => 'renewal',
@@ -201,15 +297,33 @@ class SubscriptionController extends Controller
                 'calculated_amount' => $totalAmount,
             ]);
 
-            // Send renewal request email to admin
-            Mail::to(config('mail.admin_email', 'admin@smilesuite.com'))->send(
-                new SubscriptionRenewalRequest($clinic, $validated)
-            );
+            Log::info('Renewal request created successfully', [
+                'request_id' => $subscriptionRequest->id
+            ]);
 
-            // Send confirmation email to clinic
-            Mail::to($clinic->email)->send(
-                new \App\Mail\SubscriptionRenewalConfirmation($clinic, $validated)
-            );
+            // Send renewal request email to admin
+            Log::info('Sending renewal request email to admin');
+            try {
+                Mail::to(config('mail.admin_email', 'admin@smilesuite.com'))->send(
+                    new SubscriptionRenewalRequest($clinic, $validated)
+                );
+                Log::info('Admin renewal email sent successfully');
+            } catch (\Exception $mailError) {
+                Log::error('Failed to send admin renewal email: ' . $mailError->getMessage());
+                // Don't fail the entire request if email fails
+            }
+
+            // Send renewal confirmation email to clinic
+            Log::info('Sending renewal confirmation email to clinic');
+            try {
+                Mail::to($clinic->email)->send(
+                    new \App\Mail\SubscriptionRenewalConfirmation($clinic, $validated)
+                );
+                Log::info('Clinic renewal confirmation email sent successfully');
+            } catch (\Exception $mailError) {
+                Log::error('Failed to send clinic renewal confirmation email: ' . $mailError->getMessage());
+                // Don't fail the entire request if email fails
+            }
 
             Log::info('Subscription renewal request sent', [
                 'clinic_id' => $clinic->id,

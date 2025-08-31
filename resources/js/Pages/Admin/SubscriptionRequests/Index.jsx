@@ -1120,12 +1120,82 @@ export default function SubscriptionRequestsIndex({
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <Hash className="w-4 h-4 text-green-600" />
                                                     <span className="font-semibold text-green-800">
-                                                        Reference Number
+                                                        System Reference Number
                                                     </span>
                                                 </div>
                                                 <p className="font-mono text-gray-900">
                                                     {
                                                         selectedRequestForDetails.reference_number
+                                                    }
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {/* Payment Method Reference - with manual JSON decoding */}
+                                        {(() => {
+                                            let paymentDetails =
+                                                selectedRequestForDetails.payment_details;
+                                            let userReferenceNumber = null;
+
+                                            // Manual JSON decoding if it's a string
+                                            if (
+                                                typeof paymentDetails ===
+                                                "string"
+                                            ) {
+                                                try {
+                                                    paymentDetails =
+                                                        JSON.parse(
+                                                            paymentDetails
+                                                        );
+                                                    userReferenceNumber =
+                                                        paymentDetails.user_reference_number;
+                                                } catch (e) {
+                                                    console.error(
+                                                        "Failed to parse payment details:",
+                                                        e
+                                                    );
+                                                }
+                                            } else if (
+                                                paymentDetails &&
+                                                typeof paymentDetails ===
+                                                    "object"
+                                            ) {
+                                                userReferenceNumber =
+                                                    paymentDetails.user_reference_number;
+                                            }
+
+                                            return userReferenceNumber ? (
+                                                <div className="bg-white rounded-lg p-4 border border-green-200">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Hash className="w-4 h-4 text-green-600" />
+                                                        <span className="font-semibold text-green-800">
+                                                            Payment Method
+                                                            Reference
+                                                        </span>
+                                                    </div>
+                                                    <p className="font-mono text-gray-900">
+                                                        {userReferenceNumber}
+                                                    </p>
+                                                </div>
+                                            ) : null;
+                                        })()}
+
+                                        {/* Original conditional field */}
+                                        {selectedRequestForDetails
+                                            .payment_details
+                                            ?.user_reference_number && (
+                                            <div className="bg-white rounded-lg p-4 border border-green-200">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Hash className="w-4 h-4 text-green-600" />
+                                                    <span className="font-semibold text-green-800">
+                                                        Payment Method Reference
+                                                    </span>
+                                                </div>
+                                                <p className="font-mono text-gray-900">
+                                                    {
+                                                        selectedRequestForDetails
+                                                            .payment_details
+                                                            .user_reference_number
                                                     }
                                                 </p>
                                             </div>
@@ -1141,6 +1211,21 @@ export default function SubscriptionRequestsIndex({
                                                 <p className="text-gray-900">
                                                     {
                                                         selectedRequestForDetails.sender_name
+                                                    }
+                                                </p>
+                                            </div>
+                                        )}
+                                        {selectedRequestForDetails.sender_number && (
+                                            <div className="bg-white rounded-lg p-4 border border-green-200">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Phone className="w-4 h-4 text-green-600" />
+                                                    <span className="font-semibold text-green-800">
+                                                        Sender Number
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-900">
+                                                    {
+                                                        selectedRequestForDetails.sender_number
                                                     }
                                                 </p>
                                             </div>

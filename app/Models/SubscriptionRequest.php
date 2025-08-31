@@ -40,6 +40,7 @@ class SubscriptionRequest extends Model
         'calculated_amount' => 'decimal:2',
         'amount_sent' => 'decimal:2',
         'payment_received_at' => 'datetime',
+        'payment_details' => 'array',
     ];
 
     public function clinic()

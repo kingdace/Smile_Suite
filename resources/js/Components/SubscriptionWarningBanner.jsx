@@ -309,8 +309,17 @@ export default function SubscriptionWarningBanner({ clinic, className = "" }) {
             }),
         });
 
-        const result = await response.json();
-        return result;
+        try {
+            const result = await response.json();
+            return result;
+        } catch (parseError) {
+            console.error("Failed to parse response:", parseError);
+            return {
+                success: false,
+                message:
+                    "Received invalid response from server. Please try again or contact support.",
+            };
+        }
     };
 
     const handleRenewSubmit = async () => {
@@ -328,8 +337,17 @@ export default function SubscriptionWarningBanner({ clinic, className = "" }) {
             }),
         });
 
-        const result = await response.json();
-        return result;
+        try {
+            const result = await response.json();
+            return result;
+        } catch (parseError) {
+            console.error("Failed to parse response:", parseError);
+            return {
+                success: false,
+                message:
+                    "Received invalid response from server. Please try again or contact support.",
+            };
+        }
     };
 
     return (

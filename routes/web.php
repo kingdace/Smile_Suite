@@ -440,8 +440,9 @@ Route::middleware('auth')->group(function () {
 
         // Subscription Management Route
         Route::get('subscription', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'index'])->name('clinic.subscription.index');
-        Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])->name('clinic.subscription.upgrade');
-        Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])->name('clinic.subscription.renew');
+        Route::get('subscription/test', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'test'])->name('clinic.subscription.test');
+Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])->name('clinic.subscription.upgrade');
+Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])->name('clinic.subscription.renew');
         Route::get('subscription/quick-renewal', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'quickRenewal'])->name('clinic.subscription.quick-renewal');
 
         // Clinic User Management Routes

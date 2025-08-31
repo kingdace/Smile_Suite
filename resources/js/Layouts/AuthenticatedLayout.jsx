@@ -148,12 +148,30 @@ const SubscriptionCountdown = ({ clinic }) => {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            return errorData;
+            try {
+                const errorData = await response.json();
+                return errorData;
+            } catch (parseError) {
+                // If response is not JSON (e.g., HTML error page), return a generic error
+                console.error("Failed to parse error response:", parseError);
+                return {
+                    success: false,
+                    message: `Request failed with status ${response.status}. Please try again or contact support.`,
+                };
+            }
         }
 
-        const result = await response.json();
-        return result;
+        try {
+            const result = await response.json();
+            return result;
+        } catch (parseError) {
+            console.error("Failed to parse success response:", parseError);
+            return {
+                success: false,
+                message:
+                    "Received invalid response from server. Please try again or contact support.",
+            };
+        }
     };
 
     const handleRenewSubmit = async () => {
@@ -174,12 +192,30 @@ const SubscriptionCountdown = ({ clinic }) => {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            return errorData;
+            try {
+                const errorData = await response.json();
+                return errorData;
+            } catch (parseError) {
+                // If response is not JSON (e.g., HTML error page), return a generic error
+                console.error("Failed to parse error response:", parseError);
+                return {
+                    success: false,
+                    message: `Request failed with status ${response.status}. Please try again or contact support.`,
+                };
+            }
         }
 
-        const result = await response.json();
-        return result;
+        try {
+            const result = await response.json();
+            return result;
+        } catch (parseError) {
+            console.error("Failed to parse success response:", parseError);
+            return {
+                success: false,
+                message:
+                    "Received invalid response from server. Please try again or contact support.",
+            };
+        }
     };
 
     return (

@@ -54,7 +54,7 @@ class SubscriptionPaymentController extends Controller
 
             // Generate reference number
             $referenceNumber = $this->generateReferenceNumber($subscriptionRequest, $paymentMethod);
-            
+
             // Extract payment details
             $senderName = $paymentDetails['sender_name'] ?? 'Not provided';
             $senderNumber = $paymentDetails['sender_number'] ?? 'Not provided';
@@ -67,6 +67,7 @@ class SubscriptionPaymentController extends Controller
                 'transaction_reference' => $referenceNumber,
                 'payment_amount' => $amountSent,
                 'payment_method' => $paymentMethod,
+                'user_reference_number' => $paymentDetails['reference_number'] ?? null, // User's input reference number
             ];
 
             // Store payment details
@@ -142,7 +143,7 @@ class SubscriptionPaymentController extends Controller
         $date = now()->format('Ymd');
         $requestId = str_pad($subscriptionRequest->id, 4, '0', STR_PAD_LEFT);
         $random = strtoupper(substr(md5(uniqid()), 0, 6));
-        
+
         return "{$prefix}-{$date}-{$requestId}-{$random}";
     }
 }
