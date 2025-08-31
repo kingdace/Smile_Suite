@@ -81,11 +81,11 @@ export default function ClinicGallery({ galleryImages }) {
     return (
         <div className="relative">
             {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 {/* Left Column - Image Carousel */}
                 <div className="relative">
                     {/* Main Carousel Image */}
-                    <div className="relative h-80 lg:h-96 w-full overflow-hidden rounded-2xl shadow-xl bg-gray-100">
+                    <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden rounded-xl lg:rounded-2xl shadow-xl bg-gray-100">
                         <img
                             src={
                                 galleryImages[currentImageIndex]?.image_url ||
@@ -151,9 +151,9 @@ export default function ClinicGallery({ galleryImages }) {
                 </div>
 
                 {/* Right Column - Text Content */}
-                <div className="flex flex-col justify-center items-center text-center h-full space-y-6">
+                <div className="flex flex-col justify-center items-center text-center h-full space-y-4 sm:space-y-6">
                     {/* Gallery Badge */}
-                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm">
+                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm">
                         <svg
                             className="w-4 h-4 text-blue-600"
                             fill="none"
@@ -167,26 +167,26 @@ export default function ClinicGallery({ galleryImages }) {
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2z"
                             />
                         </svg>
-                        <span className="text-sm font-semibold text-blue-700 tracking-wide">
+                        <span className="text-xs sm:text-sm font-semibold text-blue-700 tracking-wide">
                             Our Gallery
                         </span>
                     </div>
 
-                    <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900">
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900">
                         See our{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                             clinic in action
                         </span>
                     </h2>
 
-                    <p className="text-xl text-gray-600 leading-relaxed max-w-md">
+                    <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-md px-4">
                         Take a virtual tour of our modern facilities and see why
                         patients choose us for their dental care. Our
                         state-of-the-art equipment and comfortable environment
                         ensure the best experience for every patient.
                     </p>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
                         <span className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                             Professional Environment

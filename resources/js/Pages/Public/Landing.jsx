@@ -99,14 +99,14 @@ export default function Landing() {
             <SiteHeader />
             {/* Hero Section: slightly more pronounced gradient */}
             <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-blue-50 to-cyan-100 pb-0 z-10">
-                <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-stretch min-h-[32rem] md:min-h-[38rem] lg:min-h-[44rem]">
+                <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-stretch min-h-[28rem] sm:min-h-[32rem] md:min-h-[38rem] lg:min-h-[44rem]">
                     {/* Left: Headline and content */}
-                    <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 py-12 md:py-0 md:pr-0 z-10">
+                    <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 py-8 sm:py-12 md:py-0 md:pr-0 z-10">
                         {/* Enhanced tagline with better styling */}
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-blue-100/80 backdrop-blur-sm rounded-full border border-blue-200/50">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 mb-6 sm:mb-8 text-center sm:text-left">
+                            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 backdrop-blur-sm rounded-full border border-blue-200/50">
                                 <Sparkles className="w-4 h-4 text-blue-600" />
-                                <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                                <span className="text-xs sm:text-sm text-blue-700 font-semibold tracking-wide">
                                     #1 Dental SaaS Platform
                                 </span>
                             </div>
@@ -116,13 +116,13 @@ export default function Landing() {
                                 <Star className="w-4 h-4 fill-current" />
                                 <Star className="w-4 h-4 fill-current" />
                                 <Star className="w-4 h-4 fill-current" />
-                                <span className="text-sm text-gray-600 ml-1">
+                                <span className="text-xs sm:text-sm text-gray-600 ml-1">
                                     4.9/5 rating
                                 </span>
                             </div>
                         </div>
                         <h1
-                            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-gray-900 leading-tight mb-8 animate-fade-in"
+                            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-gray-900 leading-tight mb-6 sm:mb-8 animate-fade-in text-center lg:text-left"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             <span className="block">
@@ -137,7 +137,7 @@ export default function Landing() {
                             </span>
                         </h1>
                         <p
-                            className="mt-2 mb-10 text-xl text-gray-600 max-w-2xl font-medium animate-fade-in leading-relaxed"
+                            className="mt-2 mb-8 sm:mb-10 text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl font-medium animate-fade-in leading-relaxed text-center lg:text-left"
                             style={{
                                 fontFamily: "Inter, sans-serif",
                                 letterSpacing: "0.01em",
@@ -155,40 +155,40 @@ export default function Landing() {
                             </span>
                             , not administrative tasks.
                         </p>
-                        <div className="mt-2 flex flex-col sm:flex-row sm:justify-start gap-4 animate-fade-in">
+                        <div className="mt-2 flex flex-col sm:flex-row sm:justify-start gap-3 sm:gap-4 animate-fade-in">
                             <Link
                                 href={route("public.clinics.index")}
-                                className="inline-flex items-center justify-center px-10 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 group transform hover:scale-105"
+                                className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 group transform hover:scale-105"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
                                 Get Started
-                                <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                                <ArrowRight className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-300" />
                             </Link>
                             <Link
                                 href="#features"
-                                className="inline-flex items-center justify-center px-10 py-4 border-2 border-blue-600 text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:ring-offset-2 group transform hover:scale-105"
+                                className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 border-2 border-blue-600 text-base sm:text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:ring-offset-2 group transform hover:scale-105"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
                                 Explore Features
-                                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
                             </Link>
                         </div>
                         {/* Enhanced trust badges */}
-                        <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-6 animate-fade-in">
+                        <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 animate-fade-in text-center sm:text-left">
                             <div className="flex items-center gap-3">
                                 <div className="flex -space-x-2">
-                                    <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
                                         <span className="text-blue-600 text-xs font-bold">
                                             D
                                         </span>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-cyan-100 border-2 border-white flex items-center justify-center">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-cyan-100 border-2 border-white flex items-center justify-center">
                                         <span className="text-cyan-600 text-xs font-bold">
                                             C
                                         </span>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-green-100 border-2 border-white flex items-center justify-center">
-                                        <span className="text-green-600 text-xs font-bold">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-blue-600 text-xs font-bold">
                                             P
                                         </span>
                                     </div>
@@ -227,19 +227,19 @@ export default function Landing() {
                         </div>
                     </div>
                     {/* Right: Enhanced hero image with floating elements */}
-                    <div className="flex-1 relative flex items-center justify-center py-12 md:py-16 lg:py-20">
-                        {/* Enhanced decorative elements */}
-                        <div className="absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br from-blue-200/30 to-cyan-200/20 rounded-full blur-3xl z-10 animate-pulse" />
-                        <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-tr from-cyan-200/20 to-blue-200/30 rounded-full blur-2xl z-10" />
+                    <div className="flex-1 relative flex items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20">
+                        {/* Enhanced decorative elements - Hidden on mobile */}
+                        <div className="absolute -top-16 -right-16 w-32 h-32 sm:w-48 sm:h-48 bg-gradient-to-br from-blue-200/30 to-cyan-200/20 rounded-full blur-3xl z-10 animate-pulse hidden sm:block" />
+                        <div className="absolute -bottom-8 -left-8 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-tr from-cyan-200/20 to-blue-200/30 rounded-full blur-2xl z-10 hidden sm:block" />
 
-                        {/* Floating stats cards */}
-                        <div className="absolute top-8 left-8 z-30 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <Users className="w-5 h-5 text-blue-600" />
+                        {/* Floating stats cards - Hidden on mobile */}
+                        <div className="absolute top-8 left-8 z-30 bg-white/90 backdrop-blur-sm rounded-2xl p-3 sm:p-4 shadow-xl border border-white/20 hidden sm:block">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                                 </div>
                                 <div>
-                                    <div className="text-lg font-bold text-gray-900">
+                                    <div className="text-sm sm:text-lg font-bold text-gray-900">
                                         50K+
                                     </div>
                                     <div className="text-xs text-gray-500">
@@ -249,13 +249,13 @@ export default function Landing() {
                             </div>
                         </div>
 
-                        <div className="absolute bottom-8 right-8 z-30 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/20">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                    <Calendar className="w-5 h-5 text-green-600" />
+                        <div className="absolute bottom-8 right-8 z-30 bg-white/90 backdrop-blur-sm rounded-2xl p-3 sm:p-4 shadow-xl border border-white/20 hidden sm:block">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <div className="text-lg font-bold text-gray-900">
+                                    <div className="text-sm sm:text-lg font-bold text-gray-900">
                                         10K+
                                     </div>
                                     <div className="text-xs text-gray-500">
@@ -271,9 +271,9 @@ export default function Landing() {
                                 <img
                                     src="/images/dental-image.png"
                                     alt="Modern dental clinic management platform"
-                                    className="w-full h-[28rem] md:h-[34rem] lg:h-[38rem] object-cover rounded-3xl shadow-2xl border-4 border-white ring-4 ring-blue-100/50"
+                                    className="w-full h-[20rem] sm:h-[24rem] md:h-[28rem] lg:h-[34rem] xl:h-[38rem] object-cover rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border-2 sm:border-4 border-white ring-2 sm:ring-4 ring-blue-100/50"
                                     style={{
-                                        minHeight: "20rem",
+                                        minHeight: "16rem",
                                         maxHeight: "44rem",
                                         boxShadow:
                                             "0 20px 60px 0 rgba(16, 112, 202, 0.25)",
@@ -281,12 +281,12 @@ export default function Landing() {
                                     loading="lazy"
                                 />
                                 {/* Enhanced gradient overlay */}
-                                <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/60 via-blue-100/20 to-transparent pointer-events-none" />
+                                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-t from-white/60 via-blue-100/20 to-transparent pointer-events-none" />
 
-                                {/* Floating action button */}
-                                <div className="absolute bottom-6 left-6 z-30">
-                                    <button className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-xl border border-white/20 hover:bg-white transition-all duration-300 group">
-                                        <Play className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform" />
+                                {/* Floating action button - Hidden on mobile */}
+                                <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 z-30 hidden sm:block">
+                                    <button className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3 shadow-xl border border-white/20 hover:bg-white transition-all duration-300 group">
+                                        <Play className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 group-hover:scale-110 transition-transform" />
                                     </button>
                                 </div>
                             </div>
@@ -298,42 +298,42 @@ export default function Landing() {
             {/* Enhanced Features Section */}
             <section
                 id="features"
-                className="py-24 bg-gradient-to-b from-white to-blue-50/30 border-t border-b border-gray-100 z-10 relative"
+                className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white to-blue-50/30 border-t border-b border-gray-100 z-10 relative"
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="lg:text-center mb-20">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                    <div className="text-center lg:text-center mb-12 sm:mb-16 lg:mb-20">
+                        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-4 sm:mb-6">
                             <Zap className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                            <span className="text-xs sm:text-sm text-blue-700 font-semibold tracking-wide">
                                 Powerful Features
                             </span>
                         </div>
-                        <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-4 sm:mb-6">
                             Everything you need to{" "}
                             <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                 scale your practice
                             </span>
                         </h2>
-                        <p className="max-w-3xl text-xl text-gray-600 lg:mx-auto leading-relaxed">
+                        <p className="max-w-3xl text-base sm:text-lg lg:text-xl text-gray-600 mx-auto leading-relaxed px-4">
                             From patient management to advanced analytics, our
                             comprehensive platform provides all the tools modern
                             dental practices need to thrive.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                                <Users className="w-8 h-8 text-white" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
                                 Patient Management
                             </h3>
-                            <p className="text-gray-600 text-base leading-relaxed">
+                            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                                 Complete patient lifecycle management with
                                 digital records, medical history, and
                                 personalized treatment plans.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-blue-600 font-semibold">
+                            <div className="mt-4 sm:mt-6 flex items-center gap-2 text-blue-600 font-semibold text-sm sm:text-base">
                                 <span>Learn more</span>
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </div>
@@ -433,69 +433,69 @@ export default function Landing() {
             </section>
 
             {/* Enhanced CTA Section */}
-            <section className="relative z-20 bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 py-20 px-4 sm:px-8 lg:px-16">
+            <section className="relative z-20 bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 py-16 sm:py-20 px-4 sm:px-8 lg:px-16">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-6 sm:mb-8">
                         <Globe className="w-4 h-4 text-white" />
-                        <span className="text-sm text-white font-semibold tracking-wide">
+                        <span className="text-xs sm:text-sm text-white font-semibold tracking-wide">
                             Network of Trusted Clinics
                         </span>
                     </div>
-                    <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 sm:mb-6">
                         Ready to find your perfect{" "}
                         <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                             dental clinic?
                         </span>
                     </h2>
-                    <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+                    <p className="text-base sm:text-lg lg:text-xl text-blue-100 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-4">
                         Browse our extensive network of verified dental clinics,
                         read patient reviews, and book appointments with
                         confidence. Your perfect smile starts here.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
                         <Link
                             href={route("public.clinics.index")}
-                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
+                            className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 border-2 border-white text-base sm:text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Browse Clinics
-                            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                            <ArrowRight className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-300" />
                         </Link>
                         <Link
                             href="#testimonials"
-                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white/30 text-lg font-bold rounded-xl text-white bg-transparent hover:bg-white/10 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 focus:ring-offset-2 group transform hover:scale-105"
+                            className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 border-2 border-white/30 text-base sm:text-lg font-bold rounded-xl text-white bg-transparent hover:bg-white/10 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 focus:ring-offset-2 group transform hover:scale-105"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Read Reviews
-                            <Star className="ml-2 w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                            <Star className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" />
                         </Link>
                     </div>
                 </div>
             </section>
 
             {/* Enhanced FAQ Section */}
-            <section className="py-24 bg-gradient-to-b from-white to-gray-50 border-t border-b border-gray-100 z-10 relative">
+            <section className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 border-t border-b border-gray-100 z-10 relative">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                    <div className="text-center mb-12 sm:mb-16">
+                        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-4 sm:mb-6">
                             <MessageCircle className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                            <span className="text-xs sm:text-sm text-blue-700 font-semibold tracking-wide">
                                 Common Questions
                             </span>
                         </div>
-                        <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 sm:mb-6">
                             Everything you need to{" "}
                             <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                 know
                             </span>
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
                             Get answers to the most frequently asked questions
                             about Smile Suite and how we can transform your
                             dental practice.
                         </p>
                     </div>
-                    <div className="rounded-2xl bg-white/80 shadow-xl divide-y divide-gray-200 p-2">
+                    <div className="rounded-xl sm:rounded-2xl bg-white/80 shadow-xl divide-y divide-gray-200 p-2">
                         {faqs.map((faq, i) => (
                             <FaqItem
                                 key={i}
@@ -516,51 +516,51 @@ export default function Landing() {
             {/* Enhanced Testimonials Section */}
             <section
                 id="testimonials"
-                className="py-24 bg-gradient-to-br from-blue-50 via-white to-cyan-50 z-10 relative"
+                className="py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-blue-50 via-white to-cyan-50 z-10 relative"
             >
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                    <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+                        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-4 sm:mb-6">
                             <Star className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                            <span className="text-xs sm:text-sm text-blue-700 font-semibold tracking-wide">
                                 Customer Success Stories
                             </span>
                         </div>
-                        <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 sm:mb-6">
                             Trusted by{" "}
                             <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                 dental professionals
                             </span>
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
                             Join hundreds of dental practices that have
                             transformed their operations with Smile Suite.
                             Here's what our customers have to say.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
-                            <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center text-center animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
                                 <Avatar name="Dr. Alice Smith" />
                             </div>
-                            <div className="flex items-center gap-1 text-yellow-400 mb-4">
-                                <Star className="w-5 h-5 fill-yellow-400" />
-                                <Star className="w-5 h-5 fill-yellow-400" />
-                                <Star className="w-5 h-5 fill-yellow-400" />
-                                <Star className="w-5 h-5 fill-yellow-400" />
-                                <Star className="w-5 h-5 fill-yellow-400" />
+                            <div className="flex items-center gap-1 text-yellow-400 mb-3 sm:mb-4">
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400" />
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400" />
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400" />
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400" />
+                                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400" />
                             </div>
-                            <p className="text-gray-700 mb-6 text-lg leading-relaxed italic">
+                            <p className="text-gray-700 mb-4 sm:mb-6 text-sm sm:text-lg leading-relaxed italic">
                                 "Smile Suite has revolutionized our practice
                                 management. The AI-powered scheduling and
                                 patient management features have increased our
                                 efficiency by 40%."
                             </p>
                             <div className="text-center">
-                                <div className="text-blue-700 font-bold text-lg">
+                                <div className="text-blue-700 font-bold text-base sm:text-lg">
                                     Dr. Alice Smith
                                 </div>
-                                <div className="text-gray-500 text-sm">
+                                <div className="text-gray-500 text-xs sm:text-sm">
                                     Dental Practice Owner
                                 </div>
                             </div>
@@ -624,69 +624,69 @@ export default function Landing() {
             </section>
 
             {/* Enhanced Pricing Section */}
-            <div className="py-24 bg-gradient-to-b from-gray-50 to-white z-10 relative">
+            <div className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-gray-50 to-white z-10 relative">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-6">
+                    <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+                        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-4 sm:mb-6">
                             <DollarSign className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm text-blue-700 font-semibold tracking-wide">
+                            <span className="text-xs sm:text-sm text-blue-700 font-semibold tracking-wide">
                                 Flexible Pricing
                             </span>
                         </div>
-                        <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 sm:mb-6">
                             Choose the perfect{" "}
                             <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                 plan for your practice
                             </span>
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
                             Choose the plan that scales with your practice.
                             Basic plan includes 14-day free trial. No hidden
                             fees, cancel anytime.
                         </p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
                         {/* Starter Plan */}
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-blue-200 hover:scale-105">
-                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                                <DollarSign className="w-8 h-8 text-white" />
+                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-blue-200 hover:scale-105">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
+                                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </div>
-                            <h3 className="text-2xl font-bold mb-2 text-gray-900">
+                            <h3 className="text-xl sm:text-2xl font-bold mb-2 text-gray-900">
                                 Starter
                             </h3>
-                            <p className="text-4xl font-extrabold text-gray-900 mb-2">
+                            <p className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">
                                 ₱999{" "}
-                                <span className="text-lg font-medium text-gray-500">
+                                <span className="text-base sm:text-lg font-medium text-gray-500">
                                     /mo
                                 </span>
                             </p>
-                            <p className="text-gray-600 mb-6">
+                            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
                                 Perfect for small practices
                             </p>
-                            <ul className="text-gray-600 mb-8 space-y-3 text-left w-full">
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                            <ul className="text-gray-600 mb-6 sm:mb-8 space-y-2 sm:space-y-3 text-left w-full text-sm sm:text-base">
+                                <li className="flex items-center gap-2 sm:gap-3">
+                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                                     <span>Patient Management</span>
                                 </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                <li className="flex items-center gap-2 sm:gap-3">
+                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                                     <span>Appointment Scheduling</span>
                                 </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                <li className="flex items-center gap-2 sm:gap-3">
+                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                                     <span>Email Support</span>
                                 </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                <li className="flex items-center gap-2 sm:gap-3">
+                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                                     <span>Basic Reporting</span>
                                 </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                <li className="flex items-center gap-2 sm:gap-3">
+                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                                     <span>14-day Free Trial</span>
                                 </li>
                             </ul>
                             <Link href={route("register.clinic")}>
-                                <button className="w-full px-8 py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                <button className="w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base">
                                     Start Free Trial
                                 </button>
                             </Link>
@@ -804,56 +804,60 @@ export default function Landing() {
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl"></div>
                 </div>
 
-                <div className="max-w-4xl mx-auto text-center py-24 px-4 sm:py-32 sm:px-6 lg:px-8 relative z-10">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-8">
+                <div className="max-w-4xl mx-auto text-center py-16 sm:py-20 md:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-6 sm:mb-8">
                         <Sparkles className="w-4 h-4 text-white" />
-                        <span className="text-sm text-white font-semibold tracking-wide">
+                        <span className="text-xs sm:text-sm text-white font-semibold tracking-wide">
                             Join 500+ Clinics
                         </span>
                     </div>
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white mb-4 sm:mb-6">
                         Ready to transform your{" "}
                         <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                             dental practice?
                         </span>
                     </h2>
-                    <p className="mb-12 text-xl leading-8 text-blue-100 max-w-3xl mx-auto">
+                    <p className="mb-8 sm:mb-12 text-base sm:text-lg lg:text-xl leading-6 sm:leading-8 text-blue-100 max-w-3xl mx-auto px-4">
                         Join hundreds of dental professionals who have already
                         modernized their practice with Smile Suite. Get started
                         today and see the difference.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
                         <Link
                             href={route("register.clinic")}
-                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
+                            className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 border-2 border-white text-base sm:text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-100 shadow-2xl hover:shadow-white/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50 focus:ring-offset-2 group transform hover:scale-105"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Get Started
-                            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                            <ArrowRight className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-300" />
                         </Link>
                         <Link
                             href={route("public.clinics.index")}
-                            className="inline-flex items-center justify-center px-10 py-4 border-2 border-white/30 text-lg font-bold rounded-xl text-white bg-transparent hover:bg-white/10 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 focus:ring-offset-2 group transform hover:scale-105"
+                            className="inline-flex items-center justify-center px-6 sm:px-8 md:px-10 py-3 sm:py-4 border-2 border-white/30 text-base sm:text-lg font-bold rounded-xl text-white bg-transparent hover:bg-white/10 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 focus:ring-offset-2 group transform hover:scale-105"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
                             Browse Clinics
-                            <Globe className="ml-2 w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                            <Globe className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" />
                         </Link>
                     </div>
-                    <div className="mt-12 flex items-center justify-center gap-8 text-blue-100">
+                    <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 text-blue-100">
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-green-300" />
-                            <span className="text-sm">
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-300" />
+                            <span className="text-xs sm:text-sm">
                                 No credit card required
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-green-300" />
-                            <span className="text-sm">Basic plan trial</span>
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-300" />
+                            <span className="text-xs sm:text-sm">
+                                Basic plan trial
+                            </span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5 text-green-300" />
-                            <span className="text-sm">Cancel anytime</span>
+                            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-300" />
+                            <span className="text-xs sm:text-sm">
+                                Cancel anytime
+                            </span>
                         </div>
                     </div>
                 </div>

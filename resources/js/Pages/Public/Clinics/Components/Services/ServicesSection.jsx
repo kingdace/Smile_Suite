@@ -86,26 +86,26 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
     return (
         <div className="relative">
             {/* Section Header */}
-            <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm mb-6">
-                    <Stethoscope className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-semibold text-blue-700 tracking-wide">
+            <div className="text-center mb-8 sm:mb-12">
+                <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm mb-4 sm:mb-6">
+                    <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                    <span className="text-xs sm:text-sm font-semibold text-blue-700 tracking-wide">
                         Our Services
                     </span>
                 </div>
-                <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-4 sm:mb-6">
                     Comprehensive{" "}
                     <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                         dental care
                     </span>
                 </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
                     {clinic.services.length} services available
                 </p>
             </div>
 
             {/* Services Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {clinic.services.map((service, index) => {
                     const category = getServiceCategory(service.name);
                     const categoryColor = getCategoryColor(category);
@@ -113,13 +113,13 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                     return (
                         <div
                             key={index}
-                            className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group"
+                            className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group"
                         >
                             {/* Service Header */}
-                            <div className="p-4 pb-3">
-                                <div className="flex items-center justify-between mb-3">
+                            <div className="p-3 sm:p-4 pb-2 sm:pb-3">
+                                <div className="flex items-center justify-between mb-2 sm:mb-3">
                                     {/* Service Icon */}
-                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl flex items-center justify-center text-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
+                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
                                         {getServiceIcon(service.name)}
                                     </div>
 
@@ -132,19 +132,19 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                 </div>
 
                                 {/* Service Name */}
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
                                     {service.name}
                                 </h3>
 
                                 {/* Service Description */}
                                 {service.description && (
-                                    <p className="text-gray-600 text-sm leading-relaxed mb-3 line-clamp-2">
+                                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 line-clamp-2">
                                         {service.description}
                                     </p>
                                 )}
 
                                 {/* Service Meta */}
-                                <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                                <div className="flex items-center gap-3 sm:gap-4 text-xs text-gray-500 mb-2 sm:mb-3">
                                     {service.duration && (
                                         <div className="flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
@@ -162,20 +162,20 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                             </div>
 
                             {/* Service Footer */}
-                            <div className="px-4 pb-4">
+                            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
                                 {/* Price Section */}
                                 {service.price && (
-                                    <div className="mb-3">
+                                    <div className="mb-2 sm:mb-3">
                                         <div className="flex items-center justify-between">
                                             <div className="text-right">
-                                                <div className="text-xl font-bold text-gray-900">
+                                                <div className="text-lg sm:text-xl font-bold text-gray-900">
                                                     ₱
                                                     {service.price.toLocaleString()}
                                                 </div>
                                                 {service.original_price &&
                                                     service.original_price >
                                                         service.price && (
-                                                        <div className="text-sm text-gray-500 line-through">
+                                                        <div className="text-xs sm:text-sm text-gray-500 line-through">
                                                             ₱
                                                             {service.original_price.toLocaleString()}
                                                         </div>

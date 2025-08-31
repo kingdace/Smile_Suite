@@ -1,6 +1,6 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import { LogOut, User as UserIcon, LayoutGrid } from "lucide-react";
+import { LogOut, User as UserIcon, LayoutGrid, Menu, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar";
 
@@ -17,6 +17,7 @@ export default function SiteHeader() {
     const { auth = {} } = usePage().props;
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const [registerDropdownOpen, setRegisterDropdownOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const profileDropdownRef = useRef(null);
     const registerDropdownRef = useRef(null);
     const isLoggedIn = !!auth?.user;
@@ -57,26 +58,41 @@ export default function SiteHeader() {
         };
     }, [profileDropdownOpen, registerDropdownOpen]);
 
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (mobileMenuOpen) {
+                setMobileMenuOpen(false);
+            }
+        }
+        if (mobileMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [mobileMenuOpen]);
+
     return (
         <nav className="bg-gradient-to-br from-slate-50 via-white to-blue-50/40 backdrop-blur-md shadow-sm border-b border-slate-200/60 font-inter sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-18">
+                <div className="flex justify-between items-center h-16 sm:h-18">
                     {/* Logo left */}
                     <div className="flex items-center">
                         <Link
                             href="/"
-                            className="flex-shrink-0 flex items-center gap-4 group transition-all duration-300"
+                            className="flex-shrink-0 flex items-center gap-2 sm:gap-4 group transition-all duration-300"
                         >
                             <div className="relative">
                                 <img
                                     src="/images/smile-suite-logo.png"
                                     alt="Smile Suite Logo"
-                                    className="object-contain w-16 h-16 group-hover:opacity-80 transition-opacity duration-200"
+                                    className="object-contain w-12 h-12 sm:w-16 sm:h-16 group-hover:opacity-80 transition-opacity duration-200"
                                 />
                             </div>
                             <div className="flex flex-col">
                                 <div
-                                    className="text-3xl font-black bg-gradient-to-r from-slate-900 via-slate-800 to-blue-800 bg-clip-text text-transparent tracking-tight group-hover:from-blue-800 group-hover:via-blue-700 group-hover:to-slate-700 transition-all duration-300 drop-shadow-sm leading-tight"
+                                    className="text-xl sm:text-2xl lg:text-3xl font-black bg-gradient-to-r from-slate-900 via-slate-800 to-blue-800 bg-clip-text text-transparent tracking-tight group-hover:from-blue-800 group-hover:via-blue-700 group-hover:to-slate-700 transition-all duration-300 drop-shadow-sm leading-tight"
                                     style={{
                                         fontFamily: "Montserrat, sans-serif",
                                     }}
@@ -84,7 +100,7 @@ export default function SiteHeader() {
                                     Smile Suite
                                 </div>
                                 <div
-                                    className="text-xs text-slate-500 font-normal tracking-wide group-hover:text-slate-600 transition-colors duration-300 -mt-1.5"
+                                    className="text-xs text-slate-500 font-normal tracking-wide group-hover:text-slate-600 transition-colors duration-300 -mt-1.5 hidden sm:block"
                                     style={{ fontFamily: "Inter, sans-serif" }}
                                 >
                                     Cloud-based Dental Clinic as a Service
@@ -92,8 +108,8 @@ export default function SiteHeader() {
                             </div>
                         </Link>
                     </div>
-                    {/* Nav links + Register + Avatar right */}
-                    <div className="flex items-center space-x-1 md:space-x-4">
+                    {/* Desktop Navigation - Hidden on mobile */}
+                    <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
                         <Link
                             href="/#features"
                             className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
@@ -115,8 +131,11 @@ export default function SiteHeader() {
                         >
                             Reviews
                         </Link>
-                        {/* Register Dropdown */}
-                        <div className="relative" ref={registerDropdownRef}>
+                        {/* Register Dropdown - Hidden on mobile */}
+                        <div
+                            className="hidden md:block relative"
+                            ref={registerDropdownRef}
+                        >
                             <button
                                 className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold focus:outline-none transition-all duration-300 focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
                                 style={{ fontFamily: "Inter, sans-serif" }}
@@ -170,11 +189,11 @@ export default function SiteHeader() {
                                 </Link>
                             </div>
                         </div>
-                        {/* Auth Buttons or Profile */}
+                        {/* Auth Buttons or Profile - Hidden on mobile */}
                         {!isLoggedIn && (
                             <Link
                                 href={route("login")}
-                                className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-[15px] font-bold ml-3 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/30 focus:ring-offset-2 transform hover:scale-105 border border-blue-500/20"
+                                className="hidden md:inline-flex bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-[15px] font-bold ml-3 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/30 focus:ring-offset-2 transform hover:scale-105 border border-blue-500/20"
                                 style={{ fontFamily: "Inter, sans-serif" }}
                             >
                                 Login
@@ -182,7 +201,7 @@ export default function SiteHeader() {
                         )}
                         {isLoggedIn && (
                             <div
-                                className="relative ml-3 flex items-center"
+                                className="hidden md:flex relative ml-3 items-center"
                                 ref={profileDropdownRef}
                             >
                                 <button
@@ -273,6 +292,124 @@ export default function SiteHeader() {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Mobile Menu Button */}
+                    <div className="md:hidden">
+                        <button
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            className="text-slate-700 hover:text-blue-700 p-2 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                            aria-label="Toggle mobile menu"
+                        >
+                            {mobileMenuOpen ? (
+                                <X className="w-6 h-6" />
+                            ) : (
+                                <Menu className="w-6 h-6" />
+                            )}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Navigation Menu */}
+                <div
+                    className={`md:hidden transition-all duration-300 ease-in-out ${
+                        mobileMenuOpen
+                            ? "max-h-96 opacity-100 visible"
+                            : "max-h-0 opacity-0 invisible"
+                    } overflow-hidden`}
+                >
+                    <div className="px-4 py-6 space-y-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-md">
+                        {/* Mobile Navigation Links */}
+                        <Link
+                            href="/#features"
+                            className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            Features
+                        </Link>
+                        <Link
+                            href={route("public.clinics.index") || "/clinics"}
+                            className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            Find Clinics
+                        </Link>
+                        <Link
+                            href="/#testimonials"
+                            className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            Reviews
+                        </Link>
+
+                        {/* Mobile Register Options */}
+                        <div className="pt-2 border-t border-slate-200/60">
+                            <div className="text-sm font-semibold text-slate-500 px-4 py-2 mb-2">
+                                Register
+                            </div>
+                            <Link
+                                href={route("register")}
+                                className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200"
+                                style={{ fontFamily: "Inter, sans-serif" }}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Create Smile Suite Account
+                            </Link>
+                            <Link
+                                href={route("register.clinic")}
+                                className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200"
+                                style={{ fontFamily: "Inter, sans-serif" }}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Register Clinic
+                            </Link>
+                        </div>
+
+                        {/* Mobile Auth Buttons */}
+                        {!isLoggedIn && (
+                            <div className="pt-2 border-t border-slate-200/60">
+                                <Link
+                                    href={route("login")}
+                                    className="block w-full text-center bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-base font-bold shadow-lg transition-all duration-300"
+                                    style={{ fontFamily: "Inter, sans-serif" }}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    Login
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Mobile Profile (if logged in) */}
+                        {isLoggedIn && (
+                            <div className="pt-2 border-t border-slate-200/60">
+                                <Link
+                                    href={dashboardRoute}
+                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200 flex items-center gap-3"
+                                    style={{ fontFamily: "Inter, sans-serif" }}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                    {userRole === "admin"
+                                        ? "Admin Dashboard"
+                                        : "Dashboard"}
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        router.post(route("logout"));
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className="w-full text-center px-4 py-3 text-red-600 hover:bg-red-50/80 hover:text-red-700 flex items-center gap-3 text-base transition-all duration-200 font-medium rounded-xl"
+                                    style={{ fontFamily: "Inter, sans-serif" }}
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    Log Out
+                                </button>
                             </div>
                         )}
                     </div>
