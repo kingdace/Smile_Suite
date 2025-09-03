@@ -1,6 +1,13 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import { LogOut, User as UserIcon, LayoutGrid, Menu, X } from "lucide-react";
+import {
+    LogOut,
+    User as UserIcon,
+    LayoutGrid,
+    Menu,
+    X,
+    Stethoscope,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar";
 
@@ -259,20 +266,68 @@ export default function SiteHeader() {
                                         {/* <div className="px-4 py-3 text-slate-800 font-semibold border-b border-slate-100 text-[15px]">
                                             {auth.user.name}
                                         </div> */}
-                                        {/* Minimal Navigation Dropdown */}
-                                        <Link
-                                            href={dashboardRoute}
-                                            className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
-                                            style={{
-                                                fontFamily: "Inter, sans-serif",
-                                            }}
-                                            role="menuitem"
-                                        >
-                                            <LayoutGrid className="w-4 h-4 text-blue-500" />
-                                            {userRole === "admin"
-                                                ? "Admin Dashboard"
-                                                : "Dashboard"}
-                                        </Link>
+                                        {/* Patient Navigation Dropdown */}
+                                        {userRole === "patient" ? (
+                                            <>
+                                                <Link
+                                                    href={route(
+                                                        "patient.dashboard"
+                                                    )}
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
+                                                    style={{
+                                                        fontFamily:
+                                                            "Inter, sans-serif",
+                                                    }}
+                                                    role="menuitem"
+                                                >
+                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                                    Dashboard
+                                                </Link>
+                                                <Link
+                                                    href={route(
+                                                        "patient.profile"
+                                                    )}
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
+                                                    style={{
+                                                        fontFamily:
+                                                            "Inter, sans-serif",
+                                                    }}
+                                                    role="menuitem"
+                                                >
+                                                    <UserIcon className="w-4 h-4 text-green-500" />
+                                                    My Profile
+                                                </Link>
+                                                <Link
+                                                    href={route(
+                                                        "patient.treatments.index"
+                                                    )}
+                                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
+                                                    style={{
+                                                        fontFamily:
+                                                            "Inter, sans-serif",
+                                                    }}
+                                                    role="menuitem"
+                                                >
+                                                    <Stethoscope className="w-4 h-4 text-purple-500" />
+                                                    My Treatments
+                                                </Link>
+                                            </>
+                                        ) : (
+                                            <Link
+                                                href={dashboardRoute}
+                                                className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-lg mx-2 text-[15px] transition-all duration-200 flex items-center gap-3"
+                                                style={{
+                                                    fontFamily:
+                                                        "Inter, sans-serif",
+                                                }}
+                                                role="menuitem"
+                                            >
+                                                <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                                {userRole === "admin"
+                                                    ? "Admin Dashboard"
+                                                    : "Dashboard"}
+                                            </Link>
+                                        )}
                                         <div className="border-t border-slate-100 mt-2 pt-2">
                                             <button
                                                 type="button"
@@ -387,17 +442,65 @@ export default function SiteHeader() {
                         {/* Mobile Profile (if logged in) */}
                         {isLoggedIn && (
                             <div className="pt-2 border-t border-slate-200/60">
-                                <Link
-                                    href={dashboardRoute}
-                                    className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200 flex items-center gap-3"
-                                    style={{ fontFamily: "Inter, sans-serif" }}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
-                                    {userRole === "admin"
-                                        ? "Admin Dashboard"
-                                        : "Dashboard"}
-                                </Link>
+                                {userRole === "patient" ? (
+                                    <>
+                                        <Link
+                                            href={route("patient.dashboard")}
+                                            className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200 flex items-center gap-3"
+                                            style={{
+                                                fontFamily: "Inter, sans-serif",
+                                            }}
+                                            onClick={() =>
+                                                setMobileMenuOpen(false)
+                                            }
+                                        >
+                                            <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                            Dashboard
+                                        </Link>
+                                        <Link
+                                            href={route("patient.profile")}
+                                            className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200 flex items-center gap-3"
+                                            style={{
+                                                fontFamily: "Inter, sans-serif",
+                                            }}
+                                            onClick={() =>
+                                                setMobileMenuOpen(false)
+                                            }
+                                        >
+                                            <UserIcon className="w-4 h-4 text-green-500" />
+                                            My Profile
+                                        </Link>
+                                        <Link
+                                            href={route(
+                                                "patient.treatments.index"
+                                            )}
+                                            className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200 flex items-center gap-3"
+                                            style={{
+                                                fontFamily: "Inter, sans-serif",
+                                            }}
+                                            onClick={() =>
+                                                setMobileMenuOpen(false)
+                                            }
+                                        >
+                                            <Stethoscope className="w-4 h-4 text-purple-500" />
+                                            My Treatments
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <Link
+                                        href={dashboardRoute}
+                                        className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200 flex items-center gap-3"
+                                        style={{
+                                            fontFamily: "Inter, sans-serif",
+                                        }}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                        {userRole === "admin"
+                                            ? "Admin Dashboard"
+                                            : "Dashboard"}
+                                    </Link>
+                                )}
                                 <button
                                     type="button"
                                     onClick={() => {

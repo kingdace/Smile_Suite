@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Appointment Request Update - {{ $appointment->clinic->name }}</title>
+    <title>Appointment Request Received - {{ $clinic->name }}</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -30,7 +30,7 @@
             margin-bottom: 20px;
         }
         .title {
-            color: #dc2626;
+            color: #1e40af;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
@@ -67,13 +67,6 @@
         .detail-value {
             color: #1f2937;
         }
-        .denial-reason {
-            background-color: #fef2f2;
-            border: 2px solid #dc2626;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
         .next-steps {
             background-color: #eff6ff;
             border-left: 4px solid #3b82f6;
@@ -87,7 +80,7 @@
             padding: 15px;
             margin: 20px 0;
         }
-        .alternative-options {
+        .important-notes {
             background-color: #fef3c7;
             border: 1px solid #f59e0b;
             border-radius: 6px;
@@ -109,81 +102,84 @@
     <div class="container">
         <div class="header">
             <img src="{{ asset('images/smile-suite-logo.png') }}" alt="Smile Suite" class="logo">
-            <div class="title">Appointment Request Update 📋</div>
-            <div class="subtitle">{{ $appointment->clinic->name }}</div>
+            <div class="title">Appointment Request Received! 🦷</div>
+            <div class="subtitle">{{ $clinic->name }}</div>
         </div>
 
         <div class="content">
             <p>Dear {{ $patient->first_name }},</p>
 
-            <p>We regret to inform you that your appointment request at <strong>{{ $appointment->clinic->name }}</strong> for {{ \Carbon\Carbon::parse($appointment->scheduled_at)->format('F j, Y \a\t g:i A') }} could not be approved at this time.</p>
+            <p>Thank you for choosing <strong>{{ $clinic->name }}</strong> for your dental care needs. We have received your appointment request and will review it shortly.</p>
 
             <div class="appointment-details">
-                <h3 style="margin-top: 0; color: #1e40af;">📅 Your Requested Appointment</h3>
+                <h3 style="margin-top: 0; color: #1e40af;">📅 Your Appointment Details</h3>
                 <div class="detail-row">
-                    <span class="detail-label">Date & Time:</span>
-                    <span class="detail-value">{{ \Carbon\Carbon::parse($appointment->scheduled_at)->format('F j, Y \a\t g:i A') }}</span>
+                    <span class="detail-label">Clinic:</span>
+                    <span class="detail-value">{{ $clinic->name }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Service:</span>
+                    <span class="detail-label">Requested Date:</span>
+                    <span class="detail-value">{{ \Carbon\Carbon::parse($appointment->scheduled_at)->format('F j, Y') }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Requested Time:</span>
+                    <span class="detail-value">{{ \Carbon\Carbon::parse($appointment->scheduled_at)->format('g:i A') }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Reason:</span>
                     <span class="detail-value">{{ $appointment->reason }}</span>
                 </div>
                 @if($appointment->service)
                 <div class="detail-row">
-                    <span class="detail-label">Service Details:</span>
+                    <span class="detail-label">Service:</span>
                     <span class="detail-value">{{ $appointment->service->name }}</span>
+                </div>
+                @endif
+                @if($appointment->notes)
+                <div class="detail-row">
+                    <span class="detail-label">Additional Notes:</span>
+                    <span class="detail-value">{{ $appointment->notes }}</span>
                 </div>
                 @endif
             </div>
 
-            <div class="denial-reason">
-                <h3 style="margin-top: 0; color: #dc2626;">❌ Reason for Denial</h3>
-                <p>
-                    @if($reason)
-                        {{ $reason }}
-                    @else
-                        Unfortunately, we are unable to accommodate your requested time slot.
-                    @endif
-                </p>
-            </div>
-
             <div class="next-steps">
-                <h4 style="margin-top: 0; color: #1e40af;">🔄 Next Steps</h4>
-                <p>We encourage you to:</p>
+                <h4 style="margin-top: 0; color: #1e40af;">⏳ What Happens Next?</h4>
                 <ol style="margin: 10px 0; padding-left: 20px;">
-                    <li><strong>Submit a new request</strong> for a different date/time</li>
-                    <li><strong>Contact us directly</strong> to discuss available options</li>
-                    <li><strong>Call us</strong> to speak with our scheduling team</li>
+                    <li><strong>Review Process</strong> - Our team will review your request and check availability</li>
+                    <li><strong>Confirmation</strong> - You'll receive a confirmation email with the exact appointment details</li>
+                    <li><strong>Dentist Assignment</strong> - We'll assign the most suitable dentist for your needs</li>
+                    <li><strong>Final Details</strong> - Any specific instructions or preparation requirements will be provided</li>
                 </ol>
             </div>
 
             <div class="contact-info">
                 <h4 style="margin-top: 0; color: #059669;">📞 Contact Information</h4>
-                <p><strong>Phone:</strong> {{ $appointment->clinic->contact_number }}<br>
-                <strong>Email:</strong> {{ $appointment->clinic->email }}<br>
-                <strong>Address:</strong> {{ $appointment->clinic->street_address }}, {{ $appointment->clinic->address_details }}</p>
+                <p>If you have any questions or need to make changes, please contact us:</p>
+                <p><strong>Phone:</strong> {{ $clinic->contact_number }}<br>
+                <strong>Email:</strong> {{ $clinic->email }}<br>
+                <strong>Address:</strong> {{ $clinic->street_address }}, {{ $clinic->address_details }}</p>
             </div>
 
-            <div class="alternative-options">
-                <h4 style="margin-top: 0;">💡 Alternative Options</h4>
+            <div class="important-notes">
+                <h4 style="margin-top: 0;">⚠️ Important Notes</h4>
                 <ul style="margin: 10px 0; padding-left: 20px;">
-                    <li>Try booking for different days or times</li>
-                    <li>Consider our walk-in hours (if available)</li>
-                    <li>Contact us to discuss urgent dental needs</li>
+                    <li>This is a <strong>request</strong> that requires clinic approval</li>
+                    <li>The final appointment time may be adjusted based on availability</li>
+                    <li>Please arrive 10 minutes before your scheduled time</li>
+                    <li>Bring a valid ID and any relevant medical records</li>
                 </ul>
             </div>
 
-            <p>We apologize for any inconvenience and look forward to serving you in the future.</p>
-
-            <p>Thank you for your understanding.</p>
+            <p>We look forward to providing you with excellent dental care!</p>
 
             <p>Best regards,<br>
-            <strong>{{ $appointment->clinic->name }} Team</strong></p>
+            <strong>{{ $clinic->name }} Team</strong></p>
         </div>
 
         <div class="footer">
             <p>© {{ date('Y') }} Smile Suite. All rights reserved.</p>
-            <p><em>You can submit a new appointment request anytime through our online booking system.</em></p>
+            <p><em>This is an automated message. Please do not reply to this email.</em></p>
         </div>
     </div>
 </body>

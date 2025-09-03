@@ -6,7 +6,7 @@ This guide will help you configure your Smile Suite project to be accessible fro
 
 ## 🔍 **Current Network Configuration**
 
--   **Your Computer IP**: `10.116.255.70`
+-   **Your Computer IP**: `10.220.70.70`
 -   **Network**: `10.116.255.0/24`
 -   **Default Gateway**: `10.116.255.191`
 
@@ -64,8 +64,8 @@ Once running, your app will be accessible at:
     -   Vite Dev: `http://localhost:5173`
 
 -   **Network (Mobile/Other Devices)**:
-    -   Laravel: `http://10.116.255.70:8000`
-    -   Vite Dev: `http://10.116.255.70:5173`
+    -   Laravel: `http://10.220.70.70:8000`
+    -   Vite Dev: `http://10.220.70.70:5173`
 
 ## ⚠️ **Important Security Notes**
 
@@ -89,8 +89,8 @@ Once running, your app will be accessible at:
 'allowed_origins' => [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-    'http://10.116.255.70:5173',    // ✅ Added
-    'http://10.116.255.70:8000'     // ✅ Added
+    'http://10.220.70.70:5173',    // ✅ Added
+    'http://10.220.70.70:8000'     // ✅ Added
 ],
 ```
 
@@ -101,7 +101,7 @@ server: {
     host: "0.0.0.0",           // ✅ Already configured
     port: 5173,
     hmr: {
-        host: "10.116.255.70", // ✅ Updated for network
+        host: "10.220.70.70", // ✅ Updated for network
     },
 },
 ```
@@ -135,12 +135,12 @@ npm run dev:network
 ### **Step 3: Test on Mobile Device**
 
 -   Connect your mobile device to the same WiFi network
--   Open browser and navigate to: `http://10.116.255.70:8000`
+-   Open browser and navigate to: `http://10.220.70.70:8000`
 -   The app should load and be fully functional
 
 ### **Step 4: Test Vite Dev Server**
 
--   On mobile: `http://10.116.255.70:5173`
+-   On mobile: `http://10.220.70.70:5173`
 -   Hot Module Replacement (HMR) should work for development
 
 ## 🚨 **Troubleshooting**
@@ -183,7 +183,7 @@ If your network IP address changes (common when reconnecting to WiFi):
     ipconfig
 
     # Test connectivity from mobile
-    ping 10.116.255.70
+    ping 10.220.70.70
     ```
 
 ### **CORS Errors on Mobile**
@@ -232,14 +232,14 @@ netstat -an | findstr :8000
 ipconfig
 
 # Test mobile access
-curl http://10.116.255.70:8000
+curl http://10.220.70.70:8000
 ```
 
 ## 🎉 **Success Indicators**
 
 ✅ **Laravel server shows**: `Server running on [http://0.0.0.0:8000]`  
-✅ **Vite shows**: `Local: http://localhost:5173/` and `Network: http://10.116.255.70:5173/`  
-✅ **Mobile device can access**: `http://10.116.255.70:8000`  
+✅ **Vite shows**: `Local: http://localhost:5173/` and `Network: http://10.220.70.70:5173/`  
+✅ **Mobile device can access**: `http://10.220.70.70:8000`  
 ✅ **No CORS errors** in mobile browser console  
 ✅ **App loads and functions** normally on mobile
 
@@ -256,3 +256,7 @@ If you encounter issues:
 ---
 
 **Happy Mobile Development! 🚀📱**
+
+
+
+

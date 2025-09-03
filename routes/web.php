@@ -128,6 +128,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile', [App\Http\Controllers\Patient\PatientProfileController::class, 'show'])->name('profile');
         Route::get('/profile/edit', [App\Http\Controllers\Patient\PatientProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [App\Http\Controllers\Patient\PatientProfileController::class, 'update'])->name('profile.update');
+
+        // Patient Treatment Routes
+        Route::get('/treatments', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'index'])->name('treatments.index');
+        Route::get('/treatments/{treatment}', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'show'])->name('treatments.show');
     });
 
     // Admin routes

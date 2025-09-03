@@ -14,7 +14,7 @@ export default defineConfig({
         host: "0.0.0.0",
         port: 5173,
         hmr: {
-            host: "10.116.255.70",
+            host: "localhost", // Default to localhost for normal dev
         },
         cors: true,
         strictPort: true,

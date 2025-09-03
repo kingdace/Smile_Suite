@@ -864,43 +864,154 @@ export default function Index({ auth, clinic, appointments, filters }) {
             </div>
 
             {/* Approve Modal */}
-            {showApproveModal && (
+            {showApproveModal && selectedAppointment && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full relative">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
                         <button
                             className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
                             onClick={() => setShowApproveModal(false)}
                         >
                             <span className="text-2xl">&times;</span>
                         </button>
-                        <h2 className="text-xl font-bold mb-4">
-                            Approve Appointment
-                        </h2>
+
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-bold text-green-600 mb-2">
+                                Approve Appointment Request
+                            </h2>
+                            <p className="text-gray-600">
+                                Review and confirm this online booking request
+                            </p>
+                        </div>
+
+                        {/* Appointment Details */}
+                        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                            <h3 className="font-semibold text-gray-800 mb-3">
+                                Appointment Details
+                            </h3>
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Patient:
+                                    </span>
+                                    <span className="font-medium">
+                                        {
+                                            selectedAppointment.patient
+                                                ?.first_name
+                                        }{" "}
+                                        {selectedAppointment.patient?.last_name}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Date & Time:
+                                    </span>
+                                    <span className="font-medium">
+                                        {new Date(
+                                            selectedAppointment.scheduled_at
+                                        ).toLocaleDateString()}{" "}
+                                        at{" "}
+                                        {new Date(
+                                            selectedAppointment.scheduled_at
+                                        ).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Reason:
+                                    </span>
+                                    <span className="font-medium">
+                                        {selectedAppointment.reason}
+                                    </span>
+                                </div>
+                                {selectedAppointment.service && (
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            Service:
+                                        </span>
+                                        <span className="font-medium">
+                                            {selectedAppointment.service.name}
+                                        </span>
+                                    </div>
+                                )}
+                                {selectedAppointment.notes && (
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            Notes:
+                                        </span>
+                                        <span className="font-medium">
+                                            {selectedAppointment.notes}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Requested:
+                                    </span>
+                                    <span className="font-medium">
+                                        {new Date(
+                                            selectedAppointment.created_at
+                                        ).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Assign Dentist (optional)
                             </label>
                             <select
-                                className="w-full border rounded px-3 py-2"
+                                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                 value={selectedDentist}
                                 onChange={(e) =>
                                     setSelectedDentist(e.target.value)
                                 }
                             >
-                                <option value="">Unassigned</option>
+                                <option value="">
+                                    Unassigned - Will be assigned later
+                                </option>
                                 {dentists.map((d) => (
                                     <option key={d.id} value={d.id}>
                                         {d.name}
                                     </option>
                                 ))}
                             </select>
+                            <p className="text-xs text-gray-500 mt-1">
+                                The patient will be notified of the assigned
+                                dentist via email
+                            </p>
                         </div>
+
                         {actionError && (
-                            <div className="text-red-600 text-sm mb-2">
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
                                 {actionError}
                             </div>
                         )}
-                        <div className="flex justify-end gap-2 mt-4">
+
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                            <h4 className="font-medium text-green-900 mb-2">
+                                What happens next?
+                            </h4>
+                            <ul className="text-sm text-green-800 space-y-1">
+                                <li>
+                                    • Patient will receive a confirmation email
+                                </li>
+                                <li>
+                                    • Appointment will be marked as "Confirmed"
+                                </li>
+                                <li>
+                                    • Patient can view details in their portal
+                                </li>
+                                <li>
+                                    • Appointment will appear in your calendar
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
                             <Button
                                 variant="outline"
                                 onClick={() => setShowApproveModal(false)}
@@ -914,15 +1025,19 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                     color: "white",
                                     border: "none",
                                 }}
-                                className="flex items-center gap-1 rounded-md px-3 py-1.5 hover:bg-green-700 focus:ring-2 focus:ring-green-400"
+                                className="flex items-center gap-2 rounded-lg px-4 py-2 hover:bg-green-700 focus:ring-2 focus:ring-green-400"
                                 onClick={submitApprove}
                                 disabled={actionLoading}
                             >
                                 {actionLoading ? (
-                                    "Approving..."
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        Approving...
+                                    </>
                                 ) : (
                                     <>
                                         <Check className="w-4 h-4" /> Approve
+                                        Appointment
                                     </>
                                 )}
                             </Button>
@@ -931,35 +1046,165 @@ export default function Index({ auth, clinic, appointments, filters }) {
                 </div>
             )}
             {/* Deny Modal */}
-            {showDenyModal && (
+            {showDenyModal && selectedAppointment && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full relative">
+                    <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
                         <button
                             className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
                             onClick={() => setShowDenyModal(false)}
                         >
                             <span className="text-2xl">&times;</span>
                         </button>
-                        <h2 className="text-xl font-bold mb-4">
-                            Deny Appointment
-                        </h2>
+
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-bold text-red-600 mb-2">
+                                Deny Appointment Request
+                            </h2>
+                            <p className="text-gray-600">
+                                Please provide a reason for denying this
+                                appointment request
+                            </p>
+                        </div>
+
+                        {/* Appointment Details */}
+                        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                            <h3 className="font-semibold text-gray-800 mb-3">
+                                Appointment Details
+                            </h3>
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Patient:
+                                    </span>
+                                    <span className="font-medium">
+                                        {
+                                            selectedAppointment.patient
+                                                ?.first_name
+                                        }{" "}
+                                        {selectedAppointment.patient?.last_name}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Date & Time:
+                                    </span>
+                                    <span className="font-medium">
+                                        {new Date(
+                                            selectedAppointment.scheduled_at
+                                        ).toLocaleDateString()}{" "}
+                                        at{" "}
+                                        {new Date(
+                                            selectedAppointment.scheduled_at
+                                        ).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Reason:
+                                    </span>
+                                    <span className="font-medium">
+                                        {selectedAppointment.reason}
+                                    </span>
+                                </div>
+                                {selectedAppointment.service && (
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">
+                                            Service:
+                                        </span>
+                                        <span className="font-medium">
+                                            {selectedAppointment.service.name}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Requested:
+                                    </span>
+                                    <span className="font-medium">
+                                        {new Date(
+                                            selectedAppointment.created_at
+                                        ).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Reason for Denial (optional)
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Reason for Denial
                             </label>
                             <textarea
-                                className="w-full border rounded px-3 py-2"
+                                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
                                 value={denyReason}
                                 onChange={(e) => setDenyReason(e.target.value)}
-                                rows={3}
+                                rows={4}
+                                placeholder="Please provide a reason for denying this appointment request. This will be included in the email sent to the patient."
                             />
+                            <p className="text-xs text-gray-500 mt-1">
+                                This reason will be sent to the patient via
+                                email
+                            </p>
                         </div>
+
+                        {/* Common Reasons */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Common Reasons (click to select)
+                            </label>
+                            <div className="grid grid-cols-1 gap-2">
+                                {[
+                                    "No available slots at requested time",
+                                    "Requested service not available",
+                                    "Dentist not available",
+                                    "Clinic fully booked",
+                                    "Patient needs to reschedule",
+                                    "Insufficient information provided",
+                                ].map((reason) => (
+                                    <button
+                                        key={reason}
+                                        type="button"
+                                        className="text-left p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded border"
+                                        onClick={() => setDenyReason(reason)}
+                                    >
+                                        {reason}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         {actionError && (
-                            <div className="text-red-600 text-sm mb-2">
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
                                 {actionError}
                             </div>
                         )}
-                        <div className="flex justify-end gap-2 mt-4">
+
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                            <h4 className="font-medium text-red-900 mb-2">
+                                What happens next?
+                            </h4>
+                            <ul className="text-sm text-red-800 space-y-1">
+                                <li>
+                                    • Patient will receive a denial email with
+                                    your reason
+                                </li>
+                                <li>
+                                    • Appointment will be marked as "Cancelled"
+                                </li>
+                                <li>
+                                    • Patient can submit a new request for a
+                                    different time
+                                </li>
+                                <li>
+                                    • You can contact the patient directly if
+                                    needed
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
                             <Button
                                 variant="outline"
                                 onClick={() => setShowDenyModal(false)}
@@ -969,15 +1214,19 @@ export default function Index({ auth, clinic, appointments, filters }) {
                             </Button>
                             <Button
                                 variant="destructive"
-                                className="flex items-center gap-1 rounded-md px-3 py-1.5"
+                                className="flex items-center gap-2 rounded-lg px-4 py-2"
                                 onClick={submitDeny}
                                 disabled={actionLoading}
                             >
                                 {actionLoading ? (
-                                    "Denying..."
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        Denying...
+                                    </>
                                 ) : (
                                     <>
                                         <X className="w-4 h-4" /> Deny
+                                        Appointment
                                     </>
                                 )}
                             </Button>

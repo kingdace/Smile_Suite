@@ -118,9 +118,19 @@ class PatientRegistrationController extends Controller
 
         $clinicRecords = $this->patientLinkingService->getPatientClinicRecords($user);
 
+        // Load patient appointments across all clinics
+        $appointments = \App\Models\Appointment::whereHas('patient', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->with(['clinic', 'status', 'service', 'assignedDentist'])
+        ->orderBy('scheduled_at', 'desc')
+        ->limit(10) // Show last 10 appointments
+        ->get();
+
         return Inertia::render('Patient/Dashboard', [
             'user' => $user,
             'clinicRecords' => $clinicRecords,
+            'appointments' => $appointments,
         ]);
     }
 

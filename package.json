@@ -6,7 +6,7 @@
         "build": "vite build",
         "serve:network": "php artisan serve --host=0.0.0.0 --port=8000",
         "dev:network": "vite --host 0.0.0.0 --port 5173",
-        "update:ip": "powershell -ExecutionPolicy Bypass -File update-network-ip.ps1"
+        "update:ip": "powershell -ExecutionPolicy Bypass -File update-ip-robust.ps1"
     },
     "devDependencies": {
         "@headlessui/react": "^2.2.4",

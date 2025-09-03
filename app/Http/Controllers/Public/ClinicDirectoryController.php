@@ -7,11 +7,15 @@ use App\Models\Clinic;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Models\Patient;
 use App\Models\Appointment;
 use App\Models\AppointmentType;
 use App\Models\AppointmentStatus;
 use App\Models\Review;
+use App\Mail\AppointmentReceivedMail;
+use App\Mail\ClinicNewBookingMail;
 
 class ClinicDirectoryController extends Controller
 {
@@ -86,6 +90,7 @@ class ClinicDirectoryController extends Controller
             'time' => 'required',
             'reason' => 'required|string|max:255',
             'notes' => 'nullable|string|max:1000',
+            'service_id' => 'nullable|exists:services,id',
         ]);
 
         // Find or create patient record for this user at this clinic
@@ -122,10 +127,35 @@ class ClinicDirectoryController extends Controller
             'is_online_booking' => true,
             'reason' => $validated['reason'],
             'notes' => $validated['notes'] ?? null,
+            'service_id' => $validated['service_id'] ?? null,
             'created_by' => $user->id,
             'payment_status' => 'pending',
         ]);
 
-        return response()->json(['message' => 'Appointment request submitted successfully.'], 201);
+        // Load relationships for email
+        $appointment->load(['service', 'clinic', 'patient']);
+
+        // Get the loaded clinic and patient from the appointment
+        $loadedClinic = $appointment->clinic;
+        $loadedPatient = $appointment->patient;
+
+        // Send confirmation email to patient
+        try {
+            Mail::to($loadedPatient->email)->send(new AppointmentReceivedMail($appointment, $loadedPatient, $loadedClinic));
+        } catch (\Exception $e) {
+            Log::error('Failed to send appointment received email: ' . $e->getMessage());
+        }
+
+        // Send notification email to clinic staff
+        try {
+            $clinicAdmins = $loadedClinic->users()->where('role', 'clinic_admin')->get();
+            foreach ($clinicAdmins as $admin) {
+                Mail::to($admin->email)->send(new ClinicNewBookingMail($appointment, $loadedPatient, $loadedClinic));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send clinic notification email: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Appointment request submitted successfully! You will receive a confirmation email shortly.');
     }
 }
