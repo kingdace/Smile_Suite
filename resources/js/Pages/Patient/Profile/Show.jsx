@@ -16,30 +16,45 @@ import { Badge } from "@/Components/ui/badge";
 
 export default function PatientProfileShow({ user, patients }) {
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20">
             <SiteHeader />
             <Head title="My Profile" />
 
-            <div className="py-10">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
+            <div className="py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Page Header */}
                     <div className="mb-8">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900">
+                                <h2 className="text-3xl font-bold text-gray-900">
                                     My Profile
-                                </h1>
-                                <p className="text-gray-600 mt-2">
+                                </h2>
+                                <p className="text-gray-600 mt-2 text-lg">
                                     Manage your personal information and clinic
                                     records
                                 </p>
                             </div>
-                            <Link href={route("patient.profile.edit")}>
-                                <Button className="flex items-center gap-2">
-                                    <Edit className="w-4 h-4" />
-                                    Edit Profile
-                                </Button>
-                            </Link>
+                            <div className="flex items-center gap-3">
+                                <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-6 py-3 rounded-xl border border-blue-200/50 shadow-lg">
+                                    <span className="text-sm font-bold text-gray-700">
+                                        {new Date().toLocaleDateString(
+                                            "en-US",
+                                            {
+                                                weekday: "long",
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            }
+                                        )}
+                                    </span>
+                                </div>
+                                <Link href={route("patient.profile.edit")}>
+                                    <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+                                        <Edit className="w-4 h-4" />
+                                        Edit Profile
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
 
@@ -47,72 +62,100 @@ export default function PatientProfileShow({ user, patients }) {
                         {/* Main Profile Card */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Personal Information */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <User className="w-5 h-5" />
-                                        Personal Information
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                                            <User className="w-5 h-5 text-white" />
+                                        </div>
                                         <div>
-                                            <label className="text-sm font-medium text-gray-500">
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Personal Information
+                                            </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Your account details and contact
+                                                information
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                        <User className="w-4 h-4 text-blue-600" />
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <label className="text-sm font-medium text-gray-500 mb-2 block">
                                                 Full Name
                                             </label>
-                                            <p className="text-gray-900 font-medium">
+                                            <p className="text-gray-900 font-semibold text-lg">
                                                 {user.name}
                                             </p>
                                         </div>
-                                        <div>
-                                            <label className="text-sm font-medium text-gray-500">
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <label className="text-sm font-medium text-gray-500 mb-2 block">
                                                 Email
                                             </label>
-                                            <p className="text-gray-900 font-medium">
+                                            <p className="text-gray-900 font-semibold text-lg">
                                                 {user.email}
                                             </p>
                                         </div>
-                                        <div>
-                                            <label className="text-sm font-medium text-gray-500">
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <label className="text-sm font-medium text-gray-500 mb-2 block">
                                                 Phone Number
                                             </label>
-                                            <p className="text-gray-900 font-medium">
-                                                {user.phone_number}
+                                            <p className="text-gray-900 font-semibold text-lg">
+                                                {user.phone_number ||
+                                                    "Not provided"}
                                             </p>
                                         </div>
-                                        <div>
-                                            <label className="text-sm font-medium text-gray-500">
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <label className="text-sm font-medium text-gray-500 mb-2 block">
                                                 Account Type
                                             </label>
-                                            <Badge
-                                                variant="secondary"
-                                                className="mt-1"
-                                            >
+                                            <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
                                                 Smile Suite Patient
                                             </Badge>
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
 
                             {/* Clinic Records */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <FileText className="w-5 h-5" />
-                                        Clinic Records ({patients.length})
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+                                            <FileText className="w-5 h-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Clinic Records (
+                                                {patients.length})
+                                            </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Your patient records across all
+                                                connected clinics
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                                        <FileText className="w-4 h-4 text-green-600" />
+                                    </div>
+                                </div>
+                                <div>
                                     {patients.length === 0 ? (
                                         <div className="text-center py-8">
-                                            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                            <p className="text-gray-500">
-                                                No clinic records found
-                                            </p>
-                                            <p className="text-sm text-gray-400">
+                                            <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                                <FileText className="w-8 h-8 text-green-600" />
+                                            </div>
+                                            <h4 className="font-semibold text-gray-900 mb-2">
+                                                No Clinic Records Yet
+                                            </h4>
+                                            <p className="text-gray-600 text-sm">
                                                 Your clinic records will appear
-                                                here once you visit clinics.
+                                                here once you visit clinics and
+                                                book appointments.
                                             </p>
                                         </div>
                                     ) : (
@@ -120,18 +163,23 @@ export default function PatientProfileShow({ user, patients }) {
                                             {patients.map((patient, index) => (
                                                 <div
                                                     key={patient.id}
-                                                    className="border rounded-lg p-4"
+                                                    className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-6 hover:shadow-md transition-all duration-300 group"
                                                 >
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <h3 className="font-semibold text-gray-900">
-                                                            {
-                                                                patient.clinic
-                                                                    .name
-                                                            }
-                                                        </h3>
-                                                        <Badge variant="outline">
-                                                            Patient ID:{" "}
-                                                            {patient.id}
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center">
+                                                                <FileText className="w-4 h-4 text-green-600" />
+                                                            </div>
+                                                            <h3 className="font-bold text-gray-900 text-lg">
+                                                                {
+                                                                    patient
+                                                                        .clinic
+                                                                        .name
+                                                                }
+                                                            </h3>
+                                                        </div>
+                                                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
+                                                            ID: {patient.id}
                                                         </Badge>
                                                     </div>
 
@@ -272,67 +320,87 @@ export default function PatientProfileShow({ user, patients }) {
                                             ))}
                                         </div>
                                     )}
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Sidebar */}
                         <div className="space-y-6">
                             {/* Quick Stats */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Quick Stats</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-gray-600">
-                                            Connected Clinics
-                                        </span>
-                                        <span className="font-semibold">
-                                            {patients.length}
-                                        </span>
+                            <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6">
+                                <div className="mb-6">
+                                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                        <User className="w-5 h-5 text-blue-600" />
+                                        Quick Stats
+                                    </h3>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        Your profile overview
+                                    </p>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="bg-gradient-to-r from-blue-50/50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-700 font-medium">
+                                                Connected Clinics
+                                            </span>
+                                            <span className="text-2xl font-bold text-blue-600">
+                                                {patients.length}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-gray-600">
-                                            Active Records
-                                        </span>
-                                        <span className="font-semibold">
-                                            {
-                                                patients.filter(
-                                                    (p) => p.status === "active"
-                                                ).length
-                                            }
-                                        </span>
+                                    <div className="bg-gradient-to-r from-green-50/50 to-green-100/50 rounded-xl p-4 border border-green-200/50">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-700 font-medium">
+                                                Active Records
+                                            </span>
+                                            <span className="text-2xl font-bold text-green-600">
+                                                {
+                                                    patients.filter(
+                                                        (p) =>
+                                                            p.status ===
+                                                            "active"
+                                                    ).length
+                                                }
+                                            </span>
+                                        </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
 
                             {/* Quick Actions */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Quick Actions</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
+                            <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6">
+                                <div className="mb-6">
+                                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                        <Edit className="w-5 h-5 text-purple-600" />
+                                        Quick Actions
+                                    </h3>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        Navigate to important pages
+                                    </p>
+                                </div>
+                                <div className="space-y-3">
                                     <Link href={route("patient.dashboard")}>
-                                        <Button
-                                            variant="outline"
-                                            className="w-full justify-start"
-                                        >
-                                            <Calendar className="w-4 h-4 mr-2" />
-                                            View Dashboard
-                                        </Button>
+                                        <div className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-blue-100/80 rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent hover:border-blue-200/50">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
+                                                <Calendar className="w-5 h-5 text-white" />
+                                            </div>
+                                            <span className="font-semibold text-sm">
+                                                View Dashboard
+                                            </span>
+                                        </div>
                                     </Link>
                                     <Link href={route("patient.profile.edit")}>
-                                        <Button
-                                            variant="outline"
-                                            className="w-full justify-start"
-                                        >
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Edit Profile
-                                        </Button>
+                                        <div className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-purple-100/80 rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent hover:border-purple-200/50">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
+                                                <Edit className="w-5 h-5 text-white" />
+                                            </div>
+                                            <span className="font-semibold text-sm">
+                                                Edit Profile
+                                            </span>
+                                        </div>
                                     </Link>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

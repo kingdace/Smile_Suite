@@ -57,8 +57,8 @@ class PatientProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update patient profile
+        /**
+     * Update patient profile (User account only - no patient records)
      */
     public function update(Request $request)
     {
@@ -71,51 +71,20 @@ class PatientProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'patients' => 'array',
-            'patients.*.id' => 'required|exists:patients,id',
-            'patients.*.first_name' => 'required|string|max:255',
-            'patients.*.last_name' => 'required|string|max:255',
-            'patients.*.phone_number' => 'required|string|max:20',
-            'patients.*.emergency_contact_name' => 'nullable|string|max:255',
-            'patients.*.emergency_contact_number' => 'nullable|string|max:20',
-            'patients.*.emergency_contact_relationship' => 'nullable|string|max:50',
-            'patients.*.medical_history' => 'nullable|string|max:2000',
-            'patients.*.allergies' => 'nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        // Update user information
+        // Update only user account information (safe fields)
         $user->update([
             'name' => $request->name,
             'phone_number' => $request->phone_number,
         ]);
 
-        // Update patient records
-        if ($request->has('patients')) {
-            foreach ($request->patients as $patientData) {
-                $patient = Patient::find($patientData['id']);
-
-                // Ensure this patient belongs to the authenticated user
-                if ($patient && $patient->user_id === $user->id) {
-                    $patient->update([
-                        'first_name' => $patientData['first_name'],
-                        'last_name' => $patientData['last_name'],
-                        'phone_number' => $patientData['phone_number'],
-                        'emergency_contact_name' => $patientData['emergency_contact_name'] ?? null,
-                        'emergency_contact_number' => $patientData['emergency_contact_number'] ?? null,
-                        'emergency_contact_relationship' => $patientData['emergency_contact_relationship'] ?? null,
-                        'medical_history' => $patientData['medical_history'] ?? null,
-                        'allergies' => $patientData['allergies'] ?? null,
-                    ]);
-                }
-            }
-        }
-
         return redirect()->route('patient.profile.show')
-            ->with('success', 'Profile updated successfully.');
+            ->with('success', 'Your account information has been updated successfully. Clinic records are managed by your healthcare providers.');
     }
 }
 

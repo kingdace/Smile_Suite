@@ -54,7 +54,7 @@ export default function PatientTreatmentsIndex({
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20">
             <Head title="My Treatments - Smile Suite" />
 
             {/* Site Header */}
@@ -62,37 +62,46 @@ export default function PatientTreatmentsIndex({
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header Section */}
+                {/* Page Header */}
                 <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                            <Stethoscope className="w-6 h-6 text-blue-600" />
-                        </div>
+                    <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">
+                            <h2 className="text-3xl font-bold text-gray-900">
                                 My Treatments
-                            </h1>
-                            <p className="text-gray-600">
+                            </h2>
+                            <p className="text-gray-600 mt-2 text-lg">
                                 Your dental treatment history across all
                                 connected clinics
                             </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-6 py-3 rounded-xl border border-blue-200/50 shadow-lg">
+                                <span className="text-sm font-bold text-gray-700">
+                                    {new Date().toLocaleDateString("en-US", {
+                                        weekday: "long",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-center">
-                                <div className="p-3 bg-blue-100 rounded-lg">
-                                    <Building2 className="w-6 h-6 text-blue-600" />
+                    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                    <Building2 className="w-5 h-5 text-white" />
                                 </div>
-                                <div className="ml-4">
-                                    <p className="text-sm font-medium text-gray-600">
+                                <div>
+                                    <p className="text-sm text-gray-500">
                                         Connected Clinics
                                     </p>
-                                    <p className="text-2xl font-bold text-gray-900">
+                                    <p className="text-3xl font-bold text-gray-900">
                                         {clinicRecords?.length || 0}
                                     </p>
                                 </div>
@@ -100,17 +109,17 @@ export default function PatientTreatmentsIndex({
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-center">
-                                <div className="p-3 bg-green-100 rounded-lg">
-                                    <Stethoscope className="w-6 h-6 text-green-600" />
+                    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                    <Stethoscope className="w-5 h-5 text-white" />
                                 </div>
-                                <div className="ml-4">
-                                    <p className="text-sm font-medium text-gray-600">
+                                <div>
+                                    <p className="text-sm text-gray-500">
                                         Total Treatments
                                     </p>
-                                    <p className="text-2xl font-bold text-gray-900">
+                                    <p className="text-3xl font-bold text-gray-900">
                                         {treatments?.data?.length || 0}
                                     </p>
                                 </div>
@@ -118,17 +127,17 @@ export default function PatientTreatmentsIndex({
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardContent className="p-6">
-                            <div className="flex items-center">
-                                <div className="p-3 bg-yellow-100 rounded-lg">
-                                    <CheckCircle className="w-6 h-6 text-yellow-600" />
+                    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                                    <CheckCircle className="w-5 h-5 text-white" />
                                 </div>
-                                <div className="ml-4">
-                                    <p className="text-sm font-medium text-gray-600">
+                                <div>
+                                    <p className="text-sm text-gray-500">
                                         Completed
                                     </p>
-                                    <p className="text-2xl font-bold text-gray-900">
+                                    <p className="text-3xl font-bold text-gray-900">
                                         {treatments?.data?.filter(
                                             (t) =>
                                                 t.status?.toLowerCase() ===
@@ -142,20 +151,29 @@ export default function PatientTreatmentsIndex({
                 </div>
 
                 {/* Treatments List */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-blue-600" />
-                            Treatment History
-                        </CardTitle>
+                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+                    <CardHeader className="bg-gradient-to-r from-blue-50/80 to-cyan-50/80 border-b border-blue-100/50">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    Treatment History
+                                </h3>
+                                <p className="text-gray-500 text-sm">
+                                    Your complete dental treatment records
+                                </p>
+                            </div>
+                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <FileText className="w-4 h-4 text-blue-600" />
+                            </div>
+                        </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-6">
                         {treatments?.data && treatments.data.length > 0 ? (
                             <div className="space-y-4">
                                 {treatments.data.map((treatment) => (
                                     <div
                                         key={treatment.id || Math.random()}
-                                        className="border rounded-lg p-6 hover:bg-gray-50 transition-colors"
+                                        className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-6 hover:shadow-lg transition-all duration-300"
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
@@ -284,17 +302,20 @@ export default function PatientTreatmentsIndex({
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <Stethoscope className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                <div className="w-20 h-20 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Stethoscope className="w-10 h-10 text-blue-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-3">
                                     No Treatments Yet
                                 </h3>
-                                <p className="text-gray-500 mb-6">
+                                <p className="text-gray-500 mb-8 max-w-md mx-auto">
                                     You haven't received any treatments yet.
-                                    Book an appointment to get started!
+                                    Book an appointment to get started with your
+                                    dental care journey!
                                 </p>
                                 <Link href="/clinics">
-                                    <Button className="flex items-center gap-2">
-                                        <Plus className="w-4 h-4" />
+                                    <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-6 py-3 text-lg font-semibold">
+                                        <Plus className="w-5 h-5" />
                                         Find Clinics
                                     </Button>
                                 </Link>

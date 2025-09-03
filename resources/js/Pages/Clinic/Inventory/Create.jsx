@@ -21,13 +21,22 @@ export default function Create({ auth, clinic, suppliers }) {
         minimum_quantity: "",
         unit_price: "",
         category: "",
-        supplier_id: "",
+        supplier_id: "none",
         notes: "",
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("clinic.inventory.store", [clinic.id]));
+        const formData = { ...data };
+        // Convert "none" to null for supplier_id, or convert string ID to integer
+        if (formData.supplier_id === "none") {
+            formData.supplier_id = null;
+        } else if (formData.supplier_id && formData.supplier_id !== "none") {
+            formData.supplier_id = parseInt(formData.supplier_id);
+        }
+        post(route("clinic.inventory.store", [clinic.id]), {
+            data: formData,
+        });
     };
 
     return (
@@ -194,14 +203,26 @@ export default function Create({ auth, clinic, suppliers }) {
                                                 <SelectValue placeholder="Select supplier" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                {suppliers.map((supplier) => (
-                                                    <SelectItem
-                                                        key={supplier.id}
-                                                        value={supplier.id}
-                                                    >
-                                                        {supplier.name}
-                                                    </SelectItem>
-                                                ))}
+                                                <SelectItem value="none">
+                                                    None
+                                                </SelectItem>
+                                                {suppliers &&
+                                                suppliers.length > 0
+                                                    ? suppliers.map(
+                                                          (supplier) => (
+                                                              <SelectItem
+                                                                  key={
+                                                                      supplier.id
+                                                                  }
+                                                                  value={supplier.id.toString()}
+                                                              >
+                                                                  {
+                                                                      supplier.name
+                                                                  }
+                                                              </SelectItem>
+                                                          )
+                                                      )
+                                                    : null}
                                             </SelectContent>
                                         </Select>
                                         {errors.supplier_id && (

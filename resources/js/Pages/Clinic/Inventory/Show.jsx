@@ -125,7 +125,8 @@ export default function Show({ auth, clinic, inventory }) {
                                                 Supplier
                                             </dt>
                                             <dd className="mt-1">
-                                                {inventory.supplier?.name}
+                                                {inventory.supplier?.name ||
+                                                    "N/A"}
                                             </dd>
                                         </div>
                                         <div>
@@ -133,10 +134,8 @@ export default function Show({ auth, clinic, inventory }) {
                                                 Contact Person
                                             </dt>
                                             <dd className="mt-1">
-                                                {
-                                                    inventory.supplier
-                                                        ?.contact_person
-                                                }
+                                                {inventory.supplier
+                                                    ?.contact_person || "N/A"}
                                             </dd>
                                         </div>
                                         <div>
@@ -144,7 +143,8 @@ export default function Show({ auth, clinic, inventory }) {
                                                 Email
                                             </dt>
                                             <dd className="mt-1">
-                                                {inventory.supplier?.email}
+                                                {inventory.supplier?.email ||
+                                                    "N/A"}
                                             </dd>
                                         </div>
                                         <div>
@@ -152,7 +152,8 @@ export default function Show({ auth, clinic, inventory }) {
                                                 Phone
                                             </dt>
                                             <dd className="mt-1">
-                                                {inventory.supplier?.phone}
+                                                {inventory.supplier?.phone ||
+                                                    "N/A"}
                                             </dd>
                                         </div>
                                     </dl>

@@ -56,7 +56,7 @@ export default function PatientTreatmentShow({
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20">
             <Head
                 title={`Treatment Details - ${
                     treatment?.service?.name || "Treatment"
@@ -67,32 +67,56 @@ export default function PatientTreatmentShow({
             <SiteHeader />
 
             {/* Main Content */}
-            <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Back Button */}
-                <div className="mb-6">
-                    <Link href={route("patient.treatments.index")}>
-                        <Button
-                            variant="outline"
-                            className="flex items-center gap-2"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to Treatments
-                        </Button>
-                    </Link>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Page Header */}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-3xl font-bold text-gray-900">
+                                {treatment?.service?.name ||
+                                    treatment?.name ||
+                                    "Treatment Details"}
+                            </h2>
+                            <p className="text-gray-600 mt-2 text-lg">
+                                Treatment information and history
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-6 py-3 rounded-xl border border-blue-200/50 shadow-lg">
+                                <span className="text-sm font-bold text-gray-700">
+                                    {new Date().toLocaleDateString("en-US", {
+                                        weekday: "long",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </span>
+                            </div>
+                            <Link href={route("patient.treatments.index")}>
+                                <Button
+                                    variant="outline"
+                                    className="flex items-center gap-2"
+                                >
+                                    <ArrowLeft className="w-4 h-4" />
+                                    Back to Treatments
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Placeholder Notice */}
                 {isPlaceholder && (
-                    <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-orange-100 rounded-lg">
-                                <FileText className="w-5 h-5 text-orange-600" />
+                    <div className="mb-6 bg-gradient-to-r from-orange-50/80 to-yellow-50/80 backdrop-blur-sm border border-orange-200/50 rounded-xl p-6 shadow-lg">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                                <FileText className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-orange-800">
+                                <h3 className="text-lg font-bold text-orange-900">
                                     Treatment Not Available
                                 </h3>
-                                <p className="text-sm text-orange-700">
+                                <p className="text-orange-800 mt-1">
                                     This treatment record could not be found or
                                     may not be available yet. Please contact
                                     your clinic for more information.
@@ -102,39 +126,37 @@ export default function PatientTreatmentShow({
                     </div>
                 )}
 
-                {/* Header Section */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-blue-100 rounded-lg">
-                            <Stethoscope className="w-8 h-8 text-blue-600" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900">
-                                {treatment?.service?.name ||
-                                    treatment?.name ||
-                                    "Treatment Details"}
-                            </h1>
-                            <p className="text-gray-600">
-                                Treatment information and history
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Treatment Status Card */}
-                <Card className="mb-6">
+                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl mb-6">
+                    <CardHeader className="bg-gradient-to-r from-blue-50/80 to-cyan-50/80 border-b border-blue-100/50">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    Treatment Status
+                                </h3>
+                                <p className="text-gray-500 text-sm">
+                                    Current status and treatment date
+                                </p>
+                            </div>
+                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                {getStatusIcon(treatment?.status)}
+                            </div>
+                        </div>
+                    </CardHeader>
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                {getStatusIcon(treatment?.status)}
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                    <Stethoscope className="w-6 h-6 text-white" />
+                                </div>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
+                                    <h4 className="text-lg font-semibold text-gray-900">
                                         Treatment Status
-                                    </h3>
+                                    </h4>
                                     <Badge
-                                        className={getStatusColor(
+                                        className={`${getStatusColor(
                                             treatment?.status
-                                        )}
+                                        )} px-3 py-1 text-sm font-semibold`}
                                     >
                                         {treatment?.status || "Unknown"}
                                     </Badge>
@@ -144,7 +166,7 @@ export default function PatientTreatmentShow({
                                 <p className="text-sm text-gray-500">
                                     Treatment Date
                                 </p>
-                                <p className="font-medium text-gray-900">
+                                <p className="text-lg font-bold text-gray-900">
                                     {new Date(
                                         treatment?.created_at
                                     ).toLocaleDateString()}
@@ -157,33 +179,58 @@ export default function PatientTreatmentShow({
                 {/* Treatment Information Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     {/* Clinic Information */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Building2 className="w-5 h-5 text-blue-600" />
-                                Clinic Information
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-3">
+                    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+                        <CardHeader className="bg-gradient-to-r from-blue-50/80 to-cyan-50/80 border-b border-blue-100/50">
+                            <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-semibold text-gray-900">
+                                    <h3 className="text-lg font-bold text-gray-900">
+                                        Clinic Information
+                                    </h3>
+                                    <p className="text-gray-500 text-sm">
+                                        Healthcare provider details
+                                    </p>
+                                </div>
+                                <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                    <Building2 className="w-4 h-4 text-blue-600" />
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="space-y-4">
+                                <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                    <h4 className="font-bold text-gray-900 text-lg">
                                         {treatment?.clinic?.name}
                                     </h4>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-gray-600 mt-1">
                                         {treatment?.clinic?.address}
                                     </p>
                                 </div>
                                 {treatment?.clinic?.phone && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <span>📞</span>
-                                        <span>{treatment.clinic.phone}</span>
+                                    <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                <span className="text-green-600">
+                                                    📞
+                                                </span>
+                                            </div>
+                                            <span className="text-gray-700 font-medium">
+                                                {treatment.clinic.phone}
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
                                 {treatment?.clinic?.email && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <span>✉️</span>
-                                        <span>{treatment.clinic.email}</span>
+                                    <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                <span className="text-blue-600">
+                                                    ✉️
+                                                </span>
+                                            </div>
+                                            <span className="text-gray-700 font-medium">
+                                                {treatment.clinic.email}
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -191,22 +238,31 @@ export default function PatientTreatmentShow({
                     </Card>
 
                     {/* Dentist Information */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <User className="w-5 h-5 text-green-600" />
-                                Dentist Information
-                            </CardTitle>
+                    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
+                        <CardHeader className="bg-gradient-to-r from-green-50/80 to-emerald-50/80 border-b border-green-100/50">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-900">
+                                        Dentist Information
+                                    </h3>
+                                    <p className="text-gray-500 text-sm">
+                                        Healthcare professional details
+                                    </p>
+                                </div>
+                                <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                                    <User className="w-4 h-4 text-green-600" />
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-6">
                             {treatment?.dentist ? (
-                                <div className="space-y-3">
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900">
+                                <div className="space-y-4">
+                                    <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                        <h4 className="font-bold text-gray-900 text-lg">
                                             Dr. {treatment.dentist.name}
                                         </h4>
                                         {treatment.dentist.specialization && (
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-gray-600 mt-1">
                                                 {
                                                     treatment.dentist
                                                         .specialization
@@ -215,18 +271,29 @@ export default function PatientTreatmentShow({
                                         )}
                                     </div>
                                     {treatment.dentist.phone && (
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <span>📞</span>
-                                            <span>
-                                                {treatment.dentist.phone}
-                                            </span>
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                    <span className="text-green-600">
+                                                        📞
+                                                    </span>
+                                                </div>
+                                                <span className="text-gray-700 font-medium">
+                                                    {treatment.dentist.phone}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <p className="text-gray-500">
-                                    No dentist assigned
-                                </p>
+                                <div className="text-center py-8">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <User className="w-8 h-8 text-gray-400" />
+                                    </div>
+                                    <p className="text-gray-500 font-medium">
+                                        No dentist assigned
+                                    </p>
+                                </div>
                             )}
                         </CardContent>
                     </Card>
@@ -234,62 +301,97 @@ export default function PatientTreatmentShow({
 
                 {/* Appointment Details */}
                 {treatment?.appointment && (
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-purple-600" />
-                                Related Appointment
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl mb-6">
+                        <CardHeader className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 border-b border-purple-100/50">
+                            <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-semibold text-gray-900 mb-2">
+                                    <h3 className="text-lg font-bold text-gray-900">
+                                        Related Appointment
+                                    </h3>
+                                    <p className="text-gray-500 text-sm">
+                                        Appointment details and notes
+                                    </p>
+                                </div>
+                                <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+                                    <Calendar className="w-4 h-4 text-purple-600" />
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-bold text-gray-900 mb-4 text-lg">
                                         Appointment Details
                                     </h4>
-                                    <div className="space-y-2 text-sm text-gray-600">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="w-4 h-4" />
-                                            <span>
-                                                {new Date(
-                                                    treatment.appointment.scheduled_at
-                                                ).toLocaleDateString()}
-                                            </span>
+                                    <div className="space-y-3">
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                    <Calendar className="w-4 h-4 text-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Date
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {new Date(
+                                                            treatment.appointment.scheduled_at
+                                                        ).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Clock className="w-4 h-4" />
-                                            <span>
-                                                {new Date(
-                                                    treatment.appointment.scheduled_at
-                                                ).toLocaleTimeString([], {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                })}
-                                            </span>
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                    <Clock className="w-4 h-4 text-green-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Time
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {new Date(
+                                                            treatment.appointment.scheduled_at
+                                                        ).toLocaleTimeString(
+                                                            [],
+                                                            {
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            }
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                         {treatment.appointment.reason && (
-                                            <div>
-                                                <span className="font-medium">
-                                                    Reason:{" "}
-                                                </span>
-                                                <span>
-                                                    {
-                                                        treatment.appointment
-                                                            .reason
-                                                    }
-                                                </span>
+                                            <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Reason
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {
+                                                            treatment
+                                                                .appointment
+                                                                .reason
+                                                        }
+                                                    </p>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                                 {treatment.appointment.notes && (
                                     <div>
-                                        <h5 className="font-medium text-gray-900 mb-2">
+                                        <h5 className="font-bold text-gray-900 mb-4 text-lg">
                                             Appointment Notes
                                         </h5>
-                                        <p className="text-sm text-gray-600">
-                                            {treatment.appointment.notes}
-                                        </p>
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <p className="text-gray-700">
+                                                {treatment.appointment.notes}
+                                            </p>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -298,48 +400,63 @@ export default function PatientTreatmentShow({
                 )}
 
                 {/* Treatment Details */}
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-orange-600" />
-                            Treatment Details
-                        </CardTitle>
+                <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl mb-6">
+                    <CardHeader className="bg-gradient-to-r from-orange-50/80 to-amber-50/80 border-b border-orange-100/50">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    Treatment Details
+                                </h3>
+                                <p className="text-gray-500 text-sm">
+                                    Service information and treatment notes
+                                </p>
+                            </div>
+                            <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
+                                <FileText className="w-4 h-4 text-orange-600" />
+                            </div>
+                        </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h4 className="font-semibold text-gray-900 mb-3">
+                                <h4 className="font-bold text-gray-900 mb-4 text-lg">
                                     Service Information
                                 </h4>
-                                <div className="space-y-2 text-sm text-gray-600">
-                                    <div>
-                                        <span className="font-medium">
-                                            Service:{" "}
-                                        </span>
-                                        <span>
+                                <div className="space-y-3">
+                                    <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                        <p className="text-sm text-gray-500">
+                                            Service
+                                        </p>
+                                        <p className="font-bold text-gray-900 text-lg">
                                             {treatment?.service?.name || "N/A"}
-                                        </span>
+                                        </p>
                                     </div>
                                     {treatment?.service?.description && (
-                                        <div>
-                                            <span className="font-medium">
-                                                Description:{" "}
-                                            </span>
-                                            <span>
+                                        <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                            <p className="text-sm text-gray-500">
+                                                Description
+                                            </p>
+                                            <p className="text-gray-700">
                                                 {treatment.service.description}
-                                            </span>
+                                            </p>
                                         </div>
                                     )}
                                     {treatment?.cost && (
-                                        <div className="flex items-center gap-2">
-                                            <DollarSign className="w-4 h-4" />
-                                            <span className="font-medium">
-                                                Cost:{" "}
-                                            </span>
-                                            <span className="font-semibold text-green-600">
-                                                ₱
-                                                {treatment.cost.toLocaleString()}
-                                            </span>
+                                        <div className="bg-gradient-to-r from-green-50/50 to-emerald-50/50 rounded-xl border border-green-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                    <DollarSign className="w-4 h-4 text-green-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Cost
+                                                    </p>
+                                                    <p className="font-bold text-green-600 text-lg">
+                                                        ₱
+                                                        {treatment.cost.toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -347,11 +464,11 @@ export default function PatientTreatmentShow({
 
                             {treatment?.notes && (
                                 <div>
-                                    <h4 className="font-semibold text-gray-900 mb-3">
+                                    <h4 className="font-bold text-gray-900 mb-4 text-lg">
                                         Treatment Notes
                                     </h4>
-                                    <div className="bg-gray-50 p-4 rounded-lg">
-                                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                                    <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                        <p className="text-gray-700 whitespace-pre-wrap">
                                             {treatment.notes}
                                         </p>
                                     </div>

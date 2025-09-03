@@ -21,13 +21,24 @@ export default function Edit({ auth, clinic, inventory, suppliers }) {
         minimum_quantity: inventory.minimum_quantity,
         unit_price: inventory.unit_price,
         category: inventory.category,
-        supplier_id: inventory.supplier_id,
+        supplier_id: inventory.supplier_id
+            ? inventory.supplier_id.toString()
+            : "none",
         notes: inventory.notes,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("clinic.inventory.update", [clinic.id, inventory.id]));
+        const formData = { ...data };
+        // Convert "none" to null for supplier_id, or convert string ID to integer
+        if (formData.supplier_id === "none") {
+            formData.supplier_id = null;
+        } else if (formData.supplier_id && formData.supplier_id !== "none") {
+            formData.supplier_id = parseInt(formData.supplier_id);
+        }
+        put(route("clinic.inventory.update", [clinic.id, inventory.id]), {
+            data: formData,
+        });
     };
 
     return (
@@ -194,10 +205,13 @@ export default function Edit({ auth, clinic, inventory, suppliers }) {
                                                 <SelectValue placeholder="Select supplier" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value="none">
+                                                    None
+                                                </SelectItem>
                                                 {suppliers.map((supplier) => (
                                                     <SelectItem
                                                         key={supplier.id}
-                                                        value={supplier.id}
+                                                        value={supplier.id.toString()}
                                                     >
                                                         {supplier.name}
                                                     </SelectItem>

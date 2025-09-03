@@ -569,27 +569,24 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                                                 </div>
                                                                 <div className="ml-4">
                                                                     <div className="text-base font-bold text-gray-900 leading-tight">
-                                                                        {
-                                                                            appointment
-                                                                                .patient
-                                                                                .first_name
-                                                                        }{" "}
-                                                                        {
-                                                                            appointment
-                                                                                .patient
-                                                                                .last_name
-                                                                        }
+                                                                        {appointment
+                                                                            .patient
+                                                                            ?.first_name ||
+                                                                            "Unknown"}{" "}
+                                                                        {appointment
+                                                                            .patient
+                                                                            ?.last_name ||
+                                                                            ""}
                                                                     </div>
                                                                     <div className="text-sm text-gray-600">
-                                                                        {
-                                                                            appointment
-                                                                                .patient
-                                                                                .email
-                                                                        }
+                                                                        {appointment
+                                                                            .patient
+                                                                            ?.email ||
+                                                                            "No email"}
                                                                     </div>
                                                                     {appointment
                                                                         .patient
-                                                                        .phone_number && (
+                                                                        ?.phone_number && (
                                                                         <div className="text-sm text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded text-xs mt-1 inline-block">
                                                                             {
                                                                                 appointment
@@ -666,11 +663,10 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                                                     </div>
                                                                     <span className="font-medium">
                                                                         Dr.{" "}
-                                                                        {
-                                                                            appointment
-                                                                                .assigned_dentist
-                                                                                .name
-                                                                        }
+                                                                        {appointment
+                                                                            .assigned_dentist
+                                                                            ?.name ||
+                                                                            "Unknown"}
                                                                     </span>
                                                                 </div>
                                                             ) : (
