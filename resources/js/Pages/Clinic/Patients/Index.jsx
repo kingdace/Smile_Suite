@@ -356,8 +356,8 @@ export default function Index({ auth, patients, filters, statistics }) {
                         </Card>
                     </div>
 
-                    {/* Additional Statistics Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {/* Additional Statistics Row - Hidden */}
+                    {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
@@ -409,7 +409,7 @@ export default function Index({ auth, patients, filters, statistics }) {
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>
+                    </div> */}
 
                     {/* Patient Records Card */}
                     <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden border border-blue-100/30">
