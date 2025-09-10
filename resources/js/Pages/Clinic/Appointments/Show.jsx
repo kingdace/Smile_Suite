@@ -20,6 +20,7 @@ import {
     XCircle,
     Clock as ClockIcon,
     CalendarDays,
+    CalendarClock,
     Package,
     DollarSign,
     MessageSquare,
@@ -258,6 +259,216 @@ export default function Show({ auth, clinic, appointment }) {
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            {/* Patient-Initiated Changes Alert */}
+                            {appointment.status?.name === "Cancelled" &&
+                                appointment.cancelled_at &&
+                                appointment.cancellation_reason && (
+                                    <Card className="shadow-lg border-0 bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-l-red-500">
+                                        <CardHeader className="bg-gradient-to-r from-red-600 to-orange-600">
+                                            <CardTitle className="flex items-center gap-3 text-white">
+                                                <AlertCircle className="h-6 w-6" />
+                                                Patient Cancellation
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="p-6">
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-red-100 rounded-lg">
+                                                        <XCircle className="h-5 w-5 text-red-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">
+                                                            Cancelled by Patient
+                                                        </p>
+                                                        <p className="font-semibold text-red-800">
+                                                            {format(
+                                                                new Date(
+                                                                    appointment.cancelled_at
+                                                                ),
+                                                                "MMM d, yyyy 'at' h:mm a"
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-orange-100 rounded-lg">
+                                                        <MessageSquare className="h-5 w-5 text-orange-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">
+                                                            Reason
+                                                        </p>
+                                                        <p className="font-semibold text-gray-800">
+                                                            {
+                                                                appointment.cancellation_reason
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 p-4 bg-white/80 rounded-lg border border-red-200">
+                                                    <p className="text-sm text-gray-700 mb-3">
+                                                        <strong>
+                                                            Quick Actions:
+                                                        </strong>
+                                                    </p>
+                                                    <div className="flex gap-3">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-green-300 text-green-700 hover:bg-green-50"
+                                                            onClick={() => {
+                                                                // Copy patient contact info to clipboard
+                                                                const contactInfo = `Patient: ${appointment.patient?.first_name} ${appointment.patient?.last_name}\nEmail: ${appointment.patient?.email}\nPhone: ${appointment.patient?.phone_number}`;
+                                                                copyToClipboard(
+                                                                    contactInfo
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Copy className="h-4 w-4 mr-2" />
+                                                            Copy Contact Info
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                                                            onClick={() => {
+                                                                // Open email client
+                                                                const subject = `Re: Appointment Cancellation - ${appointment.patient?.first_name} ${appointment.patient?.last_name}`;
+                                                                const body = `Dear ${appointment.patient?.first_name},\n\nThank you for notifying us about your appointment cancellation. We understand that ${appointment.cancellation_reason}.\n\nWe would be happy to reschedule your appointment at a more convenient time. Please let us know your preferred dates and times.\n\nBest regards,\n${clinic.name}`;
+                                                                window.open(
+                                                                    `mailto:${
+                                                                        appointment
+                                                                            .patient
+                                                                            ?.email
+                                                                    }?subject=${encodeURIComponent(
+                                                                        subject
+                                                                    )}&body=${encodeURIComponent(
+                                                                        body
+                                                                    )}`
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Send className="h-4 w-4 mr-2" />
+                                                            Send Email
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                            {/* Patient Reschedule Alert */}
+                            {appointment.notes &&
+                                appointment.notes.includes(
+                                    "Rescheduled by patient"
+                                ) && (
+                                    <Card className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-l-blue-500">
+                                        <CardHeader className="bg-gradient-to-r from-blue-600 to-cyan-600">
+                                            <CardTitle className="flex items-center gap-3 text-white">
+                                                <CalendarClock className="h-6 w-6" />
+                                                Patient Reschedule
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="p-6">
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                                        <CalendarClock className="h-5 w-5 text-blue-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">
+                                                            Rescheduled by
+                                                            Patient
+                                                        </p>
+                                                        <p className="font-semibold text-blue-800">
+                                                            New time:{" "}
+                                                            {format(
+                                                                new Date(
+                                                                    appointment.scheduled_at
+                                                                ),
+                                                                "MMM d, yyyy 'at' h:mm a"
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-cyan-100 rounded-lg">
+                                                        <MessageSquare className="h-5 w-5 text-cyan-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">
+                                                            Notes
+                                                        </p>
+                                                        <p className="font-semibold text-gray-800">
+                                                            {appointment.notes}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 p-4 bg-white/80 rounded-lg border border-blue-200">
+                                                    <p className="text-sm text-gray-700 mb-3">
+                                                        <strong>
+                                                            Quick Actions:
+                                                        </strong>
+                                                    </p>
+                                                    <div className="flex gap-3">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-green-300 text-green-700 hover:bg-green-50"
+                                                            onClick={() => {
+                                                                // Copy patient contact info to clipboard
+                                                                const contactInfo = `Patient: ${appointment.patient?.first_name} ${appointment.patient?.last_name}\nEmail: ${appointment.patient?.email}\nPhone: ${appointment.patient?.phone_number}`;
+                                                                copyToClipboard(
+                                                                    contactInfo
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Copy className="h-4 w-4 mr-2" />
+                                                            Copy Contact Info
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                                                            onClick={() => {
+                                                                // Open email client
+                                                                const subject = `Re: Appointment Reschedule - ${appointment.patient?.first_name} ${appointment.patient?.last_name}`;
+                                                                const body = `Dear ${
+                                                                    appointment
+                                                                        .patient
+                                                                        ?.first_name
+                                                                },\n\nThank you for updating your appointment time. We have confirmed your new appointment for ${format(
+                                                                    new Date(
+                                                                        appointment.scheduled_at
+                                                                    ),
+                                                                    "MMMM d, yyyy 'at' h:mm a"
+                                                                )}.\n\nIf you need to make any further changes, please don't hesitate to contact us.\n\nBest regards,\n${
+                                                                    clinic.name
+                                                                }`;
+                                                                window.open(
+                                                                    `mailto:${
+                                                                        appointment
+                                                                            .patient
+                                                                            ?.email
+                                                                    }?subject=${encodeURIComponent(
+                                                                        subject
+                                                                    )}&body=${encodeURIComponent(
+                                                                        body
+                                                                    )}`
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Send className="h-4 w-4 mr-2" />
+                                                            Send Confirmation
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
 
                             {/* Patient Information Card */}
                             <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">

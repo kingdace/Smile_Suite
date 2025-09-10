@@ -439,6 +439,146 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Approve reschedule request
+     */
+    public function approveReschedule(Request $request, Clinic $clinic, Appointment $appointment)
+    {
+        $this->authorize('update', [$appointment, $clinic]);
+
+        if (!$appointment->status || $appointment->status->name !== 'Pending Reschedule') {
+            $msg = 'Only pending reschedule requests can be approved.';
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['message' => $msg], 422);
+            }
+            return back()->withErrors(['general' => $msg]);
+        }
+
+        // Check if we have requested time data
+        $requestedScheduledAt = $appointment->requested_scheduled_at;
+        $requestedEndedAt = $appointment->requested_ended_at;
+
+        // If not in dedicated fields, try to parse from notes (for older appointments)
+        if (!$requestedScheduledAt && $appointment->notes) {
+            // Look for "Requested new time: Sep 20, 2025 13:00 PM" pattern
+            if (preg_match('/Requested new time: (.+)/', $appointment->notes, $matches)) {
+                try {
+                    $requestedScheduledAt = \Carbon\Carbon::createFromFormat('M d, Y H:i A', trim($matches[1]))->format('Y-m-d H:i:s');
+                    $requestedEndedAt = \Carbon\Carbon::createFromFormat('M d, Y H:i A', trim($matches[1]))->addHour()->format('Y-m-d H:i:s');
+                } catch (\Exception $e) {
+                    // If parsing fails, we'll handle it below
+                }
+            }
+        }
+
+        if (!$requestedScheduledAt) {
+            $msg = 'No reschedule request found for this appointment.';
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['message' => $msg], 422);
+            }
+            return back()->withErrors(['general' => $msg]);
+        }
+
+        // Get confirmed status
+        $confirmedStatus = AppointmentStatus::where('name', 'Confirmed')->first();
+
+        // Update appointment with the requested time
+        $appointment->update([
+            'appointment_status_id' => $confirmedStatus->id,
+            'scheduled_at' => $requestedScheduledAt,
+            'ended_at' => $requestedEndedAt,
+            'notes' => $appointment->notes . "\n\nReschedule approved by clinic on " . now()->format('Y-m-d H:i:s'),
+            'requested_scheduled_at' => null,
+            'requested_ended_at' => null,
+        ]);
+
+        // Send confirmation email to patient
+        $appointment->load(['clinic', 'patient', 'assignedDentist']);
+        $patient = $appointment->patient;
+        $mailSent = false;
+        $mailError = null;
+
+        if ($patient && $patient->email) {
+            try {
+                Log::info('Sending reschedule approval email to: ' . $patient->email);
+                Mail::to($patient->email)->send(new \App\Mail\AppointmentRescheduleApprovedMail($appointment));
+                $mailSent = true;
+            } catch (\Exception $e) {
+                Log::error('Failed to send reschedule approval email: ' . $e->getMessage());
+                $mailError = $e->getMessage();
+            }
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'mail_sent' => $mailSent,
+                'mail_error' => $mailError,
+                'message' => 'Reschedule request approved and appointment updated.'
+            ]);
+        }
+        return back()->with('success', 'Reschedule request approved and appointment updated.');
+    }
+
+    /**
+     * Deny reschedule request
+     */
+    public function denyReschedule(Request $request, Clinic $clinic, Appointment $appointment)
+    {
+        $this->authorize('update', [$appointment, $clinic]);
+
+        if (!$appointment->status || $appointment->status->name !== 'Pending Reschedule') {
+            $msg = 'Only pending reschedule requests can be denied.';
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['message' => $msg], 422);
+            }
+            return back()->withErrors(['general' => $msg]);
+        }
+
+        $validated = $request->validate([
+            'denial_reason' => 'nullable|string|max:255',
+        ]);
+
+        // Get confirmed status (revert to original status)
+        $confirmedStatus = AppointmentStatus::where('name', 'Confirmed')->first();
+
+        // Update appointment back to confirmed status
+        $appointment->update([
+            'appointment_status_id' => $confirmedStatus->id,
+            'notes' => $appointment->notes . "\n\nReschedule denied by clinic on " . now()->format('Y-m-d H:i:s') .
+                      ($validated['denial_reason'] ? ". Reason: " . $validated['denial_reason'] : ''),
+            'requested_scheduled_at' => null,
+            'requested_ended_at' => null,
+        ]);
+
+        // Send denial email to patient
+        $appointment->load(['clinic', 'patient']);
+        $patient = $appointment->patient;
+        $mailSent = false;
+        $mailError = null;
+
+        if ($patient && $patient->email) {
+            try {
+                Log::info('Sending reschedule denial email to: ' . $patient->email);
+                Mail::to($patient->email)->send(new \App\Mail\AppointmentRescheduleDeniedMail($appointment, $validated['denial_reason'] ?? null));
+                $mailSent = true;
+            } catch (\Exception $e) {
+                Log::error('Failed to send reschedule denial email: ' . $e->getMessage());
+                $mailError = $e->getMessage();
+            }
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'mail_sent' => $mailSent,
+                'mail_error' => $mailError,
+                'message' => 'Reschedule request denied.'
+            ]);
+        }
+        return back()->with('success', 'Reschedule request denied.');
+    }
+
+    /**
      * Add appointment to waitlist when there's a conflict
      */
     public function addToWaitlist(Request $request, Clinic $clinic)

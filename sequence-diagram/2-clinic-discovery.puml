@@ -1,0 +1,28 @@
+@startuml ClinicDiscovery
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 40
+
+title Clinic Discovery Process
+
+actor "Patient" as P #lightpink
+participant "Frontend" as F #lightblue
+participant "ClinicController" as CC #lightgreen
+participant "Database" as DB #lightsteelblue
+
+P -> F: Browse clinic directory
+F -> CC: GET /clinics
+CC -> DB: Query active clinics with reviews
+DB --> CC: Return clinic list
+CC --> F: Render clinic directory
+F --> P: Display clinic listings with ratings
+
+P -> F: Click on clinic profile
+F -> CC: GET /clinics/{slug}
+CC -> DB: Load clinic details, services, reviews
+DB --> CC: Return clinic data
+CC --> F: Render clinic profile
+F --> P: Display clinic profile with booking option
+
+@enduml

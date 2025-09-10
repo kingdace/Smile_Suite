@@ -132,6 +132,11 @@ Route::middleware('auth')->group(function () {
         // Patient Treatment Routes
         Route::get('/treatments', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'index'])->name('treatments.index');
         Route::get('/treatments/{treatment}', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'show'])->name('treatments.show');
+
+        // Patient Appointment Management Routes
+        Route::get('/appointments/{appointment}', [App\Http\Controllers\Patient\PatientDashboardController::class, 'showAppointment'])->name('appointments.show');
+        Route::post('/appointments/{appointment}/cancel', [App\Http\Controllers\Patient\PatientDashboardController::class, 'cancelAppointment'])->name('appointments.cancel');
+        Route::post('/appointments/{appointment}/reschedule', [App\Http\Controllers\Patient\PatientDashboardController::class, 'rescheduleAppointment'])->name('appointments.reschedule');
     });
 
     // Admin routes
@@ -437,6 +442,10 @@ Route::middleware('auth')->group(function () {
         // Online Appointment Approval Routes
         Route::post('/clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])->name('clinic.appointments.approve-online');
         Route::post('/clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
+
+        // Reschedule Approval Routes
+        Route::post('/clinic/{clinic}/appointments/{appointment}/approve-reschedule', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveReschedule'])->name('clinic.appointments.approve-reschedule');
+        Route::post('/clinic/{clinic}/appointments/{appointment}/deny-reschedule', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyReschedule'])->name('clinic.appointments.deny-reschedule');
 
         // Waitlist Integration Routes
         Route::post('/clinic/{clinic}/appointments/add-to-waitlist', [\App\Http\Controllers\Clinic\AppointmentController::class, 'addToWaitlist'])

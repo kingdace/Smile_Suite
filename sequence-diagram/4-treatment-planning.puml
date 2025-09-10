@@ -1,0 +1,31 @@
+@startuml TreatmentPlanning
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 40
+
+title Treatment Planning Process
+
+actor "Dentist" as D #lightgreen
+participant "Frontend" as F #lightblue
+participant "TreatmentController" as TC #lightcoral
+participant "EmailService" as ES #wheat
+participant "Database" as DB #lightsteelblue
+actor "Patient" as P #lightpink
+
+D -> F: Access treatment dashboard
+F -> TC: GET /clinic/treatments
+TC -> DB: Query patient appointments
+DB --> TC: Return appointment details
+F --> D: Display patient appointments
+
+D -> F: Create treatment plan
+F -> TC: POST /clinic/treatments
+TC -> DB: Create treatment record
+note right: Includes dental chart data
+DB --> TC: Return treatment record
+TC -> ES: Send treatment plan email
+ES --> P: Email: "Treatment Plan Created"
+F --> D: Display "Treatment plan created"
+
+@enduml

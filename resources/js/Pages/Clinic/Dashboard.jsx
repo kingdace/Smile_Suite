@@ -48,6 +48,7 @@ import {
     Pause,
     RotateCcw,
     MoreVertical,
+    CalendarClock,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -76,6 +77,8 @@ export default function Dashboard({
     recent_patients,
     lowStockItems,
     todayTreatments,
+    patientCancelledAppointments,
+    patientRescheduledAppointments,
 }) {
     // Sample data for charts
     const appointmentData = [
@@ -104,6 +107,7 @@ export default function Dashboard({
             3: "bg-blue-50 text-blue-700 border-blue-200", // Completed
             4: "bg-red-50 text-red-700 border-red-200", // Cancelled
             5: "bg-gray-50 text-gray-700 border-gray-200", // No Show
+            6: "bg-orange-50 text-orange-700 border-orange-200", // Pending Reschedule
         };
         return colors[statusId] || "bg-gray-50 text-gray-700 border-gray-200";
     };
@@ -115,6 +119,7 @@ export default function Dashboard({
             3: "Completed",
             4: "Cancelled",
             5: "No Show",
+            6: "Pending Reschedule",
         };
         return statuses[statusId] || "Unknown";
     };
@@ -273,20 +278,46 @@ export default function Dashboard({
                             <CardContent className="p-6 relative">
                                 <div className="flex items-center gap-4">
                                     <div className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-shadow">
-                                        <FileText className="h-7 w-7 text-white" />
+                                        <Bell className="h-7 w-7 text-white" />
                                     </div>
                                     <div>
                                         <p className="text-sm text-slate-600 font-medium">
-                                            Pending Requests
+                                            Patient Changes
                                         </p>
                                         <p className="text-3xl font-bold text-slate-800">
-                                            0
+                                            {stats?.total_patient_changes || 0}
                                         </p>
                                         <div className="flex items-center gap-1 mt-1">
-                                            <TrendingDown className="h-3 w-3 text-red-500" />
-                                            <span className="text-xs text-red-600 font-medium">
-                                                -5% from yesterday
-                                            </span>
+                                            {stats?.patient_cancelled_appointments >
+                                                0 && (
+                                                <div className="flex items-center gap-1">
+                                                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                                                    <span className="text-xs text-red-600 font-medium">
+                                                        {
+                                                            stats.patient_cancelled_appointments
+                                                        }{" "}
+                                                        cancelled
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {stats?.patient_rescheduled_appointments >
+                                                0 && (
+                                                <div className="flex items-center gap-1 ml-2">
+                                                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                                    <span className="text-xs text-blue-600 font-medium">
+                                                        {
+                                                            stats.patient_rescheduled_appointments
+                                                        }{" "}
+                                                        rescheduled
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {stats?.total_patient_changes ===
+                                                0 && (
+                                                <span className="text-xs text-green-600 font-medium">
+                                                    No recent changes
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -1031,6 +1062,154 @@ export default function Dashboard({
                                     )}
                                 </CardContent>
                             </Card>
+
+                            {/* Recent Patient Changes */}
+                            {(patientCancelledAppointments?.length > 0 ||
+                                patientRescheduledAppointments?.length > 0) && (
+                                <Card className="border-0 shadow-xl bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
+                                    <CardHeader className="pb-4 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                                    <Bell className="h-5 w-5 text-white" />
+                                                </div>
+                                                <div>
+                                                    <CardTitle className="text-lg text-white">
+                                                        Recent Patient Changes
+                                                    </CardTitle>
+                                                    <p className="text-amber-100 text-sm">
+                                                        Patient-initiated
+                                                        cancellations and
+                                                        reschedules
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-3">
+                                            {/* Patient Cancellations */}
+                                            {patientCancelledAppointments
+                                                ?.slice(0, 3)
+                                                .map((appointment) => (
+                                                    <div
+                                                        key={`cancelled-${appointment.id}`}
+                                                        className="flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-red-100 hover:border-red-200 hover:bg-white/90 transition-all duration-300 shadow-sm hover:shadow-md"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+                                                                <XCircle className="h-5 w-5 text-white" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-semibold text-gray-900 text-sm">
+                                                                    {
+                                                                        appointment
+                                                                            .patient
+                                                                            ?.first_name
+                                                                    }{" "}
+                                                                    {
+                                                                        appointment
+                                                                            .patient
+                                                                            ?.last_name
+                                                                    }
+                                                                </p>
+                                                                <p className="text-xs text-gray-600">
+                                                                    Cancelled •{" "}
+                                                                    {
+                                                                        appointment
+                                                                            .type
+                                                                            ?.name
+                                                                    }
+                                                                </p>
+                                                                <p className="text-xs text-red-600 font-medium">
+                                                                    {
+                                                                        appointment.cancellation_reason
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="bg-red-50 text-red-700 border-red-200 text-xs"
+                                                        >
+                                                            Cancelled
+                                                        </Badge>
+                                                    </div>
+                                                ))}
+
+                                            {/* Patient Reschedules */}
+                                            {patientRescheduledAppointments
+                                                ?.slice(0, 3)
+                                                .map((appointment) => (
+                                                    <div
+                                                        key={`rescheduled-${appointment.id}`}
+                                                        className="flex items-center justify-between p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100 hover:border-blue-200 hover:bg-white/90 transition-all duration-300 shadow-sm hover:shadow-md"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                                                                <CalendarClock className="h-5 w-5 text-white" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-semibold text-gray-900 text-sm">
+                                                                    {
+                                                                        appointment
+                                                                            .patient
+                                                                            ?.first_name
+                                                                    }{" "}
+                                                                    {
+                                                                        appointment
+                                                                            .patient
+                                                                            ?.last_name
+                                                                    }
+                                                                </p>
+                                                                <p className="text-xs text-gray-600">
+                                                                    Rescheduled
+                                                                    •{" "}
+                                                                    {
+                                                                        appointment
+                                                                            .type
+                                                                            ?.name
+                                                                    }
+                                                                </p>
+                                                                <p className="text-xs text-blue-600 font-medium">
+                                                                    {format(
+                                                                        new Date(
+                                                                            appointment.scheduled_at
+                                                                        ),
+                                                                        "MMM d, yyyy 'at' h:mm a"
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="bg-blue-50 text-blue-700 border-blue-200 text-xs"
+                                                        >
+                                                            Rescheduled
+                                                        </Badge>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                        <div className="mt-4 pt-3 border-t border-amber-200">
+                                            <Button
+                                                asChild
+                                                variant="outline"
+                                                className="w-full gap-2 border-amber-300 text-amber-700 hover:bg-amber-50"
+                                            >
+                                                <Link
+                                                    href={route(
+                                                        "clinic.appointments.index",
+                                                        { clinic: clinic.id }
+                                                    )}
+                                                >
+                                                    <Calendar className="h-4 w-4" />
+                                                    View All Appointments
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
 
                             {/* Low Stock Alert */}
                             {lowStockItems && lowStockItems.length > 0 && (

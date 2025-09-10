@@ -1,0 +1,29 @@
+@startuml PatientRegistration
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 40
+
+title Patient Registration Process
+
+actor "Patient" as P #lightpink
+participant "Frontend" as F #lightblue
+participant "AuthController" as AC #lightgreen
+participant "EmailService" as ES #wheat
+participant "Database" as DB #lightsteelblue
+
+P -> F: Access registration page
+F -> AC: GET /patient/register
+AC --> F: Render registration form
+F --> P: Display registration form
+
+P -> F: Submit registration form
+F -> AC: POST /patient/register
+AC -> DB: Create user account
+DB --> AC: Return user record
+AC -> ES: Send verification email
+ES --> P: Email: "Account Verification"
+AC --> F: Return success response
+F --> P: Display "Registration successful"
+
+@enduml

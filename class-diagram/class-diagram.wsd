@@ -1,0 +1,186 @@
+@startuml SmileSuite_Class_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam classStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam classFontSize 16
+skinparam classFontStyle bold
+skinparam classAttributeFontSize 14
+skinparam classAttributeFontStyle bold
+skinparam noteFontSize 12
+skinparam noteFontStyle bold
+
+left to right direction
+
+class Clinic {
+    +id: bigint
+    +name: string
+    +email: string
+    +license_number: string
+    +subscription_plan: string
+    +subscription_status: string
+    +is_active: boolean
+    +region_code: string
+    +province_code: string
+    +city_municipality_code: string
+    +barangay_code: string
+    --
+    +users(): HasMany
+    +patients(): HasMany
+    +appointments(): HasMany
+    +treatments(): HasMany
+    +inventory(): HasMany
+    +payments(): HasMany
+}
+
+class User {
+    +id: bigint
+    +name: string
+    +email: string
+    +phone_number: string
+    +clinic_id: bigint
+    +role: string
+    +user_type: string
+    +is_active: boolean
+    --
+    +clinic(): BelongsTo
+    +appointments(): HasMany
+    +treatments(): HasMany
+    +isDentist(): boolean
+    +isClinicAdmin(): boolean
+    +isStaff(): boolean
+}
+
+class Patient {
+    +id: bigint
+    +clinic_id: bigint
+    +user_id: bigint
+    +first_name: string
+    +last_name: string
+    +email: string
+    +phone_number: string
+    +date_of_birth: date
+    +gender: enum
+    +region_code: string
+    +province_code: string
+    +city_municipality_code: string
+    +barangay_code: string
+    +medical_history: json
+    +allergies: json
+    +balance: decimal
+    --
+    +clinic(): BelongsTo
+    +user(): BelongsTo
+    +appointments(): HasMany
+    +treatments(): HasMany
+    +payments(): HasMany
+}
+
+class Appointment {
+    +id: bigint
+    +clinic_id: bigint
+    +patient_id: bigint
+    +appointment_type_id: bigint
+    +appointment_status_id: bigint
+    +assigned_to: bigint
+    +scheduled_at: datetime
+    +reason: string
+    +is_online_booking: boolean
+    +payment_status: string
+    --
+    +clinic(): BelongsTo
+    +patient(): BelongsTo
+    +type(): BelongsTo
+    +status(): BelongsTo
+    +assignedDentist(): BelongsTo
+    +treatments(): HasMany
+}
+
+class AppointmentType {
+    +id: bigint
+    +name: string
+    +duration_minutes: integer
+    +is_active: boolean
+    --
+    +appointments(): HasMany
+}
+
+class AppointmentStatus {
+    +id: bigint
+    +name: string
+    +is_active: boolean
+    --
+    +appointments(): HasMany
+}
+
+class Treatment {
+    +id: bigint
+    +clinic_id: bigint
+    +patient_id: bigint
+    +appointment_id: bigint
+    +user_id: bigint
+    +name: string
+    +description: text
+    +cost: decimal
+    +status: string
+    +tooth_numbers: json
+    --
+    +clinic(): BelongsTo
+    +patient(): BelongsTo
+    +appointment(): BelongsTo
+    +dentist(): BelongsTo
+    +payments(): HasMany
+}
+
+class Inventory {
+    +id: bigint
+    +clinic_id: bigint
+    +name: string
+    +quantity: integer
+    +minimum_quantity: integer
+    +unit_price: decimal
+    +category: string
+    +is_active: boolean
+    --
+    +clinic(): BelongsTo
+}
+
+class Payment {
+    +id: bigint
+    +clinic_id: bigint
+    +patient_id: bigint
+    +treatment_id: bigint
+    +amount: decimal
+    +payment_method: string
+    +status: string
+    +payment_date: date
+    +received_by: bigint
+    --
+    +clinic(): BelongsTo
+    +patient(): BelongsTo
+    +treatment(): BelongsTo
+    +receivedBy(): BelongsTo
+}
+
+' Core Relationships
+Clinic ||--o{ User : "manages"
+Clinic ||--o{ Patient : "serves"
+Clinic ||--o{ Appointment : "schedules"
+Clinic ||--o{ Treatment : "provides"
+Clinic ||--o{ Inventory : "tracks"
+Clinic ||--o{ Payment : "processes"
+
+User ||--o{ Appointment : "assigned_to"
+User ||--o{ Treatment : "performs"
+User ||--o{ Payment : "received_by"
+
+Patient ||--o{ Appointment : "books"
+Patient ||--o{ Treatment : "receives"
+Patient ||--o{ Payment : "pays"
+
+Appointment ||--o{ Treatment : "generates"
+Appointment }o--|| AppointmentType : "categorizes"
+Appointment }o--|| AppointmentStatus : "tracks"
+
+Treatment ||--o{ Payment : "generates"
+
+@enduml

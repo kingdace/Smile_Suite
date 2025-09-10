@@ -1,4 +1,4 @@
-import { Head, usePage, Link } from "@inertiajs/react";
+import { Head, usePage, Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import {
     Calendar,
@@ -38,13 +38,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Separator } from "@/Components/ui/separator";
 import { cn } from "@/lib/utils";
 import SiteHeader from "@/Components/SiteHeader";
+import AppointmentDetailsModal from "./Components/AppointmentDetailsModal";
+import AppointmentCancellationModal from "./Components/AppointmentCancellationModal";
+import AppointmentReschedulingModal from "./Components/AppointmentReschedulingModal";
 
 // Appointments Section Component
 const AppointmentsSection = ({ appointments = [] }) => {
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [loading, setLoading] = useState(false);
     const getStatusIcon = (status) => {
         switch (status?.toLowerCase()) {
             case "pending":
                 return <Clock className="w-4 h-4 text-yellow-500" />;
+            case "pending reschedule":
+                return <Clock className="w-4 h-4 text-orange-500" />;
             case "confirmed":
                 return <CheckCircle className="w-4 h-4 text-green-500" />;
             case "cancelled":
@@ -60,6 +70,8 @@ const AppointmentsSection = ({ appointments = [] }) => {
         switch (status?.toLowerCase()) {
             case "pending":
                 return "bg-yellow-100 text-yellow-800";
+            case "pending reschedule":
+                return "bg-orange-100 text-orange-800";
             case "confirmed":
                 return "bg-green-100 text-green-800";
             case "cancelled":
@@ -69,6 +81,88 @@ const AppointmentsSection = ({ appointments = [] }) => {
             default:
                 return "bg-gray-100 text-gray-800";
         }
+    };
+
+    const handleViewDetails = async (appointment) => {
+        setSelectedAppointment(appointment);
+        setLoading(true);
+        setShowDetailsModal(true);
+        setLoading(false);
+    };
+
+    const handleCancelAppointment = (appointment) => {
+        setSelectedAppointment(appointment);
+        setShowCancelModal(true);
+    };
+
+    const handleRescheduleAppointment = (appointment) => {
+        setSelectedAppointment(appointment);
+        setShowRescheduleModal(true);
+    };
+
+    const handleConfirmCancel = async (cancellationReason) => {
+        if (!selectedAppointment) return;
+
+        setLoading(true);
+        try {
+            router.post(
+                route("patient.appointments.cancel", selectedAppointment.id),
+                {
+                    cancellation_reason: cancellationReason,
+                },
+                {
+                    onSuccess: () => {
+                        setShowCancelModal(false);
+                        setSelectedAppointment(null);
+                        // Page will refresh automatically due to redirect
+                    },
+                    onError: (errors) => {
+                        console.error("Cancellation failed:", errors);
+                        setLoading(false);
+                    },
+                }
+            );
+        } catch (error) {
+            console.error("Cancellation error:", error);
+            setLoading(false);
+        }
+    };
+
+    const handleConfirmReschedule = async (rescheduleData) => {
+        if (!selectedAppointment) return;
+
+        setLoading(true);
+        try {
+            router.post(
+                route(
+                    "patient.appointments.reschedule",
+                    selectedAppointment.id
+                ),
+                rescheduleData,
+                {
+                    onSuccess: () => {
+                        setShowRescheduleModal(false);
+                        setSelectedAppointment(null);
+                        // Page will refresh automatically due to redirect
+                    },
+                    onError: (errors) => {
+                        console.error("Rescheduling failed:", errors);
+                        setLoading(false);
+                    },
+                }
+            );
+        } catch (error) {
+            console.error("Rescheduling error:", error);
+            setLoading(false);
+        }
+    };
+
+    const closeModals = () => {
+        setShowDetailsModal(false);
+        setShowCancelModal(false);
+        setShowRescheduleModal(false);
+        setSelectedAppointment(null);
+        setLoading(false);
     };
 
     return (
@@ -113,6 +207,20 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 {appointment.status?.name ||
                                                     "Unknown"}
                                             </Badge>
+                                            {/* Show special indicators for patient actions */}
+                                            {appointment.status?.name ===
+                                                "Pending Reschedule" && (
+                                                <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-orange-100 text-orange-700 border-orange-300">
+                                                    Awaiting Clinic Response
+                                                </Badge>
+                                            )}
+                                            {appointment.status?.name ===
+                                                "Cancelled" &&
+                                                appointment.cancelled_at && (
+                                                    <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-red-100 text-red-700 border-red-300">
+                                                        You Cancelled
+                                                    </Badge>
+                                                )}
                                         </div>
                                         <h4 className="font-semibold text-gray-900">
                                             {appointment.clinic?.name ||
@@ -147,11 +255,37 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 size="sm"
                                                 variant="outline"
                                                 className="text-red-600 hover:text-red-700"
+                                                onClick={() =>
+                                                    handleCancelAppointment(
+                                                        appointment
+                                                    )
+                                                }
                                             >
                                                 Cancel
                                             </Button>
                                         )}
-                                        <Button size="sm" variant="outline">
+                                        {appointment.status?.name?.toLowerCase() ===
+                                            "confirmed" && (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="text-blue-600 hover:text-blue-700"
+                                                onClick={() =>
+                                                    handleRescheduleAppointment(
+                                                        appointment
+                                                    )
+                                                }
+                                            >
+                                                Reschedule
+                                            </Button>
+                                        )}
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() =>
+                                                handleViewDetails(appointment)
+                                            }
+                                        >
                                             View Details
                                         </Button>
                                     </div>
@@ -179,6 +313,30 @@ const AppointmentsSection = ({ appointments = [] }) => {
                     </div>
                 )}
             </div>
+
+            {/* Modals */}
+            <AppointmentDetailsModal
+                showModal={showDetailsModal}
+                onClose={closeModals}
+                appointment={selectedAppointment}
+                loading={loading}
+            />
+
+            <AppointmentCancellationModal
+                showModal={showCancelModal}
+                onClose={closeModals}
+                appointment={selectedAppointment}
+                onConfirm={handleConfirmCancel}
+                loading={loading}
+            />
+
+            <AppointmentReschedulingModal
+                showModal={showRescheduleModal}
+                onClose={closeModals}
+                appointment={selectedAppointment}
+                onConfirm={handleConfirmReschedule}
+                loading={loading}
+            />
         </div>
     );
 };
@@ -512,6 +670,7 @@ export default function PatientDashboard({
     clinicRecords,
     appointments = [],
     treatments = [],
+    flash,
 }) {
     return (
         <div className="min-h-screen bg-gray-200">
@@ -519,6 +678,18 @@ export default function PatientDashboard({
 
             {/* Site Header */}
             <SiteHeader />
+
+            {/* Success Message */}
+            {flash?.success && (
+                <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 pt-4">
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-sm">
+                        <div className="flex items-center">
+                            <CheckCircle className="w-5 h-5 mr-2" />
+                            <span className="font-medium">{flash.success}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Main Container */}
             <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">

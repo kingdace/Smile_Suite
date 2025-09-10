@@ -1,0 +1,138 @@
+@startuml SmileSuite_UseCase_Diagram
+skinparam backgroundColor #FFFFFF
+skinparam actorStyle awesome
+skinparam usecaseStyle rectangle
+skinparam packageStyle rectangle
+
+left to right direction
+
+' Actors distributed around the system boundary
+actor "System Admin" as SA #lightblue
+actor "Clinic Admin" as CA #lightgreen
+actor "Dentist" as D #lightyellow
+actor "Staff" as S #lightcoral
+actor "Patient" as P #lightpink
+
+rectangle "Smile Suite: Cloud-Based Dental Clinic as a Service" {
+
+    package "System Administration" {
+        (Manage Clinics) as UC1
+        (Monitor Subscriptions) as UC2
+        (Approve Registration) as UC3
+        (View Platform Analytics) as UC4
+    }
+
+    package "Clinic Management" {
+        (Manage Appointments) as UC5
+        (Manage Staff Users) as UC6
+        (View Clinic Analytics) as UC7
+        (Manage Services) as UC8
+        (Handle Appointment Requests) as UC9
+        (Manage Clinic Profile) as UC10
+        (Manage Dentist Schedules) as UC11
+    }
+
+    package "Clinical Operations" {
+        (Update Medical Records) as UC12
+        (Create Treatment Plans) as UC13
+        (Use Dental Chart) as UC14
+        (Generate Reports) as UC15
+        (Manage Schedule) as UC16
+        (View Patient History) as UC17
+        (Handle Appointment Requests) as UC18
+    }
+
+    package "Staff Operations" {
+        (Process Payments) as UC19
+        (Manage Inventory) as UC20
+        (Add Patients) as UC21
+        (Handle Walk-ins) as UC22
+        (Handle Appointment Requests) as UC23
+        (Update Billing Records) as UC24
+    }
+
+    package "Patient Services" {
+        (Book Appointments) as UC25
+        (View Treatment History) as UC26
+        (Cancel/Reschedule) as UC27
+        (Update Profile) as UC28
+        (View Appointments) as UC29
+    }
+
+    package "Core System" {
+        (Multi-Tenant Data Isolation) as UC30
+        (Email Notification System) as UC31
+        (Role-Based Access Control) as UC32
+        (Subscription Management) as UC33
+        (PSGC Address Integration) as UC34
+    }
+}
+
+' External Systems
+cloud "Laravel Mail Server" as ES1 #lightblue
+cloud "PSGC Database" as ES2 #lightgreen
+
+' System Admin connections (Top)
+SA --> UC1
+SA --> UC2
+SA --> UC3
+SA --> UC4
+
+' Clinic Admin connections (Left)
+CA --> UC5
+CA --> UC6
+CA --> UC7
+CA --> UC8
+CA --> UC9
+CA --> UC10
+CA --> UC11
+
+' Dentist connections (Center-Left)
+D --> UC12
+D --> UC13
+D --> UC14
+D --> UC15
+D --> UC16
+D --> UC17
+D --> UC18
+
+' Staff connections (Center-Right)
+S --> UC19
+S --> UC20
+S --> UC21
+S --> UC22
+S --> UC23
+S --> UC24
+
+' Patient connections (Right)
+P --> UC25
+P --> UC26
+P --> UC27
+P --> UC28
+P --> UC29
+
+' Include relationships
+UC25 ..> UC30 : include
+UC13 ..> UC14 : include
+UC19 ..> UC24 : include
+UC9 ..> UC30 : include
+UC18 ..> UC30 : include
+UC23 ..> UC30 : include
+
+' Extend relationships
+UC31 ..> UC25 : extend
+UC31 ..> UC27 : extend
+UC20 ..> UC32 : extend
+
+' System dependencies
+UC31 --> ES1
+UC34 --> ES2
+UC30 --> ES2
+
+' Core system connections
+UC30 --> UC32
+UC30 --> UC33
+UC31 --> UC32
+UC34 --> UC25
+
+@enduml

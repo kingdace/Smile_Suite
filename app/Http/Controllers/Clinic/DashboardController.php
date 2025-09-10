@@ -85,6 +85,22 @@ class DashboardController extends Controller
             ->whereDate('created_at', today())
             ->get();
 
+        // Get patient-initiated changes (cancellations and reschedules)
+        $patientCancelledAppointments = Appointment::with(['patient', 'type', 'status'])
+            ->where('clinic_id', $clinic->id)
+            ->where('appointment_status_id', 4) // 4 = Cancelled
+            ->whereNotNull('cancelled_at')
+            ->whereNotNull('cancellation_reason')
+            ->whereDate('cancelled_at', '>=', now()->subDays(7)) // Last 7 days
+            ->get();
+
+        $patientRescheduledAppointments = Appointment::with(['patient', 'type', 'status'])
+            ->where('clinic_id', $clinic->id)
+            ->whereNotNull('notes')
+            ->where('notes', 'like', '%Rescheduled by patient%')
+            ->whereDate('updated_at', '>=', now()->subDays(7)) // Last 7 days
+            ->get();
+
         // Get subscription duration information
         $subscriptionDuration = $this->subscriptionService->getSubscriptionDuration($clinic);
 
@@ -95,6 +111,9 @@ class DashboardController extends Controller
             'upcoming_appointments' => $upcomingAppointments->count(),
             'today_treatments' => $todayTreatments->count(),
             'low_stock_items' => $lowStockItems->count(),
+            'patient_cancelled_appointments' => $patientCancelledAppointments->count(),
+            'patient_rescheduled_appointments' => $patientRescheduledAppointments->count(),
+            'total_patient_changes' => $patientCancelledAppointments->count() + $patientRescheduledAppointments->count(),
         ];
 
         // Enhanced clinic data with duration information
@@ -113,6 +132,8 @@ class DashboardController extends Controller
             'recent_patients' => $recentPatients,
             'lowStockItems' => $lowStockItems,
             'todayTreatments' => $todayTreatments,
+            'patientCancelledAppointments' => $patientCancelledAppointments,
+            'patientRescheduledAppointments' => $patientRescheduledAppointments,
             'stats' => $stats,
             'subscription_duration' => $subscriptionDuration,
         ]);

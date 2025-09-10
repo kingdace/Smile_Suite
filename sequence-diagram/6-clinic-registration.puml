@@ -1,0 +1,30 @@
+@startuml Clinic Registration Process
+skinparam backgroundColor #FFFFFF
+skinparam roundcorner 20
+title Clinic Registration Process
+
+actor "Clinic Owner" as CO
+actor "System Admin" as SA
+participant "System" as SYS
+participant "Email Service" as ES
+
+== Registration ==
+CO -> SYS: Submit clinic registration
+SYS --> CO: Registration submitted
+
+== Admin Review ==
+SA -> SYS: Review & approve clinic
+SYS -> ES: Send setup instructions
+ES --> CO: Email: "Setup Instructions"
+
+== Payment (if required) ==
+CO -> SYS: Make payment
+SYS -> ES: Send payment confirmation
+ES --> CO: Email: "Payment Confirmed"
+
+== Clinic Setup ==
+CO -> SYS: Open setup link
+CO -> SYS: Complete setup form
+SYS --> CO: "Clinic setup completed"
+
+@enduml

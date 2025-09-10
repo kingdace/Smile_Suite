@@ -1,0 +1,33 @@
+@startuml AppointmentBooking
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 40
+
+title Appointment Booking Process
+
+actor "Patient" as P #lightpink
+participant "Frontend" as F #lightblue
+participant "AppointmentController" as AC #lightgreen
+participant "EmailService" as ES #wheat
+participant "Database" as DB #lightsteelblue
+actor "Clinic Admin" as CA #orange
+
+P -> F: Click "Book Appointment"
+F --> P: Display booking form
+
+P -> F: Submit appointment form
+F -> AC: POST /clinics/{id}/book-appointment
+AC -> DB: Find or create patient record
+DB --> AC: Return patient record
+AC -> DB: Create appointment record
+note right: Status: Pending, Type: Online Booking
+DB --> AC: Return appointment
+
+AC -> ES: Send confirmation emails
+ES --> P: Email: "Appointment Request Received"
+ES --> CA: Email: "New Online Booking Request"
+AC --> F: Return success response
+F --> P: Display "Appointment request submitted!"
+
+@enduml

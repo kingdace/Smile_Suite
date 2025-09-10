@@ -217,23 +217,23 @@ This technology stack was selected based on its cost-effectiveness, scalability,
 
 # Hardware Specification
 
-| **Component**      | **Requirements**                             | **Cost**     |
-| ------------------------ | -------------------------------------------------- | ------------------ |
-| Mobile Device (Patient)  | Android 8.0+ or iOS 12+. ≥ 4 GB RAM               | ₱5,000            |
-| Processor                | Intel Core i5-11400 (11th Gen) 6- Core 2.6GHz      | ₱12,500           |
-| Motherboard              | MSI B560M PRO-VDH WIFI (mATX)                      | ₱5,800            |
-| RAM                      | 16GB DDR4 3200MHz (2x8GB Dual Channel)             | ₱3,200            |
-| Storage                  | 512GB NVMe SSD (WD Blue SN570) + 1TB HDD (Backup) | ₱3,500            |
-|                          |                                                    |                    |
-| Casing                   | Tecware Nexus Air (mATX) with 4 fans               | ₱2,300            |
-| PSU                      | FSP HV Pro 550W 80+ White                          | ₱2,100            |
-| Monitor                  | 21.5" IPS 1080p (Acer SA220Q)                      | ₱5,800            |
-| Keyboard & Mouse         | Logitech MK270 Wireless Combo                      | ₱1,200            |
-|                          |                                                    |                    |
-| Printer                  | Epson L3210 EcoTank (Color All-in-One)             | ₱9,999            |
-| Router                   | TP-Link Archer AX10 (Wi-Fi 6)                      | ₱3,500            |
-| Network                  | PLDT Fiber All Plan 200 mbps                       | ₱1,799            |
-| **Total Hardware** |                                                    | ₱**56,698** |
+| **Component**           | **Requirements**                                  | **Cost**    |
+| ----------------------- | ------------------------------------------------- | ----------- |
+| Mobile Device (Patient) | Android 8.0+ or iOS 12+. ≥ 4 GB RAM               | ₱5,000      |
+| Processor               | Intel Core i5-11400 (11th Gen) 6- Core 2.6GHz     | ₱12,500     |
+| Motherboard             | MSI B560M PRO-VDH WIFI (mATX)                     | ₱5,800      |
+| RAM                     | 16GB DDR4 3200MHz (2x8GB Dual Channel)            | ₱3,200      |
+| Storage                 | 512GB NVMe SSD (WD Blue SN570) + 1TB HDD (Backup) | ₱3,500      |
+|                         |                                                   |             |
+| Casing                  | Tecware Nexus Air (mATX) with 4 fans              | ₱2,300      |
+| PSU                     | FSP HV Pro 550W 80+ White                         | ₱2,100      |
+| Monitor                 | 21.5" IPS 1080p (Acer SA220Q)                     | ₱5,800      |
+| Keyboard & Mouse        | Logitech MK270 Wireless Combo                     | ₱1,200      |
+|                         |                                                   |             |
+| Printer                 | Epson L3210 EcoTank (Color All-in-One)            | ₱9,999      |
+| Router                  | TP-Link Archer AX10 (Wi-Fi 6)                     | ₱3,500      |
+| Network                 | PLDT Fiber All Plan 200 mbps                      | ₱1,799      |
+| **Total Hardware**      |                                                   | ₱**56,698** |
 
 The hardware
 specification centers around a robust clinic workstation built with an Intel
@@ -271,21 +271,21 @@ long-term viability of the Smile Suite implementation.
 
 # Software Specification
 
-| Component                | Technology / Service                     | Commerical Cost   |
-| ------------------------ | ---------------------------------------- | ----------------- |
-| Web Server               | Nginx Plus (Production)                  | ₱4,500/month     |
-| Database                 | MySQL Enterprise Edition                 | ₱6,000/month     |
-| Programming              | PHP 8.3 (Zend License)                   | ₱3,500/month     |
-| Backend Framework        | Laravel (via Laravel Forge)              | ₱1,200/month     |
-| Frontend Framework       | React.js (via React Dev Tools Pro)       | ₱2,500/month     |
-| API Communication        | Axios Enterprise License                 | ₱800/month       |
-| IDE                      | JetBrains PhpStorm (Commercial)          | ₱1,500/month     |
-| Local Environment        | WampServer64 Paid Version                | ₱500/month       |
-| Version Control          | GitHub Team Plan                         | ₱400/month       |
-| Hosting Platform         | DigitalOcean Droplet (4GB RAM, 80GB SSD) | ₱1,334/ month    |
-| Email Notification       | Laravel Mail/Twilio API                  | ₱2,400/month     |
-| Operating System         | Windows 11 (Licensed)                   | ₱2,000/month     |
-| **Total Software** |                                          | **₱3,334** |
+| Component          | Technology / Service                     | Commerical Cost |
+| ------------------ | ---------------------------------------- | --------------- |
+| Web Server         | Nginx Plus (Production)                  | ₱4,500/month    |
+| Database           | MySQL Enterprise Edition                 | ₱6,000/month    |
+| Programming        | PHP 8.3 (Zend License)                   | ₱3,500/month    |
+| Backend Framework  | Laravel (via Laravel Forge)              | ₱1,200/month    |
+| Frontend Framework | React.js (via React Dev Tools Pro)       | ₱2,500/month    |
+| API Communication  | Axios Enterprise License                 | ₱800/month      |
+| IDE                | JetBrains PhpStorm (Commercial)          | ₱1,500/month    |
+| Local Environment  | WampServer64 Paid Version                | ₱500/month      |
+| Version Control    | GitHub Team Plan                         | ₱400/month      |
+| Hosting Platform   | DigitalOcean Droplet (4GB RAM, 80GB SSD) | ₱1,334/ month   |
+| Email Notification | Laravel Mail/Twilio API                  | ₱2,400/month    |
+| Operating System   | Windows 11 (Licensed)                    | ₱2,000/month    |
+| **Total Software** |                                          | **₱3,334**      |
 
 The software specification establishes a cost-effective
 foundation for Smile Suite, utilizing open-source solutions like Nginx
@@ -416,3 +416,71 @@ The multi-tenant SaaS platform's scalability potential was validated through suc
 Despite the overwhelmingly positive results, the evaluation phase also highlighted areas for improvement within the multi-tenant SaaS environment. Mobile responsiveness received a usability score of 78 out of 100, indicating a need for optimization on handheld devices, particularly for the Patient Portal interface. Additionally, some delays in staff onboarding suggested a potential learning curve that could be addressed through improved training modules and user documentation. The current cash-based payment system limitation was noted as an area for future enhancement, with stakeholders expressing interest in additional payment method integration.
 
 Overall, the outcomes strongly validate Smile Suite: Cloud-Based Dental Clinic as a Service as an effective and replicable multi-tenant SaaS solution for dental clinic management, particularly for small to medium-sized clinics navigating similar operational challenges. The platform's success at Enhaynes Dental Clinic demonstrates its potential to serve as a scalable model for digital transformation in Philippine healthcare, aligning with the Department of Health's eHealth Strategic Framework and supporting broader national goals for healthcare digitization and accessibility.
+
+**5.1 and 5.2 Sections are already done in the document...**
+
+NOW LET'S PROCEED TO:
+
+**5.3 System Implementation**
+
+The Smile Suite: Cloud-Based Dental Clinic as a Service was implemented using a modern, scalable technology stack designed to support multi-tenant operations for dental clinics across the Philippines. The system architecture follows a three-tier model with a Laravel 11 backend API, React 18 frontend application, and MySQL 8.0+ database, all integrated through Inertia.js for seamless data binding and real-time updates.
+
+The backend implementation utilizes Laravel 11 (PHP 8.2+) as the core framework, providing robust MVC architecture with comprehensive middleware for authentication, authorization, and subscription management. The system implements complete multi-tenant data isolation through clinic-specific foreign keys across all database tables, ensuring that each clinic's data remains completely segregated. The subscription management system, implemented in `app/Services/SubscriptionService.php`, handles trial periods, active subscriptions, grace periods, and suspension states with automated email notifications. The authentication system leverages Laravel Breeze with email verification, supporting five distinct user roles: System Admin, Clinic Admin, Dentist, Staff, and Patient, each with appropriate access controls defined in model policies.
+
+The frontend implementation utilizes React 18 with Inertia.js to create a single-page application experience while maintaining server-side rendering benefits. The user interface is built using Tailwind CSS for styling and shadcn/ui component library for consistent, accessible UI elements. The system includes responsive dashboards for each user type, with the Patient Dashboard (`resources/js/Pages/Patient/Dashboard.jsx`) providing appointment booking, treatment history, and clinic discovery features. The Clinic Management interface (`resources/js/Pages/Clinic/`) offers comprehensive patient management, inventory tracking, appointment scheduling, and treatment planning capabilities. The Public Clinic Directory enables patients to discover clinics, view profiles, read reviews, and book appointments directly through the web interface.
+
+The database implementation uses MySQL 8.0+ with comprehensive migrations defining 27 core tables including users, clinics, patients, appointments, treatments, inventory, suppliers, and payments. The system integrates Philippine Standard Geographic Code (PSGC) data for accurate address management across all 17 regions of the Philippines. Email notifications are handled through Laravel Mail with 24+ professional HTML templates for registration confirmations, appointment reminders, subscription notifications, and payment confirmations. The system currently implements payment simulation for Philippine payment methods including GCash, PayMaya, and bank transfers, with plans for real payment gateway integration in future releases. Development and deployment utilize Vite for asset compilation, Git for version control, and Docker with Laravel Sail for local development environment consistency.
+
+**5.4 Evaluation of the system**
+
+_(Discuss
+the findings from testing based on usability, performance, and accuracy.)_
+
+_And
+more paragraph to explain………._
+
+**5.5 Android Mobile Application**
+
+-   (Highlight
+    features, system flow, and user interface of the Android app.)\*
+
+_And
+more paragraph to explain………._
+
+**6. CONCLUSION AND
+RECOMMENDATION**
+
+**6.1 Conclusion **
+
+_(Summarize the entire study and state if the
+objectives were met.)_
+
+_And
+more paragraph to explain………._
+
+**6.2 Recommendation **
+
+_(Provide suggestions for system improvement
+and future research.)_
+
+Example:
+
+Future
+work may include iOS compatibility and integration with the university's LMS…..
+
+_And
+more paragraph to explain………._
+
+**7. ACKNOWLEDGEMENT**
+
+_(Express gratitude to individuals and
+organizations who helped with the project.)_
+
+Example:
+
+The
+researchers would like to thank their adviser, faculty members, and classmates
+who contributed their time and expertise.
+
+_And
+more paragraph to explain………._

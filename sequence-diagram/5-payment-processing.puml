@@ -1,0 +1,30 @@
+@startuml PaymentProcessing
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 40
+
+title Payment Processing
+
+actor "Patient" as P #lightpink
+participant "Frontend" as F #lightblue
+participant "PaymentController" as PC #lightgray
+participant "EmailService" as ES #wheat
+participant "Database" as DB #lightsteelblue
+
+P -> F: Access payment dashboard
+F -> PC: GET /patient/payments
+PC -> DB: Query treatment costs
+DB --> PC: Return payment information
+F --> P: Display payment options
+
+P -> F: Submit payment details
+F -> PC: POST /patient/payments
+PC -> DB: Create payment record
+note right: Links to treatment
+DB --> PC: Return payment record
+PC -> ES: Send payment confirmation
+ES --> P: Email: "Payment Confirmed"
+F --> P: Display "Payment processed"
+
+@enduml
