@@ -29,7 +29,17 @@ export default function OperatingHours({ clinic }) {
             const currentTime = now.getHours() * 100 + now.getMinutes();
 
             const todayHours = clinic.operating_hours[currentDay];
-            if (!todayHours || !todayHours.open || !todayHours.close) {
+            let openTime, closeTime;
+
+            // Handle both array format [open, close] and object format {open, close}
+            if (Array.isArray(todayHours) && todayHours.length === 2) {
+                openTime = todayHours[0];
+                closeTime = todayHours[1];
+            } else if (todayHours && todayHours.open && todayHours.close) {
+                openTime = todayHours.open;
+                closeTime = todayHours.close;
+            } else {
+                // No valid hours data
                 return {
                     status: "closed",
                     text: "Closed today",
@@ -40,10 +50,10 @@ export default function OperatingHours({ clinic }) {
                 };
             }
 
-            const openTime = parseInt(todayHours.open.replace(":", ""));
-            const closeTime = parseInt(todayHours.close.replace(":", ""));
+            const openTimeInt = parseInt(openTime.replace(":", ""));
+            const closeTimeInt = parseInt(closeTime.replace(":", ""));
 
-            if (currentTime >= openTime && currentTime <= closeTime) {
+            if (currentTime >= openTimeInt && currentTime <= closeTimeInt) {
                 return {
                     status: "open",
                     text: "Open now",
@@ -52,10 +62,10 @@ export default function OperatingHours({ clinic }) {
                     borderColor: "border-green-200",
                     icon: CheckCircle,
                 };
-            } else if (currentTime < openTime) {
+            } else if (currentTime < openTimeInt) {
                 return {
                     status: "closed",
-                    text: `Opens at ${todayHours.open}`,
+                    text: `Opens at ${openTime}`,
                     color: "text-orange-600",
                     bgColor: "bg-orange-50",
                     borderColor: "border-orange-200",
@@ -173,10 +183,27 @@ export default function OperatingHours({ clinic }) {
                                             weekday: "long",
                                         })
                                         .toLowerCase();
-                                const isClosed =
-                                    !dayHours ||
-                                    !dayHours.open ||
-                                    !dayHours.close;
+
+                                // Handle both array format [open, close] and object format {open, close}
+                                let isClosed, openTime, closeTime;
+                                if (
+                                    Array.isArray(dayHours) &&
+                                    dayHours.length === 2
+                                ) {
+                                    openTime = dayHours[0];
+                                    closeTime = dayHours[1];
+                                    isClosed = !openTime || !closeTime;
+                                } else if (
+                                    dayHours &&
+                                    dayHours.open &&
+                                    dayHours.close
+                                ) {
+                                    openTime = dayHours.open;
+                                    closeTime = dayHours.close;
+                                    isClosed = false;
+                                } else {
+                                    isClosed = true;
+                                }
 
                                 return (
                                     <div
@@ -210,8 +237,7 @@ export default function OperatingHours({ clinic }) {
                                                 </span>
                                             ) : (
                                                 <span className="text-gray-700 font-semibold">
-                                                    {dayHours.open} -{" "}
-                                                    {dayHours.close}
+                                                    {openTime} - {closeTime}
                                                 </span>
                                             )}
                                         </div>

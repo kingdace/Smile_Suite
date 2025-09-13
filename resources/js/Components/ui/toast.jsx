@@ -1,73 +1,126 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
+import { CheckCircle, XCircle, AlertCircle, Info, X } from "lucide-react";
 
-export const Toast = React.forwardRef(
-    ({ className, variant = "default", children, ...props }, ref) => {
-        const variants = {
-            default: "bg-white text-gray-900",
-            success: "bg-green-50 text-green-800",
-            error: "bg-red-50 text-red-800",
-            warning: "bg-yellow-50 text-yellow-800",
-        };
+const Toast = ({
+    id,
+    type = "info",
+    title,
+    message,
+    duration = 5000,
+    onClose,
+}) => {
+    const [isVisible, setIsVisible] = useState(true);
 
-        return (
-            <div
-                ref={ref}
-                className={`rounded-lg p-4 shadow-lg ${variants[variant]} ${
-                    className || ""
-                }`}
-                {...props}
-            >
-                {children}
+    useEffect(() => {
+        if (duration > 0) {
+            const timer = setTimeout(() => {
+                handleClose();
+            }, duration);
+            return () => clearTimeout(timer);
+        }
+    }, [duration]);
+
+    const handleClose = () => {
+        setIsVisible(false);
+        setTimeout(() => onClose(id), 300);
+    };
+
+    const icons = {
+        success: CheckCircle,
+        error: XCircle,
+        warning: AlertCircle,
+        info: Info,
+    };
+
+    const colors = {
+        success: "bg-green-50 border-green-200 text-green-800",
+        error: "bg-red-50 border-red-200 text-red-800",
+        warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
+        info: "bg-blue-50 border-blue-200 text-blue-800",
+    };
+
+    const Icon = icons[type];
+
+    if (!isVisible) return null;
+
+    return (
+        <div
+            className={`fixed top-4 right-4 z-50 max-w-sm w-full bg-white rounded-lg shadow-lg border-l-4 ${colors[type]} transform transition-all duration-300 ease-in-out`}
+            style={{
+                transform: isVisible ? "translateX(0)" : "translateX(100%)",
+                opacity: isVisible ? 1 : 0,
+            }}
+        >
+            <div className="p-4">
+                <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                        <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="ml-3 w-0 flex-1">
+                        {title && (
+                            <p className="text-sm font-medium">{title}</p>
+                        )}
+                        {message && <p className="text-sm mt-1">{message}</p>}
+                    </div>
+                    <div className="ml-4 flex-shrink-0 flex">
+                        <button
+                            onClick={handleClose}
+                            className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
             </div>
-        );
-    }
-);
-Toast.displayName = "Toast";
+        </div>
+    );
+};
 
-export const ToastTitle = React.forwardRef(
-    ({ className, children, ...props }, ref) => (
-        <h3
-            ref={ref}
-            className={`text-sm font-medium ${className || ""}`}
-            {...props}
-        >
-            {children}
-        </h3>
-    )
-);
-ToastTitle.displayName = "ToastTitle";
+export const ToastContainer = ({ toasts, onRemoveToast }) => {
+    return (
+        <div className="fixed top-4 right-4 z-50 space-y-2">
+            {toasts.map((toast) => (
+                <Toast key={toast.id} {...toast} onClose={onRemoveToast} />
+            ))}
+        </div>
+    );
+};
 
-export const ToastDescription = React.forwardRef(
-    ({ className, children, ...props }, ref) => (
-        <p ref={ref} className={`mt-1 text-sm ${className || ""}`} {...props}>
-            {children}
-        </p>
-    )
-);
-ToastDescription.displayName = "ToastDescription";
+export const useToast = () => {
+    const [toasts, setToasts] = useState([]);
 
-export const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
-    <button
-        ref={ref}
-        className={`ml-auto inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-            className || ""
-        }`}
-        {...props}
-    >
-        <span className="sr-only">Close</span>
-        <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-            />
-        </svg>
-    </button>
-));
-ToastClose.displayName = "ToastClose";
+    const addToast = (toast) => {
+        const id = Date.now().toString();
+        setToasts((prev) => [...prev, { ...toast, id }]);
+    };
+
+    const removeToast = (id) => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    };
+
+    const showSuccess = (title, message) => {
+        addToast({ type: "success", title, message });
+    };
+
+    const showError = (title, message) => {
+        addToast({ type: "error", title, message });
+    };
+
+    const showWarning = (title, message) => {
+        addToast({ type: "warning", title, message });
+    };
+
+    const showInfo = (title, message) => {
+        addToast({ type: "info", title, message });
+    };
+
+    return {
+        toasts,
+        addToast,
+        removeToast,
+        showSuccess,
+        showError,
+        showWarning,
+        showInfo,
+    };
+};

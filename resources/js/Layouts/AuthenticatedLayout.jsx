@@ -502,11 +502,19 @@ const Header = ({
                             <div className="flex items-center gap-4">
                                 <div className="relative">
                                     <div className="w-11 h-11 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/60 overflow-hidden">
-                                        <img
-                                            src="/images/smile-suite-logo.png"
-                                            alt="Smile Suite Logo"
-                                            className="w-9 h-9 object-contain"
-                                        />
+                                        {auth?.clinic?.logo_url ? (
+                                            <img
+                                                src={auth.clinic.logo_url}
+                                                alt={`${auth.clinic.name} Logo`}
+                                                className="w-9 h-9 object-contain"
+                                            />
+                                        ) : (
+                                            <img
+                                                src="/images/smile-suite-logo.png"
+                                                alt="Smile Suite Logo"
+                                                className="w-9 h-9 object-contain"
+                                            />
+                                        )}
                                     </div>
                                     {/* Enhanced glow effect */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-2xl animate-pulse"></div>
@@ -756,16 +764,7 @@ export default function Authenticated({
     children,
     hideSidebar = false,
 }) {
-    // Debug auth data
-    console.log("=== AUTH DEBUG ===");
-    console.log("Auth data:", auth);
-    console.log("Auth user:", auth?.user);
-    console.log("Auth user role:", auth?.user?.role);
-    console.log("Auth clinic_id:", auth?.clinic_id);
-    console.log("Auth clinic:", auth?.clinic);
-    console.log("User name:", auth?.user?.name || auth?.name);
-    console.log("Current route:", route().current());
-    console.log("==================");
+    // Debug auth data - removed to prevent console loop
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);

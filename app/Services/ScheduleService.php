@@ -15,8 +15,9 @@ class ScheduleService
     /**
      * Get available time slots for a dentist on a specific date
      * UNIFIED SYSTEM: Uses both DentistSchedule table and User profile working_hours
+     * Now includes clinic business hours validation
      */
-    public function getAvailableSlots(int $dentistId, string $date, int $duration = null): array
+    public function getAvailableSlots(int $dentistId, string $date, int $duration = null, int $clinicId = null): array
     {
         $dateCarbon = Carbon::parse($date);
         $dentist = User::find($dentistId);
@@ -43,11 +44,62 @@ class ScheduleService
             $allSlots = $this->getSlotsFromProfileWorkingHours($dentist, $dateCarbon, $duration);
         }
 
+        // Apply clinic business hours filter if clinic ID provided
+        if ($clinicId) {
+            $allSlots = $this->filterSlotsByClinicHours($allSlots, $dateCarbon, $clinicId);
+        }
+
         // Remove duplicates and sort
         $allSlots = array_unique($allSlots);
         sort($allSlots);
 
         return $allSlots;
+    }
+
+    /**
+     * Filter time slots by clinic business hours
+     */
+    private function filterSlotsByClinicHours(array $slots, Carbon $date, int $clinicId): array
+    {
+        $clinic = \App\Models\Clinic::find($clinicId);
+        if (!$clinic || !$clinic->operating_hours) {
+            return $slots; // No business hours set, return all slots
+        }
+
+        // Check if it's a holiday
+        if (\App\Models\ClinicHoliday::isHoliday($clinicId, $date->format('Y-m-d'))) {
+            return []; // Clinic is closed on holidays
+        }
+
+        $dayOfWeek = strtolower($date->format('l'));
+        $dayHours = $clinic->operating_hours[$dayOfWeek] ?? null;
+
+        // If clinic is closed on this day, return empty array
+        if (!$dayHours) {
+            return [];
+        }
+
+        // Handle different operating hours formats
+        if (is_array($dayHours) && count($dayHours) === 2) {
+            // Format: ['09:00', '17:00']
+            $openTime = $dayHours[0];
+            $closeTime = $dayHours[1];
+        } elseif (is_array($dayHours) && isset($dayHours['open'])) {
+            // Format: {open: '09:00', close: '17:00', is_closed: false}
+            if ($dayHours['is_closed'] ?? false) {
+                return [];
+            }
+            $openTime = $dayHours['open'] ?? '09:00';
+            $closeTime = $dayHours['close'] ?? '17:00';
+        } else {
+            // Invalid format, assume closed
+            return [];
+        }
+
+        // Filter slots that fall within business hours
+        return array_filter($slots, function ($slot) use ($openTime, $closeTime) {
+            return $slot >= $openTime && $slot < $closeTime;
+        });
     }
 
     /**

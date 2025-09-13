@@ -117,6 +117,20 @@ class ClinicDirectoryController extends Controller
         $scheduledAt = date('Y-m-d H:i:s', strtotime($validated['date'] . ' ' . $validated['time']));
         $endedAt = date('Y-m-d H:i:s', strtotime($scheduledAt . ' +1 hour'));
 
+        // Validate against clinic business hours
+        $appointmentService = app(\App\Services\AppointmentService::class);
+        $businessHoursErrors = $appointmentService->validateBusinessHours([
+            'scheduled_at' => $scheduledAt,
+            'duration' => 60 // Default 1 hour for online bookings
+        ], $clinic->id);
+
+        if (!empty($businessHoursErrors)) {
+            return response()->json([
+                'message' => 'Booking failed',
+                'errors' => $businessHoursErrors
+            ], 422);
+        }
+
         $appointment = Appointment::create([
             'clinic_id' => $clinic->id,
             'patient_id' => $patient->id,

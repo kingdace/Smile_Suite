@@ -49,11 +49,51 @@ class ClinicProfileController extends Controller
         Log::info('Clinic profile update request:', $request->all());
         $user = Auth::user();
         $clinic = $user->clinic;
+
+        Log::info('User info:', ['id' => $user->id, 'role' => $user->role, 'name' => $user->name, 'email' => $user->email]);
+        Log::info('Active tab check:', ['has_active_tab' => $request->has('active_tab'), 'active_tab_value' => $request->get('active_tab')]);
+
+        // Check if this is a user account update by looking for the active_tab parameter
+        if ($request->has('active_tab') && $request->get('active_tab') === 'user') {
+            Log::info('Taking USER ACCOUNT UPDATE path');
+            // This is a user account update
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'password' => 'nullable|string|min:8|confirmed',
+            ]);
+            Log::info('User account update validated:', $validated);
+            Log::info('User before update:', ['id' => $user->id, 'name' => $user->name, 'email' => $user->email]);
+
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            if (!empty($validated['password'])) {
+                $user->password = bcrypt($validated['password']);
+            }
+
+            $result = $user->save();
+            Log::info('User save result:', ['success' => $result]);
+            Log::info('User after update:', ['id' => $user->id, 'name' => $user->name, 'email' => $user->email]);
+
+            // Refresh the user from database to verify
+            $user->refresh();
+            Log::info('User after refresh:', ['id' => $user->id, 'name' => $user->name, 'email' => $user->email]);
+
+            // Force refresh the auth session to ensure updated data is available
+            Auth::setUser($user);
+
+            // Preserve the active tab when redirecting
+            $activeTab = $request->input('active_tab', 'clinic');
+            return redirect()->route('clinic.profile.index', ['tab' => $activeTab])->with('success', 'Profile updated successfully.');
+        }
+
+        // This is a clinic profile update (only for clinic_admin)
         if ($user->role === 'clinic_admin' && $clinic) {
+            Log::info('Taking CLINIC PROFILE UPDATE path');
             $validated = $request->validate([
                 'clinic_name' => 'required|string|max:255',
                 'contact_number' => 'nullable|string|max:30',
-                'email' => 'required|email',
+                'clinic_email' => 'required|email',
                 'license_number' => 'nullable|string|max:100',
                 'description' => 'nullable|string',
                 'logo' => 'nullable|image|max:2048',
@@ -64,19 +104,23 @@ class ClinicProfileController extends Controller
             Log::info('Clinic profile validated:', $validated);
             $clinic->name = $validated['clinic_name'];
             $clinic->contact_number = $validated['contact_number'] ?? $clinic->contact_number;
-            $clinic->email = $validated['email'];
+            $clinic->email = $validated['clinic_email'];
             $clinic->license_number = $validated['license_number'] ?? $clinic->license_number;
             $clinic->description = $validated['description'] ?? $clinic->description;
             $clinic->latitude = $validated['latitude'] ?? null;
             $clinic->longitude = $validated['longitude'] ?? null;
             if (array_key_exists('operating_hours', $validated)) {
                 $oh = $validated['operating_hours'];
+                Log::info('Operating hours before processing:', ['raw' => $oh, 'type' => gettype($oh)]);
                 if (is_string($oh)) {
                     $decoded = json_decode($oh, true);
+                    Log::info('Decoded operating hours:', ['decoded' => $decoded]);
                     $clinic->operating_hours = $decoded ?: null;
                 } else {
+                    Log::info('Setting operating hours directly:', ['hours' => $oh]);
                     $clinic->operating_hours = $oh;
                 }
+                Log::info('Operating hours after setting:', ['final' => $clinic->operating_hours]);
             } else {
                 $clinic->operating_hours = null;
             }
@@ -85,8 +129,16 @@ class ClinicProfileController extends Controller
                 $clinic->logo_url = '/storage/' . $path;
             }
             $clinic->save();
-            return redirect()->route('clinic.profile.index')->with('success', 'Clinic profile updated successfully.');
+
+            // Log what was actually saved to database
+            $clinic->refresh();
+            Log::info('Operating hours after save and refresh:', ['saved' => $clinic->operating_hours]);
+
+            // Preserve the active tab when redirecting
+            $activeTab = $request->input('active_tab', 'clinic');
+            return redirect()->route('clinic.profile.index', ['tab' => $activeTab])->with('success', 'Clinic profile updated successfully.');
         } else {
+            Log::info('Taking STAFF/DENTIST UPDATE path');
             // Staff/dentist: only update their own user info
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -99,7 +151,9 @@ class ClinicProfileController extends Controller
                 $user->password = bcrypt($validated['password']);
             }
             $user->save();
-            return redirect()->route('clinic.profile.index')->with('success', 'Profile updated successfully.');
+            // Preserve the active tab when redirecting
+            $activeTab = $request->input('active_tab', 'clinic');
+            return redirect()->route('clinic.profile.index', ['tab' => $activeTab])->with('success', 'Profile updated successfully.');
         }
     }
 

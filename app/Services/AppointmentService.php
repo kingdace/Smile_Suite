@@ -31,6 +31,12 @@ class AppointmentService
             throw new \InvalidArgumentException(implode(', ', $validationErrors));
         }
 
+        // Validate against clinic business hours
+        $businessHoursErrors = $this->validateBusinessHours($data, $clinicId);
+        if (!empty($businessHoursErrors)) {
+            throw new \InvalidArgumentException(implode(', ', $businessHoursErrors));
+        }
+
         // Check for scheduling conflicts
         if ($this->hasSchedulingConflict($data['assigned_to'], $data['scheduled_at'], $data['duration'] ?? 30)) {
             throw new \InvalidArgumentException('This time slot conflicts with an existing appointment.');
@@ -321,6 +327,77 @@ class AppointmentService
             $validPaymentStatuses = ['pending', 'paid', 'partial', 'insurance'];
             if (!in_array($data['payment_status'], $validPaymentStatuses)) {
                 $errors[] = 'Invalid payment status';
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validate appointment against clinic business hours
+     */
+    public function validateBusinessHours(array $data, int $clinicId): array
+    {
+        $errors = [];
+
+        if (empty($data['scheduled_at'])) {
+            return $errors;
+        }
+
+        $clinic = Clinic::find($clinicId);
+        if (!$clinic || !$clinic->operating_hours) {
+            return $errors; // No business hours set, skip validation
+        }
+
+        $scheduledAt = Carbon::parse($data['scheduled_at']);
+        $dayOfWeek = strtolower($scheduledAt->format('l'));
+        $time = $scheduledAt->format('H:i');
+
+        // Check if it's a holiday
+        if (\App\Models\ClinicHoliday::isHoliday($clinicId, $scheduledAt->format('Y-m-d'))) {
+            $errors[] = 'Clinic is closed on ' . $scheduledAt->format('M j, Y') . ' (Holiday)';
+            return $errors;
+        }
+
+        // Check if clinic is open on this day
+        $dayHours = $clinic->operating_hours[$dayOfWeek] ?? null;
+
+        // Handle different operating hours formats
+        if (!$dayHours) {
+            $errors[] = 'Clinic is closed on ' . $scheduledAt->format('l');
+            return $errors;
+        }
+
+        // Handle array format [open, close] or object format {open, close, is_closed}
+        if (is_array($dayHours) && count($dayHours) === 2) {
+            // Format: ['09:00', '17:00']
+            $openTime = $dayHours[0];
+            $closeTime = $dayHours[1];
+        } elseif (is_array($dayHours) && isset($dayHours['open'])) {
+            // Format: {open: '09:00', close: '17:00', is_closed: false}
+            if ($dayHours['is_closed'] ?? false) {
+                $errors[] = 'Clinic is closed on ' . $scheduledAt->format('l');
+                return $errors;
+            }
+            $openTime = $dayHours['open'] ?? '09:00';
+            $closeTime = $dayHours['close'] ?? '17:00';
+        } else {
+            // Invalid format, assume closed
+            $errors[] = 'Clinic is closed on ' . $scheduledAt->format('l');
+            return $errors;
+        }
+
+        if ($time < $openTime || $time >= $closeTime) {
+            $errors[] = "Appointment time must be between {$openTime} and {$closeTime} on {$scheduledAt->format('l')}";
+        }
+
+        // Check if appointment duration fits within business hours
+        if (isset($data['duration'])) {
+            $appointmentEnd = $scheduledAt->copy()->addMinutes($data['duration']);
+            $appointmentEndTime = $appointmentEnd->format('H:i');
+
+            if ($appointmentEndTime > $closeTime) {
+                $errors[] = "Appointment duration extends beyond clinic closing time ({$closeTime})";
             }
         }
 
