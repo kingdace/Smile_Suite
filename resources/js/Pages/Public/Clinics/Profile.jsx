@@ -90,7 +90,7 @@ export default function ClinicProfile({ clinic, auth }) {
             {/* Main Content Wrapper */}
             <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-cyan-50">
                 {/* Hero Section */}
-                <section className="relative bg-gradient-to-r from-cyan-500 to-blue-600 text-white pt-32 sm:pt-0 pb-16 sm:pb-0">
+                <section className="relative pt-32 sm:pt-0 pb-16 sm:pb-0">
                     <ClinicHero
                         clinic={clinic}
                         onBookAppointment={handleBookAppointment}
