@@ -8,14 +8,8 @@ export default function UserInfoSection({ data, setData, errors, isAdmin }) {
     if (!isAdmin) return null;
 
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-blue-600" />
-                    User Information
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="space-y-6">
+            <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <Label htmlFor="name" className="text-sm font-medium">
@@ -125,7 +119,7 @@ export default function UserInfoSection({ data, setData, errors, isAdmin }) {
                         your password.
                     </p>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { router } from "@inertiajs/react";
+import { useToast } from "@/Components/ui/toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -7,36 +9,68 @@ import { Textarea } from "@/Components/ui/textarea";
 import { Calendar, Plus, Trash2, Edit } from "lucide-react";
 
 export default function HolidayManagementSection({
+    clinicId,
     initialHolidays = [],
     errors = {},
+    showSuccess: showSuccessProp,
+    showError: showErrorProp,
 }) {
     const [holidays, setHolidays] = useState(initialHolidays);
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingHoliday, setEditingHoliday] = useState(null);
+    const [showDeleteId, setShowDeleteId] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
         date: "",
         is_recurring: false,
         description: "",
     });
+    const [loading, setLoading] = useState(false);
+    const { showSuccess: showSuccessHook, showError: showErrorHook } =
+        useToast();
+    const showSuccess = showSuccessProp || showSuccessHook;
+    const showError = showErrorProp || showErrorHook;
 
-    const handleAddHoliday = () => {
-        if (!formData.name || !formData.date) return;
-
-        const newHoliday = {
-            id: Date.now(), // Temporary ID for new holidays
-            ...formData,
-            is_active: true,
-        };
-
-        setHolidays([...holidays, newHoliday]);
-        setFormData({
-            name: "",
-            date: "",
-            is_recurring: false,
-            description: "",
-        });
-        setShowAddForm(false);
+    const handleAddHoliday = async () => {
+        if (!formData.name || !formData.date || !clinicId) return;
+        setLoading(true);
+        try {
+            await router.post(
+                route("clinic.holidays.store", clinicId),
+                formData,
+                {
+                    preserveState: true,
+                    onSuccess: (page) => {
+                        // Optimistic: append last created from response if available
+                        const response = page?.props?.flash?.holiday || null;
+                        setHolidays((prev) => [
+                            ...prev,
+                            response || {
+                                id: Date.now(),
+                                ...formData,
+                                is_active: true,
+                            },
+                        ]);
+                        showSuccess(
+                            "Holiday added",
+                            "The holiday has been saved."
+                        );
+                        setFormData({
+                            name: "",
+                            date: "",
+                            is_recurring: false,
+                            description: "",
+                        });
+                        setShowAddForm(false);
+                    },
+                    onError: () =>
+                        showError("Failed", "Could not add holiday."),
+                    onFinish: () => setLoading(false),
+                }
+            );
+        } catch (e) {
+            setLoading(false);
+        }
     };
 
     const handleEditHoliday = (holiday) => {
@@ -50,30 +84,77 @@ export default function HolidayManagementSection({
         setShowAddForm(true);
     };
 
-    const handleUpdateHoliday = () => {
-        if (!formData.name || !formData.date) return;
-
-        setHolidays(
-            holidays.map((holiday) =>
-                holiday.id === editingHoliday.id
-                    ? { ...holiday, ...formData }
-                    : holiday
-            )
-        );
-
-        setFormData({
-            name: "",
-            date: "",
-            is_recurring: false,
-            description: "",
-        });
-        setShowAddForm(false);
-        setEditingHoliday(null);
+    const handleUpdateHoliday = async () => {
+        if (!formData.name || !formData.date || !clinicId || !editingHoliday)
+            return;
+        setLoading(true);
+        try {
+            await router.put(
+                route("clinic.holidays.update", [clinicId, editingHoliday.id]),
+                formData,
+                {
+                    preserveState: true,
+                    onSuccess: () => {
+                        setHolidays((prev) =>
+                            prev.map((h) =>
+                                h.id === editingHoliday.id
+                                    ? { ...h, ...formData }
+                                    : h
+                            )
+                        );
+                        showSuccess(
+                            "Holiday updated",
+                            "Changes have been saved."
+                        );
+                        setFormData({
+                            name: "",
+                            date: "",
+                            is_recurring: false,
+                            description: "",
+                        });
+                        setShowAddForm(false);
+                        setEditingHoliday(null);
+                    },
+                    onError: () =>
+                        showError("Failed", "Could not update holiday."),
+                    onFinish: () => setLoading(false),
+                }
+            );
+        } catch (e) {
+            setLoading(false);
+        }
     };
 
-    const handleDeleteHoliday = (holidayId) => {
-        setHolidays(holidays.filter((holiday) => holiday.id !== holidayId));
+    const handleDeleteHoliday = async (holidayId) => {
+        if (!clinicId || !holidayId) return;
+        setLoading(true);
+        try {
+            await router.delete(
+                route("clinic.holidays.destroy", [clinicId, holidayId]),
+                {
+                    preserveState: true,
+                    onSuccess: () => {
+                        setHolidays((prev) =>
+                            prev.filter((h) => h.id !== holidayId)
+                        );
+                        showSuccess(
+                            "Holiday deleted",
+                            "The holiday was removed."
+                        );
+                        setShowDeleteId(null);
+                    },
+                    onError: () =>
+                        showError("Failed", "Could not delete holiday."),
+                    onFinish: () => setLoading(false),
+                }
+            );
+        } catch (e) {
+            setLoading(false);
+        }
     };
+
+    const openDeleteConfirmation = (holidayId) => setShowDeleteId(holidayId);
+    const closeDeleteConfirmation = () => setShowDeleteId(null);
 
     const handleCancel = () => {
         setFormData({
@@ -87,14 +168,8 @@ export default function HolidayManagementSection({
     };
 
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-600" />
-                    Holiday Management
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="space-y-6">
+            <div className="space-y-6">
                 {/* Add/Edit Form */}
                 {showAddForm && (
                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -213,92 +288,130 @@ export default function HolidayManagementSection({
                     </div>
                 )}
 
-                {/* Add Button */}
-                {!showAddForm && (
-                    <Button
-                        type="button"
-                        onClick={() => setShowAddForm(true)}
-                        className="w-full md:w-auto"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Holiday
-                    </Button>
+                {/* Add Button (when there are holidays) */}
+                {!showAddForm && holidays.length > 0 && (
+                    <div className="flex justify-end">
+                        <Button
+                            type="button"
+                            onClick={() => setShowAddForm(true)}
+                            className="md:w-auto"
+                            disabled={loading}
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Holiday
+                        </Button>
+                    </div>
                 )}
 
                 {/* Holidays List */}
                 {holidays.length > 0 && (
-                    <div className="space-y-2">
-                        <h4 className="font-medium text-gray-700">
-                            Current Holidays
-                        </h4>
-                        {holidays.map((holiday) => (
-                            <div
-                                key={holiday.id}
-                                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-50"
-                            >
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <h5 className="font-medium text-gray-900">
-                                            {holiday.name}
-                                        </h5>
-                                        {holiday.is_recurring && (
-                                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
-                                                Recurring
-                                            </span>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-gray-800">
+                                Current Holidays
+                            </h4>
+                            <span className="text-xs text-gray-500">
+                                {holidays.length}{" "}
+                                {holidays.length === 1 ? "entry" : "entries"}
+                            </span>
+                        </div>
+                        {holidays.map((holiday) => {
+                            const formatted = new Date(
+                                holiday.date
+                            ).toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            });
+                            return (
+                                <div
+                                    key={holiday.id}
+                                    className="grid grid-cols-[auto_1fr_auto] items-center gap-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow transition-all"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                                        <Calendar className="h-5 w-5 text-blue-500" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h5 className="font-semibold text-gray-900 truncate">
+                                                {holiday.name}
+                                            </h5>
+                                            {holiday.is_recurring && (
+                                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                                                    Recurs yearly
+                                                </span>
+                                            )}
+                                            {holiday.is_active === false && (
+                                                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+                                                    Inactive
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            {formatted}
+                                        </div>
+                                        {holiday.description && (
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {holiday.description}
+                                            </p>
                                         )}
                                     </div>
-                                    <p className="text-sm text-gray-600">
-                                        {new Date(
-                                            holiday.date
-                                        ).toLocaleDateString("en-US", {
-                                            weekday: "long",
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                        })}
-                                    </p>
-                                    {holiday.description && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            {holiday.description}
-                                        </p>
-                                    )}
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            onClick={() =>
+                                                handleEditHoliday(holiday)
+                                            }
+                                            size="sm"
+                                            variant="outline"
+                                            className="h-8 px-2"
+                                        >
+                                            <Edit className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            onClick={() =>
+                                                openDeleteConfirmation(
+                                                    holiday.id
+                                                )
+                                            }
+                                            size="sm"
+                                            variant="destructive"
+                                            className="h-8 px-2"
+                                            disabled={loading}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="flex gap-1">
-                                    <Button
-                                        type="button"
-                                        onClick={() =>
-                                            handleEditHoliday(holiday)
-                                        }
-                                        size="sm"
-                                        variant="outline"
-                                        className="h-8 w-8 p-0"
-                                    >
-                                        <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        onClick={() =>
-                                            handleDeleteHoliday(holiday.id)
-                                        }
-                                        size="sm"
-                                        variant="destructive"
-                                        className="h-8 w-8 p-0"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
 
                 {holidays.length === 0 && !showAddForm && (
-                    <div className="text-center py-8 text-gray-500">
-                        <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                        <p>No holidays configured yet.</p>
-                        <p className="text-sm">
-                            Add holidays to prevent appointments on those dates.
+                    <div className="flex flex-col items-center justify-center text-center py-16 rounded-xl border border-dashed border-gray-200 bg-gradient-to-b from-white to-gray-50">
+                        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                            <Calendar className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <h4 className="text-gray-800 font-semibold mb-1">
+                            No holidays configured yet
+                        </h4>
+                        <p className="text-sm text-gray-600 max-w-md mb-6">
+                            Add holidays to automatically block bookings on
+                            those dates for this clinic. You can set one-time or
+                            recurring holidays.
                         </p>
+                        <Button
+                            type="button"
+                            onClick={() => setShowAddForm(true)}
+                            className="px-5"
+                            disabled={loading}
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Holiday
+                        </Button>
                     </div>
                 )}
 
@@ -307,8 +420,42 @@ export default function HolidayManagementSection({
                         {errors.holidays}
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+            {/* Delete Confirmation Modal */}
+            {showDeleteId && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+                        <h3 className="text-lg font-semibold mb-4">
+                            Delete Holiday
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                            Are you sure you want to delete this holiday? This
+                            action cannot be undone.
+                        </p>
+                        <div className="flex gap-3">
+                            <Button
+                                type="button"
+                                onClick={closeDeleteConfirmation}
+                                variant="outline"
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={() =>
+                                    handleDeleteHoliday(showDeleteId)
+                                }
+                                variant="destructive"
+                                className="flex-1"
+                                disabled={loading}
+                            >
+                                {loading ? "Deleting..." : "Delete"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
-

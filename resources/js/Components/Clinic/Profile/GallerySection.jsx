@@ -63,14 +63,8 @@ export default function GallerySection({
     );
 
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Image className="h-5 w-5 text-blue-600" />
-                    Gallery Management
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="space-y-6">
+            <div className="space-y-6">
                 {/* Upload Section */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <input
@@ -277,11 +271,11 @@ export default function GallerySection({
                 {errors.gallery && (
                     <div className="text-red-500 text-sm">{errors.gallery}</div>
                 )}
-            </CardContent>
+            </div>
 
             {/* Toast Container */}
             <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
-        </Card>
+        </div>
     );
 }
 

@@ -17,11 +17,11 @@ use App\Http\Controllers\Clinic\TreatmentController;
 use App\Http\Controllers\Clinic\InventoryController;
 use App\Http\Controllers\Clinic\PaymentController;
 use App\Http\Controllers\Clinic\ReportController;
-use App\Http\Controllers\Clinic\SettingController;
 use App\Http\Controllers\Clinic\SupplierController;
 use App\Http\Controllers\Clinic\DentistScheduleController;
 use App\Http\Controllers\Clinic\ServiceController;
 use App\Http\Controllers\Clinic\WaitlistController;
+use App\Http\Controllers\ClinicHolidayController;
 use App\Http\Controllers\Public\ClinicDirectoryController;
 use App\Http\Controllers\Public\ClinicRegistrationController;
 use App\Http\Controllers\Admin\ClinicRegistrationRequestController;
@@ -347,11 +347,12 @@ Route::middleware('auth')->group(function () {
         Route::get('clinic/{clinic}/reports/treatments', [ReportController::class, 'treatments'])
             ->name('clinic.reports.treatments');
 
-        // Settings Routes
-        Route::get('clinic/{clinic}/settings', [SettingController::class, 'index'])
-            ->name('clinic.settings.index');
-        Route::put('clinic/{clinic}/settings', [SettingController::class, 'update'])
-            ->name('clinic.settings.update');
+        // Holidays Routes
+        Route::get('clinic/{clinic}/holidays', [ClinicHolidayController::class, 'index'])->name('clinic.holidays.index');
+        Route::post('clinic/{clinic}/holidays', [ClinicHolidayController::class, 'store'])->name('clinic.holidays.store');
+        Route::put('clinic/{clinic}/holidays/{holiday}', [ClinicHolidayController::class, 'update'])->name('clinic.holidays.update');
+        Route::delete('clinic/{clinic}/holidays/{holiday}', [ClinicHolidayController::class, 'destroy'])->name('clinic.holidays.destroy');
+
 
         // Suppliers Routes
         Route::resource('clinic/{clinic}/suppliers', SupplierController::class)

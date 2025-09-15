@@ -39,14 +39,8 @@ export default function LocationSection({ data, setData, errors }) {
     }, [data.latitude, data.longitude]);
 
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-blue-600" />
-                    Location Settings
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="space-y-6">
+            <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <Label
@@ -130,8 +124,8 @@ export default function LocationSection({ data, setData, errors }) {
                         helps patients find you easily.
                     </p>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
 

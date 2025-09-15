@@ -103,6 +103,12 @@ export default function Index({
 
     const [isLoading, setIsLoading] = useState(false);
 
+    // Handle input changes with real-time validation
+    const handleInputChange = (fieldName, value) => {
+        setData(fieldName, value);
+        validateField(fieldName, value, { ...data, [fieldName]: value });
+    };
+
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -262,39 +268,83 @@ export default function Index({
         >
             <Head title="Clinic Profile" />
 
-            <div className="py-12">
+            <div className="py-8">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {/* Success Message */}
                     {success && (
-                        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-                            <p className="text-green-700">{success}</p>
+                        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <svg
+                                        className="h-5 w-5 text-green-400"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-green-800">
+                                        {success}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     )}
 
                     {/* Error Message */}
                     {errors.message && (
-                        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-                            <p className="text-red-700">{errors.message}</p>
+                        <div className="mb-6 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-6 shadow-sm">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <svg
+                                        className="h-5 w-5 text-red-400"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-red-800">
+                                        {errors.message}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     )}
 
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        {/* Tab Navigation */}
-                        <div className="border-b border-gray-200">
-                            <nav className="-mb-px flex space-x-8 px-6">
+                    <div className="bg-white overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 max-w-6xl mx-auto">
+                        {/* Modern Tab Navigation */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                            <nav className="flex justify-center space-x-1 sm:space-x-2 px-4 sm:px-6 py-2 overflow-x-auto">
                                 {tabs.map((tab) => {
                                     const Icon = tab.icon;
                                     return (
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
+                                            className={`relative py-3 px-3 sm:px-4 md:px-6 font-medium text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2 md:gap-3 transition-all duration-200 rounded-t-lg whitespace-nowrap min-w-[80px] sm:min-w-[100px] flex-shrink-0 ${
                                                 activeTab === tab.id
-                                                    ? "border-blue-500 text-blue-600"
-                                                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                                    ? "bg-white text-blue-700 shadow-sm border-t-2 border-l-2 border-r-2 border-blue-200 -mb-px"
+                                                    : "text-gray-600 hover:text-blue-600 hover:bg-white/50"
                                             }`}
                                         >
-                                            <Icon className="h-4 w-4" />
+                                            <Icon
+                                                className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                                                    activeTab === tab.id
+                                                        ? "text-blue-600"
+                                                        : ""
+                                                }`}
+                                            />
                                             {tab.label}
                                         </button>
                                     );
@@ -303,7 +353,7 @@ export default function Index({
                         </div>
 
                         {/* Tab Content */}
-                        <div className="p-6 bg-gray-50 min-h-[600px]">
+                        <div className="p-6 sm:p-8 bg-gradient-to-br from-gray-50 to-white min-h-[600px] transition-all duration-300">
                             {/* Progress Bar */}
                             {isSubmitting && (
                                 <div className="mb-6">
@@ -321,17 +371,7 @@ export default function Index({
                                 {/* Clinic Settings Tab */}
                                 {activeTab === "clinic" && (
                                     <div className="space-y-6">
-                                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                            <div className="mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                                    <Building2 className="h-5 w-5 text-blue-600" />
-                                                    Clinic Settings
-                                                </h3>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Manage your clinic's basic
-                                                    information and settings.
-                                                </p>
-                                            </div>
+                                        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                                             <ClinicInfoSection
                                                 data={data}
                                                 setData={setData}
@@ -347,6 +387,9 @@ export default function Index({
                                                 isFieldValidating={
                                                     isFieldValidating
                                                 }
+                                                handleInputChange={
+                                                    handleInputChange
+                                                }
                                             />
                                         </div>
                                     </div>
@@ -355,17 +398,7 @@ export default function Index({
                                 {/* User Account Tab */}
                                 {activeTab === "user" && (
                                     <div className="space-y-6">
-                                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                            <div className="mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                                    <User className="h-5 w-5 text-blue-600" />
-                                                    User Account
-                                                </h3>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Manage your user account
-                                                    information and password.
-                                                </p>
-                                            </div>
+                                        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                                             <UserInfoSection
                                                 data={data}
                                                 setData={setData}
@@ -382,18 +415,7 @@ export default function Index({
                                 {/* Operating Hours Tab */}
                                 {activeTab === "hours" && (
                                     <div className="space-y-6">
-                                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                            <div className="mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                                    <Clock className="h-5 w-5 text-blue-600" />
-                                                    Operating Hours
-                                                </h3>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Set your clinic's operating
-                                                    hours for each day of the
-                                                    week.
-                                                </p>
-                                            </div>
+                                        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                                             <OperatingHoursSection
                                                 initialOperatingHours={
                                                     data.operating_hours
@@ -413,18 +435,7 @@ export default function Index({
                                 {/* Location Tab */}
                                 {activeTab === "location" && (
                                     <div className="space-y-6">
-                                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                            <div className="mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                                    <MapPin className="h-5 w-5 text-blue-600" />
-                                                    Clinic Location
-                                                </h3>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Set your clinic's location
-                                                    on the map to help patients
-                                                    find you.
-                                                </p>
-                                            </div>
+                                        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                                             <LocationSection
                                                 data={data}
                                                 setData={setData}
@@ -440,17 +451,7 @@ export default function Index({
                                 {/* Gallery Tab */}
                                 {activeTab === "gallery" && (
                                     <div className="space-y-6">
-                                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                            <div className="mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                                    <Image className="h-5 w-5 text-blue-600" />
-                                                    Clinic Gallery
-                                                </h3>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Upload and manage images to
-                                                    showcase your clinic.
-                                                </p>
-                                            </div>
+                                        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                                             <GallerySection
                                                 initialGalleryImages={
                                                     clinic?.gallery_images || []
@@ -470,19 +471,9 @@ export default function Index({
                                 {/* Holidays Tab */}
                                 {activeTab === "holidays" && (
                                     <div className="space-y-6">
-                                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                            <div className="mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                                                    <Calendar className="h-5 w-5 text-blue-600" />
-                                                    Holiday Management
-                                                </h3>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Manage clinic holidays to
-                                                    prevent appointments on
-                                                    those dates.
-                                                </p>
-                                            </div>
+                                        <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                                             <HolidayManagementSection
+                                                clinicId={clinic?.id}
                                                 initialHolidays={
                                                     clinic?.holidays || []
                                                 }
@@ -490,32 +481,48 @@ export default function Index({
                                                     ...errors,
                                                     ...validationErrors,
                                                 }}
+                                                showSuccess={showSuccess}
+                                                showError={showError}
                                             />
                                         </div>
                                     </div>
                                 )}
-
                                 {/* Submit Button */}
-                                <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <h4 className="text-lg font-medium text-gray-900">
-                                                Save Changes
-                                            </h4>
-                                            <p className="text-sm text-gray-600">
-                                                Click save to update your clinic
-                                                profile settings.
-                                            </p>
+                                <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-10 rounded-2xl p-8 border border-blue-100 shadow-lg">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                                        <div className="text-center sm:text-left">
+                                            <div className="flex items-center justify-center sm:justify-start gap-3 mb-3">
+                                                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                                                    <Save className="h-6 w-6 text-white" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-xl font-bold text-gray-900">
+                                                        Save Changes
+                                                    </h4>
+                                                    <p className="text-sm text-gray-600">
+                                                        Update your clinic
+                                                        profile settings
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {isSubmitting && (
+                                                <div className="text-sm text-blue-600 font-medium">
+                                                    Please wait while we save
+                                                    your changes...
+                                                </div>
+                                            )}
                                         </div>
-                                        <LoadingButton
-                                            type="submit"
-                                            loading={isSubmitting}
-                                            loadingText="Saving..."
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <Save className="h-4 w-4 mr-2" />
-                                            Save Changes
-                                        </LoadingButton>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <LoadingButton
+                                                type="submit"
+                                                loading={isSubmitting}
+                                                loadingText="Saving..."
+                                                className="bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-600 hover:from-blue-700 hover:via-indigo-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px]"
+                                            >
+                                                <Save className="h-5 w-5 mr-2" />
+                                                Save Changes
+                                            </LoadingButton>
+                                        </div>
                                     </div>
                                 </div>
                             </form>

@@ -39,14 +39,8 @@ export default function OperatingHoursSection({
     }, [operatingDays]); // Removed onOperatingHoursChange from dependencies
 
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                    Operating Hours
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
+        <div className="space-y-6">
+            <div>
                 {/* Quick Setup Section */}
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
                     <h3 className="font-semibold text-blue-900 mb-3">
@@ -202,7 +196,7 @@ export default function OperatingHoursSection({
                         {errors.operating_hours}
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

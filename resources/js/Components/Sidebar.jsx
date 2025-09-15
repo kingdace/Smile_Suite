@@ -178,13 +178,6 @@ const navigation = (clinicId) => [
         icon: BarChart3,
         description: "Analytics & insights",
     },
-    {
-        name: "Settings",
-        href: route("clinic.settings.index", [clinicId]),
-        routeName: "clinic.settings.*",
-        icon: Settings,
-        description: "Clinic configuration",
-    },
 ];
 
 export default function Sidebar({ className, auth }) {

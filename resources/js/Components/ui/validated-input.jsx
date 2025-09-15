@@ -31,22 +31,22 @@ export function ValidatedInput({
             : type;
 
     const getInputClasses = () => {
-        let classes = `block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 ${inputClassName}`;
+        let classes = `block w-full px-4 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-300 ${inputClassName}`;
 
         if (disabled) {
             classes += " bg-gray-50 text-gray-500 cursor-not-allowed";
         } else if (isInvalid) {
             classes +=
-                " border-red-300 focus:border-red-500 focus:ring-red-500";
+                " border-red-300 focus:border-red-500 focus:ring-red-500 bg-red-50";
         } else if (isValid) {
             classes +=
-                " border-green-300 focus:border-green-500 focus:ring-green-500";
+                " border-green-300 focus:border-green-500 focus:ring-green-500 bg-green-50";
         } else if (isFocused) {
             classes +=
-                " border-blue-300 focus:border-blue-500 focus:ring-blue-500";
+                " border-blue-300 focus:border-blue-500 focus:ring-blue-500 bg-blue-50";
         } else {
             classes +=
-                " border-gray-300 focus:border-blue-500 focus:ring-blue-500";
+                " border-gray-300 focus:border-blue-500 focus:ring-blue-500 hover:border-gray-400";
         }
 
         return classes;
@@ -73,11 +73,11 @@ export function ValidatedInput({
     };
 
     return (
-        <div className={`space-y-1 ${className}`}>
+        <div className={`space-y-3 ${className}`}>
             {label && (
                 <label
                     htmlFor={name}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-semibold text-gray-800"
                 >
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
@@ -129,16 +129,16 @@ export function ValidatedInput({
 
             {/* Error Message */}
             {error && (
-                <p className="text-sm text-red-600 flex items-center">
-                    <XCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+                <p className="text-sm text-red-600 flex items-center bg-red-50 px-3 py-2 rounded-lg border border-red-200">
+                    <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                     {error}
                 </p>
             )}
 
             {/* Success Message */}
             {isValid && !error && (
-                <p className="text-sm text-green-600 flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+                <p className="text-sm text-green-600 flex items-center bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                    <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                     Looks good!
                 </p>
             )}
@@ -209,11 +209,11 @@ export function ValidatedTextarea({
     };
 
     return (
-        <div className={`space-y-1 ${className}`}>
+        <div className={`space-y-3 ${className}`}>
             {label && (
                 <label
                     htmlFor={name}
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-semibold text-gray-800"
                 >
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
@@ -250,16 +250,16 @@ export function ValidatedTextarea({
 
             {/* Error Message */}
             {error && (
-                <p className="text-sm text-red-600 flex items-center">
-                    <XCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+                <p className="text-sm text-red-600 flex items-center bg-red-50 px-3 py-2 rounded-lg border border-red-200">
+                    <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                     {error}
                 </p>
             )}
 
             {/* Success Message */}
             {isValid && !error && (
-                <p className="text-sm text-green-600 flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+                <p className="text-sm text-green-600 flex items-center bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                    <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
                     Looks good!
                 </p>
             )}

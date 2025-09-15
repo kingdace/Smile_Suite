@@ -600,7 +600,9 @@ const Header = ({
                                             className="flex items-center"
                                         >
                                             <User className="w-4 h-4 mr-2" />
-                                            Profile
+                                            {auth?.user?.role === "clinic_admin"
+                                                ? "Clinic Management"
+                                                : "Profile"}
                                         </Dropdown.Link>
                                         {auth?.user?.role ===
                                             "clinic_admin" && (
@@ -622,24 +624,6 @@ const Header = ({
                                         >
                                             <Crown className="w-4 h-4 mr-2" />
                                             Subscription
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={(() => {
-                                                const clinicId =
-                                                    auth?.clinic_id ||
-                                                    auth?.clinic?.id ||
-                                                    auth?.user?.clinic_id;
-                                                return clinicId
-                                                    ? route(
-                                                          "clinic.settings.index",
-                                                          clinicId
-                                                      )
-                                                    : "#";
-                                            })()}
-                                            className="flex items-center"
-                                        >
-                                            <Settings className="w-4 h-4 mr-2" />
-                                            Settings
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route("logout")}

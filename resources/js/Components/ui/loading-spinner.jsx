@@ -25,17 +25,16 @@ export function LoadingButton({
         <button
             {...props}
             disabled={loading}
-            className={`relative ${className}`}
+            className={`relative inline-flex items-center justify-center ${className}`}
         >
-            {loading && (
-                <LoadingSpinner
-                    size="sm"
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                />
+            {loading ? (
+                <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    <span>{loadingText}</span>
+                </>
+            ) : (
+                children
             )}
-            <span className={loading ? "ml-6" : ""}>
-                {loading ? loadingText : children}
-            </span>
         </button>
     );
 }

@@ -30,14 +30,8 @@ export default function ClinicInfoSection({
     if (!isAdmin) return null;
 
     return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-blue-600" />
-                    Clinic Information
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="space-y-6">
+            <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ValidatedInput
                         name="clinic_name"
@@ -151,7 +145,7 @@ export default function ClinicInfoSection({
                         </div>
                     )}
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

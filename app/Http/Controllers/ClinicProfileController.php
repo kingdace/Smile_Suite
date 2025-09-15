@@ -30,12 +30,13 @@ class ClinicProfileController extends Controller
             $limit = $planLimits[$plan] ?? 5;
             $users = User::where('clinic_id', $clinic->id)->get();
             // Eager load gallery images
-            $clinic->load('galleryImages');
+            $clinic->load(['galleryImages', 'holidays']);
         }
         return inertia('Clinic/Profile/Index', [
             'user' => $user,
             'clinic' => $clinic ? array_merge($clinic->toArray(), [
                 'gallery_images' => $clinic->galleryImages ? $clinic->galleryImages->values()->toArray() : [],
+                'holidays' => $clinic->holidays ? $clinic->holidays->values()->toArray() : [],
             ]) : null,
             'users' => $users,
             'plan' => $plan,

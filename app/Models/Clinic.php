@@ -240,4 +240,12 @@ class Clinic extends Model
     {
         return $this->hasMany(PurchaseOrder::class);
     }
+
+    /**
+     * Get the holidays associated with the clinic.
+     */
+    public function holidays()
+    {
+        return $this->hasMany(\App\Models\ClinicHoliday::class);
+    }
 }
