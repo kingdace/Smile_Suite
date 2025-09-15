@@ -31,6 +31,31 @@ export default function HolidayManagementSection({
     const showSuccess = showSuccessProp || showSuccessHook;
     const showError = showErrorProp || showErrorHook;
 
+    // Derived statistics and displays
+    const totalCount = holidays.length;
+    const recurringCount = holidays.filter((h) => h.is_recurring).length;
+    const inactiveCount = holidays.filter((h) => h.is_active === false).length;
+    const nextUpcoming = (() => {
+        const today = new Date();
+        const future = holidays
+            .filter((h) => h.is_active !== false)
+            .map((h) => ({ ...h, _date: new Date(h.date) }))
+            .filter((h) => !isNaN(h._date))
+            .filter((h) => h._date >= new Date(today.toDateString()))
+            .sort((a, b) => a._date - b._date)[0];
+        if (!future) return null;
+        try {
+            return new Date(future.date).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            });
+        } catch (e) {
+            return future.date;
+        }
+    })();
+
     const handleAddHoliday = async () => {
         if (!formData.name || !formData.date || !clinicId) return;
         setLoading(true);
@@ -170,6 +195,45 @@ export default function HolidayManagementSection({
     return (
         <div className="space-y-6">
             <div className="space-y-6">
+                {/* Header and Actions */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="space-y-1">
+                        <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            Holidays
+                            {totalCount > 0 && (
+                                <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                    {totalCount} total
+                                </span>
+                            )}
+                        </h4>
+                        {totalCount > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-50 border border-gray-200">
+                                    Recurring: {recurringCount}
+                                </span>
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-50 border border-gray-200">
+                                    Inactive: {inactiveCount}
+                                </span>
+                                {nextUpcoming && (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        Next: {nextUpcoming}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {!showAddForm && (
+                        <Button
+                            type="button"
+                            onClick={() => setShowAddForm(true)}
+                            className="md:w-auto"
+                            disabled={loading}
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Holiday
+                        </Button>
+                    )}
+                </div>
                 {/* Add/Edit Form */}
                 {showAddForm && (
                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -288,20 +352,7 @@ export default function HolidayManagementSection({
                     </div>
                 )}
 
-                {/* Add Button (when there are holidays) */}
-                {!showAddForm && holidays.length > 0 && (
-                    <div className="flex justify-end">
-                        <Button
-                            type="button"
-                            onClick={() => setShowAddForm(true)}
-                            className="md:w-auto"
-                            disabled={loading}
-                        >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Holiday
-                        </Button>
-                    </div>
-                )}
+                {/* Old inline Add button removed in favor of header action */}
 
                 {/* Holidays List */}
                 {holidays.length > 0 && (

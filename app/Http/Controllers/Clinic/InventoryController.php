@@ -154,6 +154,11 @@ class InventoryController extends Controller
             abort(403);
         }
 
+        // Coerce empty supplier selection to null so validation treats it as optional
+        if (!$request->filled('supplier_id') || $request->input('supplier_id') === '' || $request->input('supplier_id') === 'none') {
+            $request->merge(['supplier_id' => null]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sku' => 'nullable|string|max:255|unique:inventory,sku',
@@ -266,6 +271,11 @@ class InventoryController extends Controller
         // Check if the inventory belongs to the clinic
         if ($inventory->clinic_id !== $clinic->id) {
             abort(403);
+        }
+
+        // Coerce empty supplier selection to null so validation treats it as optional
+        if (!$request->filled('supplier_id') || $request->input('supplier_id') === '' || $request->input('supplier_id') === 'none') {
+            $request->merge(['supplier_id' => null]);
         }
 
         $validated = $request->validate([

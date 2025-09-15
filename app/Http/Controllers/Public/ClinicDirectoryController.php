@@ -82,7 +82,8 @@ class ClinicDirectoryController extends Controller
         // Only allow logged-in patients
         $user = Auth::user();
         if (!$user || $user->role !== 'patient') {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return redirect()->route('login')
+                ->with('error', 'Please log in as a patient to book an appointment.');
         }
 
         $validated = $request->validate([
@@ -125,10 +126,14 @@ class ClinicDirectoryController extends Controller
         ], $clinic->id);
 
         if (!empty($businessHoursErrors)) {
-            return response()->json([
-                'message' => 'Booking failed',
-                'errors' => $businessHoursErrors
-            ], 422);
+            // Redirect back with validation-style errors so Inertia can handle them
+            // Attach to a sensible key (e.g., 'date') and a general message
+            return back()
+                ->withErrors([
+                    'date' => $businessHoursErrors[0] ?? 'Selected time is unavailable.',
+                    'booking' => 'Booking failed',
+                ])
+                ->withInput();
         }
 
         $appointment = Appointment::create([
