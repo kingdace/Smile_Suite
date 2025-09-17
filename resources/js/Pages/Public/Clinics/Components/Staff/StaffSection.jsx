@@ -59,6 +59,15 @@ export default function StaffSection({ clinic, onBookAppointment }) {
         return "bg-gray-100 text-gray-700 border-gray-200";
     };
 
+    const isClinicalRole = (role) => {
+        const r = role.toLowerCase();
+        return (
+            r.includes("dentist") ||
+            r.includes("doctor") ||
+            r.includes("hygienist")
+        );
+    };
+
     return (
         <div className="relative">
             {/* Section Header */}
@@ -87,7 +96,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                 {clinic.staff.map((member, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group"
+                        className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group flex flex-col h-full"
                     >
                         {/* Header with Avatar and Role */}
                         <div className="relative p-5 pb-4">
@@ -158,53 +167,62 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                             )}
                         </div>
 
-                        {/* Additional Info */}
-                        {(member.specialties ||
-                            member.experience ||
-                            member.education) && (
-                            <div className="px-5 pb-4 space-y-3">
-                                {member.specialties && (
-                                    <div>
-                                        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                                            Specialties
-                                        </h4>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {member.specialties.map(
+                        {/* Profile Meta (always renders to keep layout consistent) */}
+                        <div className="px-5 pb-4 space-y-3">
+                            <div>
+                                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                                    {isClinicalRole(member.role)
+                                        ? "Specialties"
+                                        : "Responsibilities"}
+                                </h4>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {isClinicalRole(member.role) ? (
+                                        member.specialties &&
+                                        member.specialties.length > 0 ? (
+                                            member.specialties.map(
                                                 (specialty, idx) => (
                                                     <span
                                                         key={idx}
-                                                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-200 hover:bg-blue-100 transition-colors duration-300"
+                                                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-200"
                                                     >
                                                         {specialty}
                                                     </span>
                                                 )
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {member.experience && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <Award className="w-4 h-4 text-yellow-500" />
-                                        <span className="font-medium">
-                                            {member.experience} years experience
+                                            )
+                                        ) : (
+                                            <span className="px-2 py-1 bg-gray-50 text-gray-500 text-xs rounded-full border border-gray-200">
+                                                Not specified
+                                            </span>
+                                        )
+                                    ) : (
+                                        <span className="px-2 py-1 bg-gray-50 text-gray-600 text-xs rounded-full border border-gray-200">
+                                            {member.role}
                                         </span>
-                                    </div>
-                                )}
-
-                                {member.education && (
-                                    <div className="text-sm text-gray-600">
-                                        <span className="font-semibold">
-                                            Education:
-                                        </span>{" "}
-                                        {member.education}
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        )}
+
+                            {member.experience && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Award className="w-4 h-4 text-yellow-500" />
+                                    <span className="font-medium">
+                                        {member.experience} years experience
+                                    </span>
+                                </div>
+                            )}
+
+                            {member.education && (
+                                <div className="text-sm text-gray-600">
+                                    <span className="font-semibold">
+                                        Education:
+                                    </span>{" "}
+                                    {member.education}
+                                </div>
+                            )}
+                        </div>
 
                         {/* Action Button */}
-                        <div className="px-5 pb-5">
+                        <div className="px-5 pb-5 mt-auto">
                             <button
                                 onClick={onBookAppointment}
                                 className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
