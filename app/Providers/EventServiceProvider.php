@@ -6,6 +6,12 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Models\Appointment;
+use App\Models\Payment;
+use App\Models\Review;
+use App\Observers\AppointmentObserver;
+use App\Observers\PaymentObserver;
+use App\Observers\ReviewObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -25,7 +31,10 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register model observers for real-time broadcasting
+        Appointment::observe(AppointmentObserver::class);
+        Payment::observe(PaymentObserver::class);
+        Review::observe(ReviewObserver::class);
     }
 
     /**

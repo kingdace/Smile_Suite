@@ -14,10 +14,11 @@ use App\Models\Appointment;
 use App\Models\Treatment;
 use App\Models\Inventory;
 use App\Traits\SubscriptionAccessControl;
+use App\Traits\ExportTrait;
 
 class ReportController extends Controller
 {
-    use SubscriptionAccessControl;
+    use SubscriptionAccessControl, ExportTrait;
 
     public function __construct()
     {
@@ -138,7 +139,24 @@ class ReportController extends Controller
             })
             ->values();
 
-        return Inertia::render('Clinic/Reports/Index', [
+        // Enhanced appointment statistics
+        $appointmentStats = [
+            'completed' => $clinic->appointments()->where('appointment_status_id', $completedStatusId)->count(),
+            'pending' => $clinic->appointments()->where('appointment_status_id', $pendingStatusId)->count(),
+            'cancelled' => $clinic->appointments()->where('appointment_status_id', $cancelledStatusId)->count(),
+            'total' => $clinic->appointments()->count(),
+            'this_month' => $clinic->appointments()->whereBetween('scheduled_at', [now()->startOfMonth(), now()->endOfMonth()])->count(),
+        ];
+
+        // Enhanced inventory statistics
+        $inventoryStats = [
+            'total_items' => $clinic->inventory()->count(),
+            'low_stock' => $clinic->inventory()->whereRaw('quantity <= minimum_quantity')->count(),
+            'out_of_stock' => $clinic->inventory()->where('quantity', 0)->count(),
+            'total_value' => $clinic->inventory()->selectRaw('SUM(quantity * unit_price) as total')->first()->total ?? 0,
+        ];
+
+        return Inertia::render('Clinic/Reports/SimpleEnhanced', [
             'clinic' => $clinic,
             'metrics' => $metrics,
             'monthlyRevenue' => $monthlyRevenue,
@@ -146,7 +164,9 @@ class ReportController extends Controller
             'topPatients' => $topPatients,
             'recentActivity' => $recentActivity,
             'treatmentCategories' => $treatmentCategories,
-            'filters' => $request->only(['date_from', 'date_to']),
+            'appointmentStats' => $appointmentStats,
+            'inventoryStats' => $inventoryStats,
+            'filters' => $request->only(['date_from', 'date_to', 'search', 'status', 'category']),
             'auth' => [
                 'user' => [
                     'id' => Auth::id(),
@@ -446,5 +466,451 @@ class ReportController extends Controller
                 'clinic_id' => $clinic->id,
             ],
         ]);
+    }
+
+    /**
+     * Export patients report
+     */
+    public function exportPatients(Request $request)
+    {
+        $clinic = Auth::user()->clinic;
+        
+        $query = $clinic->patients()
+            ->withCount(['appointments', 'treatments'])
+            ->withSum('payments', 'amount');
+
+        // Apply filters
+        $query = $this->applyPatientFilters($query, $request);
+
+        $headers = [
+            'ID',
+            'First Name',
+            'Last Name',
+            'Email',
+            'Phone',
+            'Date of Birth',
+            'Total Appointments',
+            'Total Treatments',
+            'Total Payments',
+            'Created Date'
+        ];
+
+        $dataMapper = function($patient) {
+            return [
+                $patient->id,
+                $patient->first_name,
+                $patient->last_name,
+                $patient->email,
+                $patient->phone,
+                $patient->date_of_birth ? Carbon::parse($patient->date_of_birth)->format('Y-m-d') : 'N/A',
+                $patient->appointments_count ?? 0,
+                $patient->treatments_count ?? 0,
+                $patient->payments_sum_amount ?? 0,
+                $patient->created_at ? Carbon::parse($patient->created_at)->format('Y-m-d') : 'N/A'
+            ];
+        };
+
+        return $this->exportData(
+            $query,
+            'patients_report',
+            $headers,
+            $this->detectFormat(),
+            $dataMapper,
+            $clinic->id
+        );
+    }
+
+    /**
+     * Export appointments report
+     */
+    public function exportAppointments(Request $request)
+    {
+        $clinic = Auth::user()->clinic;
+        
+        $query = $clinic->appointments()
+            ->with(['patient', 'assignedDentist', 'type', 'status']);
+
+        // Apply filters
+        $query = $this->applyAppointmentFilters($query, $request);
+
+        $headers = [
+            'ID',
+            'Patient Name',
+            'Dentist',
+            'Type',
+            'Status',
+            'Scheduled Date',
+            'Duration',
+            'Notes',
+            'Created Date'
+        ];
+
+        $dataMapper = function($appointment) {
+            return [
+                $appointment->id,
+                $appointment->patient ? 
+                    trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name) : 
+                    'N/A',
+                $appointment->assignedDentist ? $appointment->assignedDentist->name : 'N/A',
+                $appointment->type ? $appointment->type->name : 'N/A',
+                $appointment->status ? $appointment->status->name : 'N/A',
+                $appointment->scheduled_at ? 
+                    Carbon::parse($appointment->scheduled_at)->format('Y-m-d H:i') : 
+                    'N/A',
+                $appointment->duration ? $appointment->duration . ' min' : 'N/A',
+                $appointment->notes ?? 'N/A',
+                $appointment->created_at ? Carbon::parse($appointment->created_at)->format('Y-m-d') : 'N/A'
+            ];
+        };
+
+        return $this->exportData(
+            $query,
+            'appointments_report',
+            $headers,
+            $this->detectFormat(),
+            $dataMapper,
+            $clinic->id
+        );
+    }
+
+    /**
+     * Export revenue report
+     */
+    public function exportRevenue(Request $request)
+    {
+        $clinic = Auth::user()->clinic;
+        
+        $query = $clinic->payments()
+            ->with(['patient', 'treatment']);
+
+        // Apply filters using the existing trait method
+        $query = $this->applyExportFilters($query, $request);
+
+        return $this->exportData(
+            $query,
+            'revenue_report',
+            $this->getPaymentExportHeaders(),
+            $this->detectFormat(),
+            [$this, 'mapPaymentData'],
+            $clinic->id
+        );
+    }
+
+    /**
+     * Export treatments report
+     */
+    public function exportTreatments(Request $request)
+    {
+        $clinic = Auth::user()->clinic;
+        
+        $query = $clinic->treatments()
+            ->with(['patient', 'dentist', 'service']);
+
+        // Apply filters
+        $query = $this->applyTreatmentFilters($query, $request);
+
+        $headers = [
+            'ID',
+            'Patient Name',
+            'Dentist',
+            'Service',
+            'Cost',
+            'Status',
+            'Start Date',
+            'End Date',
+            'Diagnosis',
+            'Notes'
+        ];
+
+        $dataMapper = function($treatment) {
+            return [
+                $treatment->id,
+                $treatment->patient ? 
+                    trim($treatment->patient->first_name . ' ' . $treatment->patient->last_name) : 
+                    'N/A',
+                $treatment->dentist ? $treatment->dentist->name : 'N/A',
+                $treatment->service ? $treatment->service->name : 'N/A',
+                $treatment->cost ?? 'N/A',
+                $treatment->status ?? 'N/A',
+                $treatment->start_date ? 
+                    Carbon::parse($treatment->start_date)->format('Y-m-d') : 
+                    'N/A',
+                $treatment->end_date ? 
+                    Carbon::parse($treatment->end_date)->format('Y-m-d') : 
+                    'N/A',
+                $treatment->diagnosis ?? 'N/A',
+                $treatment->notes ?? 'N/A'
+            ];
+        };
+
+        return $this->exportData(
+            $query,
+            'treatments_report',
+            $headers,
+            $this->detectFormat(),
+            $dataMapper,
+            $clinic->id
+        );
+    }
+
+    /**
+     * Export inventory report
+     */
+    public function exportInventory(Request $request)
+    {
+        $clinic = Auth::user()->clinic;
+        
+        $query = $clinic->inventory()->with('supplier');
+
+        // Apply filters
+        $query = $this->applyInventoryFilters($query, $request);
+
+        $headers = [
+            'ID',
+            'Name',
+            'Category',
+            'Description',
+            'Quantity',
+            'Minimum Quantity',
+            'Unit Price',
+            'Total Value',
+            'Supplier',
+            'Status'
+        ];
+
+        $dataMapper = function($item) {
+            $totalValue = ($item->quantity ?? 0) * ($item->unit_price ?? 0);
+            $status = 'In Stock';
+            if (($item->quantity ?? 0) <= 0) {
+                $status = 'Out of Stock';
+            } elseif (($item->quantity ?? 0) <= ($item->minimum_quantity ?? 0)) {
+                $status = 'Low Stock';
+            }
+
+            return [
+                $item->id,
+                $item->name ?? 'N/A',
+                $item->category ?? 'N/A',
+                $item->description ?? 'N/A',
+                $item->quantity ?? 0,
+                $item->minimum_quantity ?? 0,
+                $item->unit_price ?? 0,
+                number_format($totalValue, 2),
+                $item->supplier->name ?? 'N/A',
+                $status
+            ];
+        };
+
+        return $this->exportData(
+            $query,
+            'inventory_report',
+            $headers,
+            $this->detectFormat(),
+            $dataMapper,
+            $clinic->id
+        );
+    }
+
+    /**
+     * Export comprehensive analytics report
+     */
+    public function exportAnalytics(Request $request)
+    {
+        $clinic = Auth::user()->clinic;
+        
+        // Get date range for filtering
+        $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
+        $dateTo = $request->get('date_to', now()->endOfMonth()->format('Y-m-d'));
+
+        // Compile comprehensive analytics data
+        $analyticsData = collect([
+            (object)[
+                'metric' => 'Total Patients',
+                'value' => $clinic->patients()->count(),
+                'period' => 'All Time',
+                'category' => 'Patients'
+            ],
+            (object)[
+                'metric' => 'Total Appointments',
+                'value' => $clinic->appointments()->count(),
+                'period' => 'All Time',
+                'category' => 'Appointments'
+            ],
+            (object)[
+                'metric' => 'Total Revenue',
+                'value' => $clinic->payments()->where('status', 'completed')->sum('amount'),
+                'period' => 'All Time',
+                'category' => 'Revenue'
+            ],
+            (object)[
+                'metric' => 'Monthly Revenue',
+                'value' => $clinic->payments()
+                    ->where('status', 'completed')
+                    ->whereBetween('payment_date', [$dateFrom, $dateTo])
+                    ->sum('amount'),
+                'period' => $dateFrom . ' to ' . $dateTo,
+                'category' => 'Revenue'
+            ],
+            (object)[
+                'metric' => 'Completed Treatments',
+                'value' => $clinic->treatments()->where('status', 'completed')->count(),
+                'period' => 'All Time',
+                'category' => 'Treatments'
+            ],
+            (object)[
+                'metric' => 'Pending Appointments',
+                'value' => $clinic->appointments()
+                    ->whereHas('status', function($q) {
+                        $q->where('name', 'Pending');
+                    })->count(),
+                'period' => 'Current',
+                'category' => 'Appointments'
+            ]
+        ]);
+
+        $headers = [
+            'Metric',
+            'Value',
+            'Period',
+            'Category'
+        ];
+
+        // Generate filename
+        $filename = 'analytics_report_' . $clinic->id . '_' . now()->format('Y-m-d_H-i-s');
+        $format = $this->detectFormat();
+        $extension = $format === 'excel' ? 'xlsx' : 'csv';
+        $fullFilename = $filename . '.' . $extension;
+
+        if ($format === 'excel') {
+            return $this->exportAnalyticsToExcel($analyticsData, $fullFilename, $headers);
+        } else {
+            return $this->exportAnalyticsToCsv($analyticsData, $fullFilename, $headers);
+        }
+    }
+
+    /**
+     * Export analytics data to CSV
+     */
+    private function exportAnalyticsToCsv($data, $filename, $headers)
+    {
+        $responseHeaders = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($data, $headers) {
+            $file = fopen('php://output', 'w');
+
+            // Write CSV headers
+            fputcsv($file, $headers);
+
+            // Write data rows
+            foreach ($data as $item) {
+                fputcsv($file, [
+                    $item->metric,
+                    $item->value,
+                    $item->period,
+                    $item->category
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $responseHeaders);
+    }
+
+    /**
+     * Export analytics data to Excel
+     */
+    private function exportAnalyticsToExcel($data, $filename, $headers)
+    {
+        $export = new \App\Exports\ExcelExport($data, $headers, null, 'Analytics Report');
+        return \Maatwebsite\Excel\Facades\Excel::download($export, $filename);
+    }
+
+    // Helper methods for applying filters
+
+    private function applyPatientFilters($query, Request $request)
+    {
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'like', "%{$request->search}%")
+                    ->orWhere('last_name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%");
+            });
+        }
+
+        return $query;
+    }
+
+    private function applyAppointmentFilters($query, Request $request)
+    {
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('notes', 'like', "%{$request->search}%")
+                  ->orWhere('reason', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->status) {
+            $statusId = \App\Models\AppointmentStatus::where('name', $request->status)->first()?->id;
+            if ($statusId) {
+                $query->where('appointment_status_id', $statusId);
+            }
+        }
+
+        if ($request->date_from) {
+            $query->where('scheduled_at', '>=', $request->date_from);
+        }
+
+        if ($request->date_to) {
+            $query->where('scheduled_at', '<=', $request->date_to);
+        }
+
+        return $query;
+    }
+
+    private function applyTreatmentFilters($query, Request $request)
+    {
+        if ($request->search) {
+            $query->where('notes', 'like', "%{$request->search}%");
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->category) {
+            $query->whereHas('service', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->category}%");
+            });
+        }
+
+        return $query;
+    }
+
+    private function applyInventoryFilters($query, Request $request)
+    {
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->category) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->stock_status) {
+            if ($request->stock_status === 'low') {
+                $query->where('quantity', '<=', 'minimum_quantity');
+            } elseif ($request->stock_status === 'out') {
+                $query->where('quantity', 0);
+            }
+        }
+
+        return $query;
     }
 }

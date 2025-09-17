@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
+import ExportButton from "@/Components/Reports/ExportButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
@@ -220,14 +221,13 @@ export default function Inventory({
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Button
+                        <ExportButton
+                            exportRoute={`/clinic/${clinic.id}/reports/export/inventory`}
+                            filters={filters}
+                            clinic={clinic}
                             variant="outline"
-                            size="sm"
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                        >
-                            <Download className="w-4 h-4 mr-2" />
-                            Export
-                        </Button>
+                        />
                         <Link href={route("clinic.reports.index", clinic.id)}>
                             <Button
                                 variant="outline"

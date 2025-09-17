@@ -62,9 +62,12 @@
         "react-qr-code": "^2.0.16",
         "recharts": "^3.1.2",
         "sonner": "^2.0.5",
+        "swr": "^2.2.4",
         "swiper": "^11.2.10",
         "tailwind-merge": "^3.3.1",
         "tailwindcss-animate": "^1.0.7",
+        "laravel-echo": "^1.16.1",
+        "pusher-js": "^8.4.0-rc2",
         "ziggy-js": "^2.5.3"
     }
 }

@@ -13,10 +13,11 @@ use Inertia\Inertia;
 use App\Models\Clinic;
 use Carbon\Carbon;
 use App\Traits\SubscriptionAccessControl;
+use App\Traits\ExportTrait;
 
 class PaymentController extends Controller
 {
-    use SubscriptionAccessControl;
+    use SubscriptionAccessControl, ExportTrait;
 
     public function __construct()
     {
@@ -372,56 +373,17 @@ class PaymentController extends Controller
     {
         $query = $clinic->payments()->with(['patient', 'treatment']);
 
-        // Apply filters
-        if ($request->date_from && $request->date_to) {
-            $query->whereBetween('payment_date', [$request->date_from, $request->date_to]);
-        }
+        // Apply filters using the trait method
+        $query = $this->applyExportFilters($query, $request);
 
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->payment_method) {
-            $query->where('payment_method', $request->payment_method);
-        }
-
-        $payments = $query->get();
-
-        $filename = 'payments_' . $clinic->id . '_' . now()->format('Y-m-d_H-i-s') . '.csv';
-
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ];
-
-        $callback = function() use ($payments) {
-            $file = fopen('php://output', 'w');
-
-            // CSV headers
-            fputcsv($file, [
-                'ID', 'Reference Number', 'Patient Name', 'Treatment', 'Amount',
-                'Payment Method', 'Status', 'Category', 'Payment Date', 'Notes'
-            ]);
-
-            foreach ($payments as $payment) {
-                fputcsv($file, [
-                    $payment->id,
-                    $payment->reference_number,
-                    $payment->patient ? $payment->patient->first_name . ' ' . $payment->patient->last_name : 'N/A',
-                    $payment->treatment ? $payment->treatment->name : 'N/A',
-                    $payment->amount,
-                    $payment->payment_method,
-                    $payment->status,
-                    $payment->category,
-                    $payment->payment_date,
-                    $payment->notes,
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return $this->exportData(
+            $query,
+            'payments',
+            $this->getPaymentExportHeaders(),
+            $this->detectFormat(),
+            [$this, 'mapPaymentData'],
+            $clinic->id
+        );
     }
 
     public function receipt(Clinic $clinic, Payment $payment)

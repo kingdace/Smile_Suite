@@ -199,6 +199,44 @@ Route::middleware('auth')->group(function () {
         Route::get('/clinic/{clinic}/dashboard', [DashboardController::class, 'index'])
             ->name('clinic.dashboard');
 
+        // Dashboard API routes for real-time updates
+        Route::get('/clinic/{clinic}/dashboard/metrics', function (Request $request, $clinic) {
+            $timeRange = $request->get('range', 'week');
+            $clinicModel = \App\Models\Clinic::findOrFail($clinic);
+            $metrics = app(\App\Services\DashboardMetricsService::class)->getAllMetrics($clinicModel, $timeRange);
+            
+            return response()->json($metrics);
+        })->name('clinic.dashboard.metrics');
+        
+        Route::get('/clinic/{clinic}/dashboard/chart-data', function (Request $request, $clinic) {
+            $timeRange = $request->get('range', 'week');
+            $clinicModel = \App\Models\Clinic::findOrFail($clinic);
+            $chartData = app(\App\Services\DashboardMetricsService::class)->getChartData($clinicModel, $timeRange);
+            
+            return response()->json($chartData);
+        })->name('clinic.dashboard.chart-data');
+        
+        Route::get('/user/dashboard-layout', function (Request $request) {
+            $user = $request->user();
+            return response()->json([
+                'layout' => $user->dashboard_layout ?? null
+            ]);
+        })->name('user.dashboard-layout.get');
+        
+        Route::post('/user/dashboard-layout', function (Request $request) {
+            $user = $request->user();
+            $layout = $request->validate([
+                'layout' => 'required|array'
+            ]);
+            
+            $user->update(['dashboard_layout' => $layout['layout']]);
+            
+            return response()->json([
+                'success' => true,
+                'layout' => $user->dashboard_layout
+            ]);
+        })->name('user.dashboard-layout.save');
+
         // Patient search route
         Route::get('clinic/{clinic}/patients/search', [PatientController::class, 'search'])
             ->name('clinic.patients.search');
@@ -346,6 +384,37 @@ Route::middleware('auth')->group(function () {
             ->name('clinic.reports.inventory');
         Route::get('clinic/{clinic}/reports/treatments', [ReportController::class, 'treatments'])
             ->name('clinic.reports.treatments');
+
+        // Export Routes for Reports
+        Route::get('clinic/{clinic}/reports/export/patients', [ReportController::class, 'exportPatients'])
+            ->name('clinic.reports.export.patients');
+        Route::get('clinic/{clinic}/reports/export/appointments', [ReportController::class, 'exportAppointments'])
+            ->name('clinic.reports.export.appointments');
+        Route::get('clinic/{clinic}/reports/export/revenue', [ReportController::class, 'exportRevenue'])
+            ->name('clinic.reports.export.revenue');
+        Route::get('clinic/{clinic}/reports/export/treatments', [ReportController::class, 'exportTreatments'])
+            ->name('clinic.reports.export.treatments');
+        Route::get('clinic/{clinic}/reports/export/inventory', [ReportController::class, 'exportInventory'])
+            ->name('clinic.reports.export.inventory');
+        Route::get('clinic/{clinic}/reports/export/analytics', [ReportController::class, 'exportAnalytics'])
+            ->name('clinic.reports.export.analytics');
+
+        // Test export route for debugging
+        Route::get('clinic/{clinic}/reports/test-export', function(\App\Models\Clinic $clinic) {
+            return response()->json([
+                'message' => 'Export routes are working!',
+                'clinic_id' => $clinic->id,
+                'clinic_name' => $clinic->name,
+                'available_exports' => [
+                    'patients' => route('clinic.reports.export.patients', $clinic->id),
+                    'appointments' => route('clinic.reports.export.appointments', $clinic->id),
+                    'revenue' => route('clinic.reports.export.revenue', $clinic->id),
+                    'treatments' => route('clinic.reports.export.treatments', $clinic->id),
+                    'inventory' => route('clinic.reports.export.inventory', $clinic->id),
+                    'analytics' => route('clinic.reports.export.analytics', $clinic->id),
+                ]
+            ]);
+        })->name('clinic.reports.test.export');
 
         // Holidays Routes
         Route::get('clinic/{clinic}/holidays', [ClinicHolidayController::class, 'index'])->name('clinic.holidays.index');

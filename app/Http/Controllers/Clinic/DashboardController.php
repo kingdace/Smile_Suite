@@ -9,6 +9,7 @@ use App\Models\Inventory;
 use App\Models\Patient;
 use App\Models\Treatment;
 use App\Services\SubscriptionService;
+use App\Services\DashboardMetricsService;
 use App\Traits\SubscriptionAccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,11 +20,13 @@ class DashboardController extends Controller
     use SubscriptionAccessControl;
 
     protected $subscriptionService;
+    protected $dashboardMetricsService;
 
-    public function __construct(SubscriptionService $subscriptionService)
+    public function __construct(SubscriptionService $subscriptionService, DashboardMetricsService $dashboardMetricsService)
     {
         $this->middleware(['auth', 'verified']);
         $this->subscriptionService = $subscriptionService;
+        $this->dashboardMetricsService = $dashboardMetricsService;
     }
 
     public function index(Request $request, Clinic $clinic)
@@ -32,6 +35,13 @@ class DashboardController extends Controller
         $this->checkSubscriptionAccess();
 
         $user = Auth::user();
+        
+        // Get time range from request, default to 'week'
+        $timeRange = $request->get('range', 'week');
+        $validRanges = ['today', 'week', 'month', 'quarter', 'year'];
+        if (!in_array($timeRange, $validRanges)) {
+            $timeRange = 'week';
+        }
 
         // Check if user is inactive
         if ($user->user_type === 'clinic_staff' && !$user->is_active) {
@@ -104,7 +114,10 @@ class DashboardController extends Controller
         // Get subscription duration information
         $subscriptionDuration = $this->subscriptionService->getSubscriptionDuration($clinic);
 
-        // Calculate statistics
+        // Get advanced metrics using the new service
+        $advancedMetrics = $this->dashboardMetricsService->getAllMetrics($clinic, $timeRange);
+
+        // Calculate statistics (keeping existing for backward compatibility)
         $stats = [
             'total_patients' => Patient::where('clinic_id', $clinic->id)->count(),
             'today_appointments' => $todayAppointments->count(),
@@ -136,6 +149,14 @@ class DashboardController extends Controller
             'patientRescheduledAppointments' => $patientRescheduledAppointments,
             'stats' => $stats,
             'subscription_duration' => $subscriptionDuration,
+            // New advanced metrics data
+            'metrics' => $advancedMetrics,
+            'current_time_range' => $timeRange,
+            'available_time_ranges' => $validRanges,
+            'revenue_metrics' => $advancedMetrics['revenue'],
+            'appointment_metrics' => $advancedMetrics['appointments'],
+            'satisfaction_metrics' => $advancedMetrics['satisfaction'],
+            'chart_data' => $advancedMetrics['charts'],
         ]);
     }
 

@@ -1,4 +1,6 @@
+import React, { useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
+import ExportButton from "@/Components/Reports/ExportButton";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
@@ -143,13 +145,13 @@ export default function PatientsReport({
                                     <ArrowLeft className="h-4 w-4" />
                                     Back
                                 </Button>
-                                <Button
+                                <ExportButton
+                                    exportRoute={`/clinic/${clinic.id}/reports/export/patients`}
+                                    filters={filters}
+                                    clinic={clinic}
                                     variant="outline"
                                     className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
-                                >
-                                    <Download className="h-4 w-4" />
-                                    Export
-                                </Button>
+                                />
                             </div>
                         </div>
                     </div>

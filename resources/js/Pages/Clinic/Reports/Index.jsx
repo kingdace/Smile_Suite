@@ -104,6 +104,7 @@ import {
     Funnel as RechartsFunnel,
 } from "recharts";
 import { useState, useEffect } from "react";
+import ExportButton from "@/Components/Reports/ExportButton";
 
 export default function ReportsIndex({
     auth,
@@ -260,16 +261,15 @@ export default function ReportsIndex({
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="gap-2 border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50"
-                                >
-                                    <Download className="w-4 h-4 text-blue-600" />
-                                    Export
-                                </Button>
+                                <ExportButton
+                                    exportRoute={`/clinic/${clinic.id}/reports/export/analytics`}
+                                    filters={filters}
+                                    clinic={clinic}
+                                    className="border-2 border-blue-200 hover:border-blue-300 hover:bg-blue-50"
+                                />
                                 <Button
                                     size="sm"
+                                    onClick={() => window.location.reload()}
                                     className="gap-2 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
                                     <RefreshCw className="w-4 h-4" />
