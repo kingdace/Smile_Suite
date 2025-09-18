@@ -187,34 +187,97 @@ class ReportController extends Controller
         $clinic = Auth::user()->clinic;
 
         $query = $clinic->patients()
-            ->withCount(['appointments', 'treatments'])
-            ->withSum('payments', 'amount');
+            ->withCount(['appointments', 'treatments', 'payments'])
+            ->withSum('payments', 'amount')
+            ->withAvg('reviews', 'rating')
+            ->with(['user', 'appointments' => function($q) {
+                $q->latest()->limit(3)->with(['status', 'type']);
+            }, 'treatments' => function($q) {
+                $q->latest()->limit(3)->with('service');
+            }, 'payments' => function($q) {
+                $q->latest()->limit(3);
+            }]);
 
+        // Enhanced filtering
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('first_name', 'like', "%{$request->search}%")
                     ->orWhere('last_name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%");
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('phone_number', 'like', "%{$request->search}%");
             });
+        }
+
+        if ($request->category) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->status) {
+            switch ($request->status) {
+                case 'new':
+                    $query->new();
+                    break;
+                case 'active':
+                    $query->active();
+                    break;
+                case 'inactive':
+                    $query->inactive();
+                    break;
+            }
+        }
+
+        if ($request->age_range) {
+            $ageRanges = explode('-', $request->age_range);
+            if (count($ageRanges) == 2) {
+                $minAge = (int)$ageRanges[0];
+                $maxAge = (int)$ageRanges[1];
+                $query->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN ? AND ?', [$minAge, $maxAge]);
+            }
         }
 
         $patients = $query->latest()->paginate(15);
 
-        // Patient statistics
+        // Enhanced patient statistics
         $patientStats = [
             'total_patients' => $clinic->patients()->count(),
+            'new_patients' => $clinic->patients()->new()->count(),
+            'active_patients' => $clinic->patients()->active()->count(),
+            'inactive_patients' => $clinic->patients()->inactive()->count(),
             'new_this_month' => $clinic->patients()->whereMonth('created_at', now()->month)->count(),
-            'active_patients' => $clinic->patients()->whereHas('appointments', function ($q) {
-                $q->where('scheduled_at', '>=', now()->subMonths(3));
-            })->count(),
             'total_revenue' => $clinic->patients()->withSum('payments', 'amount')->get()->sum('payments_sum_amount'),
+            'avg_age' => $clinic->patients()->whereNotNull('date_of_birth')->get()->avg(function($patient) {
+                return $patient->date_of_birth ? $patient->date_of_birth->age : 0;
+            }),
+            'verified_emails' => $clinic->patients()->where('email_verified', true)->count(),
+            'with_insurance' => $clinic->patients()->whereNotNull('insurance_provider')->count(),
+        ];
+
+        // Demographics data
+        $demographics = [
+            'age_groups' => $clinic->patients()->whereNotNull('date_of_birth')->get()->groupBy(function($patient) {
+                $age = $patient->date_of_birth->age;
+                if ($age < 18) return '0-17';
+                if ($age < 30) return '18-29';
+                if ($age < 50) return '30-49';
+                if ($age < 65) return '50-64';
+                return '65+';
+            })->map(function($group) {
+                return $group->count();
+            }),
+            'gender_distribution' => $clinic->patients()->whereNotNull('gender')->get()->groupBy('gender')->map(function($group) {
+                return $group->count();
+            }),
+            'categories' => $clinic->patients()->whereNotNull('category')->get()->groupBy('category')->map(function($group) {
+                return $group->count();
+            }),
         ];
 
         return Inertia::render('Clinic/Reports/Patients', [
             'clinic' => $clinic,
             'patients' => $patients,
             'patientStats' => $patientStats,
-            'filters' => $request->only(['search']),
+            'demographics' => $demographics,
+            'filters' => $request->only(['search', 'category', 'status', 'age_range']),
             'auth' => [
                 'user' => [
                     'id' => Auth::id(),
@@ -483,30 +546,54 @@ class ReportController extends Controller
         $query = $this->applyPatientFilters($query, $request);
 
         $headers = [
-            'ID',
+            'Patient ID',
             'First Name',
             'Last Name',
-            'Email',
-            'Phone',
+            'Email Address',
+            'Phone Number',
             'Date of Birth',
+            'Age (Years)',
+            'Gender',
+            'Patient Category',
+            'Patient Status',
+            'Blood Type',
             'Total Appointments',
             'Total Treatments',
-            'Total Payments',
-            'Created Date'
+            'Total Payments (₱)',
+            'Average Rating',
+            'Last Dental Visit',
+            'Insurance Provider',
+            'Emergency Contact Name',
+            'Emergency Contact Phone',
+            'Email Verified',
+            'Has User Account',
+            'Registration Date'
         ];
 
         $dataMapper = function($patient) {
             return [
-                $patient->id,
-                $patient->first_name,
-                $patient->last_name,
-                $patient->email,
-                $patient->phone,
-                $patient->date_of_birth ? Carbon::parse($patient->date_of_birth)->format('Y-m-d') : 'N/A',
+                $patient->id ?? 0,
+                $patient->first_name ?? '',
+                $patient->last_name ?? '',
+                $patient->email ?? '',
+                $patient->phone_number ?? '',
+                $patient->date_of_birth ? Carbon::parse($patient->date_of_birth)->format('Y-m-d') : '',
+                $patient->date_of_birth ? Carbon::parse($patient->date_of_birth)->age : '',
+                $patient->gender ? ucfirst($patient->gender) : '',
+                $patient->category ? ucwords(str_replace('_', ' ', $patient->category)) : '',
+                $patient->status ? ucfirst($patient->status) : '',
+                $patient->blood_type ?? '',
                 $patient->appointments_count ?? 0,
                 $patient->treatments_count ?? 0,
-                $patient->payments_sum_amount ?? 0,
-                $patient->created_at ? Carbon::parse($patient->created_at)->format('Y-m-d') : 'N/A'
+                number_format($patient->payments_sum_amount ?? 0, 2),
+                $patient->reviews_avg_rating ? number_format($patient->reviews_avg_rating, 1) : '',
+                $patient->last_dental_visit ?? '',
+                $patient->insurance_provider ?? '',
+                $patient->emergency_contact_name ?? '',
+                $patient->emergency_contact_number ?? '',
+                $patient->email_verified ? 'Yes' : 'No',
+                $patient->user_id ? 'Yes' : 'No',
+                $patient->created_at ? Carbon::parse($patient->created_at)->format('Y-m-d') : ''
             ];
         };
 
@@ -547,7 +634,7 @@ class ReportController extends Controller
 
         $dataMapper = function($appointment) {
             return [
-                $appointment->id,
+                $appointment->id ?? 0,
                 $appointment->patient ? 
                     trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name) : 
                     'N/A',
@@ -555,11 +642,11 @@ class ReportController extends Controller
                 $appointment->type ? $appointment->type->name : 'N/A',
                 $appointment->status ? $appointment->status->name : 'N/A',
                 $appointment->scheduled_at ? 
-                    Carbon::parse($appointment->scheduled_at)->format('Y-m-d H:i') : 
+                    Carbon::parse($appointment->scheduled_at)->format('Y-m-d H:i:s') : 
                     'N/A',
-                $appointment->duration ? $appointment->duration . ' min' : 'N/A',
+                $appointment->duration ? $appointment->duration . ' minutes' : '0 minutes',
                 $appointment->notes ?? 'N/A',
-                $appointment->created_at ? Carbon::parse($appointment->created_at)->format('Y-m-d') : 'N/A'
+                $appointment->created_at ? Carbon::parse($appointment->created_at)->format('Y-m-d H:i:s') : 'N/A'
             ];
         };
 

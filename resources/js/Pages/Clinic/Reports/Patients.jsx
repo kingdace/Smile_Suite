@@ -49,6 +49,7 @@ export default function PatientsReport({
     clinic,
     patients,
     patientStats,
+    demographics,
     filters,
 }) {
     const formatCurrency = (amount) => {
@@ -89,7 +90,28 @@ export default function PatientsReport({
         });
     };
 
-    // Chart data for patient growth
+    // Chart data for demographics - with error handling
+    const ageGroupData = demographics?.age_groups ? 
+        Object.entries(demographics.age_groups).map(([group, count]) => ({
+            group,
+            count,
+            percentage: patientStats?.total_patients ? ((count / patientStats.total_patients) * 100).toFixed(1) : '0'
+        })) : [];
+
+    const genderData = demographics?.gender_distribution ? 
+        Object.entries(demographics.gender_distribution).map(([gender, count]) => ({
+            name: gender.charAt(0).toUpperCase() + gender.slice(1),
+            value: count,
+            color: gender === 'male' ? '#3B82F6' : gender === 'female' ? '#EC4899' : '#10B981'
+        })) : [];
+
+    const categoryData = demographics?.categories ? 
+        Object.entries(demographics.categories).map(([category, count]) => ({
+            name: category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            value: count
+        })) : [];
+
+    // Patient growth data
     const patientGrowthData = [
         { month: "Jan", patients: 45 },
         { month: "Feb", patients: 52 },
@@ -169,7 +191,7 @@ export default function PatientsReport({
                                         </p>
                                         <p className="text-3xl font-bold text-blue-600">
                                             {formatNumber(
-                                                patientStats.total_patients
+                                                patientStats?.total_patients || 0
                                             )}
                                         </p>
                                     </div>
@@ -195,7 +217,7 @@ export default function PatientsReport({
                                         </p>
                                         <p className="text-3xl font-bold text-green-600">
                                             {formatNumber(
-                                                patientStats.new_this_month
+                                                patientStats?.new_this_month || 0
                                             )}
                                         </p>
                                     </div>
@@ -221,7 +243,7 @@ export default function PatientsReport({
                                         </p>
                                         <p className="text-3xl font-bold text-purple-600">
                                             {formatNumber(
-                                                patientStats.active_patients
+                                                patientStats?.active_patients || 0
                                             )}
                                         </p>
                                     </div>
@@ -247,7 +269,7 @@ export default function PatientsReport({
                                         </p>
                                         <p className="text-3xl font-bold text-orange-600">
                                             {formatCurrency(
-                                                patientStats.total_revenue
+                                                patientStats?.total_revenue || 0
                                             )}
                                         </p>
                                     </div>
@@ -265,45 +287,6 @@ export default function PatientsReport({
                         </Card>
                     </div>
 
-                    {/* Search and Filters */}
-                    <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30 mb-8">
-                        <CardHeader className="pb-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <Search className="h-5 w-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-xl font-bold text-gray-900">
-                                        Search & Filters
-                                    </CardTitle>
-                                    <p className="text-sm text-gray-600">
-                                        Find specific patients or filter results
-                                    </p>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center gap-4">
-                                <div className="flex-1">
-                                    <Input
-                                        type="text"
-                                        placeholder="Search patients by name, email, or phone..."
-                                        defaultValue={filters.search || ""}
-                                        onChange={handleSearch}
-                                        className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
-                                    />
-                                </div>
-                                <Button
-                                    onClick={clearFilters}
-                                    variant="outline"
-                                    className="gap-2 h-12 px-6 rounded-xl"
-                                >
-                                    <RefreshCw className="h-4 w-4" />
-                                    Clear
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
 
                     {/* Charts Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -409,170 +392,175 @@ export default function PatientsReport({
                     </div>
 
                     {/* Patients Table */}
-                    <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30">
-                        <CardHeader className="pb-4">
+                    <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-blue-50/30 overflow-hidden">
+                        <CardHeader className="pb-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-100 rounded-lg">
-                                        <Users className="h-5 w-5 text-blue-600" />
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                                        <Users className="h-6 w-6 text-white" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-xl font-bold text-gray-900">
+                                        <CardTitle className="text-2xl font-bold text-white">
                                             Patient Records
                                         </CardTitle>
-                                        <p className="text-sm text-gray-600">
-                                            Detailed patient information and
-                                            statistics
+                                        <p className="text-blue-100 mt-1">
+                                            Comprehensive patient management overview
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <Badge
-                                        variant="outline"
-                                        className="bg-blue-50 text-blue-700 border-blue-200"
-                                    >
-                                        {patients.total} patients
-                                    </Badge>
-                                </div>
+                                <Badge
+                                    variant="outline"
+                                    className="bg-white/20 text-white border-white/30 backdrop-blur-sm px-4 py-2"
+                                >
+                                    {patients?.total || 0} patients
+                                </Badge>
                             </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-0">
                             <div className="overflow-x-auto">
                                 <table className="w-full">
                                     <thead>
-                                        <tr className="border-b border-gray-200">
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Patient
+                                        <tr className="bg-gradient-to-r from-gray-50 to-blue-50 border-b-2 border-blue-100">
+                                            <th className="text-left py-4 px-6 font-bold text-gray-800">
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="h-4 w-4 text-blue-600" />
+                                                    Patient
+                                                </div>
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Contact
+                                            <th className="text-left py-4 px-6 font-bold text-gray-800">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="h-4 w-4 text-green-600" />
+                                                    Contact
+                                                </div>
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Appointments
+                                            <th className="text-left py-4 px-6 font-bold text-gray-800">
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-4 w-4 text-blue-600" />
+                                                    Appointments
+                                                </div>
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Treatments
+                                            <th className="text-left py-4 px-6 font-bold text-gray-800">
+                                                <div className="flex items-center gap-2">
+                                                    <Stethoscope className="h-4 w-4 text-green-600" />
+                                                    Treatments
+                                                </div>
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Total Spent
+                                            <th className="text-left py-4 px-6 font-bold text-gray-800">
+                                                <div className="flex items-center gap-2">
+                                                    <DollarSign className="h-4 w-4 text-emerald-600" />
+                                                    Total Spent
+                                                </div>
                                             </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Last Visit
-                                            </th>
-                                            <th className="text-left py-3 px-4 font-semibold text-gray-900">
-                                                Actions
+                                            <th className="text-left py-4 px-12 font-bold text-gray-800 w-40">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="h-4 w-4 text-purple-600" />
+                                                    Last Visit
+                                                </div>
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {patients.data.map((patient) => (
+                                    <tbody className="bg-white">
+                                        {patients?.data?.map((patient, index) => (
                                             <tr
                                                 key={patient.id}
-                                                className="border-b border-gray-100 hover:bg-gray-50"
+                                                className={`border-b border-gray-100 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/30 transition-all duration-200 ${
+                                                    index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
+                                                }`}
                                             >
-                                                <td className="py-4 px-4">
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">
-                                                            {patient.first_name}{" "}
-                                                            {patient.last_name}
+                                                <td className="py-4 px-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md shrink-0">
+                                                            {patient.first_name?.charAt(0)}{patient.last_name?.charAt(0)}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-semibold text-gray-900 text-base">
+                                                                {patient.first_name} {patient.last_name}
+                                                            </p>
+                                                            <p className="text-sm text-gray-500 flex items-center gap-1">
+                                                                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                                                                ID: {patient.id}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-6">
+                                                    <div className="space-y-1">
+                                                        <p className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                                                            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+                                                            {patient.email || 'No email'}
                                                         </p>
-                                                        <p className="text-sm text-gray-600">
-                                                            ID: {patient.id}
+                                                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                                                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                                            {patient.phone_number || 'No phone'}
                                                         </p>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4">
-                                                    <div>
-                                                        <p className="text-sm text-gray-900">
-                                                            {patient.email}
-                                                        </p>
-                                                        <p className="text-sm text-gray-600">
-                                                            {
-                                                                patient.phone_number
-                                                            }
+                                                <td className="py-4 px-6">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-blue-200 font-medium shadow-sm"
+                                                    >
+                                                        {patient.appointments_count || 0} appointments
+                                                    </Badge>
+                                                </td>
+                                                <td className="py-4 px-6">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="bg-gradient-to-r from-green-50 to-emerald-100 text-green-700 border-green-200 font-medium shadow-sm"
+                                                    >
+                                                        {patient.treatments_count || 0} treatments
+                                                    </Badge>
+                                                </td>
+                                                <td className="py-4 px-9">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full shadow-sm"></div>
+                                                        <p className="font-bold text-sm text-emerald-600">
+                                                            {formatCurrency(patient.payments_sum_amount || 0)}
                                                         </p>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-4">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="bg-blue-50 text-blue-700 border-blue-200"
-                                                    >
-                                                        {
-                                                            patient.appointments_count
-                                                        }{" "}
-                                                        appointments
-                                                    </Badge>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="bg-green-50 text-green-700 border-green-200"
-                                                    >
-                                                        {
-                                                            patient.treatments_count
-                                                        }{" "}
-                                                        treatments
-                                                    </Badge>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <p className="font-semibold text-green-600">
-                                                        {formatCurrency(
-                                                            patient.payments_sum_amount ||
-                                                                0
-                                                        )}
-                                                    </p>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <p className="text-sm text-gray-600">
-                                                        {formatDate(
-                                                            patient.created_at
-                                                        )}
-                                                    </p>
-                                                </td>
-                                                <td className="py-4 px-4">
-                                                    <Link
-                                                        href={route(
-                                                            "clinic.patients.show",
-                                                            {
-                                                                clinic: clinic.id,
-                                                                patient:
-                                                                    patient.id,
-                                                            }
-                                                        )}
-                                                    >
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="gap-2"
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                            View
-                                                        </Button>
-                                                    </Link>
+                                                <td className="py-4 px-12 w-40">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2 h-2 bg-purple-400 rounded-full shrink-0"></div>
+                                                        <p className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                                            {formatDate(patient.created_at)}
+                                                        </p>
+                                                    </div>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )) || (
+                                            <tr>
+                                                <td colSpan="6" className="py-12 text-center">
+                                                    <div className="flex flex-col items-center gap-3">
+                                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                                            <Users className="h-8 w-8 text-gray-400" />
+                                                        </div>
+                                                        <p className="text-gray-500 font-medium">No patients found</p>
+                                                        <p className="text-gray-400 text-sm">Start by adding your first patient</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
 
                             {/* Pagination */}
-                            {patients.links && patients.links.length > 3 && (
-                                <div className="flex items-center justify-between mt-6">
-                                    <div className="text-sm text-gray-600">
-                                        Showing {patients.from} to {patients.to}{" "}
-                                        of {patients.total} results
+                            {patients?.links && patients.links.length > 3 && (
+                                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
+                                    <div className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        Showing {patients.from || 0} to {patients.to || 0} of {patients.total || 0} results
                                     </div>
                                     <div className="flex gap-2">
                                         {patients.links.map((link, index) => (
                                             <Link
                                                 key={index}
                                                 href={link.url}
-                                                className={`px-3 py-2 text-sm rounded-lg border ${
+                                                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
                                                     link.active
-                                                        ? "bg-blue-600 text-white border-blue-600"
-                                                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-md"
+                                                        : "bg-white text-gray-700 border-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 shadow-sm"
                                                 }`}
                                                 dangerouslySetInnerHTML={{
                                                     __html: link.label,

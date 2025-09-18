@@ -111,6 +111,11 @@ class Patient extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     // Define the relationship to the User model
     public function user()
     {

@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,7 +15,7 @@ trait ExportTrait
     /**
      * Export data to CSV or Excel format
      *
-     * @param Builder $query The query builder instance
+     * @param Builder|\Illuminate\Database\Eloquent\Relations\Relation $query The query builder instance or relation
      * @param string $filename Base filename without extension
      * @param array $headers Array of column headers
      * @param string $format Export format ('csv' or 'excel')
@@ -23,7 +24,7 @@ trait ExportTrait
      * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     protected function exportData(
-        Builder $query,
+        $query,
         string $filename,
         array $headers,
         string $format = 'csv',
@@ -318,20 +319,20 @@ trait ExportTrait
     protected function mapPaymentData($payment): array
     {
         return [
-            $payment->id,
-            $payment->reference_number,
+            $payment->id ?? 0,
+            $payment->reference_number ?? 'N/A',
             $payment->patient ? 
                 trim($payment->patient->first_name . ' ' . $payment->patient->last_name) : 
                 'N/A',
             $payment->treatment ? $payment->treatment->name : 'N/A',
-            $payment->amount,
-            $payment->payment_method,
-            $payment->status,
-            $payment->category,
+            number_format($payment->amount ?? 0, 2),
+            $payment->payment_method ?? 'N/A',
+            $payment->status ?? 'N/A',
+            $payment->category ?? 'N/A',
             $payment->payment_date ? 
-                Carbon::parse($payment->payment_date)->format('Y-m-d') : 
+                Carbon::parse($payment->payment_date)->format('Y-m-d H:i:s') : 
                 'N/A',
-            $payment->notes,
+            $payment->notes ?? 'N/A',
         ];
     }
 }

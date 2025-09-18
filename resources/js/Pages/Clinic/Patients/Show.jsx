@@ -24,8 +24,95 @@ import {
 } from "lucide-react";
 
 export default function Show({ auth, patient }) {
+    // Safety check for patient data
+    if (!patient) {
+        return (
+            <AuthenticatedLayout user={auth.user}>
+                <Head title="Patient Not Found" />
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center py-12">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-4">Patient Not Found</h1>
+                            <p className="text-gray-600 mb-6">The patient you're looking for doesn't exist or you don't have permission to view it.</p>
+                            <Link href={route('clinic.patients.index', { clinic: auth.clinic_id })}>
+                                <Button>
+                                    <ArrowLeft className="h-4 w-4 mr-2" />
+                                    Back to Patients
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </AuthenticatedLayout>
+        );
+    }
+
     const formatDate = (date) => {
         return date ? format(new Date(date), "MMMM d, yyyy") : "Not specified";
+    };
+
+    const formatAppointmentNotes = (notes) => {
+        if (!notes) return null;
+        
+        // Check if it's a system-generated reschedule message
+        if (notes.includes("Reschedule") || notes.includes("BROAWS")) {
+            // Count reschedule attempts
+            const rescheduleCount = (notes.match(/Reschedule/g) || []).length;
+            
+            // Extract meaningful reasons (filter out system codes)
+            const reasonMatches = notes.match(/Reason: ([^.]+)/g);
+            const meaningfulReasons = [];
+            
+            if (reasonMatches) {
+                reasonMatches.forEach(match => {
+                    const reason = match.replace("Reason: ", "").trim();
+                    // Filter out system codes and meaningless text
+                    if (reason && 
+                        !reason.includes("BROAWS") && 
+                        !reason.includes("qwe") && 
+                        !reason.includes("No available slots") &&
+                        reason.length > 3) {
+                        meaningfulReasons.push(reason);
+                    }
+                });
+            }
+            
+            let formattedNote = "📅 Appointment Rescheduled";
+            
+            if (rescheduleCount > 1) {
+                formattedNote += ` (${rescheduleCount} times)`;
+            }
+            
+            if (meaningfulReasons.length > 0) {
+                // Show the most recent meaningful reason
+                const lastReason = meaningfulReasons[meaningfulReasons.length - 1];
+                formattedNote += `\n💬 Latest reason: ${lastReason}`;
+            }
+            
+            // Check if appointment was approved
+            if (notes.includes("approved by clinic")) {
+                formattedNote += `\n✅ Reschedule approved by clinic`;
+            }
+            
+            return formattedNote;
+        }
+        
+        // Check for other system messages
+        if (notes.includes("denied by clinic")) {
+            return "❌ Reschedule request denied by clinic";
+        }
+        
+        if (notes.includes("cancelled")) {
+            return "🚫 Appointment cancelled";
+        }
+        
+        // For regular notes, clean up and format nicely
+        const cleanNotes = notes.trim();
+        if (cleanNotes.length > 150) {
+            return cleanNotes.substring(0, 150) + "...";
+        }
+        
+        return cleanNotes;
     };
 
     const getAddressString = () => {
@@ -49,14 +136,15 @@ export default function Show({ auth, patient }) {
 
         // Handle string values for last_dental_visit
         if (
-            patient.last_dental_visit.includes("Within 3 months") ||
+            patient.last_dental_visit &&
+            (patient.last_dental_visit.includes("Within 3 months") ||
             patient.last_dental_visit.includes("Within 6 months") ||
-            patient.last_dental_visit.includes("Within 1 year")
+            patient.last_dental_visit.includes("Within 1 year"))
         ) {
             return "active";
         }
 
-        if (patient.last_dental_visit.includes("More than 1 year")) {
+        if (patient.last_dental_visit && patient.last_dental_visit.includes("More than 1 year")) {
             return "inactive";
         }
 
@@ -765,7 +853,7 @@ export default function Show({ auth, patient }) {
                     </Card>
 
                     <Tabs defaultValue="appointments" className="mt-8">
-                        <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-xl">
+                        {/* <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-xl">
                             <TabsTrigger
                                 value="appointments"
                                 className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200"
@@ -787,7 +875,7 @@ export default function Show({ auth, patient }) {
                                 <Shield className="h-4 w-4 mr-2" />
                                 Payments
                             </TabsTrigger>
-                        </TabsList>
+                        </TabsList> */}
 
                         <TabsContent value="appointments" className="mt-6">
                             <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
@@ -865,12 +953,17 @@ export default function Show({ auth, patient }) {
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                {appointment.notes && (
-                                                                    <p className="text-gray-700 ml-11">
-                                                                        {
-                                                                            appointment.notes
-                                                                        }
-                                                                    </p>
+                                                                {formatAppointmentNotes(appointment.notes) && (
+                                                                    <div className="ml-11 mt-3">
+                                                                        <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 rounded-lg p-3 border border-blue-200/50 shadow-sm">
+                                                                            <div className="flex items-start gap-2">
+                                                                                <FileText className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                                                                                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                                                                                    {formatAppointmentNotes(appointment.notes)}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                             <Badge
@@ -885,11 +978,11 @@ export default function Show({ auth, patient }) {
                                                                 }`}
                                                             >
                                                                 {appointment.status
-                                                                    .charAt(0)
-                                                                    .toUpperCase() +
-                                                                    appointment.status.slice(
-                                                                        1
-                                                                    )}
+                                                                    ? appointment.status
+                                                                        .charAt(0)
+                                                                        .toUpperCase() +
+                                                                    appointment.status.slice(1)
+                                                                    : "Pending"}
                                                             </Badge>
                                                         </div>
                                                     </div>

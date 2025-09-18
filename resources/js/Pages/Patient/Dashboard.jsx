@@ -49,6 +49,70 @@ const AppointmentsSection = ({ appointments = [] }) => {
     const [showRescheduleModal, setShowRescheduleModal] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const formatAppointmentNotes = (notes) => {
+        if (!notes) return null;
+        
+        // Check if it's a system-generated reschedule message
+        if (notes.includes("Reschedule") || notes.includes("BROAWS")) {
+            // Count reschedule attempts
+            const rescheduleCount = (notes.match(/Reschedule/g) || []).length;
+            
+            // Extract meaningful reasons (filter out system codes)
+            const reasonMatches = notes.match(/Reason: ([^.]+)/g);
+            const meaningfulReasons = [];
+            
+            if (reasonMatches) {
+                reasonMatches.forEach(match => {
+                    const reason = match.replace("Reason: ", "").trim();
+                    // Filter out system codes and meaningless text
+                    if (reason && 
+                        !reason.includes("BROAWS") && 
+                        !reason.includes("qwe") && 
+                        !reason.includes("No available slots") &&
+                        reason.length > 3) {
+                        meaningfulReasons.push(reason);
+                    }
+                });
+            }
+            
+            let formattedNote = "📅 Rescheduled";
+            
+            if (rescheduleCount > 1) {
+                formattedNote += ` (${rescheduleCount}x)`;
+            }
+            
+            if (meaningfulReasons.length > 0) {
+                // Show the most recent meaningful reason
+                const lastReason = meaningfulReasons[meaningfulReasons.length - 1];
+                formattedNote += ` - ${lastReason}`;
+            }
+            
+            // Check if appointment was approved
+            if (notes.includes("approved by clinic")) {
+                formattedNote += " ✅";
+            }
+            
+            return formattedNote;
+        }
+        
+        // Check for other system messages
+        if (notes.includes("denied by clinic")) {
+            return "❌ Reschedule request denied";
+        }
+        
+        if (notes.includes("cancelled")) {
+            return "🚫 Appointment cancelled";
+        }
+        
+        // For regular notes, clean up and format nicely
+        const cleanNotes = notes.trim();
+        if (cleanNotes.length > 80) {
+            return cleanNotes.substring(0, 80) + "...";
+        }
+        
+        return cleanNotes;
+    };
     const getStatusIcon = (status) => {
         switch (status?.toLowerCase()) {
             case "pending":
@@ -242,10 +306,17 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             {appointment.reason ||
                                                 "No reason specified"}
                                         </p>
-                                        {appointment.notes && (
-                                            <p className="text-xs text-gray-400 mt-1">
-                                                Notes: {appointment.notes}
-                                            </p>
+                                        {formatAppointmentNotes(appointment.notes) && (
+                                            <div className="mt-2">
+                                                <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 rounded-lg p-2 border border-blue-200/50">
+                                                    <div className="flex items-start gap-2">
+                                                        <FileText className="h-3 w-3 text-blue-500 mt-0.5 shrink-0" />
+                                                        <p className="text-xs text-gray-600 leading-relaxed">
+                                                            {formatAppointmentNotes(appointment.notes)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="flex flex-col gap-2">
