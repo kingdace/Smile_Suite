@@ -117,7 +117,10 @@ class AppointmentController extends Controller
         return Inertia::render('Clinic/Appointments/CreateSimplified', [
             'clinic' => $clinic,
             'types' => AppointmentType::all(),
-            'statuses' => AppointmentStatus::all(),
+            'statuses' => AppointmentStatus::all()
+                ->unique('name')
+                ->sortBy('name')
+                ->values(),
             'dentists' => $clinic->users()
                 ->where('role', 'dentist')
                 ->where('is_active', true)
@@ -279,7 +282,10 @@ class AppointmentController extends Controller
             'clinic' => $clinic,
             'appointment' => $appointment,
             'types' => AppointmentType::all(),
-            'statuses' => AppointmentStatus::all(),
+            'statuses' => AppointmentStatus::all()
+                ->unique('name')
+                ->sortBy('name')
+                ->values(),
             'dentists' => $clinic->users()->where('role', 'dentist')->get(),
             'services' => $clinic->services()->active()->get(),
             'auth' => [
@@ -322,8 +328,20 @@ class AppointmentController extends Controller
                 $validated['service_id'] = null;
             }
 
-            // Use the appointment service to update the appointment
-            $updatedAppointment = $this->appointmentService->updateAppointment($appointment, $validated);
+            // Calculate new end time if scheduled_at or duration changed
+            if (isset($validated['scheduled_at']) || isset($validated['duration'])) {
+                $scheduledAt = \Carbon\Carbon::parse($validated['scheduled_at'] ?? $appointment->scheduled_at);
+                $duration = $validated['duration'] ?? $appointment->duration;
+                $validated['ended_at'] = $scheduledAt->copy()->addMinutes($duration);
+            }
+
+            // Handle cancellation
+            if (isset($validated['appointment_status_id']) && $validated['appointment_status_id'] == 4) { // Cancelled
+                $validated['cancelled_at'] = now();
+            }
+
+            // Update appointment directly (like rescheduleAppointment does) to avoid service validation conflicts
+            $appointment->update($validated);
 
             return redirect()->route('clinic.appointments.show', [$clinic->id, $appointment->id])
                 ->with('success', 'Appointment updated successfully.');

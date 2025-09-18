@@ -1,8 +1,10 @@
 import { Head, useForm } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
+import { useToast, ToastContainer } from "@/Components/ui/toast";
 import {
     Select,
     SelectContent,
@@ -30,7 +32,7 @@ import {
     MessageSquare,
     Bell,
 } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { format, parseISO } from "date-fns";
 
 export default function Edit({
@@ -42,6 +44,8 @@ export default function Edit({
     dentists,
     services,
 }) {
+    const { toasts, removeToast, showSuccess, showError } = useToast();
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     // Helper function to format datetime for datetime-local input
     const formatDateTimeForInput = (dateTimeString) => {
         if (!dateTimeString) return "";
@@ -66,10 +70,10 @@ export default function Edit({
         }
     };
 
-    const { data, setData, put, processing, errors } = useForm({
-        appointment_type_id: appointment.appointment_type_id,
-        appointment_status_id: appointment.appointment_status_id,
-        assigned_to: appointment.assigned_to || "unassigned",
+    const { data, setData, put, processing, errors, isDirty } = useForm({
+        appointment_type_id: String(appointment.appointment_type_id || ""),
+        appointment_status_id: String(appointment.appointment_status_id || ""),
+        assigned_to: String(appointment.assigned_to || "unassigned"),
         scheduled_at: formatDateTimeForInput(appointment.scheduled_at),
         ended_at: formatDateTimeForInput(appointment.ended_at),
         duration: String(appointment.duration || 30),
@@ -77,8 +81,8 @@ export default function Edit({
         notes: appointment.notes || "",
         cancellation_reason: appointment.cancellation_reason || "",
         payment_status: appointment.payment_status || "pending",
-        service_id: appointment.service_id || "none",
-        is_follow_up: appointment.is_follow_up || false,
+        service_id: String(appointment.service_id || "none"),
+        is_follow_up: Boolean(appointment.is_follow_up),
         previous_visit_date: formatDateForInput(
             appointment.previous_visit_date
         ),
@@ -89,7 +93,77 @@ export default function Edit({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("clinic.appointments.update", [clinic.id, appointment.id]));
+        e.stopPropagation();
+        
+        // Convert form data to proper types for backend
+        const submitData = {
+            appointment_type_id: parseInt(data.appointment_type_id) || null,
+            appointment_status_id: parseInt(data.appointment_status_id) || null,
+            assigned_to: data.assigned_to === 'unassigned' ? 'unassigned' : String(data.assigned_to),
+            scheduled_at: data.scheduled_at,
+            ended_at: data.ended_at,
+            duration: parseInt(data.duration) || 30,
+            reason: data.reason || '',
+            notes: data.notes || '',
+            cancellation_reason: data.cancellation_reason || '',
+            payment_status: data.payment_status || 'pending',
+            service_id: data.service_id === 'none' ? null : String(data.service_id),
+            is_follow_up: Boolean(data.is_follow_up),
+            previous_visit_date: data.previous_visit_date || '',
+            previous_visit_notes: data.previous_visit_notes || '',
+            send_reminder: Boolean(data.send_reminder),
+            reminder_type: data.reminder_type || 'email'
+        };
+
+        // Validate required fields before submission
+        if (!submitData.appointment_type_id || !submitData.appointment_status_id) {
+            showError(
+                "Validation Error",
+                "Please select both appointment type and status."
+            );
+            return;
+        }
+        
+        router.put(route("clinic.appointments.update", [clinic.id, appointment.id]), submitData, {
+            onSuccess: (page) => {
+                showSuccess(
+                    "Success!",
+                    "Appointment updated successfully."
+                );
+                setHasUnsavedChanges(false);
+            },
+            onError: (errors) => {
+                // Check if there are specific validation errors
+                if (errors && Object.keys(errors).length > 0) {
+                    const errorMessages = Object.values(errors).flat().join(', ');
+                    showError(
+                        "Validation Error",
+                        errorMessages
+                    );
+                } else {
+                    showError(
+                        "Error",
+                        "Failed to update appointment. Please check the form and try again."
+                    );
+                }
+            },
+            preserveScroll: true
+        });
+        
+        return false; // Prevent any default form submission
+    };
+
+    const handleCancel = (e) => {
+        e.preventDefault();
+        if (isDirty) {
+            const confirmed = window.confirm(
+                "You have unsaved changes. Are you sure you want to leave without saving?"
+            );
+            if (!confirmed) {
+                return;
+            }
+        }
+        window.location.href = route("clinic.appointments.show", [clinic.id, appointment.id]);
     };
 
     const getStatusColor = (statusName) => {
@@ -130,52 +204,41 @@ export default function Edit({
                 <div className="max-w-7xl mx-auto px-6 py-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <div className="flex items-center gap-4 mb-6">
-                            <Link
-                                href={route("clinic.appointments.show", [
-                                    clinic.id,
-                                    appointment.id,
-                                ])}
-                                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors bg-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                Back to Details
-                            </Link>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-900">
+                        <div className="bg-white rounded-lg shadow-sm border p-6">
+                            <div className="flex items-start justify-between mb-2">
+                                <h1 className="text-2xl font-bold text-gray-900">
                                     Edit Appointment #{appointment.id}
                                 </h1>
-                                <p className="text-gray-600 mt-2">
-                                    Patient: {appointment.patient?.first_name}{" "}
-                                    {appointment.patient?.last_name}
-                                </p>
+                                <Link
+                                    href={route("clinic.appointments.show", [
+                                        clinic.id,
+                                        appointment.id,
+                                    ])}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    <ArrowLeft className="h-4 w-4" />
+                                    Back to Details
+                                </Link>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <Badge
-                                    className={getStatusColor(
-                                        appointment.status?.name
-                                    )}
-                                >
-                                    {appointment.status?.name}
-                                </Badge>
-                                <Badge
-                                    className={getPaymentStatusColor(
-                                        appointment.payment_status
-                                    )}
-                                >
-                                    {appointment.payment_status
-                                        ?.charAt(0)
-                                        .toUpperCase() +
-                                        appointment.payment_status?.slice(1)}
-                                </Badge>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                                <div className="flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    <span>
+                                        {appointment.patient?.first_name}{" "}
+                                        {appointment.patient?.last_name}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>
+                                        {format(parseISO(appointment.scheduled_at), "PPP 'at' p")}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} method="POST" action="#">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Main Form */}
                             <div className="lg:col-span-2 space-y-6">
@@ -215,7 +278,7 @@ export default function Edit({
                                                         {types.map((type) => (
                                                             <SelectItem
                                                                 key={type.id}
-                                                                value={type.id}
+                                                                value={String(type.id)}
                                                             >
                                                                 {type.name}
                                                             </SelectItem>
@@ -261,7 +324,7 @@ export default function Edit({
                                                                         status.id
                                                                     }
                                                                     value={
-                                                                        status.id
+                                                                        String(status.id)
                                                                     }
                                                                 >
                                                                     {
@@ -312,7 +375,7 @@ export default function Edit({
                                                                         dentist.id
                                                                     }
                                                                     value={
-                                                                        dentist.id
+                                                                        String(dentist.id)
                                                                     }
                                                                 >
                                                                     {
@@ -361,7 +424,7 @@ export default function Edit({
                                                                         service.id
                                                                     }
                                                                     value={
-                                                                        service.id
+                                                                        String(service.id)
                                                                     }
                                                                 >
                                                                     {
@@ -792,35 +855,18 @@ export default function Edit({
                                     </CardContent>
                                 </Card>
 
-                                {/* Current Appointment Info */}
+                                {/* Current Information - Compact */}
                                 <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
-                                    <CardHeader>
-                                        <CardTitle className="flex items-center gap-2">
+                                    <CardHeader className="pb-4">
+                                        <CardTitle className="flex items-center gap-2 text-lg">
                                             <User className="h-5 w-5" />
                                             Current Information
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="space-y-4">
+                                    <CardContent className="pt-0">
                                         <div className="space-y-3">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-gray-600">
-                                                    Patient
-                                                </span>
-                                                <span className="text-sm font-medium">
-                                                    {
-                                                        appointment.patient
-                                                            ?.first_name
-                                                    }{" "}
-                                                    {
-                                                        appointment.patient
-                                                            ?.last_name
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-gray-600">
-                                                    Current Status
-                                                </span>
+                                            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                                <span className="text-sm font-medium text-gray-700">Status</span>
                                                 <Badge
                                                     className={getStatusColor(
                                                         appointment.status?.name
@@ -829,10 +875,8 @@ export default function Edit({
                                                     {appointment.status?.name}
                                                 </Badge>
                                             </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-gray-600">
-                                                    Payment Status
-                                                </span>
+                                            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                                                <span className="text-sm font-medium text-gray-700">Payment</span>
                                                 <Badge
                                                     className={getPaymentStatusColor(
                                                         appointment.payment_status
@@ -841,20 +885,14 @@ export default function Edit({
                                                     {appointment.payment_status
                                                         ?.charAt(0)
                                                         .toUpperCase() +
-                                                        appointment.payment_status?.slice(
-                                                            1
-                                                        )}
+                                                        appointment.payment_status?.slice(1)}
                                                 </Badge>
                                             </div>
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex items-center justify-between py-2">
+                                                <span className="text-sm font-medium text-gray-700">Created</span>
                                                 <span className="text-sm text-gray-600">
-                                                    Created
-                                                </span>
-                                                <span className="text-sm font-medium">
                                                     {format(
-                                                        new Date(
-                                                            appointment.created_at
-                                                        ),
+                                                        new Date(appointment.created_at),
                                                         "MMM d, yyyy"
                                                     )}
                                                 </span>
@@ -864,42 +902,41 @@ export default function Edit({
                                 </Card>
 
                                 {/* Action Buttons */}
-                                <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
-                                    <CardContent className="p-6">
-                                        <div className="space-y-3">
-                                            <Button
-                                                type="submit"
-                                                disabled={processing}
-                                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                                            >
-                                                <Save className="h-4 w-4 mr-2" />
-                                                {processing
-                                                    ? "Updating..."
-                                                    : "Update Appointment"}
-                                            </Button>
-
-                                            <Link
-                                                href={route(
-                                                    "clinic.appointments.show",
-                                                    [clinic.id, appointment.id]
-                                                )}
-                                            >
+                                <div className="sticky top-6">
+                                    <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
+                                        <CardContent className="p-4">
+                                            <div className="space-y-3">
                                                 <Button
+                                                    type="submit"
+                                                    disabled={processing}
+                                                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md"
+                                                    size="lg"
+                                                >
+                                                    <Save className="h-4 w-4 mr-2" />
+                                                    {processing
+                                                        ? "Updating..."
+                                                        : "Update Appointment"}
+                                                </Button>
+
+                                                <Button
+                                                    type="button"
                                                     variant="outline"
-                                                    className="w-full"
+                                                    className="w-full border-gray-300 hover:bg-gray-50"
+                                                    onClick={handleCancel}
                                                 >
                                                     <X className="h-4 w-4 mr-2" />
                                                     Cancel
                                                 </Button>
-                                            </Link>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
+            <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
         </AuthenticatedLayout>
     );
 }

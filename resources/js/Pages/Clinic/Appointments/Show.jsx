@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 
-export default function Show({ auth, clinic, appointment }) {
+export default function Show({ auth, clinic, appointment, flash }) {
     const getStatusColor = (statusName) => {
         const colors = {
             Pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -94,6 +94,18 @@ export default function Show({ auth, clinic, appointment }) {
             <Head title="Appointment Details" />
 
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+                {/* Success Message */}
+                {flash?.success && (
+                    <div className="max-w-7xl mx-auto px-6 pt-6">
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-sm mb-4">
+                            <div className="flex items-center">
+                                <CheckCircle className="w-5 h-5 mr-2" />
+                                <span className="font-medium">{flash.success}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="max-w-7xl mx-auto px-6 py-8">
                     {/* Header with Actions */}
                     <div className="mb-8">
