@@ -80,13 +80,20 @@ const SCHEDULE_TEMPLATES = [
 
 export default function Index({ auth, clinic, schedules, dentists }) {
     const [selectedDentist, setSelectedDentist] = useState(null);
-    const [activeTab, setActiveTab] = useState("list");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState(null);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    const [unifiedScheduleInfo, setUnifiedScheduleInfo] = useState(null);
     const [isLoadingInfo, setIsLoadingInfo] = useState(false);
+    const [dentistInfo, setDentistInfo] = useState(null);
+    const [isCreating, setIsCreating] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(null);
+    const [activeTab, setActiveTab] = useState("list");
+    const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+    const [unifiedScheduleInfo, setUnifiedScheduleInfo] = useState(null);
+    const [isQuickSetup, setIsQuickSetup] = useState(false);
+    const [selectedDays, setSelectedDays] = useState([]);
+    const [isApplyingTemplate, setIsApplyingTemplate] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         user_id: "",
@@ -98,6 +105,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
         is_available: true,
         schedule_type: "weekly",
         notes: "",
+        allow_overlap: false,
+        max_appointments_per_day: null,
     });
 
     const dentistSchedules = selectedDentist
@@ -172,77 +181,236 @@ export default function Index({ auth, clinic, schedules, dentists }) {
     };
 
     const handleTemplateSelect = (template) => {
+        if (!selectedDentist) {
+            toast.error("Please select a dentist first before applying a template");
+            return;
+        }
         setSelectedTemplate(template);
         setIsTemplateDialogOpen(true);
     };
 
     const applyTemplate = () => {
-        if (!selectedTemplate || !selectedDentist) return;
+        if (!selectedTemplate) {
+            toast.error("Please select a template first");
+            return;
+        }
+        
+        if (!selectedDentist) {
+            toast.error("Please select a dentist first");
+            return;
+        }
 
         const templateData = {
             template_key: selectedTemplate.id,
-            dentist_ids: [selectedDentist],
+            dentist_ids: [parseInt(selectedDentist)],
         };
 
-        post(
-            route("clinic.dentist-schedules.create-from-template", {
-                clinic: clinic.id,
-            }),
-            {
-                data: templateData,
-                onSuccess: () => {
-                    toast.success(
-                        `Applied ${selectedTemplate.name} template successfully`
-                    );
-                    setIsTemplateDialogOpen(false);
-                    setSelectedTemplate(null);
-                },
-                onError: (errors) => {
-                    Object.values(errors).forEach((error) =>
-                        toast.error(error)
-                    );
-                },
+        setIsApplyingTemplate(true);
+        
+        // Use fetch instead of Inertia post for better error handling
+        fetch(route("clinic.dentist-schedules.create-from-template", { clinic: clinic.id }), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: JSON.stringify(templateData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                toast.success(data.message || `Applied ${selectedTemplate.name} template successfully`);
+                setIsTemplateDialogOpen(false);
+                setSelectedTemplate(null);
+                // Reload page to show new schedules
+                window.location.reload();
+            } else {
+                toast.error(data.message || "Failed to apply template");
             }
-        );
+            setIsApplyingTemplate(false);
+        })
+        .catch(error => {
+            console.error('Template application error:', error);
+            toast.error("Failed to apply template. Please try again.");
+            setIsApplyingTemplate(false);
+        });
     };
 
     const handleSubmit = () => {
+        console.log('handleSubmit called', { data, isQuickSetup, selectedDays, editingSchedule });
+        
+        // Basic form validation
+        if (!data.user_id) {
+            toast.error("Please select a dentist");
+            return;
+        }
+        
+        // Validate days selection
+        if (isQuickSetup && !editingSchedule) {
+            console.log('Quick Setup validation - selectedDays:', selectedDays);
+            if (selectedDays.length === 0) {
+                toast.error("Please select at least one day");
+                return;
+            }
+            console.log('Quick Setup validation passed');
+        } else {
+            console.log('Single day validation - day_of_week:', data.day_of_week);
+            if (!data.day_of_week && data.day_of_week !== 0) {
+                toast.error("Please select a day of the week");
+                return;
+            }
+            console.log('Single day validation passed');
+        }
+        
+        if (!data.start_time || !data.end_time) {
+            toast.error("Please set both start and end times");
+            return;
+        }
+        if (data.start_time >= data.end_time) {
+            toast.error("End time must be after start time");
+            return;
+        }
+
         if (editingSchedule) {
+            setIsUpdating(true);
             put(
                 route("clinic.dentist-schedules.update", {
                     clinic: clinic.id,
                     schedule: editingSchedule.id,
                 }),
+                data,
                 {
                     onSuccess: () => {
                         toast.success("Schedule updated successfully");
                         reset();
                         setEditingSchedule(null);
                         setIsDialogOpen(false);
+                        setIsUpdating(false);
                     },
                     onError: (errors) => {
-                        Object.values(errors).forEach((error) =>
-                            toast.error(error)
-                        );
+                        console.error('Update errors:', errors);
+                        if (typeof errors === 'object' && errors !== null) {
+                            Object.values(errors).flat().forEach((error) =>
+                                toast.error(error)
+                            );
+                        } else {
+                            toast.error("Failed to update schedule. Please try again.");
+                        }
+                        setIsUpdating(false);
                     },
                 }
             );
         } else {
-            post(
-                route("clinic.dentist-schedules.store", { clinic: clinic.id }),
-                {
-                    onSuccess: () => {
-                        toast.success("Schedule created successfully");
+            setIsCreating(true);
+            
+            // Handle Quick Setup (multiple days)
+            console.log('Checking Quick Setup condition:', { isQuickSetup, selectedDaysLength: selectedDays.length });
+            if (isQuickSetup && selectedDays.length > 0) {
+                console.log('Starting Quick Setup for', selectedDays.length, 'days');
+                const promises = selectedDays.map(dayValue => {
+                    // Transform data for each day (same as single day)
+                    const scheduleData = {
+                        ...data,
+                        user_id: parseInt(data.user_id),
+                        day_of_week: parseInt(dayValue),
+                        buffer_time: parseInt(data.buffer_time) || 15,
+                        slot_duration: parseInt(data.slot_duration) || 30,
+                        is_available: Boolean(data.is_available),
+                        allow_overlap: Boolean(data.allow_overlap),
+                        max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
+                    };
+                    
+                    return fetch(route("clinic.dentist-schedules.store", { clinic: clinic.id }), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: JSON.stringify(scheduleData)
+                    });
+                });
+                
+                Promise.all(promises)
+                    .then(responses => Promise.all(responses.map(r => r.json())))
+                    .then(results => {
+                        const successful = results.filter(r => r.success);
+                        const failed = results.filter(r => !r.success);
+                        
+                        if (successful.length > 0) {
+                            toast.success(`Successfully created ${successful.length} schedule(s)`);
+                        }
+                        
+                        if (failed.length > 0) {
+                            failed.forEach(result => {
+                                toast.error(result.message || "Failed to create schedule");
+                            });
+                        }
+                        
+                        if (successful.length > 0) {
+                            reset();
+                            setIsDialogOpen(false);
+                            setSelectedDays([]);
+                            setIsQuickSetup(false);
+                            // Reload page to show new schedules
+                            window.location.reload();
+                        }
+                        
+                        setIsCreating(false);
+                    })
+                    .catch(error => {
+                        console.error('Bulk create error:', error);
+                        toast.error("Failed to create schedules. Please try again.");
+                        setIsCreating(false);
+                    });
+            } else {
+                // Handle single day creation
+                console.log('About to call post with data:', data);
+                const storeUrl = route("clinic.dentist-schedules.store", { clinic: clinic.id });
+                console.log('Store URL:', storeUrl);
+                
+                // Transform data to ensure correct types
+                const transformedData = {
+                    ...data,
+                    user_id: parseInt(data.user_id),
+                    day_of_week: parseInt(data.day_of_week),
+                    buffer_time: parseInt(data.buffer_time) || 15,
+                    slot_duration: parseInt(data.slot_duration) || 30,
+                    is_available: Boolean(data.is_available),
+                    allow_overlap: Boolean(data.allow_overlap),
+                    max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
+                };
+                console.log('Transformed data:', transformedData);
+                
+                // Use fetch method like the working template application
+                console.log('Using fetch method like template...');
+                fetch(storeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify(transformedData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toast.success(data.message || "Schedule created successfully");
                         reset();
                         setIsDialogOpen(false);
-                    },
-                    onError: (errors) => {
-                        Object.values(errors).forEach((error) =>
-                            toast.error(error)
-                        );
-                    },
-                }
-            );
+                        setIsCreating(false);
+                        // Reload page to show new schedules
+                        window.location.reload();
+                    } else {
+                        toast.error(data.message || "Failed to create schedule");
+                        setIsCreating(false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Create error:', error);
+                    toast.error("Failed to create schedule. Please try again.");
+                    setIsCreating(false);
+                });
+            }
         }
     };
 
@@ -258,12 +426,15 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             is_available: schedule.is_available,
             schedule_type: schedule.schedule_type || "weekly",
             notes: schedule.notes || "",
+            allow_overlap: schedule.allow_overlap || false,
+            max_appointments_per_day: schedule.max_appointments_per_day || null,
         });
         setIsDialogOpen(true);
     };
 
     const handleDelete = (schedule) => {
-        if (confirm("Are you sure you want to delete this schedule?")) {
+        if (confirm("Are you sure you want to delete this schedule? This action cannot be undone.")) {
+            setIsDeleting(schedule.id);
             router.delete(
                 route("clinic.dentist-schedules.destroy", {
                     clinic: clinic.id,
@@ -272,9 +443,18 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                 {
                     onSuccess: () => {
                         toast.success("Schedule deleted successfully");
+                        setIsDeleting(null);
                     },
-                    onError: () => {
-                        toast.error("Failed to delete schedule");
+                    onError: (errors) => {
+                        console.error('Delete errors:', errors);
+                        if (typeof errors === 'object' && errors !== null) {
+                            Object.values(errors).flat().forEach((error) =>
+                                toast.error(error)
+                            );
+                        } else {
+                            toast.error("Failed to delete schedule. Please try again.");
+                        }
+                        setIsDeleting(null);
                     },
                 }
             );
@@ -1034,12 +1214,15 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                                                 template
                                                                             )
                                                                         }
-                                                                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                                                                        className={`w-full ${selectedDentist 
+                                                                            ? "bg-indigo-600 hover:bg-indigo-700" 
+                                                                            : "bg-gray-400 hover:bg-gray-500"
+                                                                        }`}
                                                                         size="sm"
+                                                                        disabled={!selectedDentist}
                                                                     >
                                                                         <Settings className="h-4 w-4 mr-2" />
-                                                                        Apply
-                                                                        Template
+                                                                        Apply Template
                                                                     </Button>
                                                                 </CardContent>
                                                             </Card>
@@ -1061,10 +1244,17 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                 open={isTemplateDialogOpen}
                 onOpenChange={setIsTemplateDialogOpen}
             >
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Apply Schedule Template</DialogTitle>
                         <DialogDescription>
+                            {!selectedDentist && (
+                                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                    <p className="text-yellow-800 text-sm">
+                                        ⚠️ Please select a dentist first before applying a template.
+                                    </p>
+                                </div>
+                            )}
                             {selectedTemplate ? (
                                 <>
                                     Apply the{" "}
@@ -1275,11 +1465,11 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                 </Button>
                                 <Button
                                     onClick={applyTemplate}
-                                    disabled={!selectedDentist || processing}
+                                    disabled={!selectedDentist || isApplyingTemplate}
                                     className="bg-indigo-600 hover:bg-indigo-700"
                                 >
-                                    {processing
-                                        ? "Applying..."
+                                    {isApplyingTemplate
+                                        ? "Applying Template..."
                                         : "Apply Template"}
                                 </Button>
                             </div>
@@ -1290,7 +1480,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
 
             {/* Schedule Form Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>
                             {editingSchedule
@@ -1300,10 +1490,28 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                         <DialogDescription>
                             {editingSchedule
                                 ? "Update the schedule details for the selected dentist."
+                                : isQuickSetup
+                                ? "Create schedules for multiple days with the same settings."
                                 : "Create a new schedule entry for the selected dentist."}
                         </DialogDescription>
+                        {!editingSchedule && (
+                            <div className="flex items-center space-x-2 mt-3 p-3 bg-blue-50 rounded-lg">
+                                <Switch
+                                    checked={isQuickSetup}
+                                    onCheckedChange={(checked) => {
+                                        setIsQuickSetup(checked);
+                                        if (!checked) {
+                                            setSelectedDays([]);
+                                        }
+                                    }}
+                                />
+                                <Label className="text-sm font-medium text-blue-700">
+                                    Quick Setup - Create for multiple days
+                                </Label>
+                            </div>
+                        )}
                     </DialogHeader>
-                    <div className="space-y-4">
+                    <div className="space-y-6 py-2">
                         <div className="space-y-2">
                             <Label>Dentist</Label>
                             <Select
@@ -1329,29 +1537,60 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             </Select>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>Day of Week</Label>
-                            <Select
-                                value={data.day_of_week}
-                                onValueChange={(value) =>
-                                    setData("day_of_week", value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select day" />
-                                </SelectTrigger>
-                                <SelectContent>
+                        {isQuickSetup && !editingSchedule ? (
+                            <div className="space-y-2">
+                                <Label>Select Days</Label>
+                                <div className="grid grid-cols-2 gap-2">
                                     {WORKING_DAYS.map((day) => (
-                                        <SelectItem
-                                            key={day.value}
-                                            value={day.value.toString()}
-                                        >
-                                            {day.label}
-                                        </SelectItem>
+                                        <div key={day.value} className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id={`day-${day.value}`}
+                                                checked={selectedDays.includes(day.value)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedDays([...selectedDays, day.value]);
+                                                    } else {
+                                                        setSelectedDays(selectedDays.filter(d => d !== day.value));
+                                                    }
+                                                }}
+                                                className="rounded border-gray-300"
+                                            />
+                                            <Label htmlFor={`day-${day.value}`} className="text-sm">
+                                                {day.label}
+                                            </Label>
+                                        </div>
                                     ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                    Select multiple days to create schedules with the same settings
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                <Label>Day of Week</Label>
+                                <Select
+                                    value={data.day_of_week}
+                                    onValueChange={(value) =>
+                                        setData("day_of_week", value)
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select day" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {WORKING_DAYS.map((day) => (
+                                            <SelectItem
+                                                key={day.value}
+                                                value={day.value.toString()}
+                                            >
+                                                {day.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -1376,6 +1615,67 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             </div>
                         </div>
 
+                        {/* Advanced Settings */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Buffer Time (minutes)</Label>
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    max="60"
+                                    value={data.buffer_time}
+                                    onChange={(e) =>
+                                        setData("buffer_time", parseInt(e.target.value) || 15)
+                                    }
+                                    placeholder="15"
+                                />
+                                <p className="text-xs text-gray-500">Time between appointments</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Slot Duration (minutes)</Label>
+                                <Input
+                                    type="number"
+                                    min="15"
+                                    max="240"
+                                    value={data.slot_duration}
+                                    onChange={(e) =>
+                                        setData("slot_duration", parseInt(e.target.value) || 30)
+                                    }
+                                    placeholder="30"
+                                />
+                                <p className="text-xs text-gray-500">Default appointment length</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Maximum Appointments Per Day (optional)</Label>
+                            <Input
+                                type="number"
+                                min="1"
+                                max="50"
+                                value={data.max_appointments_per_day || ""}
+                                onChange={(e) =>
+                                    setData("max_appointments_per_day", e.target.value ? parseInt(e.target.value) : null)
+                                }
+                                placeholder="Leave empty for no limit"
+                            />
+                            <p className="text-xs text-gray-500">Limit the number of appointments for this day</p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Notes (optional)</Label>
+                            <Input
+                                type="text"
+                                value={data.notes || ""}
+                                onChange={(e) =>
+                                    setData("notes", e.target.value)
+                                }
+                                placeholder="Add any special notes for this schedule"
+                                maxLength="1000"
+                            />
+                            <p className="text-xs text-gray-500">Special instructions or notes</p>
+                        </div>
+
                         <div className="flex items-center space-x-2">
                             <Switch
                                 checked={data.is_available}
@@ -1386,6 +1686,17 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             <Label>Available for appointments</Label>
                         </div>
 
+                        <div className="flex items-center space-x-2">
+                            <Switch
+                                checked={data.allow_overlap || false}
+                                onCheckedChange={(checked) =>
+                                    setData("allow_overlap", checked)
+                                }
+                            />
+                            <Label>Allow overlapping appointments</Label>
+                            <p className="text-xs text-gray-500 ml-2">(Advanced: allows double-booking)</p>
+                        </div>
+
                         <div className="flex justify-end gap-2">
                             <Button
                                 variant="outline"
@@ -1393,19 +1704,25 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                     setIsDialogOpen(false);
                                     reset();
                                     setEditingSchedule(null);
+                                    setIsQuickSetup(false);
+                                    setSelectedDays([]);
                                 }}
                             >
                                 Cancel
                             </Button>
                             <Button
                                 onClick={handleSubmit}
-                                disabled={processing}
+                                disabled={processing || isCreating || isUpdating}
                             >
-                                {processing
+                                {isCreating
+                                    ? (isQuickSetup && selectedDays.length > 1 ? `Creating ${selectedDays.length} Schedules...` : "Creating...")
+                                    : isUpdating
+                                    ? "Updating..."
+                                    : processing
                                     ? "Saving..."
                                     : editingSchedule
-                                    ? "Update"
-                                    : "Create"}
+                                    ? "Update Schedule"
+                                    : (isQuickSetup && selectedDays.length > 1 ? `Create ${selectedDays.length} Schedules` : "Create Schedule")}
                             </Button>
                         </div>
                     </div>
