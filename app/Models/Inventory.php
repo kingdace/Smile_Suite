@@ -21,69 +21,44 @@ class Inventory extends Model
 
     protected $fillable = [
         'clinic_id',
-        'supplier_id',
+        'supplier_id', // Optional - can be null
         'name',
-        'sku',
-        'barcode',
-        'brand',
-        'model',
-        'size',
-        'color',
         'description',
         'quantity',
         'minimum_quantity',
-        'unit_price',
-        'cost_price',
-        'selling_price',
-        'markup_percentage',
+        'unit_price', // In Philippine Peso (₱)
         'category',
-        'location',
-        'shelf',
-        'rack',
-        'usage_count',
-        'last_used_at',
-        'last_restocked_at',
-        'is_active',
-        'requires_prescription',
-        'is_controlled_substance',
-        'reorder_point',
-        'reorder_quantity',
         'expiry_date',
-        'batch_number',
-        'lot_number',
-        'specifications',
-        'warnings',
-        'instructions',
         'notes',
+        'is_active',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'minimum_quantity' => 'integer',
-        'unit_price' => 'decimal:2',
-        'cost_price' => 'decimal:2',
-        'selling_price' => 'decimal:2',
-        'markup_percentage' => 'decimal:2',
-        'usage_count' => 'integer',
-        'reorder_point' => 'integer',
-        'reorder_quantity' => 'integer',
+        'unit_price' => 'decimal:2', // Philippine Peso format
         'is_active' => 'boolean',
-        'requires_prescription' => 'boolean',
-        'is_controlled_substance' => 'boolean',
         'expiry_date' => 'date',
-        'last_used_at' => 'datetime',
-        'last_restocked_at' => 'datetime',
-        'specifications' => 'array',
-        'warnings' => 'array',
     ];
 
-    // Categories
-    const CATEGORY_DENTAL_SUPPLIES = 'dental_supplies';
-    const CATEGORY_EQUIPMENT = 'equipment';
+    // Simplified Categories for Clinic Inventory
     const CATEGORY_MEDICATIONS = 'medications';
-    const CATEGORY_LABORATORY = 'laboratory';
-    const CATEGORY_OFFICE_SUPPLIES = 'office_supplies';
-    const CATEGORY_OTHER = 'other';
+    const CATEGORY_SUPPLIES = 'supplies';
+    const CATEGORY_EQUIPMENT = 'equipment';
+    const CATEGORY_OTHERS = 'others';
+
+    /**
+     * Get available categories
+     */
+    public static function getCategories(): array
+    {
+        return [
+            self::CATEGORY_MEDICATIONS => 'Medications',
+            self::CATEGORY_SUPPLIES => 'Supplies',
+            self::CATEGORY_EQUIPMENT => 'Equipment',
+            self::CATEGORY_OTHERS => 'Others',
+        ];
+    }
 
     public function clinic(): BelongsTo
     {
@@ -106,17 +81,15 @@ class Inventory extends Model
     }
 
     /**
-     * Get the category label
+     * Get category label
      */
     public function getCategoryLabelAttribute(): string
     {
         return match($this->category) {
-            self::CATEGORY_DENTAL_SUPPLIES => 'Dental Supplies',
-            self::CATEGORY_EQUIPMENT => 'Equipment',
             self::CATEGORY_MEDICATIONS => 'Medications',
-            self::CATEGORY_LABORATORY => 'Laboratory',
-            self::CATEGORY_OFFICE_SUPPLIES => 'Office Supplies',
-            self::CATEGORY_OTHER => 'Other',
+            self::CATEGORY_SUPPLIES => 'Supplies',
+            self::CATEGORY_EQUIPMENT => 'Equipment',
+            self::CATEGORY_OTHERS => 'Others',
             default => ucfirst(str_replace('_', ' ', $this->category)),
         };
     }
@@ -138,11 +111,11 @@ class Inventory extends Model
     }
 
     /**
-     * Check if item needs reordering
+     * Check if item needs reordering (same as low stock for simplified version)
      */
     public function needsReorder(): bool
     {
-        return $this->reorder_point && $this->quantity <= $this->reorder_point;
+        return $this->isLowStock();
     }
 
     /**
@@ -170,35 +143,27 @@ class Inventory extends Model
     }
 
     /**
-     * Get formatted total value
+     * Get formatted total value in Philippine Peso
      */
     public function getFormattedTotalValueAttribute(): string
     {
-        return '$' . number_format($this->total_value, 2);
+        return '₱' . number_format($this->total_value, 2);
     }
 
     /**
-     * Get formatted unit price
+     * Get formatted unit price in Philippine Peso
      */
     public function getFormattedUnitPriceAttribute(): string
     {
-        return '$' . number_format($this->unit_price, 2);
+        return '₱' . number_format($this->unit_price, 2);
     }
 
     /**
-     * Get formatted cost price
+     * Helper method to format any amount in PHP currency
      */
-    public function getFormattedCostPriceAttribute(): string
+    public static function formatPhpCurrency(float $amount): string
     {
-        return $this->cost_price ? '$' . number_format($this->cost_price, 2) : 'N/A';
-    }
-
-    /**
-     * Get formatted selling price
-     */
-    public function getFormattedSellingPriceAttribute(): string
-    {
-        return $this->selling_price ? '$' . number_format($this->selling_price, 2) : 'N/A';
+        return '₱' . number_format($amount, 2);
     }
 
     /**
@@ -282,11 +247,11 @@ class Inventory extends Model
     }
 
     /**
-     * Scope for items needing reorder
+     * Scope for items needing reorder (same as low stock)
      */
     public function scopeNeedsReorder($query)
     {
-        return $query->whereRaw('quantity <= reorder_point');
+        return $query->whereRaw('quantity <= minimum_quantity');
     }
 
     /**

@@ -387,18 +387,20 @@ class DentistScheduleController extends Controller
         
         // Verify schedule belongs to this clinic
         if ($schedule->clinic_id !== $clinic->id) {
-            return back()->withErrors([
-                'error' => 'Schedule not found in this clinic'
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Schedule not found in this clinic'
+            ], 404);
         }
 
         // Authorization: Only clinic admin/owner or the dentist who owns the schedule can update
         $user = auth()->user();
-        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner'])) 
+        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner', 'clinic_admin'])) 
             && !($user->role === 'dentist' && $user->id === $schedule->user_id)) {
-            return back()->withErrors([
-                'error' => 'Unauthorized. You can only edit your own schedule or you must be a clinic administrator.'
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. You can only edit your own schedule or you must be a clinic administrator.'
+            ], 403);
         }
 
         $validated = $request->validate([
@@ -413,6 +415,9 @@ class DentistScheduleController extends Controller
             'allow_overlap' => 'boolean',
             'max_appointments_per_day' => 'nullable|integer|min:1|max:50',
         ]);
+        
+        // Remove _method from validated data if it exists
+        unset($validated['_method']);
 
         try {
             $schedule->update(array_filter($validated, function($value) {
@@ -425,7 +430,11 @@ class DentistScheduleController extends Controller
                 'clinic_id' => $clinic->id
             ]);
 
-            return redirect()->back()->with('success', 'Schedule updated successfully');
+            return response()->json([
+                'success' => true,
+                'message' => 'Schedule updated successfully',
+                'schedule' => $schedule->load('dentist')
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Error updating schedule', [
@@ -434,9 +443,10 @@ class DentistScheduleController extends Controller
                 'validated_data' => $validated
             ]);
 
-            return back()->withErrors([
-                'error' => 'Failed to update schedule: ' . $e->getMessage()
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update schedule: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -450,18 +460,20 @@ class DentistScheduleController extends Controller
         
         // Verify schedule belongs to this clinic
         if ($schedule->clinic_id !== $clinic->id) {
-            return back()->withErrors([
-                'error' => 'Schedule not found in this clinic'
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Schedule not found in this clinic'
+            ], 404);
         }
 
         // Authorization: Only clinic admin/owner or the dentist who owns the schedule can delete
         $user = auth()->user();
-        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner'])) 
+        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner', 'clinic_admin'])) 
             && !($user->role === 'dentist' && $user->id === $schedule->user_id)) {
-            return back()->withErrors([
-                'error' => 'Unauthorized. You can only delete your own schedule or you must be a clinic administrator.'
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. You can only delete your own schedule or you must be a clinic administrator.'
+            ], 403);
         }
 
         try {
@@ -476,7 +488,10 @@ class DentistScheduleController extends Controller
                 'clinic_id' => $clinic->id
             ]);
 
-            return redirect()->back()->with('success', 'Schedule deleted successfully');
+            return response()->json([
+                'success' => true,
+                'message' => 'Schedule deleted successfully'
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Error deleting schedule', [
@@ -484,9 +499,10 @@ class DentistScheduleController extends Controller
                 'schedule_id' => $schedule->id
             ]);
 
-            return back()->withErrors([
-                'error' => 'Failed to delete schedule: ' . $e->getMessage()
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete schedule: ' . $e->getMessage()
+            ], 500);
         }
     }
 

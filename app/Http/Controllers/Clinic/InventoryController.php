@@ -139,7 +139,7 @@ class InventoryController extends Controller
 
         $suppliers = $clinic->suppliers()->get();
 
-        return Inertia::render('Clinic/Inventory/Create', [
+        return Inertia::render('Clinic/Inventory/CreateSimplified', [
             'clinic' => $clinic,
             'suppliers' => $suppliers,
         ]);
@@ -159,44 +159,22 @@ class InventoryController extends Controller
             $request->merge(['supplier_id' => null]);
         }
 
+        // Simplified validation for essential fields only
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|max:255|unique:inventory,sku',
-            'barcode' => 'nullable|string|max:255|unique:inventory,barcode',
-            'brand' => 'nullable|string|max:255',
-            'model' => 'nullable|string|max:255',
-            'size' => 'nullable|string|max:255',
-            'color' => 'nullable|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'quantity' => 'required|integer|min:0',
             'minimum_quantity' => 'required|integer|min:0',
             'unit_price' => 'required|numeric|min:0',
-            'cost_price' => 'nullable|numeric|min:0',
-            'selling_price' => 'nullable|numeric|min:0',
-            'markup_percentage' => 'nullable|numeric|min:0|max:100',
-            'category' => 'required|string|max:255',
+            'category' => 'required|string|in:medications,supplies,equipment,others',
             'supplier_id' => 'nullable|exists:suppliers,id',
-            'location' => 'nullable|string|max:255',
-            'shelf' => 'nullable|string|max:255',
-            'rack' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'requires_prescription' => 'boolean',
-            'is_controlled_substance' => 'boolean',
-            'reorder_point' => 'nullable|integer|min:0',
-            'reorder_quantity' => 'nullable|integer|min:1',
             'expiry_date' => 'nullable|date|after:today',
-            'batch_number' => 'nullable|string|max:255',
-            'lot_number' => 'nullable|string|max:255',
-            'specifications' => 'nullable|array',
-            'warnings' => 'nullable|array',
-            'instructions' => 'nullable|string',
             'notes' => 'nullable|string',
+            'is_active' => 'boolean',
         ]);
 
         // Set default values
         $validated['is_active'] = $validated['is_active'] ?? true;
-        $validated['requires_prescription'] = $validated['requires_prescription'] ?? false;
-        $validated['is_controlled_substance'] = $validated['is_controlled_substance'] ?? false;
 
         $inventory = $clinic->inventory()->create($validated);
 
@@ -252,7 +230,7 @@ class InventoryController extends Controller
 
         $suppliers = $clinic->suppliers()->get();
 
-        return Inertia::render('Clinic/Inventory/Edit', [
+        return Inertia::render('Clinic/Inventory/EditSimplified', [
             'clinic' => $clinic,
             'inventory' => $inventory,
             'suppliers' => $suppliers,
@@ -278,44 +256,22 @@ class InventoryController extends Controller
             $request->merge(['supplier_id' => null]);
         }
 
+        // Simplified validation for essential fields only (update method)
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|max:255|unique:inventory,sku,' . $inventory->id,
-            'barcode' => 'nullable|string|max:255|unique:inventory,barcode,' . $inventory->id,
-            'brand' => 'nullable|string|max:255',
-            'model' => 'nullable|string|max:255',
-            'size' => 'nullable|string|max:255',
-            'color' => 'nullable|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'quantity' => 'required|integer|min:0',
             'minimum_quantity' => 'required|integer|min:0',
             'unit_price' => 'required|numeric|min:0',
-            'cost_price' => 'nullable|numeric|min:0',
-            'selling_price' => 'nullable|numeric|min:0',
-            'markup_percentage' => 'nullable|numeric|min:0|max:100',
-            'category' => 'required|string|max:255',
+            'category' => 'required|string|in:medications,supplies,equipment,others',
             'supplier_id' => 'nullable|exists:suppliers,id',
-            'location' => 'nullable|string|max:255',
-            'shelf' => 'nullable|string|max:255',
-            'rack' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'requires_prescription' => 'boolean',
-            'is_controlled_substance' => 'boolean',
-            'reorder_point' => 'nullable|integer|min:0',
-            'reorder_quantity' => 'nullable|integer|min:1',
             'expiry_date' => 'nullable|date',
-            'batch_number' => 'nullable|string|max:255',
-            'lot_number' => 'nullable|string|max:255',
-            'specifications' => 'nullable|array',
-            'warnings' => 'nullable|array',
-            'instructions' => 'nullable|string',
             'notes' => 'nullable|string',
+            'is_active' => 'boolean',
         ]);
 
         // Set default values
         $validated['is_active'] = $validated['is_active'] ?? true;
-        $validated['requires_prescription'] = $validated['requires_prescription'] ?? false;
-        $validated['is_controlled_substance'] = $validated['is_controlled_substance'] ?? false;
 
         $inventory->update($validated);
 

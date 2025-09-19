@@ -1,8 +1,9 @@
-import { Head, Link, router } from "@inertiajs/react";
-import { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Button } from "@/Components/ui/button";
+import { Head, Link, router } from "@inertiajs/react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Label } from "@/Components/ui/label";
 import {
     Table,
     TableBody,
@@ -18,35 +19,44 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
-import { Separator } from "@/Components/ui/separator";
+import Pagination from "@/Components/Pagination";
+import { format } from "date-fns";
 import {
     Search,
+    PlusCircle,
     Filter,
-    Plus,
     Package,
     AlertTriangle,
     TrendingUp,
     DollarSign,
-    Calendar,
-    MapPin,
-    Barcode,
+    Activity,
+    Clock,
+    User,
+    FileText,
     Eye,
-    Edit,
-    MoreHorizontal,
+    Pencil,
+    Trash2,
+    Settings,
+    CheckCircle,
+    AlertCircle,
+    XCircle,
+    Timer,
+    BarChart3,
     Download,
     Upload,
     RefreshCw,
-    BarChart3,
-    Clock,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
-    FileText,
-    Trash2,
-    Settings,
-    Activity,
+    MapPin,
+    Barcode,
+    MoreHorizontal,
+    Calendar,
+    Star,
+    BookmarkPlus,
+    Bookmark,
+    X,
+    ChevronDown,
+    ChevronRight,
+    Sliders,
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -54,6 +64,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
+import { useState } from "react";
 
 export default function Index({ auth, clinic, inventory, filters }) {
     const [search, setSearch] = useState(filters.search || "");
@@ -63,6 +74,20 @@ export default function Index({ auth, clinic, inventory, filters }) {
     const [sortBy, setSortBy] = useState(filters.sort_by || "name");
     const [sortOrder, setSortOrder] = useState(filters.sort_order || "asc");
     const [showFilters, setShowFilters] = useState(false);
+    
+    // Advanced filtering states
+    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+    const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+    const [quantityRange, setQuantityRange] = useState({ min: "", max: "" });
+    const [expiryFilter, setExpiryFilter] = useState("all");
+    const [dateRange, setDateRange] = useState({ from: "", to: "" });
+    const [savedFilters, setSavedFilters] = useState([
+        { id: 1, name: "Low Stock Alert", filters: { status: "low_stock" }, icon: AlertTriangle },
+        { id: 2, name: "Out of Stock", filters: { status: "out_of_stock" }, icon: XCircle },
+        { id: 3, name: "Expiring Soon", filters: { expiry: "expiring" }, icon: Timer },
+        { id: 4, name: "High Value Items", filters: { price_min: "100" }, icon: DollarSign },
+    ]);
+    const [activeQuickFilter, setActiveQuickFilter] = useState(null);
 
     // Calculate summary statistics
     const totalItems = inventory.total || 0;
@@ -149,14 +174,59 @@ export default function Index({ auth, clinic, inventory, filters }) {
         setSupplier("all");
         setSortBy("name");
         setSortOrder("asc");
-        router.get(
-            route("clinic.inventory.index", [clinic.id]),
-            {},
-            {
-                preserveState: true,
-                preserveScroll: true,
-            }
-        );
+        setPriceRange({ min: "", max: "" });
+        setQuantityRange({ min: "", max: "" });
+        setExpiryFilter("all");
+        setDateRange({ from: "", to: "" });
+        setActiveQuickFilter(null);
+        router.get(route("clinic.inventory.index", [clinic.id]));
+    };
+
+    const applyQuickFilter = (filterPreset) => {
+        setActiveQuickFilter(filterPreset.id);
+        const filters = filterPreset.filters;
+        
+        if (filters.status) setStatus(filters.status);
+        if (filters.expiry) setExpiryFilter(filters.expiry);
+        if (filters.price_min) setPriceRange(prev => ({ ...prev, min: filters.price_min }));
+        
+        // Apply the filters
+        router.get(route("clinic.inventory.index", [clinic.id]), {
+            search,
+            category: category === "all" ? "" : category,
+            status: filters.status || (status === "all" ? "" : status),
+            supplier: supplier === "all" ? "" : supplier,
+            expiry: filters.expiry || (expiryFilter === "all" ? "" : expiryFilter),
+            price_min: filters.price_min || priceRange.min,
+            price_max: priceRange.max,
+            quantity_min: quantityRange.min,
+            quantity_max: quantityRange.max,
+            sort_by: sortBy,
+            sort_order: sortOrder,
+        });
+    };
+
+    const saveCurrentFilters = () => {
+        const filterName = prompt("Enter a name for this filter preset:");
+        if (filterName) {
+            const newFilter = {
+                id: Date.now(),
+                name: filterName,
+                filters: {
+                    search,
+                    category: category !== "all" ? category : "",
+                    status: status !== "all" ? status : "",
+                    supplier: supplier !== "all" ? supplier : "",
+                    expiry: expiryFilter !== "all" ? expiryFilter : "",
+                    price_min: priceRange.min,
+                    price_max: priceRange.max,
+                    quantity_min: quantityRange.min,
+                    quantity_max: quantityRange.max,
+                },
+                icon: Bookmark,
+            };
+            setSavedFilters(prev => [...prev, newFilter]);
+        }
     };
 
     const getStockStatusColor = (item) => {
@@ -213,370 +283,400 @@ export default function Index({ auth, clinic, inventory, filters }) {
         <AuthenticatedLayout auth={auth}>
             <Head title="Inventory Management" />
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
-                {/* Enhanced Header Section */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mx-5 mb-5 rounded-xl shadow-2xl">
-                    <div className="absolute inset-0 bg-black/5"></div>
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
-                    <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-10 -translate-x-10"></div>
-                    <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white/3 rounded-full -translate-y-8 -translate-x-8"></div>
-
-                    <div className="relative px-6 py-6">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-white/25 rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg">
-                                    <Package className="h-6 w-6 text-white" />
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50">
+                {/* Clean Header */}
+                <div className="pt-6 pb-2">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 rounded-2xl shadow-2xl backdrop-blur-sm border border-white/20">
+                            <div className="px-6 py-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/30 hover:bg-white/30 transition-all duration-300">
+                                                <Package className="h-6 w-6 text-white" />
+                                            </div>
+                                            <div>
+                                                <h1 className="text-xl font-bold text-white drop-shadow-sm">
+                                                    Inventory Management
+                                                </h1>
+                                                <p className="text-sm text-blue-100 font-medium">
+                                                    Manage and track your clinic's inventory
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center space-x-3">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                            className="border-white/50 text-white hover:bg-white/30 backdrop-blur-sm bg-white/10"
+                                        >
+                                            <Link href={route("clinic.inventory.transactions.index", [clinic.id])}>
+                                                <BarChart3 className="h-4 w-4 mr-2" />
+                                                Transactions
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            asChild
+                                            className="bg-white/20 text-white border-white/40 hover:bg-white/30 backdrop-blur-sm"
+                                        >
+                                            <Link href={route("clinic.inventory.create", [clinic.id])}>
+                                                <PlusCircle className="h-4 w-4 mr-2" />
+                                                Add Item
+                                            </Link>
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold text-white mb-1">
-                                        Inventory Management
-                                    </h1>
-                                    <p className="text-blue-100 text-sm font-medium">
-                                        Manage and track your clinic's inventory
-                                        and supplies
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className="gap-2 text-sm px-4 py-2 rounded-xl transition-all duration-300 border backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30"
-                                >
-                                    <Filter className="h-4 w-4" />
-                                    Filters
-                                </Button>
-                                <Link
-                                    href={route(
-                                        "clinic.inventory.transactions.index",
-                                        [clinic.id]
-                                    )}
-                                >
-                                    <Button
-                                        variant="outline"
-                                        className="gap-2 text-sm px-4 py-2 rounded-xl transition-all duration-300 border backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30"
-                                    >
-                                        <BarChart3 className="h-4 w-4" />
-                                        Transactions
-                                    </Button>
-                                </Link>
-                                <Link
-                                    href={route("clinic.inventory.create", [
-                                        clinic.id,
-                                    ])}
-                                >
-                                    <Button className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm">
-                                        <Plus className="h-4 w-4" />
-                                        Add Item
-                                    </Button>
-                                </Link>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-6 -mt--10 pb-12">
-                    {/* Enhanced Key Metrics Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <Package className="h-7 w-7 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Total Items
-                                        </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {totalItems}
-                                        </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-green-600 font-medium">
-                                                All inventory items
-                                            </span>
+                {/* Main Dashboard Content */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    {/* Key Performance Indicators */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        {/* Total Items */}
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-100 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-blue-700 mb-1">Total Items</p>
+                                        <p className="text-3xl font-bold text-blue-900">{totalItems}</p>
+                                        <div className="flex items-center mt-2">
+                                            <TrendingUp className="h-4 w-4 text-emerald-500 mr-1" />
+                                            <span className="text-sm text-emerald-600 font-medium">Active</span>
                                         </div>
+                                    </div>
+                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                        <Package className="h-6 w-6 text-white" />
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-yellow-100/50">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <AlertTriangle className="h-7 w-7 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Low Stock
-                                        </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {lowStockItems}
-                                        </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-yellow-600 font-medium">
-                                                Needs restocking
-                                            </span>
+                        {/* Low Stock Items */}
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-orange-100 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-amber-700 mb-1">Low Stock</p>
+                                        <p className="text-3xl font-bold text-amber-900">{lowStockItems}</p>
+                                        <div className="flex items-center mt-2">
+                                            <AlertTriangle className="h-4 w-4 text-amber-500 mr-1" />
+                                            <span className="text-sm text-amber-600 font-medium">Need attention</span>
                                         </div>
+                                    </div>
+                                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                        <AlertTriangle className="h-6 w-6 text-white" />
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-red-100/50">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-500 to-red-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-red-500 via-red-600 to-rose-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <XCircle className="h-7 w-7 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Out of Stock
-                                        </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {outOfStockItems}
-                                        </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-red-600 font-medium">
-                                                Urgent restock needed
-                                            </span>
+                        {/* Out of Stock */}
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-red-50 to-pink-100 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-red-700 mb-1">Out of Stock</p>
+                                        <p className="text-3xl font-bold text-red-900">{outOfStockItems}</p>
+                                        <div className="flex items-center mt-2">
+                                            <XCircle className="h-4 w-4 text-red-500 mr-1" />
+                                            <span className="text-sm text-red-600 font-medium">Urgent</span>
                                         </div>
+                                    </div>
+                                    <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                        <XCircle className="h-6 w-6 text-white" />
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-green-100/50">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <DollarSign className="h-7 w-7 text-white" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Total Value
-                                        </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {formatCurrency(totalValue)}
-                                        </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-green-600 font-medium">
-                                                Current inventory value
-                                            </span>
+                        {/* Total Value */}
+                        <Card className="border-0 shadow-lg bg-gradient-to-br from-emerald-50 to-green-100 hover:shadow-xl transition-all duration-300 group">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-emerald-700 mb-1">Total Value</p>
+                                        <p className="text-3xl font-bold text-emerald-900">{formatCurrency(totalValue)}</p>
+                                        <div className="flex items-center mt-2">
+                                            <DollarSign className="h-4 w-4 text-emerald-500 mr-1" />
+                                            <span className="text-sm text-emerald-600 font-medium">Inventory worth</span>
                                         </div>
+                                    </div>
+                                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                                        <DollarSign className="h-6 w-6 text-white" />
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Inventory Records Card */}
-                    <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden border border-blue-100/30">
-                        <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50">
-                            <div className="space-y-6">
-                                {/* Title Section - Top Row */}
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                        <FileText className="h-4 w-4 text-white" />
-                                    </div>
+                    {/* Quick Filter Buttons */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                                <Star className="h-5 w-5 text-yellow-500 mr-2" />
+                                Quick Filters
+                            </h3>
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                                    className="flex items-center"
+                                >
+                                    <Sliders className="h-4 w-4 mr-2" />
+                                    Advanced Filters
+                                    {showAdvancedFilters ? <ChevronDown className="h-4 w-4 ml-1" /> : <ChevronRight className="h-4 w-4 ml-1" />}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={saveCurrentFilters}
+                                    className="flex items-center"
+                                >
+                                    <BookmarkPlus className="h-4 w-4 mr-2" />
+                                    Save Filter
+                                </Button>
+                            </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {savedFilters.map((filter) => {
+                                const IconComponent = filter.icon;
+                                const isActive = activeQuickFilter === filter.id;
+                                return (
+                                    <Button
+                                        key={filter.id}
+                                        variant={isActive ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => applyQuickFilter(filter)}
+                                        className={`flex items-center justify-center p-3 h-auto ${
+                                            isActive 
+                                                ? "bg-blue-600 text-white shadow-lg" 
+                                                : "hover:bg-blue-50 hover:border-blue-300"
+                                        }`}
+                                    >
+                                        <IconComponent className="h-4 w-4 mr-2" />
+                                        <span className="font-medium">{filter.name}</span>
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Advanced Filters Panel */}
+                    {showAdvancedFilters && (
+                        <Card className="mb-6 border-0 shadow-xl bg-white">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                                        <Filter className="h-5 w-5 text-blue-500 mr-2" />
+                                        Advanced Filters
+                                    </CardTitle>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowAdvancedFilters(false)}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {/* Price Range */}
                                     <div>
-                                        <CardTitle className="text-xl font-bold text-gray-900">
-                                            Inventory Records
-                                        </CardTitle>
-                                        <p className="text-sm text-gray-600">
-                                            Manage and view all inventory items
-                                            and supplies
-                                        </p>
+                                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Price Range</Label>
+                                        <div className="flex items-center space-x-2">
+                                            <Input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={priceRange.min}
+                                                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                                                className="w-full"
+                                            />
+                                            <span className="text-gray-500">-</span>
+                                            <Input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={priceRange.max}
+                                                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Quantity Range */}
+                                    <div>
+                                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Quantity Range</Label>
+                                        <div className="flex items-center space-x-2">
+                                            <Input
+                                                type="number"
+                                                placeholder="Min"
+                                                value={quantityRange.min}
+                                                onChange={(e) => setQuantityRange(prev => ({ ...prev, min: e.target.value }))}
+                                                className="w-full"
+                                            />
+                                            <span className="text-gray-500">-</span>
+                                            <Input
+                                                type="number"
+                                                placeholder="Max"
+                                                value={quantityRange.max}
+                                                onChange={(e) => setQuantityRange(prev => ({ ...prev, max: e.target.value }))}
+                                                className="w-full"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Expiry Filter */}
+                                    <div>
+                                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Expiry Status</Label>
+                                        <Select value={expiryFilter} onValueChange={setExpiryFilter}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select expiry status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All Items</SelectItem>
+                                                <SelectItem value="expired">Expired</SelectItem>
+                                                <SelectItem value="expiring">Expiring Soon (30 days)</SelectItem>
+                                                <SelectItem value="valid">Valid</SelectItem>
+                                                <SelectItem value="no_expiry">No Expiry Date</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* Date Range */}
+                                    <div>
+                                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Created Date</Label>
+                                        <div className="flex items-center space-x-2">
+                                            <Input
+                                                type="date"
+                                                value={dateRange.from}
+                                                onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
+                                                className="w-full"
+                                            />
+                                            <span className="text-gray-500">-</span>
+                                            <Input
+                                                type="date"
+                                                value={dateRange.to}
+                                                onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
+                                                className="w-full"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Search and Filters - Second Row */}
-                                <div className="flex items-center gap-4 justify-center">
-                                    {/* Search Bar */}
-                                    <div className="relative w-96">
+                                <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+                                    <Button variant="outline" onClick={clearFilters}>
+                                        <RefreshCw className="h-4 w-4 mr-2" />
+                                        Clear All
+                                    </Button>
+                                    <Button onClick={applyFilters}>
+                                        <Search className="h-4 w-4 mr-2" />
+                                        Apply Filters
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Inventory Table */}
+                    <Card className="border-0 shadow-xl bg-white hover:shadow-2xl transition-all duration-300">
+                        <CardHeader className="pb-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                        <Package className="h-5 w-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-xl font-semibold text-gray-900">Inventory Items</CardTitle>
+                                        <p className="text-sm text-gray-600">Manage your clinic's inventory</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
+                                        <Filter className="h-4 w-4 mr-2" />
+                                        Filters
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Search and Filters */}
+                            <div className="mt-4 space-y-4">
+                                <div className="flex items-center space-x-4">
+                                    <div className="relative flex-1">
                                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                                         <Input
                                             type="text"
                                             placeholder="Search inventory items..."
                                             value={search}
                                             onChange={handleInputChange}
-                                            className="pl-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 w-full rounded-lg"
+                                            className="pl-10"
                                         />
                                     </div>
-
-                                    {/* Filter Dropdowns */}
-                                    <div className="flex items-center gap-3">
-                                        <Select
-                                            value={category}
-                                            onValueChange={setCategory}
-                                        >
-                                            <SelectTrigger className="w-36 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm rounded-lg">
-                                                <SelectValue placeholder="Category" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Categories
+                                    <Select value={category} onValueChange={setCategory}>
+                                        <SelectTrigger className="w-48">
+                                            <SelectValue placeholder="Category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Categories</SelectItem>
+                                            {categories.map((cat) => (
+                                                <SelectItem key={cat} value={cat}>
+                                                    {cat.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                                                 </SelectItem>
-                                                {categories.map((cat) => (
-                                                    <SelectItem
-                                                        key={cat}
-                                                        value={cat}
-                                                    >
-                                                        {cat
-                                                            .replace(/_/g, " ")
-                                                            .replace(
-                                                                /\b\w/g,
-                                                                (l) =>
-                                                                    l.toUpperCase()
-                                                            )}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-
-                                        <Select
-                                            value={status}
-                                            onValueChange={setStatus}
-                                        >
-                                            <SelectTrigger className="w-36 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm rounded-lg">
-                                                <SelectValue placeholder="Status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Status
-                                                </SelectItem>
-                                                <SelectItem value="in_stock">
-                                                    In Stock
-                                                </SelectItem>
-                                                <SelectItem value="low_stock">
-                                                    Low Stock
-                                                </SelectItem>
-                                                <SelectItem value="out_of_stock">
-                                                    Out of Stock
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-
-                                        <Select
-                                            value={supplier}
-                                            onValueChange={setSupplier}
-                                        >
-                                            <SelectTrigger className="w-40 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm rounded-lg">
-                                                <SelectValue placeholder="Supplier" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Suppliers
-                                                </SelectItem>
-                                                {suppliers.map((sup) => (
-                                                    <SelectItem
-                                                        key={sup}
-                                                        value={sup}
-                                                    >
-                                                        {sup}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-
-                                        <Button
-                                            onClick={applyFilters}
-                                            className="h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
-                                        >
-                                            <Search className="h-4 w-4 mr-2" />
-                                            Search
-                                        </Button>
-                                        <Button
-                                            onClick={clearFilters}
-                                            variant="outline"
-                                            className="h-11 px-4 rounded-lg"
-                                        >
-                                            <RefreshCw className="h-4 w-4 mr-2" />
-                                            Clear
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                {/* Action Buttons - Third Row */}
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm">
-                                            <Download className="h-4 w-4 mr-2" />
-                                            Export
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                            <Upload className="h-4 w-4 mr-2" />
-                                            Import
-                                        </Button>
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        Showing {inventory.from || 0} to{" "}
-                                        {inventory.to || 0} of{" "}
-                                        {inventory.total || 0} results
-                                    </div>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Select value={status} onValueChange={setStatus}>
+                                        <SelectTrigger className="w-40">
+                                            <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Status</SelectItem>
+                                            <SelectItem value="in_stock">In Stock</SelectItem>
+                                            <SelectItem value="low_stock">Low Stock</SelectItem>
+                                            <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Button onClick={applyFilters}>
+                                        <Search className="h-4 w-4 mr-2" />
+                                        Search
+                                    </Button>
+                                    <Button onClick={clearFilters} variant="outline">
+                                        <RefreshCw className="h-4 w-4 mr-2" />
+                                        Clear
+                                    </Button>
                                 </div>
                             </div>
                         </CardHeader>
-
                         <CardContent className="p-0">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b-2 border-blue-200">
-                                        <TableHead className="font-bold text-blue-900 py-4 text-left">
-                                            Item
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Category
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Stock Status
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Quantity
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Unit Price
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Total Value
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Supplier
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Expiry
-                                        </TableHead>
-                                        <TableHead className="font-bold text-blue-900 py-4 text-center">
-                                            Actions
-                                        </TableHead>
+                                    <TableRow>
+                                        <TableHead className="font-semibold text-gray-900">Item</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Category</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Stock Status</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Quantity</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Unit Price</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Total Value</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Supplier</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Expiry</TableHead>
+                                        <TableHead className="font-semibold text-gray-900">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {inventory.data &&
-                                    inventory.data.length > 0 ? (
+                                    {inventory.data && inventory.data.length > 0 ? (
                                         inventory.data.map((item) => (
-                                            <TableRow
-                                                key={item.id}
-                                                className="hover:bg-blue-50/30 transition-all duration-200 border-b border-gray-100"
-                                            >
+                                            <TableRow key={item.id} className="hover:bg-gray-50 transition-colors duration-200">
                                                 <TableCell className="py-4">
                                                     <div>
-                                                        <div className="font-semibold text-gray-900 text-base">
-                                                            {item.name}
-                                                        </div>
+                                                        <div className="font-medium text-gray-900">{item.name}</div>
                                                         {item.sku && (
                                                             <div className="text-sm text-gray-500 flex items-center gap-1 mt-1">
                                                                 <Barcode className="h-3 w-3" />
@@ -591,173 +691,77 @@ export default function Index({ auth, clinic, inventory, filters }) {
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="bg-blue-50 text-blue-700 border-blue-200 font-medium"
-                                                    >
-                                                        {item.category
-                                                            .replace(/_/g, " ")
-                                                            .replace(
-                                                                /\b\w/g,
-                                                                (l) =>
-                                                                    l.toUpperCase()
-                                                            )}
+                                                <TableCell>
+                                                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                                        {item.category.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <Badge
-                                                        variant={getStockStatusColor(
-                                                            item
-                                                        )}
-                                                        className={
-                                                            getStockStatusColor(
-                                                                item
-                                                            ) === "destructive"
-                                                                ? "bg-red-100 text-red-700 border-red-200 font-medium"
-                                                                : getStockStatusColor(
-                                                                      item
-                                                                  ) ===
-                                                                  "secondary"
-                                                                ? "bg-yellow-100 text-yellow-700 border-yellow-200 font-medium"
-                                                                : "bg-green-100 text-green-700 border-green-200 font-medium"
-                                                        }
-                                                    >
-                                                        {getStockStatusLabel(
-                                                            item
-                                                        )}
+                                                <TableCell>
+                                                    <Badge variant={getStockStatusColor(item)} className={
+                                                        getStockStatusColor(item) === "destructive"
+                                                            ? "bg-red-100 text-red-700 border-red-200"
+                                                            : getStockStatusColor(item) === "secondary"
+                                                            ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                            : "bg-green-100 text-green-700 border-green-200"
+                                                    }>
+                                                        {getStockStatusLabel(item)}
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <span className="font-bold text-gray-900 text-lg">
-                                                        {item.quantity}
-                                                    </span>
+                                                <TableCell>
+                                                    <span className="font-semibold text-gray-900">{item.quantity}</span>
                                                     {item.minimum_quantity && (
-                                                        <div className="text-sm text-gray-500 mt-1">
-                                                            Min:{" "}
-                                                            {
-                                                                item.minimum_quantity
-                                                            }
-                                                        </div>
+                                                        <div className="text-sm text-gray-500">Min: {item.minimum_quantity}</div>
                                                     )}
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <span className="font-bold text-gray-900 text-lg">
-                                                        {formatCurrency(
-                                                            item.unit_price
-                                                        )}
+                                                <TableCell>
+                                                    <span className="font-semibold text-gray-900">{formatCurrency(item.unit_price)}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="font-semibold text-green-700">
+                                                        {formatCurrency(item.quantity * parseFloat(item.unit_price))}
                                                     </span>
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <span className="font-bold text-green-700 text-lg">
-                                                        {formatCurrency(
-                                                            item.quantity *
-                                                                parseFloat(
-                                                                    item.unit_price
-                                                                )
-                                                        )}
-                                                    </span>
+                                                <TableCell>
+                                                    <span className="text-gray-700">{item.supplier?.name || "N/A"}</span>
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <span className="font-medium text-gray-700">
-                                                        {item.supplier?.name ||
-                                                            "N/A"}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="py-4 text-center">
-                                                    <Badge
-                                                        variant={getExpiryStatusColor(
-                                                            item
-                                                        )}
-                                                        className={
-                                                            getExpiryStatusColor(
-                                                                item
-                                                            ) === "destructive"
-                                                                ? "bg-red-100 text-red-700 border-red-200 font-medium"
-                                                                : getExpiryStatusColor(
-                                                                      item
-                                                                  ) ===
-                                                                  "secondary"
-                                                                ? "bg-orange-100 text-orange-700 border-orange-200 font-medium"
-                                                                : "bg-green-100 text-green-700 border-green-200 font-medium"
-                                                        }
-                                                    >
-                                                        {getExpiryStatusLabel(
-                                                            item
-                                                        )}
+                                                <TableCell>
+                                                    <Badge variant={getExpiryStatusColor(item)} className={
+                                                        getExpiryStatusColor(item) === "destructive"
+                                                            ? "bg-red-100 text-red-700 border-red-200"
+                                                            : getExpiryStatusColor(item) === "secondary"
+                                                            ? "bg-orange-100 text-orange-700 border-orange-200"
+                                                            : "bg-green-100 text-green-700 border-green-200"
+                                                    }>
+                                                        {getExpiryStatusLabel(item)}
                                                     </Badge>
                                                     {item.expiry_date && (
-                                                        <div className="text-sm text-gray-500 mt-1">
-                                                            {formatDate(
-                                                                item.expiry_date
-                                                            )}
-                                                        </div>
+                                                        <div className="text-sm text-gray-500 mt-1">{formatDate(item.expiry_date)}</div>
                                                     )}
                                                 </TableCell>
-                                                <TableCell className="py-4 text-center">
+                                                <TableCell>
                                                     <DropdownMenu>
-                                                        <DropdownMenuTrigger
-                                                            asChild
-                                                        >
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-9 w-9 p-0 hover:bg-blue-100 rounded-lg"
-                                                            >
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                                                 <MoreHorizontal className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent
-                                                            align="end"
-                                                            className="w-48"
-                                                        >
-                                                            <DropdownMenuItem
-                                                                asChild
-                                                            >
-                                                                <Link
-                                                                    href={route(
-                                                                        "clinic.inventory.show",
-                                                                        [
-                                                                            clinic.id,
-                                                                            item.id,
-                                                                        ]
-                                                                    )}
-                                                                >
+                                                        <DropdownMenuContent align="end" className="w-48">
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={route("clinic.inventory.show", [clinic.id, item.id])}>
                                                                     <Eye className="h-4 w-4 mr-2" />
                                                                     View Details
                                                                 </Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                asChild
-                                                            >
-                                                                <Link
-                                                                    href={route(
-                                                                        "clinic.inventory.edit",
-                                                                        [
-                                                                            clinic.id,
-                                                                            item.id,
-                                                                        ]
-                                                                    )}
-                                                                >
-                                                                    <Edit className="h-4 w-4 mr-2" />
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={route("clinic.inventory.edit", [clinic.id, item.id])}>
+                                                                    <Pencil className="h-4 w-4 mr-2" />
                                                                     Edit Item
                                                                 </Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                asChild
-                                                            >
-                                                                <Link
-                                                                    href={route(
-                                                                        "clinic.inventory.transactions.history",
-                                                                        [
-                                                                            clinic.id,
-                                                                            item.id,
-                                                                        ]
-                                                                    )}
-                                                                >
+                                                            <DropdownMenuItem asChild>
+                                                                <Link href={route("clinic.inventory.transactions.history", [clinic.id, item.id])}>
                                                                     <BarChart3 className="h-4 w-4 mr-2" />
-                                                                    Transaction
-                                                                    History
+                                                                    Transaction History
                                                                 </Link>
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
@@ -767,28 +771,14 @@ export default function Index({ auth, clinic, inventory, filters }) {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell
-                                                colSpan={9}
-                                                className="text-center py-12"
-                                            >
+                                            <TableCell colSpan={9} className="text-center py-12">
                                                 <div className="text-gray-500">
                                                     <Package className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                                                    <p className="text-xl font-medium text-gray-900 mb-2">
-                                                        No inventory items found
-                                                    </p>
-                                                    <p className="text-sm text-gray-600 mb-6">
-                                                        Get started by adding
-                                                        your first inventory
-                                                        item.
-                                                    </p>
-                                                    <Link
-                                                        href={route(
-                                                            "clinic.inventory.create",
-                                                            [clinic.id]
-                                                        )}
-                                                    >
+                                                    <p className="text-xl font-medium text-gray-900 mb-2">No inventory items found</p>
+                                                    <p className="text-sm text-gray-600 mb-6">Get started by adding your first inventory item.</p>
+                                                    <Link href={route("clinic.inventory.create", [clinic.id])}>
                                                         <Button className="bg-blue-600 hover:bg-blue-700">
-                                                            <Plus className="h-4 w-4 mr-2" />
+                                                            <PlusCircle className="h-4 w-4 mr-2" />
                                                             Add First Item
                                                         </Button>
                                                     </Link>
@@ -803,26 +793,9 @@ export default function Index({ auth, clinic, inventory, filters }) {
                             {inventory.links && inventory.links.length > 3 && (
                                 <div className="flex items-center justify-between p-6 border-t border-gray-200">
                                     <div className="text-sm text-gray-700">
-                                        Showing {inventory.from} to{" "}
-                                        {inventory.to} of {inventory.total}{" "}
-                                        results
+                                        Showing {inventory.from} to {inventory.to} of {inventory.total} results
                                     </div>
-                                    <div className="flex gap-2">
-                                        {inventory.links.map((link, index) => (
-                                            <Link
-                                                key={index}
-                                                href={link.url}
-                                                className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                                                    link.active
-                                                        ? "bg-blue-500 text-white"
-                                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                                }`}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: link.label,
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
+                                    <Pagination links={inventory.links} />
                                 </div>
                             )}
                         </CardContent>

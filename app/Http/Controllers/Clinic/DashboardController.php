@@ -61,19 +61,19 @@ class DashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        // Get today's appointments
+        // Get today's appointments (include pending and confirmed)
         $todayAppointments = Appointment::with(['patient', 'assignedDentist', 'type', 'status'])
             ->where('clinic_id', $clinic->id)
             ->whereDate('scheduled_at', today())
-            ->where('appointment_status_id', 2) // 2 = Confirmed
+            ->whereIn('appointment_status_id', [1, 2]) // 1 = Pending, 2 = Confirmed
             ->orderBy('scheduled_at')
             ->get();
 
-        // Get upcoming appointments
+        // Get upcoming appointments (include pending and confirmed)
         $upcomingAppointments = Appointment::with(['patient', 'assignedDentist', 'type', 'status'])
             ->where('clinic_id', $clinic->id)
             ->whereDate('scheduled_at', '>', today())
-            ->where('appointment_status_id', 2) // 2 = Confirmed
+            ->whereIn('appointment_status_id', [1, 2]) // 1 = Pending, 2 = Confirmed
             ->orderBy('scheduled_at')
             ->take(5)
             ->get();

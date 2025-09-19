@@ -167,8 +167,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             const data = await response.json();
             if (data.success) {
                 toast.success(data.message);
-                // Reload the page to show updated schedules
-                window.location.reload();
+                // Refresh data while preserving selected dentist
+                router.reload({ only: ['schedules'] });
             } else {
                 toast.error(
                     data.message || "Failed to sync profile to schedule"
@@ -222,8 +222,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                 toast.success(data.message || `Applied ${selectedTemplate.name} template successfully`);
                 setIsTemplateDialogOpen(false);
                 setSelectedTemplate(null);
-                // Reload page to show new schedules
-                window.location.reload();
+                // Refresh data while preserving selected dentist
+                router.reload({ only: ['schedules'] });
             } else {
                 toast.error(data.message || "Failed to apply template");
             }
@@ -237,7 +237,16 @@ export default function Index({ auth, clinic, schedules, dentists }) {
     };
 
     const handleSubmit = () => {
-        console.log('handleSubmit called', { data, isQuickSetup, selectedDays, editingSchedule });
+        console.log('🚀 handleSubmit called!');
+        console.log('Current state:', { 
+            isQuickSetup, 
+            selectedDays, 
+            editingSchedule, 
+            isCreating, 
+            isUpdating, 
+            processing,
+            data 
+        });
         
         // Basic form validation
         if (!data.user_id) {
@@ -247,19 +256,15 @@ export default function Index({ auth, clinic, schedules, dentists }) {
         
         // Validate days selection
         if (isQuickSetup && !editingSchedule) {
-            console.log('Quick Setup validation - selectedDays:', selectedDays);
             if (selectedDays.length === 0) {
                 toast.error("Please select at least one day");
                 return;
             }
-            console.log('Quick Setup validation passed');
         } else {
-            console.log('Single day validation - day_of_week:', data.day_of_week);
             if (!data.day_of_week && data.day_of_week !== 0) {
                 toast.error("Please select a day of the week");
                 return;
             }
-            console.log('Single day validation passed');
         }
         
         if (!data.start_time || !data.end_time) {
@@ -273,40 +278,93 @@ export default function Index({ auth, clinic, schedules, dentists }) {
 
         if (editingSchedule) {
             setIsUpdating(true);
-            put(
-                route("clinic.dentist-schedules.update", {
-                    clinic: clinic.id,
-                    schedule: editingSchedule.id,
-                }),
-                data,
-                {
-                    onSuccess: () => {
-                        toast.success("Schedule updated successfully");
-                        reset();
-                        setEditingSchedule(null);
-                        setIsDialogOpen(false);
-                        setIsUpdating(false);
-                    },
-                    onError: (errors) => {
-                        console.error('Update errors:', errors);
-                        if (typeof errors === 'object' && errors !== null) {
-                            Object.values(errors).flat().forEach((error) =>
-                                toast.error(error)
-                            );
-                        } else {
-                            toast.error("Failed to update schedule. Please try again.");
-                        }
-                        setIsUpdating(false);
-                    },
+            
+            // Validate time format before sending
+            if (!data.start_time || !data.end_time) {
+                toast.error("Please set both start and end times");
+                setIsUpdating(false);
+                return;
+            }
+            
+            // Transform data for update (exclude user_id since it shouldn't change)
+            const transformedData = {
+                day_of_week: parseInt(data.day_of_week),
+                start_time: data.start_time,
+                end_time: data.end_time,
+                buffer_time: parseInt(data.buffer_time) || 15,
+                slot_duration: parseInt(data.slot_duration) || 30,
+                is_available: Boolean(data.is_available),
+                schedule_type: data.schedule_type || "weekly",
+                notes: data.notes || "",
+                allow_overlap: Boolean(data.allow_overlap),
+                max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
+            };
+            
+            console.log('Update data being sent:', transformedData);
+            
+            // Use fetch method like CREATE
+            fetch(route("clinic.dentist-schedules.update", {
+                clinic: clinic.id,
+                schedule: editingSchedule.id,
+            }), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    ...transformedData,
+                    _method: 'PUT'
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(JSON.stringify(errorData));
+                    });
                 }
-            );
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    toast.success(data.message || "Schedule updated successfully");
+                    reset();
+                    setEditingSchedule(null);
+                    setIsDialogOpen(false);
+                    setIsUpdating(false);
+                    // Refresh data while preserving selected dentist
+                    router.reload({ only: ['schedules'] });
+                } else {
+                    toast.error(data.message || "Failed to update schedule");
+                    setIsUpdating(false);
+                }
+            })
+            .catch(error => {
+                console.error('Update error:', error);
+                try {
+                    const errorData = JSON.parse(error.message);
+                    if (errorData.errors) {
+                        // Show specific validation errors
+                        Object.values(errorData.errors).flat().forEach(errorMsg => {
+                            toast.error(errorMsg);
+                        });
+                    } else {
+                        toast.error(errorData.message || "Failed to update schedule");
+                    }
+                } catch {
+                    toast.error("Failed to update schedule. Please try again.");
+                }
+                setIsUpdating(false);
+            });
         } else {
             setIsCreating(true);
             
             // Handle Quick Setup (multiple days)
-            console.log('Checking Quick Setup condition:', { isQuickSetup, selectedDaysLength: selectedDays.length });
             if (isQuickSetup && selectedDays.length > 0) {
-                console.log('Starting Quick Setup for', selectedDays.length, 'days');
+                console.log('Starting Quick Setup for days:', selectedDays);
+                console.log('Base data:', data);
+                
                 const promises = selectedDays.map(dayValue => {
                     // Transform data for each day (same as single day)
                     const scheduleData = {
@@ -320,21 +378,35 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                         max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
                     };
                     
+                    console.log(`Creating schedule for day ${dayValue}:`, scheduleData);
+                    
                     return fetch(route("clinic.dentist-schedules.store", { clinic: clinic.id }), {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
                         },
                         body: JSON.stringify(scheduleData)
+                    }).then(response => {
+                        console.log(`Response for day ${dayValue}:`, response.status);
+                        return response.json();
+                    }).catch(error => {
+                        console.error(`Error for day ${dayValue}:`, error);
+                        return { success: false, message: `Failed to create schedule for day ${dayValue}` };
                     });
                 });
                 
+                console.log('All promises created, waiting for results...');
+                
                 Promise.all(promises)
-                    .then(responses => Promise.all(responses.map(r => r.json())))
                     .then(results => {
+                        console.log('All results received:', results);
+                        
                         const successful = results.filter(r => r.success);
                         const failed = results.filter(r => !r.success);
+                        
+                        console.log(`Successful: ${successful.length}, Failed: ${failed.length}`);
                         
                         if (successful.length > 0) {
                             toast.success(`Successfully created ${successful.length} schedule(s)`);
@@ -351,8 +423,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             setIsDialogOpen(false);
                             setSelectedDays([]);
                             setIsQuickSetup(false);
-                            // Reload page to show new schedules
-                            window.location.reload();
+                            // Refresh data while preserving selected dentist
+                            router.reload({ only: ['schedules'] });
                         }
                         
                         setIsCreating(false);
@@ -364,9 +436,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                     });
             } else {
                 // Handle single day creation
-                console.log('About to call post with data:', data);
                 const storeUrl = route("clinic.dentist-schedules.store", { clinic: clinic.id });
-                console.log('Store URL:', storeUrl);
                 
                 // Transform data to ensure correct types
                 const transformedData = {
@@ -379,10 +449,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                     allow_overlap: Boolean(data.allow_overlap),
                     max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
                 };
-                console.log('Transformed data:', transformedData);
                 
                 // Use fetch method like the working template application
-                console.log('Using fetch method like template...');
                 fetch(storeUrl, {
                     method: 'POST',
                     headers: {
@@ -398,8 +466,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                         reset();
                         setIsDialogOpen(false);
                         setIsCreating(false);
-                        // Reload page to show new schedules
-                        window.location.reload();
+                        // Refresh data while preserving selected dentist
+                        router.reload({ only: ['schedules'] });
                     } else {
                         toast.error(data.message || "Failed to create schedule");
                         setIsCreating(false);
@@ -415,12 +483,27 @@ export default function Index({ auth, clinic, schedules, dentists }) {
     };
 
     const handleEdit = (schedule) => {
+        console.log('Schedule data for editing:', schedule);
         setEditingSchedule(schedule);
+        
+        // Ensure time format is correct
+        const startTime = schedule.start_time ? 
+            (schedule.start_time.includes('T') ? 
+                schedule.start_time.split('T')[1].substring(0, 5) : 
+                schedule.start_time.substring(0, 5)) : "";
+        
+        const endTime = schedule.end_time ? 
+            (schedule.end_time.includes('T') ? 
+                schedule.end_time.split('T')[1].substring(0, 5) : 
+                schedule.end_time.substring(0, 5)) : "";
+        
+        console.log('Formatted times:', { startTime, endTime });
+        
         setData({
             user_id: schedule.user_id.toString(),
             day_of_week: schedule.day_of_week?.toString() || "",
-            start_time: schedule.start_time.substring(0, 5),
-            end_time: schedule.end_time.substring(0, 5),
+            start_time: startTime,
+            end_time: endTime,
             buffer_time: schedule.buffer_time || 15,
             slot_duration: schedule.slot_duration || 30,
             is_available: schedule.is_available,
@@ -435,29 +518,39 @@ export default function Index({ auth, clinic, schedules, dentists }) {
     const handleDelete = (schedule) => {
         if (confirm("Are you sure you want to delete this schedule? This action cannot be undone.")) {
             setIsDeleting(schedule.id);
-            router.delete(
-                route("clinic.dentist-schedules.destroy", {
-                    clinic: clinic.id,
-                    schedule: schedule.id,
-                }),
-                {
-                    onSuccess: () => {
-                        toast.success("Schedule deleted successfully");
-                        setIsDeleting(null);
-                    },
-                    onError: (errors) => {
-                        console.error('Delete errors:', errors);
-                        if (typeof errors === 'object' && errors !== null) {
-                            Object.values(errors).flat().forEach((error) =>
-                                toast.error(error)
-                            );
-                        } else {
-                            toast.error("Failed to delete schedule. Please try again.");
-                        }
-                        setIsDeleting(null);
-                    },
+            
+            // Use fetch method like CREATE and UPDATE
+            fetch(route("clinic.dentist-schedules.destroy", {
+                clinic: clinic.id,
+                schedule: schedule.id,
+            }), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({
+                    _method: 'DELETE'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    toast.success(data.message || "Schedule deleted successfully");
+                    setIsDeleting(null);
+                    // Refresh data while preserving selected dentist
+                    router.reload({ only: ['schedules'] });
+                } else {
+                    toast.error(data.message || "Failed to delete schedule");
+                    setIsDeleting(null);
                 }
-            );
+            })
+            .catch(error => {
+                console.error('Delete error:', error);
+                toast.error("Failed to delete schedule. Please try again.");
+                setIsDeleting(null);
+            });
         }
     };
 
@@ -522,7 +615,12 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                     Templates
                                 </Button>
                                 <Button
-                                    onClick={() => setIsDialogOpen(true)}
+                                    onClick={() => {
+                                        console.log('🆕 Add Schedule button clicked - clearing editingSchedule');
+                                        setEditingSchedule(null);
+                                        reset();
+                                        setIsDialogOpen(true);
+                                    }}
                                     className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
                                     <Plus className="h-5 w-5 mr-2" />
@@ -806,11 +904,12 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                     </CardTitle>
                                                     <div className="flex items-center gap-2">
                                                         <Button
-                                                            onClick={() =>
-                                                                setIsDialogOpen(
-                                                                    true
-                                                                )
-                                                            }
+                                                            onClick={() => {
+                                                                console.log('🆕 Add Schedule button clicked (dentist view) - clearing editingSchedule');
+                                                                setEditingSchedule(null);
+                                                                reset();
+                                                                setIsDialogOpen(true);
+                                                            }}
                                                             className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
                                                         >
                                                             <Plus className="h-4 w-4 mr-2" />
@@ -841,11 +940,12 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                         </p>
                                                         <div className="flex items-center justify-center gap-3">
                                                             <Button
-                                                                onClick={() =>
-                                                                    setIsDialogOpen(
-                                                                        true
-                                                                    )
-                                                                }
+                                                                onClick={() => {
+                                                                    console.log('🆕 Add Schedule button clicked (empty state) - clearing editingSchedule');
+                                                                    setEditingSchedule(null);
+                                                                    reset();
+                                                                    setIsDialogOpen(true);
+                                                                }}
                                                                 className="bg-indigo-600 hover:bg-indigo-700 text-white"
                                                             >
                                                                 <Plus className="h-4 w-4 mr-2" />
@@ -1479,7 +1579,17 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             </Dialog>
 
             {/* Schedule Form Dialog */}
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog 
+                open={isDialogOpen} 
+                onOpenChange={(open) => {
+                    setIsDialogOpen(open);
+                    if (!open) {
+                        console.log('🚪 Dialog closed - clearing editingSchedule');
+                        setEditingSchedule(null);
+                        reset();
+                    }
+                }}
+            >
                 <DialogContent className="max-h-[90vh] overflow-y-auto max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>

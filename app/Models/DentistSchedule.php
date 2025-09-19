@@ -34,8 +34,8 @@ class DentistSchedule extends Model
     ];
 
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'start_time' => 'string',
+        'end_time' => 'string',
         'date' => 'date',
         'is_available' => 'boolean',
         'buffer_time' => 'integer',
