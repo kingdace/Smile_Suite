@@ -270,50 +270,50 @@ export default function EditPayment({
             <Head title="Edit Payment" />
 
             <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
-                {/* Enhanced Header Section */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mx-5 mb-8 rounded-xl shadow-2xl">
+                {/* Compact Header Section */}
+                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mx-5 mb-6 rounded-xl shadow-2xl">
                     <div className="absolute inset-0 bg-black/5"></div>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
                     <div className="absolute top-1/2 left-1/4 w-20 h-20 bg-white/3 rounded-full -translate-y-10 -translate-x-10"></div>
 
-                    <div className="relative px-8 py-8">
+                    <div className="relative px-6 py-4">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6">
-                                <div className="p-4 bg-white/25 rounded-3xl backdrop-blur-sm border border-white/40 shadow-lg">
-                                    <DollarSign className="h-8 w-8 text-white" />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/25 rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                    <DollarSign className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold text-white mb-2">
+                                    <h1 className="text-2xl font-bold text-white mb-1">
                                         Edit Payment
                                     </h1>
-                                    <p className="text-blue-100 text-base font-medium">
+                                    <p className="text-blue-100 text-sm font-medium">
                                         Update payment information and details
                                     </p>
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <span className="text-blue-200 text-sm">
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <span className="text-blue-200 text-xs">
                                             Reference:
                                         </span>
                                         <Badge
                                             variant="outline"
-                                            className="bg-white/20 border-white/30 text-white"
+                                            className="bg-white/20 border-white/30 text-white text-xs px-2 py-1"
                                         >
                                             {payment.reference_number}
                                         </Badge>
-                                        <span className="text-blue-200 text-sm">
+                                        <span className="text-blue-200 text-xs">
                                             Status:
                                         </span>
                                         {getStatusBadge(payment.status)}
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
                                 <Button
                                     onClick={() => window.history.back()}
                                     variant="outline"
-                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-base px-6 py-3 rounded-xl transition-all duration-300"
+                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
                                 >
-                                    <ArrowLeft className="h-5 w-5" />
+                                    <ArrowLeft className="h-4 w-4" />
                                     Back
                                 </Button>
                             </div>
@@ -321,7 +321,7 @@ export default function EditPayment({
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-8 -mt-12 pb-16">
+                <div className="max-w-7xl mx-auto px-8 mt-6 pb-16">
                     <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
                         {/* Main Form */}
                         <div className="xl:col-span-3 space-y-8">

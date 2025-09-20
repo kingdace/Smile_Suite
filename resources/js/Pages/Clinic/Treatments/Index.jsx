@@ -441,142 +441,147 @@ export default function Index({ auth, treatments, services, filters }) {
                         </Card>
                     </div>
 
-                    {/* Combined Search, Filters & Table Section */}
-                    <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
-                        <CardContent className="p-0">
-                            {/* Search and Filters Header */}
-                            <div className="p-6 border-b border-gray-200 bg-gray-50/30">
-                                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
-                                            <FileText className="h-5 w-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900">
-                                                Treatment Records
-                                            </h3>
-                                            <p className="text-sm text-gray-600">
-                                                Search, filter, and manage all
-                                                treatments
-                                            </p>
-                                        </div>
+                    {/* Treatment Records Card */}
+                    <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden border border-blue-100/30">
+                        <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50">
+                            <div className="space-y-6">
+                                {/* Title Section - Top Row */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <FileText className="h-4 w-4 text-white" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-xl font-bold text-gray-900">
+                                            Treatment Records
+                                        </CardTitle>
+                                        <p className="text-sm text-gray-600">
+                                            Manage and view all treatment
+                                            information
+                                        </p>
                                     </div>
                                 </div>
 
-                                <form
-                                    onSubmit={handleFormSubmit}
-                                    className="space-y-4"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                                        <div className="relative">
-                                            <Input
-                                                type="text"
-                                                placeholder="Search treatments..."
-                                                value={search}
-                                                onChange={handleInputChange}
-                                                className="pl-10 pr-4 h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                            />
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                                        </div>
+                                {/* Search and Filters - Second Row */}
+                                <div className="flex items-center gap-4 justify-center">
+                                    <form
+                                        onSubmit={handleFormSubmit}
+                                        className="space-y-4"
+                                    >
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                                            <div className="relative">
+                                                <Input
+                                                    type="text"
+                                                    placeholder="Search treatments..."
+                                                    value={search}
+                                                    onChange={handleInputChange}
+                                                    className="pl-10 pr-4 h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                                />
+                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                            </div>
 
-                                        <Select
-                                            value={filterState.service_id}
-                                            onValueChange={(value) =>
-                                                handleFilterChange(
-                                                    "service_id",
-                                                    value
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                <SelectValue placeholder="All Services" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Services
-                                                </SelectItem>
-                                                {services.map((service) => (
-                                                    <SelectItem
-                                                        key={service.id}
-                                                        value={service.id.toString()}
-                                                    >
-                                                        {service.name}
+                                            <Select
+                                                value={filterState.service_id}
+                                                onValueChange={(value) =>
+                                                    handleFilterChange(
+                                                        "service_id",
+                                                        value
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                                    <SelectValue placeholder="All Services" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">
+                                                        All Services
                                                     </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                                    {services.map((service) => (
+                                                        <SelectItem
+                                                            key={service.id}
+                                                            value={service.id.toString()}
+                                                        >
+                                                            {service.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
 
-                                        <Select
-                                            value={filterState.status}
-                                            onValueChange={(value) =>
-                                                handleFilterChange(
-                                                    "status",
-                                                    value
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                <SelectValue placeholder="All Statuses" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Status
-                                                </SelectItem>
-                                                <SelectItem value="scheduled">
-                                                    Scheduled
-                                                </SelectItem>
-                                                <SelectItem value="in_progress">
-                                                    In Progress
-                                                </SelectItem>
-                                                <SelectItem value="completed">
-                                                    Completed
-                                                </SelectItem>
-                                                <SelectItem value="cancelled">
-                                                    Cancelled
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                            <Select
+                                                value={filterState.status}
+                                                onValueChange={(value) =>
+                                                    handleFilterChange(
+                                                        "status",
+                                                        value
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                                    <SelectValue placeholder="All Statuses" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">
+                                                        All Status
+                                                    </SelectItem>
+                                                    <SelectItem value="scheduled">
+                                                        Scheduled
+                                                    </SelectItem>
+                                                    <SelectItem value="in_progress">
+                                                        In Progress
+                                                    </SelectItem>
+                                                    <SelectItem value="completed">
+                                                        Completed
+                                                    </SelectItem>
+                                                    <SelectItem value="cancelled">
+                                                        Cancelled
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
 
-                                        <Select
-                                            value={filterState.payment_status}
-                                            onValueChange={(value) =>
-                                                handleFilterChange(
-                                                    "payment_status",
-                                                    value
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                <SelectValue placeholder="All Payment Statuses" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Payment Statuses
-                                                </SelectItem>
-                                                <SelectItem value="pending">
-                                                    Pending
-                                                </SelectItem>
-                                                <SelectItem value="partial">
-                                                    Partial
-                                                </SelectItem>
-                                                <SelectItem value="completed">
-                                                    Completed
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                            <Select
+                                                value={
+                                                    filterState.payment_status
+                                                }
+                                                onValueChange={(value) =>
+                                                    handleFilterChange(
+                                                        "payment_status",
+                                                        value
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger className="h-12 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                                    <SelectValue placeholder="All Payment Statuses" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">
+                                                        All Payment Statuses
+                                                    </SelectItem>
+                                                    <SelectItem value="pending">
+                                                        Pending
+                                                    </SelectItem>
+                                                    <SelectItem value="partial">
+                                                        Partial
+                                                    </SelectItem>
+                                                    <SelectItem value="completed">
+                                                        Completed
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
 
-                                        <Button
-                                            onClick={clearFilters}
-                                            variant="outline"
-                                            className="h-12 gap-2 text-sm px-4 rounded-xl border-gray-300 hover:bg-gray-50"
-                                        >
-                                            <XCircle className="h-4 w-4" />
-                                            Clear All
-                                        </Button>
-                                    </div>
-                                </form>
+                                            <Button
+                                                onClick={clearFilters}
+                                                variant="outline"
+                                                className="h-12 gap-2 text-sm px-4 rounded-xl border-gray-300 hover:bg-gray-50"
+                                            >
+                                                <XCircle className="h-4 w-4" />
+                                                Clear All
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                        </CardHeader>
 
+                        <CardContent className="p-0">
                             {/* Bulk Actions Bar */}
                             {showBulkActions &&
                                 selectedTreatments.length > 0 && (
@@ -606,10 +611,11 @@ export default function Index({ auth, treatments, services, filters }) {
                                     </div>
                                 )}
 
+                            {/* Treatment Records Table */}
                             <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+                                        <TableRow className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/70">
                                             {showBulkActions && (
                                                 <TableHead className="w-12">
                                                     <input
@@ -623,49 +629,49 @@ export default function Index({ auth, treatments, services, filters }) {
                                                 </TableHead>
                                             )}
                                             <TableHead
-                                                className="cursor-pointer hover:bg-gray-100/50 transition-colors"
+                                                className="cursor-pointer hover:bg-blue-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
                                                     handleSort("patient_id")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <User className="h-4 w-4 text-gray-500" />
+                                                    <User className="h-4 w-4 text-blue-600" />
                                                     Patient
                                                     {getSortIcon("patient_id")}
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer hover:bg-gray-100/50 transition-colors"
+                                                className="cursor-pointer hover:bg-green-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
                                                     handleSort("service_id")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <Stethoscope className="h-4 w-4 text-gray-500" />
+                                                    <Stethoscope className="h-4 w-4 text-blue-600" />
                                                     Service
                                                     {getSortIcon("service_id")}
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer hover:bg-gray-100/50 transition-colors"
+                                                className="cursor-pointer hover:bg-purple-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
                                                     handleSort("status")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <Activity className="h-4 w-4 text-gray-500" />
+                                                    <Activity className="h-4 w-4 text-blue-600" />
                                                     Status
                                                     {getSortIcon("status")}
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer hover:bg-gray-100/50 transition-colors"
+                                                className="cursor-pointer hover:bg-orange-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
                                                     handleSort("payment_status")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <DollarSign className="h-4 w-4 text-gray-500" />
+                                                    <DollarSign className="h-4 w-4 text-blue-600" />
                                                     Payment
                                                     {getSortIcon(
                                                         "payment_status"
@@ -673,31 +679,34 @@ export default function Index({ auth, treatments, services, filters }) {
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer hover:bg-gray-100/50 transition-colors"
+                                                className="cursor-pointer hover:bg-emerald-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
                                                     handleSort("cost")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <DollarSign className="h-4 w-4 text-gray-500" />
+                                                    <DollarSign className="h-4 w-4 text-blue-600" />
                                                     Cost
                                                     {getSortIcon("cost")}
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer hover:bg-gray-100/50 transition-colors"
+                                                className="cursor-pointer hover:bg-cyan-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
                                                     handleSort("start_date")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4 text-gray-500" />
+                                                    <Calendar className="h-4 w-4 text-blue-600" />
                                                     Date
                                                     {getSortIcon("start_date")}
                                                 </div>
                                             </TableHead>
-                                            <TableHead className="text-right">
-                                                Actions
+                                            <TableHead className="text-right text-gray-700 font-semibold">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <Settings className="h-4 w-4 text-blue-600" />
+                                                    Actions
+                                                </div>
                                             </TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -759,7 +768,7 @@ export default function Index({ auth, treatments, services, filters }) {
                                             treatments.data.map((treatment) => (
                                                 <TableRow
                                                     key={treatment.id}
-                                                    className="hover:bg-gray-50/50 transition-colors group"
+                                                    className="hover:bg-gradient-to-r hover:from-blue-50/60 hover:via-indigo-50/40 hover:to-cyan-50/60 transition-all duration-300 border-b border-gray-100/50 hover:border-blue-200/50"
                                                 >
                                                     {showBulkActions && (
                                                         <TableCell>
@@ -777,143 +786,227 @@ export default function Index({ auth, treatments, services, filters }) {
                                                             />
                                                         </TableCell>
                                                     )}
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                                                                <User className="h-5 w-5 text-white" />
+                                                    <TableCell
+                                                        className={`py-4 ${
+                                                            showBulkActions
+                                                                ? "px-2"
+                                                                : "px-4"
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                                                {treatment
+                                                                    .patient
+                                                                    ?.full_name
+                                                                    ? treatment.patient.full_name
+                                                                          .split(
+                                                                              " "
+                                                                          )
+                                                                          .slice(
+                                                                              0,
+                                                                              3
+                                                                          )
+                                                                          .map(
+                                                                              (
+                                                                                  word
+                                                                              ) =>
+                                                                                  word.charAt(
+                                                                                      0
+                                                                                  )
+                                                                          )
+                                                                          .join(
+                                                                              ""
+                                                                          )
+                                                                          .toUpperCase()
+                                                                    : "T"}
                                                             </div>
-                                                            <div>
-                                                                <p className="font-semibold text-gray-900">
+                                                            <div className="space-y-1">
+                                                                <div className="font-bold text-gray-900 text-base leading-tight">
                                                                     {treatment
                                                                         .patient
                                                                         ?.full_name ||
-                                                                        "N/A"}
-                                                                </p>
-                                                                <p className="text-sm text-gray-500">
+                                                                        "Unnamed Patient"}
+                                                                </div>
+                                                                <div className="flex items-center gap-1 flex-wrap">
+                                                                    <span className="text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-medium">
+                                                                        ID:{" "}
+                                                                        {
+                                                                            treatment.id
+                                                                        }
+                                                                    </span>
                                                                     {treatment
                                                                         .patient
-                                                                        ?.email ||
-                                                                        "No email"}
-                                                                </p>
+                                                                        ?.email && (
+                                                                        <span className="text-xs text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
+                                                                            {
+                                                                                treatment
+                                                                                    .patient
+                                                                                    .email
+                                                                            }
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell>
-                                                        <div>
-                                                            <p className="font-semibold text-gray-900">
-                                                                {treatment
-                                                                    .service
-                                                                    ?.name ||
-                                                                    "No service"}
-                                                            </p>
-                                                            <p className="text-sm text-gray-500 line-clamp-2">
-                                                                {treatment.diagnosis ||
-                                                                    "No diagnosis"}
-                                                            </p>
+                                                    <TableCell className="px-4 py-4">
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <Stethoscope className="h-3 w-3 text-gray-400" />
+                                                                <span className="text-sm font-medium text-gray-900 truncate">
+                                                                    {treatment
+                                                                        .service
+                                                                        ?.name || (
+                                                                        <span className="text-gray-400 italic font-normal">
+                                                                            No
+                                                                            service
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <FileText className="h-3 w-3 text-gray-400" />
+                                                                <span className="text-sm font-medium text-gray-900 line-clamp-2">
+                                                                    {treatment.diagnosis || (
+                                                                        <span className="text-gray-400 italic font-normal">
+                                                                            No
+                                                                            diagnosis
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell>
+                                                    <TableCell className="px-4 py-4">
                                                         <Badge
-                                                            className={`${getStatusColor(
-                                                                treatment.status
-                                                            )} px-3 py-1 rounded-full text-xs font-medium`}
-                                                        >
-                                                            {treatment.status.replace(
-                                                                "_",
-                                                                " "
-                                                            )}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge
-                                                            className={`${getPaymentStatusColor(
-                                                                treatment.payment_status
-                                                            )} px-3 py-1 rounded-full text-xs font-medium`}
-                                                        >
-                                                            {
-                                                                treatment.payment_status
+                                                            variant={
+                                                                treatment.status ===
+                                                                "completed"
+                                                                    ? "default"
+                                                                    : treatment.status ===
+                                                                      "in_progress"
+                                                                    ? "secondary"
+                                                                    : "outline"
                                                             }
+                                                            className={`text-xs font-semibold px-1.5 py-0.5 ${
+                                                                treatment.status ===
+                                                                "completed"
+                                                                    ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-300"
+                                                                    : treatment.status ===
+                                                                      "in_progress"
+                                                                    ? "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border-blue-300"
+                                                                    : treatment.status ===
+                                                                      "scheduled"
+                                                                    ? "bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border-yellow-300"
+                                                                    : "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border-gray-300"
+                                                            }`}
+                                                        >
+                                                            {treatment.status ===
+                                                            "completed"
+                                                                ? "Completed"
+                                                                : treatment.status ===
+                                                                  "in_progress"
+                                                                ? "In Progress"
+                                                                : treatment.status ===
+                                                                  "scheduled"
+                                                                ? "Scheduled"
+                                                                : "Cancelled"}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-bold text-gray-900">
+                                                    <TableCell className="px-4 py-4">
+                                                        <Badge
+                                                            className={`text-xs font-semibold px-1.5 py-0.5 ${
+                                                                treatment.payment_status ===
+                                                                "completed"
+                                                                    ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-300"
+                                                                    : treatment.payment_status ===
+                                                                      "partial"
+                                                                    ? "bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border-yellow-300"
+                                                                    : "bg-gradient-to-r from-red-100 to-pink-100 text-red-700 border-red-300"
+                                                            }`}
+                                                        >
+                                                            {treatment.payment_status ===
+                                                            "completed"
+                                                                ? "Paid"
+                                                                : treatment.payment_status ===
+                                                                  "partial"
+                                                                ? "Partial"
+                                                                : "Pending"}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-4">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-xs border border-emerald-200 font-bold">
                                                                 ₱
                                                                 {parseFloat(
                                                                     treatment.cost ||
                                                                         0
                                                                 ).toLocaleString()}
                                                             </span>
-                                                            {treatment.payment_status ===
-                                                                "completed" && (
-                                                                <CheckCircle className="h-4 w-4 text-green-500" />
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="px-4 py-4">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {treatment.start_date ? (
+                                                                <span className="text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded text-xs border border-cyan-200">
+                                                                    {format(
+                                                                        new Date(
+                                                                            treatment.start_date
+                                                                        ),
+                                                                        "MMM dd, yyyy"
+                                                                    )}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-gray-400 italic font-normal bg-gray-50 px-1.5 py-0.5 rounded text-xs border border-gray-200">
+                                                                    No date
+                                                                </span>
+                                                            )}
+                                                            {treatment.estimated_duration_minutes && (
+                                                                <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                                                                    <Clock className="h-3 w-3" />
+                                                                    <span>
+                                                                        {
+                                                                            treatment.estimated_duration_minutes
+                                                                        }{" "}
+                                                                        min
+                                                                    </span>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell>
-                                                        <div>
-                                                            <p className="font-medium text-gray-900">
-                                                                {treatment.start_date
-                                                                    ? format(
-                                                                          new Date(
-                                                                              treatment.start_date
-                                                                          ),
-                                                                          "MMM dd, yyyy"
-                                                                      )
-                                                                    : "No date"}
-                                                            </p>
-                                                            <div className="flex items-center gap-1 text-xs text-gray-500">
-                                                                <Clock className="h-3 w-3" />
-                                                                {treatment.estimated_duration_minutes
-                                                                    ? `${treatment.estimated_duration_minutes} min`
-                                                                    : "No duration"}
-                                                            </div>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-2 justify-end">
-                                                            <Link
-                                                                href={route(
-                                                                    "clinic.treatments.show",
-                                                                    {
-                                                                        clinic: auth.clinic_id,
-                                                                        treatment:
-                                                                            treatment.id,
-                                                                    }
-                                                                )}
+                                                    <TableCell className="px-4 py-4">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    router.visit(
+                                                                        `/clinic/${auth.clinic_id}/treatments/${treatment.id}`
+                                                                    )
+                                                                }
+                                                                className="h-8 w-8 p-0 bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:border-blue-300 transition-all duration-200"
+                                                                title="View Treatment Details"
                                                             >
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-300"
-                                                                >
-                                                                    <Eye className="h-4 w-4" />
-                                                                </Button>
-                                                            </Link>
-                                                            <Link
-                                                                href={route(
-                                                                    "clinic.treatments.edit",
-                                                                    {
-                                                                        clinic: auth.clinic_id,
-                                                                        treatment:
-                                                                            treatment.id,
-                                                                    }
-                                                                )}
+                                                                <Eye className="h-3 w-3" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    router.visit(
+                                                                        `/clinic/${auth.clinic_id}/treatments/${treatment.id}/edit`
+                                                                    )
+                                                                }
+                                                                className="h-8 w-8 p-0 bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-200"
+                                                                title="Edit Treatment"
                                                             >
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-300"
-                                                                >
-                                                                    <Pencil className="h-4 w-4" />
-                                                                </Button>
-                                                            </Link>
+                                                                <Pencil className="h-3 w-3" />
+                                                            </Button>
                                                             {auth.user.role ===
                                                                 "clinic_admin" && (
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-300 text-red-600"
                                                                     onClick={() =>
                                                                         handleDeleteTreatment(
                                                                             treatment.id,
@@ -923,8 +1016,10 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                                 "Treatment"
                                                                         )
                                                                     }
+                                                                    className="h-8 w-8 p-0 bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                                                                    title="Delete Treatment"
                                                                 >
-                                                                    <Trash2 className="h-4 w-4" />
+                                                                    <Trash2 className="h-3 w-3" />
                                                                 </Button>
                                                             )}
                                                         </div>

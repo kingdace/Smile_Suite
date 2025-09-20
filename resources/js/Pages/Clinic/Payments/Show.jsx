@@ -28,7 +28,6 @@ import {
     RefreshCw,
     X,
     Eye,
-    Download,
 } from "lucide-react";
 
 export default function Show({ auth, payment, relatedPayments = [] }) {
@@ -137,61 +136,61 @@ export default function Show({ auth, payment, relatedPayments = [] }) {
             <Head title="Payment Details" />
 
             <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
-                {/* Enhanced Header Section */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mx-5 mb-8 rounded-xl shadow-2xl">
+                {/* Compact Header Section */}
+                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mx-5 mb-6 rounded-xl shadow-2xl">
                     <div className="absolute inset-0 bg-black/5"></div>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
                     <div className="absolute top-1/2 left-1/4 w-20 h-20 bg-white/3 rounded-full -translate-y-10 -translate-x-10"></div>
 
-                    <div className="relative px-8 py-8">
+                    <div className="relative px-6 py-4">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6">
-                                <div className="p-4 bg-white/25 rounded-3xl backdrop-blur-sm border border-white/40 shadow-lg">
-                                    <DollarSign className="h-8 w-8 text-white" />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/25 rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                    <DollarSign className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold text-white mb-2">
+                                    <h1 className="text-2xl font-bold text-white mb-1">
                                         Payment Details
                                     </h1>
-                                    <p className="text-blue-100 text-base font-medium">
+                                    <p className="text-blue-100 text-sm font-medium">
                                         {payment.patient
                                             ? `${payment.patient.first_name} ${payment.patient.last_name}`
                                             : "Payment"}{" "}
                                         - Complete payment information
                                     </p>
-                                    <div className="flex items-center gap-4 mt-3">
-                                        <span className="text-blue-200 text-sm">
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <span className="text-blue-200 text-xs">
                                             Reference:
                                         </span>
                                         <Badge
                                             variant="outline"
-                                            className="bg-white/20 border-white/30 text-white font-mono"
+                                            className="bg-white/20 border-white/30 text-white font-mono text-xs px-2 py-1"
                                         >
                                             {payment.reference_number || "N/A"}
                                         </Badge>
-                                        <span className="text-blue-200 text-sm">
+                                        <span className="text-blue-200 text-xs">
                                             Amount:
                                         </span>
                                         <Badge
                                             variant="outline"
-                                            className="bg-green-500/20 border-green-400/30 text-green-100"
+                                            className="bg-green-500/20 border-green-400/30 text-green-100 text-xs px-2 py-1"
                                         >
                                             {formatCurrency(payment.amount)}
                                         </Badge>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
                                 <Link
                                     href={route("clinic.payments.edit", [
                                         auth.clinic?.id,
                                         payment.id,
                                     ])}
                                 >
-                                    <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white text-base px-6 py-3 rounded-xl transition-all duration-300">
-                                        <Edit className="h-5 w-5" />
-                                        Edit Payment
+                                    <Button className="gap-1 bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-all duration-300">
+                                        <Edit className="h-4 w-4" />
+                                        Edit
                                     </Button>
                                 </Link>
                                 <a
@@ -202,17 +201,17 @@ export default function Show({ auth, payment, relatedPayments = [] }) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-3 rounded-xl transition-all duration-300">
-                                        <Printer className="h-5 w-5" />
-                                        Print Receipt
+                                    <Button className="gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-all duration-300">
+                                        <Printer className="h-4 w-4" />
+                                        Receipt
                                     </Button>
                                 </a>
                                 <Button
                                     variant="outline"
                                     onClick={() => window.history.back()}
-                                    className="gap-2 text-base px-6 py-3 rounded-xl transition-all duration-300 border backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30"
+                                    className="gap-1 text-sm px-4 py-2 rounded-lg transition-all duration-300 border backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30"
                                 >
-                                    <ArrowLeft className="h-5 w-5" />
+                                    <ArrowLeft className="h-4 w-4" />
                                     Back
                                 </Button>
                             </div>
@@ -220,10 +219,10 @@ export default function Show({ auth, payment, relatedPayments = [] }) {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-8 -mt-12 pb-16">
-                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+                <div className="max-w-7xl mx-auto px-8 mt-6 pb-16">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                         {/* Main Content */}
-                        <div className="xl:col-span-3 space-y-8">
+                        <div className="xl:col-span-2 space-y-8">
                             {/* Payment Information */}
                             <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30">
                                 <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50 px-8 py-6">
@@ -452,100 +451,9 @@ export default function Show({ auth, payment, relatedPayments = [] }) {
                         </div>
 
                         {/* Sidebar */}
-                        <div className="space-y-8">
-                            {/* Quick Actions */}
-                            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30">
-                                <CardHeader className="bg-gradient-to-r from-gray-50 via-purple-50/30 to-violet-50/20 border-b border-gray-200/50 px-6 py-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                                            <Edit className="h-6 w-6 text-white" />
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-xl font-bold text-gray-900">
-                                                Quick Actions
-                                            </CardTitle>
-                                            <p className="text-sm text-gray-600">
-                                                Manage this payment
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-6">
-                                    <div className="space-y-4">
-                                        <Link
-                                            href={route(
-                                                "clinic.payments.edit",
-                                                [auth.clinic?.id, payment.id]
-                                            )}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                className="w-full"
-                                            >
-                                                <Edit className="h-4 w-4 mr-2" />
-                                                Edit Payment
-                                            </Button>
-                                        </Link>
-                                        <a
-                                            href={route(
-                                                "clinic.payments.receipt",
-                                                {
-                                                    clinic: auth.clinic?.id,
-                                                    payment: payment.id,
-                                                }
-                                            )}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                className="w-full"
-                                            >
-                                                <Printer className="h-4 w-4 mr-2" />
-                                                Print Receipt
-                                            </Button>
-                                        </a>
-                                        <Button
-                                            variant="outline"
-                                            className="w-full"
-                                            onClick={() => {
-                                                // Download functionality
-                                                const receiptUrl = route(
-                                                    "clinic.payments.receipt",
-                                                    {
-                                                        clinic: auth.clinic?.id,
-                                                        payment: payment.id,
-                                                    }
-                                                );
-                                                window.open(
-                                                    receiptUrl,
-                                                    "_blank"
-                                                );
-                                            }}
-                                        >
-                                            <Download className="h-4 w-4 mr-2" />
-                                            Download Receipt
-                                        </Button>
-                                        <Link
-                                            href={route(
-                                                "clinic.payments.index",
-                                                [auth.clinic?.id]
-                                            )}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                className="w-full"
-                                            >
-                                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                                Back to Payments
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
+                        <div className="flex flex-col space-y-8 h-full">
                             {/* Payment Summary */}
-                            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30">
+                            <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30 flex-[2]">
                                 <CardHeader className="bg-gradient-to-r from-gray-50 via-green-50/30 to-emerald-50/20 border-b border-gray-200/50 px-6 py-6">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
@@ -625,7 +533,7 @@ export default function Show({ auth, payment, relatedPayments = [] }) {
 
                             {/* Patient Information */}
                             {payment.patient && (
-                                <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30">
+                                <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30 flex-[1]">
                                     <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50 px-6 py-6">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">

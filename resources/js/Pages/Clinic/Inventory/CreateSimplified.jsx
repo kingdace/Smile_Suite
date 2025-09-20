@@ -14,20 +14,13 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import {
-    CalendarIcon,
     Loader2,
     Package,
     ArrowLeft,
     Save,
+    DollarSign,
+    Calendar,
 } from "lucide-react";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/Components/ui/popover";
-import { Calendar as CalendarComponent } from "@/Components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { useState } from "react";
 
 export default function CreateSimplified({ auth, clinic, suppliers }) {
@@ -56,9 +49,13 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         const formData = { ...data };
-        
+
         // Convert empty supplier to null
-        if (!formData.supplier_id || formData.supplier_id === "" || formData.supplier_id === "none") {
+        if (
+            !formData.supplier_id ||
+            formData.supplier_id === "" ||
+            formData.supplier_id === "none"
+        ) {
             formData.supplier_id = null;
         }
 
@@ -68,9 +65,10 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
     };
 
     // Calculate total value
-    const totalValue = data.quantity && data.unit_price 
-        ? parseFloat(data.quantity) * parseFloat(data.unit_price)
-        : 0;
+    const totalValue =
+        data.quantity && data.unit_price
+            ? parseFloat(data.quantity) * parseFloat(data.unit_price)
+            : 0;
 
     return (
         <AuthenticatedLayout auth={auth}>
@@ -78,8 +76,8 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
 
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50">
                 {/* Header */}
-                <div className="pt-6 pb-2">
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="pt-4 pb-2">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 rounded-2xl shadow-2xl backdrop-blur-sm border border-white/20">
                             <div className="px-6 py-4">
                                 <div className="flex items-center justify-between">
@@ -89,16 +87,17 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                                                 <Package className="h-6 w-6 text-white" />
                                             </div>
                                             <div>
-                                                <h1 className="text-xl font-bold text-white drop-shadow-sm">
+                                                <h1 className="text-2xl font-bold text-white drop-shadow-sm">
                                                     Add New Inventory Item
                                                 </h1>
                                                 <p className="text-sm text-blue-100 font-medium">
-                                                    Simple inventory tracking for your clinic
+                                                    Simple inventory tracking
+                                                    for your clinic
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex items-center space-x-3">
                                         <Button
                                             variant="outline"
@@ -106,7 +105,12 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                                             asChild
                                             className="border-white/50 text-white hover:bg-white/30 backdrop-blur-sm bg-white/10"
                                         >
-                                            <Link href={route("clinic.inventory.index", [clinic.id])}>
+                                            <Link
+                                                href={route(
+                                                    "clinic.inventory.index",
+                                                    [clinic.id]
+                                                )}
+                                            >
                                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                                 Back to Inventory
                                             </Link>
@@ -119,103 +123,183 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                 </div>
 
                 {/* Main Content */}
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <Card className="border-0 shadow-xl bg-white">
-                        <CardHeader className="pb-6">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
+                        <CardHeader className="pb-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-b border-gray-100">
                             <CardTitle className="text-2xl font-semibold text-gray-900 flex items-center space-x-3">
-                                <Package className="h-6 w-6 text-blue-600" />
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <Package className="h-5 w-5 text-white" />
+                                </div>
                                 <span>Item Information</span>
                             </CardTitle>
-                            <p className="text-gray-600">Fill in the essential details for your inventory item</p>
+                            <p className="text-gray-600 mt-2">
+                                Fill in the essential details for your inventory
+                                item
+                            </p>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-8">
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 {/* Basic Information */}
                                 <div className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                         {/* Item Name */}
-                                        <div className="md:col-span-2">
-                                            <Label htmlFor="name" className="text-base font-medium">
+                                        <div className="lg:col-span-2">
+                                            <Label
+                                                htmlFor="name"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Item Name *
                                             </Label>
                                             <Input
                                                 id="name"
                                                 type="text"
                                                 value={data.name}
-                                                onChange={(e) => setData("name", e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "name",
+                                                        e.target.value
+                                                    )
+                                                }
                                                 placeholder="e.g., Paracetamol 500mg, Gauze Pads, Dental Mirror"
-                                                className="mt-2 h-12 text-base"
+                                                className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                                 required
                                             />
-                                            <InputError message={errors.name} className="mt-2" />
+                                            <InputError
+                                                message={errors.name}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         {/* Category */}
                                         <div>
-                                            <Label htmlFor="category" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="category"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Category *
                                             </Label>
-                                            <Select value={data.category} onValueChange={(value) => setData("category", value)}>
-                                                <SelectTrigger className="mt-2 h-12 text-base">
+                                            <Select
+                                                value={data.category}
+                                                onValueChange={(value) =>
+                                                    setData("category", value)
+                                                }
+                                            >
+                                                <SelectTrigger className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                                                     <SelectValue placeholder="Select category" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {categories.map((category) => (
-                                                        <SelectItem key={category.value} value={category.value}>
-                                                            {category.label}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {categories.map(
+                                                        (category) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    category.value
+                                                                }
+                                                                value={
+                                                                    category.value
+                                                                }
+                                                            >
+                                                                {category.label}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
                                                 </SelectContent>
                                             </Select>
-                                            <InputError message={errors.category} className="mt-2" />
+                                            <InputError
+                                                message={errors.category}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         {/* Supplier (Optional) */}
                                         <div>
-                                            <Label htmlFor="supplier_id" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="supplier_id"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Supplier (Optional)
                                             </Label>
-                                            <Select value={data.supplier_id} onValueChange={(value) => setData("supplier_id", value)}>
-                                                <SelectTrigger className="mt-2 h-12 text-base">
+                                            <Select
+                                                value={data.supplier_id}
+                                                onValueChange={(value) =>
+                                                    setData(
+                                                        "supplier_id",
+                                                        value
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                                                     <SelectValue placeholder="Select supplier (optional)" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="none">No Supplier</SelectItem>
-                                                    {suppliers.map((supplier) => (
-                                                        <SelectItem key={supplier.id} value={supplier.id.toString()}>
-                                                            {supplier.name}
-                                                        </SelectItem>
-                                                    ))}
+                                                    <SelectItem value="none">
+                                                        No Supplier
+                                                    </SelectItem>
+                                                    {suppliers.map(
+                                                        (supplier) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    supplier.id
+                                                                }
+                                                                value={supplier.id.toString()}
+                                                            >
+                                                                {supplier.name}
+                                                            </SelectItem>
+                                                        )
+                                                    )}
                                                 </SelectContent>
                                             </Select>
-                                            <InputError message={errors.supplier_id} className="mt-2" />
+                                            <InputError
+                                                message={errors.supplier_id}
+                                                className="mt-2"
+                                            />
                                         </div>
                                     </div>
 
                                     {/* Description */}
                                     <div>
-                                        <Label htmlFor="description" className="text-base font-medium">
+                                        <Label
+                                            htmlFor="description"
+                                            className="text-base font-semibold text-gray-700"
+                                        >
                                             Description
                                         </Label>
                                         <Textarea
                                             id="description"
                                             value={data.description}
-                                            onChange={(e) => setData("description", e.target.value)}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "description",
+                                                    e.target.value
+                                                )
+                                            }
                                             placeholder="Brief description of the item..."
-                                            className="mt-2 min-h-[100px] text-base"
+                                            className="mt-2 min-h-[100px] text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                             rows={4}
                                         />
-                                        <InputError message={errors.description} className="mt-2" />
+                                        <InputError
+                                            message={errors.description}
+                                            className="mt-2"
+                                        />
                                     </div>
                                 </div>
 
                                 {/* Stock & Pricing */}
-                                <div className="border-t pt-8">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Stock & Pricing</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="border-t border-gray-200 pt-8">
+                                    <div className="flex items-center space-x-3 mb-6">
+                                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+                                            <DollarSign className="h-4 w-4 text-white" />
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                            Stock & Pricing
+                                        </h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                         {/* Current Quantity */}
                                         <div>
-                                            <Label htmlFor="quantity" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="quantity"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Current Quantity *
                                             </Label>
                                             <Input
@@ -223,17 +307,28 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                                                 type="number"
                                                 min="0"
                                                 value={data.quantity}
-                                                onChange={(e) => setData("quantity", e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "quantity",
+                                                        e.target.value
+                                                    )
+                                                }
                                                 placeholder="0"
-                                                className="mt-2 h-12 text-base"
+                                                className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                                 required
                                             />
-                                            <InputError message={errors.quantity} className="mt-2" />
+                                            <InputError
+                                                message={errors.quantity}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         {/* Minimum Quantity (for alerts) */}
                                         <div>
-                                            <Label htmlFor="minimum_quantity" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="minimum_quantity"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Alert When Below *
                                             </Label>
                                             <Input
@@ -241,18 +336,33 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                                                 type="number"
                                                 min="0"
                                                 value={data.minimum_quantity}
-                                                onChange={(e) => setData("minimum_quantity", e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "minimum_quantity",
+                                                        e.target.value
+                                                    )
+                                                }
                                                 placeholder="5"
-                                                className="mt-2 h-12 text-base"
+                                                className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                                 required
                                             />
-                                            <InputError message={errors.minimum_quantity} className="mt-2" />
-                                            <p className="text-sm text-gray-500 mt-1">Low stock alert threshold</p>
+                                            <InputError
+                                                message={
+                                                    errors.minimum_quantity
+                                                }
+                                                className="mt-2"
+                                            />
+                                            <p className="text-sm text-gray-500 mt-1">
+                                                Low stock alert threshold
+                                            </p>
                                         </div>
 
                                         {/* Unit Price */}
                                         <div>
-                                            <Label htmlFor="unit_price" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="unit_price"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Unit Price (₱) *
                                             </Label>
                                             <Input
@@ -261,24 +371,44 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                                                 step="0.01"
                                                 min="0"
                                                 value={data.unit_price}
-                                                onChange={(e) => setData("unit_price", e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "unit_price",
+                                                        e.target.value
+                                                    )
+                                                }
                                                 placeholder="0.00"
-                                                className="mt-2 h-12 text-base"
+                                                className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                                 required
                                             />
-                                            <InputError message={errors.unit_price} className="mt-2" />
+                                            <InputError
+                                                message={errors.unit_price}
+                                                className="mt-2"
+                                            />
                                         </div>
                                     </div>
 
                                     {/* Total Value Display */}
                                     {totalValue > 0 && (
-                                        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                        <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 shadow-sm">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-base font-medium text-blue-900">
-                                                    Total Stock Value:
-                                                </span>
-                                                <span className="text-xl font-bold text-blue-900">
-                                                    ₱{totalValue.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                                        <DollarSign className="h-5 w-5 text-white" />
+                                                    </div>
+                                                    <span className="text-lg font-semibold text-blue-900">
+                                                        Total Stock Value:
+                                                    </span>
+                                                </div>
+                                                <span className="text-2xl font-bold text-blue-900">
+                                                    ₱
+                                                    {totalValue.toLocaleString(
+                                                        "en-PH",
+                                                        {
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2,
+                                                        }
+                                                    )}
                                                 </span>
                                             </div>
                                         </div>
@@ -286,77 +416,105 @@ export default function CreateSimplified({ auth, clinic, suppliers }) {
                                 </div>
 
                                 {/* Additional Details */}
-                                <div className="border-t pt-8">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Additional Details</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="border-t border-gray-200 pt-8">
+                                    <div className="flex items-center space-x-3 mb-6">
+                                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center">
+                                            <Calendar className="h-4 w-4 text-white" />
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-gray-900">
+                                            Additional Details
+                                        </h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                         {/* Expiry Date */}
                                         <div>
-                                            <Label htmlFor="expiry_date" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="expiry_date"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Expiry Date (Optional)
                                             </Label>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        className={cn(
-                                                            "w-full mt-2 h-12 text-base justify-start text-left font-normal",
-                                                            !data.expiry_date && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                                        {data.expiry_date ? (
-                                                            format(data.expiry_date, "PPP")
-                                                        ) : (
-                                                            <span>Pick expiry date</span>
-                                                        )}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0">
-                                                    <CalendarComponent
-                                                        mode="single"
-                                                        selected={data.expiry_date}
-                                                        onSelect={(date) => setData("expiry_date", date)}
-                                                        initialFocus
-                                                        disabled={(date) => date < new Date()}
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <InputError message={errors.expiry_date} className="mt-2" />
+                                            <Input
+                                                id="expiry_date"
+                                                type="date"
+                                                value={
+                                                    data.expiry_date
+                                                        ? new Date(
+                                                              data.expiry_date
+                                                          )
+                                                              .toISOString()
+                                                              .split("T")[0]
+                                                        : ""
+                                                }
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "expiry_date",
+                                                        e.target.value
+                                                            ? new Date(
+                                                                  e.target.value
+                                                              )
+                                                            : undefined
+                                                    )
+                                                }
+                                                min={
+                                                    new Date()
+                                                        .toISOString()
+                                                        .split("T")[0]
+                                                }
+                                                className="mt-2 h-12 text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                            />
+                                            <InputError
+                                                message={errors.expiry_date}
+                                                className="mt-2"
+                                            />
                                         </div>
 
                                         {/* Notes */}
                                         <div>
-                                            <Label htmlFor="notes" className="text-base font-medium">
+                                            <Label
+                                                htmlFor="notes"
+                                                className="text-base font-semibold text-gray-700"
+                                            >
                                                 Notes (Optional)
                                             </Label>
                                             <Textarea
                                                 id="notes"
                                                 value={data.notes}
-                                                onChange={(e) => setData("notes", e.target.value)}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "notes",
+                                                        e.target.value
+                                                    )
+                                                }
                                                 placeholder="Additional notes..."
-                                                className="mt-2 min-h-[100px] text-base"
+                                                className="mt-2 min-h-[100px] text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                                                 rows={4}
                                             />
-                                            <InputError message={errors.notes} className="mt-2" />
+                                            <InputError
+                                                message={errors.notes}
+                                                className="mt-2"
+                                            />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="border-t pt-8">
+                                <div className="border-t border-gray-200 pt-8">
                                     <div className="flex items-center justify-end space-x-4">
                                         <Button
                                             type="button"
                                             variant="outline"
-                                            onClick={() => window.history.back()}
-                                            className="h-12 px-8 text-base"
+                                            onClick={() =>
+                                                window.history.back()
+                                            }
+                                            className="h-12 px-8 text-base border-gray-300 hover:bg-gray-50"
                                         >
                                             Cancel
                                         </Button>
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                                            className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200"
                                         >
                                             {processing ? (
                                                 <>

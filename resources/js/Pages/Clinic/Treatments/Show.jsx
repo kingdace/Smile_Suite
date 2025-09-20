@@ -50,20 +50,7 @@ import ImageGallery from "@/Components/ImageGallery";
 
 export default function Show({ auth, treatment }) {
     useEffect(() => {
-        console.log("Treatment prop changed:", treatment);
-        console.log("Appointment data:", treatment.appointment);
-        console.log("Inventory items:", treatment?.inventoryItems);
-        console.log(
-            "Inventory items count:",
-            treatment?.inventoryItems?.length
-        );
-        console.log("Inventory deducted:", treatment?.inventory_deducted);
-        console.log("Treatment keys:", Object.keys(treatment || {}));
-        console.log("Inventory items type:", typeof treatment?.inventoryItems);
-        console.log(
-            "Inventory items is array:",
-            Array.isArray(treatment?.inventoryItems)
-        );
+        // Treatment data loaded
     }, [treatment]);
 
     const { delete: destroy } = useForm({});
@@ -163,28 +150,28 @@ export default function Show({ auth, treatment }) {
         >
             <Head title={`Treatment: ${treatment.name}`} />
 
-            <div key={treatment.id} className="py-12">
+            <div key={treatment.id} className="py-4">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    {/* Enhanced Header Card */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl shadow-2xl">
+                    {/* Compact Enhanced Header Card */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl shadow-xl">
                         {/* Background decorative elements */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-400/20 rounded-full blur-xl"></div>
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-400/20 rounded-full blur-lg"></div>
 
-                        <div className="relative p-8">
-                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                        <div className="relative p-6">
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                                 {/* Left side - Treatment info */}
-                                <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-4">
                                     {/* Treatment icon */}
                                     <div className="relative">
-                                        <div className="w-20 h-20 bg-gradient-to-br from-white/30 to-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-lg">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-white/20 to-white/10 rounded-xl flex items-center justify-center">
-                                                <NotebookPen className="h-6 w-6 text-white" />
+                                        <div className="w-14 h-14 bg-gradient-to-br from-white/30 to-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-md">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-white/20 to-white/10 rounded-lg flex items-center justify-center">
+                                                <NotebookPen className="h-4 w-4 text-white" />
                                             </div>
                                         </div>
                                         {/* Status indicator */}
                                         <div
-                                            className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white shadow-md ${
+                                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
                                                 treatment.status === "completed"
                                                     ? "bg-green-400"
                                                     : treatment.status ===
@@ -198,7 +185,7 @@ export default function Show({ auth, treatment }) {
                                         ></div>
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         <div className="flex items-center gap-3">
                                             <Link
                                                 href={route(
@@ -209,28 +196,28 @@ export default function Show({ auth, treatment }) {
                                                 )}
                                                 className="text-white/80 hover:text-white transition-colors"
                                             >
-                                                <ArrowLeft className="h-5 w-5" />
+                                                <ArrowLeft className="h-4 w-4" />
                                             </Link>
-                                            <h1 className="text-3xl font-bold text-white tracking-tight">
+                                            <h1 className="text-2xl font-bold text-white tracking-tight">
                                                 {treatment.name}
                                             </h1>
                                         </div>
-                                        <div className="flex items-center gap-3 text-white/90 text-sm">
-                                            <span className="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-lg backdrop-blur-sm">
+                                        <div className="flex items-center gap-2 text-white/90 text-sm">
+                                            <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
                                                 <FileText className="h-3 w-3" />
                                                 #{treatment.id}
                                             </span>
-                                            <span className="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-lg backdrop-blur-sm">
+                                            <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
                                                 <Calendar className="h-3 w-3" />
                                                 {format(
                                                     new Date(
                                                         treatment.created_at
                                                     ),
-                                                    "PPP"
+                                                    "MMM d, yyyy"
                                                 )}
                                             </span>
                                             {treatment.patient && (
-                                                <span className="flex items-center gap-1 bg-white/10 px-3 py-1 rounded-lg backdrop-blur-sm">
+                                                <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
                                                     <Users className="h-3 w-3" />
                                                     {
                                                         treatment.patient
@@ -243,11 +230,11 @@ export default function Show({ auth, treatment }) {
                                 </div>
 
                                 {/* Right side - Status badges and actions */}
-                                <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-3">
                                     {/* Status badges */}
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2 flex-wrap">
                                         <div
-                                            className={`px-4 py-2 rounded-xl text-sm font-semibold text-white shadow-lg backdrop-blur-sm ${
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white shadow-md backdrop-blur-sm ${
                                                 treatment.status === "completed"
                                                     ? "bg-green-500/80 border border-green-400/50"
                                                     : treatment.status ===
@@ -267,7 +254,7 @@ export default function Show({ auth, treatment }) {
                                                     .replace("_", " ")}
                                         </div>
                                         <div
-                                            className={`px-4 py-2 rounded-xl text-sm font-semibold text-white shadow-lg backdrop-blur-sm ${
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white shadow-md backdrop-blur-sm ${
                                                 treatment.payment_status ===
                                                 "completed"
                                                     ? "bg-green-500/80 border border-green-400/50"
@@ -289,7 +276,7 @@ export default function Show({ auth, treatment }) {
                                         </div>
                                         {treatment.outcome && (
                                             <div
-                                                className={`px-4 py-2 rounded-xl text-sm font-semibold text-white shadow-lg backdrop-blur-sm ${
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white shadow-md backdrop-blur-sm ${
                                                     treatment.outcome ===
                                                     "successful"
                                                         ? "bg-green-500/80 border border-green-400/50"
@@ -309,37 +296,34 @@ export default function Show({ auth, treatment }) {
                                             </div>
                                         )}
                                     </div>
+                                </div>
 
-                                    {/* Action buttons */}
-                                    <div className="flex gap-3">
-                                        <Link
-                                            href={route(
-                                                "clinic.treatments.edit",
-                                                {
-                                                    clinic: auth.clinic_id,
-                                                    treatment: treatment.id,
-                                                }
-                                            )}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm"
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                                Edit Treatment
-                                            </Button>
-                                        </Link>
+                                {/* Action buttons - moved to absolute right corner */}
+                                <div className="flex gap-2">
+                                    <Link
+                                        href={route("clinic.treatments.edit", {
+                                            clinic: auth.clinic_id,
+                                            treatment: treatment.id,
+                                        })}
+                                    >
                                         <Button
-                                            variant="destructive"
+                                            variant="outline"
                                             size="sm"
-                                            onClick={handleDelete}
-                                            className="flex items-center gap-2 bg-red-500/80 hover:bg-red-600/80 border-red-400/50 text-white backdrop-blur-sm"
+                                            className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm text-xs px-3 py-1.5 h-8"
                                         >
-                                            <Trash2 className="h-4 w-4" />
-                                            Delete
+                                            <Pencil className="h-3 w-3" />
+                                            Edit
                                         </Button>
-                                    </div>
+                                    </Link>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={handleDelete}
+                                        className="flex items-center gap-1.5 bg-red-500/80 hover:bg-red-600/80 border-red-400/50 text-white backdrop-blur-sm text-xs px-3 py-1.5 h-8"
+                                    >
+                                        <Trash2 className="h-3 w-3" />
+                                        Delete
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -1327,214 +1311,176 @@ export default function Show({ auth, treatment }) {
                                         </div>
                                     )}
 
-                                {/* Debug Info */}
-                                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
-                                    <h4 className="text-sm font-semibold text-yellow-800 mb-2">
-                                        Debug Info:
-                                    </h4>
-                                    <p className="text-xs text-yellow-700">
-                                        Inventory Items:{" "}
-                                        {treatment?.inventoryItems
-                                            ? "EXISTS"
-                                            : "NULL"}{" "}
-                                        | Count:{" "}
-                                        {treatment?.inventoryItems?.length || 0}{" "}
-                                        | Type:{" "}
-                                        {typeof treatment?.inventoryItems} | Is
-                                        Array:{" "}
-                                        {Array.isArray(
-                                            treatment?.inventoryItems
-                                        )
-                                            ? "YES"
-                                            : "NO"}{" "}
-                                        | Deducted:{" "}
-                                        {treatment?.inventory_deducted
-                                            ? "YES"
-                                            : "NO"}
-                                    </p>
-                                </div>
-
                                 {/* Inventory Items Used */}
-                                {(() => {
-                                    console.log("Condition check:", {
-                                        hasInventoryItems:
-                                            !!treatment.inventoryItems,
-                                        isArray: Array.isArray(
-                                            treatment.inventoryItems
-                                        ),
-                                        length: treatment.inventoryItems
-                                            ?.length,
-                                        condition:
-                                            treatment.inventoryItems &&
-                                            treatment.inventoryItems.length > 0,
-                                    });
-                                    return (
-                                        treatment.inventoryItems &&
-                                        treatment.inventoryItems.length > 0
-                                    );
-                                })() && (
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600 mb-4 flex items-center gap-2">
-                                            <Package className="h-4 w-4" />
-                                            Inventory Items Used (
-                                            {treatment.inventoryItems.length})
-                                        </p>
-                                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
-                                            <div className="space-y-4">
-                                                {treatment.inventoryItems.map(
-                                                    (item, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="bg-white rounded-lg p-4 border border-blue-200 shadow-sm"
-                                                        >
-                                                            <div className="flex items-start justify-between">
-                                                                <div className="flex-1">
-                                                                    <div className="flex items-center gap-3 mb-2">
-                                                                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                                                            {index +
-                                                                                1}
-                                                                        </div>
-                                                                        <div>
-                                                                            <h4 className="font-semibold text-gray-900">
+                                {treatment.inventoryItems &&
+                                    treatment.inventoryItems.length > 0 && (
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-600 mb-4 flex items-center gap-2">
+                                                <Package className="h-4 w-4" />
+                                                Inventory Items Used (
+                                                {
+                                                    treatment.inventoryItems
+                                                        .length
+                                                }
+                                                )
+                                            </p>
+                                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+                                                <div className="space-y-4">
+                                                    {treatment.inventoryItems.map(
+                                                        (item, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="bg-white rounded-lg p-4 border border-blue-200 shadow-sm"
+                                                            >
+                                                                <div className="flex items-start justify-between">
+                                                                    <div className="flex-1">
+                                                                        <div className="flex items-center gap-3 mb-2">
+                                                                            <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                                                {index +
+                                                                                    1}
+                                                                            </div>
+                                                                            <div>
+                                                                                <h4 className="font-semibold text-gray-900">
+                                                                                    {item
+                                                                                        .inventory
+                                                                                        ?.name ||
+                                                                                        "Unknown Item (Deleted)"}
+                                                                                </h4>
                                                                                 {item
                                                                                     .inventory
-                                                                                    ?.name ||
-                                                                                    "Unknown Item (Deleted)"}
-                                                                            </h4>
-                                                                            {item
-                                                                                .inventory
-                                                                                ?.description && (
-                                                                                <p className="text-sm text-gray-600">
+                                                                                    ?.description && (
+                                                                                    <p className="text-sm text-gray-600">
+                                                                                        {
+                                                                                            item
+                                                                                                .inventory
+                                                                                                .description
+                                                                                        }
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                                                                            <div className="bg-blue-50 p-3 rounded-lg">
+                                                                                <p className="text-xs font-medium text-blue-600 mb-1">
+                                                                                    Quantity
+                                                                                    Used
+                                                                                </p>
+                                                                                <p className="text-lg font-bold text-blue-800">
                                                                                     {
-                                                                                        item
-                                                                                            .inventory
-                                                                                            .description
+                                                                                        item.quantity_used
+                                                                                    }{" "}
+                                                                                    units
+                                                                                </p>
+                                                                            </div>
+                                                                            <div className="bg-green-50 p-3 rounded-lg">
+                                                                                <p className="text-xs font-medium text-green-600 mb-1">
+                                                                                    Unit
+                                                                                    Cost
+                                                                                </p>
+                                                                                <p className="text-lg font-bold text-green-800">
+                                                                                    ₱
+                                                                                    {parseFloat(
+                                                                                        item.unit_cost
+                                                                                    ).toLocaleString(
+                                                                                        "en-PH",
+                                                                                        {
+                                                                                            minimumFractionDigits: 2,
+                                                                                            maximumFractionDigits: 2,
+                                                                                        }
+                                                                                    )}
+                                                                                </p>
+                                                                            </div>
+                                                                            <div className="bg-purple-50 p-3 rounded-lg">
+                                                                                <p className="text-xs font-medium text-purple-600 mb-1">
+                                                                                    Total
+                                                                                    Cost
+                                                                                </p>
+                                                                                <p className="text-lg font-bold text-purple-800">
+                                                                                    ₱
+                                                                                    {parseFloat(
+                                                                                        item.total_cost
+                                                                                    ).toLocaleString(
+                                                                                        "en-PH",
+                                                                                        {
+                                                                                            minimumFractionDigits: 2,
+                                                                                            maximumFractionDigits: 2,
+                                                                                        }
+                                                                                    )}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {item.notes && (
+                                                                            <div className="mt-3 bg-yellow-50 p-3 rounded-lg border-l-3 border-yellow-300">
+                                                                                <p className="text-sm text-gray-700">
+                                                                                    <span className="font-medium text-yellow-800">
+                                                                                        Notes:
+                                                                                    </span>{" "}
+                                                                                    {
+                                                                                        item.notes
                                                                                     }
                                                                                 </p>
-                                                                            )}
-                                                                        </div>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-
-                                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-                                                                        <div className="bg-blue-50 p-3 rounded-lg">
-                                                                            <p className="text-xs font-medium text-blue-600 mb-1">
-                                                                                Quantity
-                                                                                Used
-                                                                            </p>
-                                                                            <p className="text-lg font-bold text-blue-800">
-                                                                                {
-                                                                                    item.quantity_used
-                                                                                }{" "}
-                                                                                units
-                                                                            </p>
-                                                                        </div>
-                                                                        <div className="bg-green-50 p-3 rounded-lg">
-                                                                            <p className="text-xs font-medium text-green-600 mb-1">
-                                                                                Unit
-                                                                                Cost
-                                                                            </p>
-                                                                            <p className="text-lg font-bold text-green-800">
-                                                                                ₱
-                                                                                {parseFloat(
-                                                                                    item.unit_cost
-                                                                                ).toLocaleString(
-                                                                                    "en-PH",
-                                                                                    {
-                                                                                        minimumFractionDigits: 2,
-                                                                                        maximumFractionDigits: 2,
-                                                                                    }
-                                                                                )}
-                                                                            </p>
-                                                                        </div>
-                                                                        <div className="bg-purple-50 p-3 rounded-lg">
-                                                                            <p className="text-xs font-medium text-purple-600 mb-1">
-                                                                                Total
-                                                                                Cost
-                                                                            </p>
-                                                                            <p className="text-lg font-bold text-purple-800">
-                                                                                ₱
-                                                                                {parseFloat(
-                                                                                    item.total_cost
-                                                                                ).toLocaleString(
-                                                                                    "en-PH",
-                                                                                    {
-                                                                                        minimumFractionDigits: 2,
-                                                                                        maximumFractionDigits: 2,
-                                                                                    }
-                                                                                )}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {item.notes && (
-                                                                        <div className="mt-3 bg-yellow-50 p-3 rounded-lg border-l-3 border-yellow-300">
-                                                                            <p className="text-sm text-gray-700">
-                                                                                <span className="font-medium text-yellow-800">
-                                                                                    Notes:
-                                                                                </span>{" "}
-                                                                                {
-                                                                                    item.notes
-                                                                                }
-                                                                            </p>
-                                                                        </div>
-                                                                    )}
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    )
-                                                )}
+                                                        )
+                                                    )}
 
-                                                {/* Inventory Summary */}
-                                                <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-xl border-2 border-blue-300">
-                                                    <div className="flex items-center justify-between">
-                                                        <div>
-                                                            <h4 className="text-lg font-semibold text-blue-900 mb-1">
-                                                                Inventory
-                                                                Summary
-                                                            </h4>
-                                                            <p className="text-sm text-blue-700">
-                                                                {
+                                                    {/* Inventory Summary */}
+                                                    <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-xl border-2 border-blue-300">
+                                                        <div className="flex items-center justify-between">
+                                                            <div>
+                                                                <h4 className="text-lg font-semibold text-blue-900 mb-1">
+                                                                    Inventory
+                                                                    Summary
+                                                                </h4>
+                                                                <p className="text-sm text-blue-700">
+                                                                    {
+                                                                        treatment
+                                                                            .inventoryItems
+                                                                            .length
+                                                                    }{" "}
+                                                                    items used
+                                                                    in this
                                                                     treatment
-                                                                        .inventoryItems
-                                                                        .length
-                                                                }{" "}
-                                                                items used in
-                                                                this treatment
-                                                            </p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-2xl font-bold text-blue-900">
-                                                                ₱
-                                                                {treatment.inventoryItems
-                                                                    .reduce(
-                                                                        (
-                                                                            sum,
-                                                                            item
-                                                                        ) =>
-                                                                            sum +
-                                                                            parseFloat(
-                                                                                item.total_cost
-                                                                            ),
-                                                                        0
-                                                                    )
-                                                                    .toLocaleString(
-                                                                        "en-PH",
-                                                                        {
-                                                                            minimumFractionDigits: 2,
-                                                                            maximumFractionDigits: 2,
-                                                                        }
-                                                                    )}
-                                                            </p>
-                                                            <p className="text-sm text-blue-700">
-                                                                Total Cost
-                                                            </p>
+                                                                </p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="text-2xl font-bold text-blue-900">
+                                                                    ₱
+                                                                    {treatment.inventoryItems
+                                                                        .reduce(
+                                                                            (
+                                                                                sum,
+                                                                                item
+                                                                            ) =>
+                                                                                sum +
+                                                                                parseFloat(
+                                                                                    item.total_cost
+                                                                                ),
+                                                                            0
+                                                                        )
+                                                                        .toLocaleString(
+                                                                            "en-PH",
+                                                                            {
+                                                                                minimumFractionDigits: 2,
+                                                                                maximumFractionDigits: 2,
+                                                                            }
+                                                                        )}
+                                                                </p>
+                                                                <p className="text-sm text-blue-700">
+                                                                    Total Cost
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {treatment.follow_up_notes && (
                                     <div>

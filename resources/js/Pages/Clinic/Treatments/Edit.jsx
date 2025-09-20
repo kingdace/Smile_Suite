@@ -18,7 +18,6 @@ import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector"
 import {
     CalendarIcon,
     Loader2,
-    ArrowLeft,
     Users,
     Stethoscope,
     Tag,
@@ -373,55 +372,14 @@ export default function Edit({
                 title={`Edit Treatment: ${treatment?.name || "Loading..."}`}
             />
 
-            <div className="py-12">
+            <div className="py-4">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <Card className="bg-white shadow-lg rounded-xl border-0">
                         <form onSubmit={submit} className="space-y-8">
-                            <CardHeader className="px-6 py-6 border-b">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <Link
-                                            href={route(
-                                                "clinic.treatments.show",
-                                                {
-                                                    clinic: auth.clinic_id,
-                                                    treatment: treatment?.id,
-                                                }
-                                            )}
-                                            className="text-gray-500 hover:text-gray-700 transition-colors"
-                                        >
-                                            <ArrowLeft className="h-5 w-5" />
-                                        </Link>
-                                        <CardTitle className="text-2xl font-bold text-gray-900">
-                                            Edit Treatment
-                                        </CardTitle>
-                                    </div>
-                                    <div className="flex space-x-3">
-                                        <Link
-                                            href={route(
-                                                "clinic.treatments.show",
-                                                {
-                                                    clinic: auth.clinic_id,
-                                                    treatment: treatment?.id,
-                                                }
-                                            )}
-                                        >
-                                            <Button variant="outline" size="sm">
-                                                Cancel
-                                            </Button>
-                                        </Link>
-                                        <Button
-                                            type="submit"
-                                            disabled={processing}
-                                            size="sm"
-                                        >
-                                            {processing && (
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            )}
-                                            Update Treatment
-                                        </Button>
-                                    </div>
-                                </div>
+                            <CardHeader className="px-6 py-4 border-b bg-gradient-to-r from-blue-200 via-blue-300 to-indigo-300 rounded-t-xl">
+                                <CardTitle className="text-xl font-semibold text-gray-900">
+                                    Edit Treatment
+                                </CardTitle>
                             </CardHeader>
 
                             <CardContent className="px-6 pb-6 space-y-8">
@@ -1558,6 +1516,31 @@ export default function Edit({
                                             />
                                         </div>
                                     </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+                                    <Link
+                                        href={route("clinic.treatments.show", {
+                                            clinic: auth.clinic_id,
+                                            treatment: treatment?.id,
+                                        })}
+                                    >
+                                        <Button variant="outline" size="sm">
+                                            Cancel
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        size="sm"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    >
+                                        {processing && (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        )}
+                                        Update Treatment
+                                    </Button>
                                 </div>
                             </CardContent>
                         </form>

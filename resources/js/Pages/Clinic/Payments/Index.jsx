@@ -938,323 +938,417 @@ export default function Index({
                                 </div>
                             )}
 
-                            {/* Table */}
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-gray-50">
-                                            {showBulkActions && (
-                                                <TableHead className="w-12">
-                                                    <Checkbox
-                                                        checked={selectAll}
-                                                        onCheckedChange={
-                                                            handleSelectAll
-                                                        }
-                                                        className="ml-2"
-                                                    />
-                                                </TableHead>
-                                            )}
-                                            <TableHead
-                                                className="font-semibold text-gray-900 cursor-pointer"
-                                                onClick={() =>
-                                                    handleSort("payment_date")
-                                                }
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    Date
-                                                    {getSortIcon(
-                                                        "payment_date"
-                                                    )}
+                            {/* Payments Records Card */}
+                            <Card className="border-0 bg-white/90 backdrop-blur-sm overflow-hidden border border-blue-100/30">
+                                <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50">
+                                    <div className="space-y-4">
+                                        {/* Title Section - Top Row */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <DollarSign className="h-5 w-5 text-white" />
                                                 </div>
-                                            </TableHead>
-                                            <TableHead
-                                                className="font-semibold text-gray-900 cursor-pointer"
-                                                onClick={() =>
-                                                    handleSort("patient_id")
-                                                }
-                                            >
-                                                <div className="flex items-center gap-1">
-                                                    Patient
-                                                    {getSortIcon("patient_id")}
+                                                <div>
+                                                    <CardTitle className="text-2xl font-bold text-gray-900">
+                                                        Payment Records
+                                                    </CardTitle>
+                                                    <p className="text-sm text-gray-600">
+                                                        Manage and view all
+                                                        payment transactions
+                                                    </p>
                                                 </div>
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-gray-900">
-                                                Treatment
-                                            </TableHead>
-                                            <TableHead
-                                                className="font-semibold text-gray-900 text-right cursor-pointer"
-                                                onClick={() =>
-                                                    handleSort("amount")
-                                                }
-                                            >
-                                                <div className="flex items-center justify-end gap-1">
-                                                    Amount
-                                                    {getSortIcon("amount")}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="text-right">
+                                                    <div className="text-2xl font-bold text-blue-600">
+                                                        {payments.total || 0}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        Total Payments
+                                                    </div>
                                                 </div>
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-gray-900">
-                                                Method
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-gray-900">
-                                                Status
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-gray-900 text-center">
-                                                Actions
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {payments.data &&
-                                        payments.data.length > 0 ? (
-                                            payments.data.map((payment) => (
-                                                <TableRow
-                                                    key={payment.id}
-                                                    className="hover:bg-gray-50/50"
-                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+
+                                <CardContent className="p-0">
+                                    {/* Payments Records Table */}
+                                    <div className="overflow-x-auto">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/70">
                                                     {showBulkActions && (
-                                                        <TableCell>
+                                                        <TableHead className="w-12 px-6 py-4">
                                                             <Checkbox
-                                                                checked={selectedPayments.includes(
-                                                                    payment.id
-                                                                )}
-                                                                onCheckedChange={() =>
-                                                                    handleSelectPayment(
-                                                                        payment.id
-                                                                    )
+                                                                checked={
+                                                                    selectAll
+                                                                }
+                                                                onCheckedChange={
+                                                                    handleSelectAll
                                                                 }
                                                                 className="ml-2"
                                                             />
-                                                        </TableCell>
+                                                        </TableHead>
                                                     )}
-                                                    <TableCell>
+                                                    <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                                         <div className="flex items-center gap-2">
-                                                            <Calendar className="h-4 w-4 text-gray-400" />
-                                                            <span className="font-medium text-gray-900">
-                                                                {new Date(
-                                                                    payment.payment_date
-                                                                ).toLocaleDateString()}
-                                                            </span>
+                                                            <User className="h-4 w-4 text-blue-600" />
+                                                            Patient
                                                         </div>
-                                                        {payment.reference_number && (
-                                                            <div className="text-sm text-gray-500">
-                                                                Ref:{" "}
-                                                                {
-                                                                    payment.reference_number
-                                                                }
-                                                            </div>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>
+                                                    </TableHead>
+                                                    <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                                         <div className="flex items-center gap-2">
-                                                            <User className="h-4 w-4 text-gray-400" />
-                                                            <div>
-                                                                <span className="font-medium text-gray-900">
-                                                                    {
-                                                                        payment
-                                                                            .patient
-                                                                            ?.first_name
-                                                                    }{" "}
-                                                                    {
-                                                                        payment
-                                                                            .patient
-                                                                            ?.last_name
-                                                                    }
-                                                                </span>
-                                                                {payment.patient
-                                                                    ?.phone_number && (
-                                                                    <div className="text-sm text-gray-500">
-                                                                        {
-                                                                            payment
-                                                                                .patient
-                                                                                .phone_number
-                                                                        }
-                                                                    </div>
-                                                                )}
-                                                            </div>
+                                                            <Calendar className="h-4 w-4 text-blue-600" />
+                                                            Date
                                                         </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <span className="text-gray-900">
-                                                            {payment.treatment
-                                                                ?.name || "N/A"}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <span className="font-bold text-green-600 text-lg">
-                                                            {formatCurrency(
-                                                                payment.amount
-                                                            )}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell>
+                                                    </TableHead>
+                                                    <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                                         <div className="flex items-center gap-2">
-                                                            {methodIcon(
-                                                                payment.payment_method
-                                                            )}
-                                                            <span className="text-gray-900">
-                                                                {payment.payment_method
-                                                                    .replace(
-                                                                        "_",
-                                                                        " "
-                                                                    )
-                                                                    .replace(
-                                                                        /\b\w/g,
-                                                                        (c) =>
-                                                                            c.toUpperCase()
-                                                                    )}
-                                                            </span>
+                                                            <Stethoscope className="h-4 w-4 text-blue-600" />
+                                                            Treatment
                                                         </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {statusBadge(
-                                                            payment.status
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="flex gap-2 justify-center">
-                                                            <Link
-                                                                href={route(
-                                                                    "clinic.payments.show",
-                                                                    [
-                                                                        auth
-                                                                            .clinic
-                                                                            ?.id,
-                                                                        payment.id,
-                                                                    ]
-                                                                )}
-                                                            >
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="h-8 px-3"
-                                                                >
-                                                                    <Eye className="h-3 w-3 mr-1" />
-                                                                    View
-                                                                </Button>
-                                                            </Link>
-                                                            <Link
-                                                                href={route(
-                                                                    "clinic.payments.edit",
-                                                                    [
-                                                                        auth
-                                                                            .clinic
-                                                                            ?.id,
-                                                                        payment.id,
-                                                                    ]
-                                                                )}
-                                                            >
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="h-8 px-3"
-                                                                >
-                                                                    <Edit className="h-3 w-3 mr-1" />
-                                                                    Edit
-                                                                </Button>
-                                                            </Link>
+                                                    </TableHead>
+                                                    <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                        <div className="flex items-center gap-2">
+                                                            <DollarSign className="h-4 w-4 text-blue-600" />
+                                                            Amount
                                                         </div>
-                                                    </TableCell>
+                                                    </TableHead>
+                                                    <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                        <div className="flex items-center gap-2">
+                                                            <CreditCard className="h-4 w-4 text-blue-600" />
+                                                            Method
+                                                        </div>
+                                                    </TableHead>
+                                                    <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                        <div className="flex items-center gap-2">
+                                                            <ShieldCheck className="h-4 w-4 text-blue-600" />
+                                                            Status
+                                                        </div>
+                                                    </TableHead>
+                                                    <TableHead className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <MoreHorizontal className="h-4 w-4 text-blue-600" />
+                                                            Actions
+                                                        </div>
+                                                    </TableHead>
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={
-                                                        showBulkActions ? 8 : 7
-                                                    }
-                                                    className="text-center py-12"
-                                                >
-                                                    <div className="flex flex-col items-center gap-3">
-                                                        <DollarSign className="h-12 w-12 text-gray-300" />
-                                                        <div>
-                                                            <p className="text-lg font-medium text-gray-900">
-                                                                No payments
-                                                                found
-                                                            </p>
-                                                            <p className="text-gray-500">
-                                                                Get started by
-                                                                adding your
-                                                                first payment
-                                                            </p>
-                                                        </div>
-                                                        <Button
-                                                            onClick={() =>
-                                                                router.visit(
-                                                                    route(
-                                                                        "clinic.payments.create",
-                                                                        {
-                                                                            clinic: auth
-                                                                                .clinic
-                                                                                ?.id,
-                                                                        }
-                                                                    )
-                                                                )
+                                            </TableHeader>
+                                            <TableBody>
+                                                {payments.data &&
+                                                payments.data.length > 0 ? (
+                                                    payments.data.map(
+                                                        (payment) => (
+                                                            <TableRow
+                                                                key={payment.id}
+                                                                className="hover:bg-gradient-to-r hover:from-blue-50/60 hover:via-indigo-50/40 hover:to-cyan-50/60 transition-all duration-300 border-b border-gray-100/50 hover:border-blue-200/50"
+                                                            >
+                                                                {showBulkActions && (
+                                                                    <TableCell className="px-6 py-4">
+                                                                        <Checkbox
+                                                                            checked={selectedPayments.includes(
+                                                                                payment.id
+                                                                            )}
+                                                                            onCheckedChange={() =>
+                                                                                handleSelectPayment(
+                                                                                    payment.id
+                                                                                )
+                                                                            }
+                                                                            className="ml-2"
+                                                                        />
+                                                                    </TableCell>
+                                                                )}
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                                                            <User className="h-5 w-5" />
+                                                                        </div>
+                                                                        <div className="space-y-1">
+                                                                            <div className="font-bold text-gray-900 text-base leading-tight">
+                                                                                {
+                                                                                    payment
+                                                                                        .patient
+                                                                                        ?.first_name
+                                                                                }{" "}
+                                                                                {
+                                                                                    payment
+                                                                                        .patient
+                                                                                        ?.last_name
+                                                                                }
+                                                                            </div>
+                                                                            <div className="flex items-center gap-1 flex-wrap">
+                                                                                <span className="text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-medium">
+                                                                                    ID:{" "}
+                                                                                    {
+                                                                                        payment
+                                                                                            .patient
+                                                                                            ?.id
+                                                                                    }
+                                                                                </span>
+                                                                                {payment
+                                                                                    .patient
+                                                                                    ?.phone_number && (
+                                                                                    <span className="text-xs text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
+                                                                                        {
+                                                                                            payment
+                                                                                                .patient
+                                                                                                .phone_number
+                                                                                        }
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="text-sm font-medium text-gray-900">
+                                                                        <span className="text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded text-xs border border-cyan-200">
+                                                                            {new Date(
+                                                                                payment.payment_date
+                                                                            ).toLocaleDateString()}
+                                                                        </span>
+                                                                        {payment.reference_number && (
+                                                                            <div className="mt-1 text-xs text-gray-500">
+                                                                                Ref:{" "}
+                                                                                {
+                                                                                    payment.reference_number
+                                                                                }
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="space-y-2">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Stethoscope className="h-3 w-3 text-gray-400" />
+                                                                            <span className="text-sm font-medium text-gray-900">
+                                                                                {payment
+                                                                                    .treatment
+                                                                                    ?.name || (
+                                                                                    <span className="text-gray-400 italic font-normal">
+                                                                                        No
+                                                                                        treatment
+                                                                                    </span>
+                                                                                )}
+                                                                            </span>
+                                                                        </div>
+                                                                        {payment
+                                                                            .treatment
+                                                                            ?.id && (
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className="text-xs text-gray-600 bg-gray-50 px-1.5 py-0.5 rounded font-medium">
+                                                                                    Treatment
+                                                                                    ID:{" "}
+                                                                                    {
+                                                                                        payment
+                                                                                            .treatment
+                                                                                            .id
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="text-sm font-medium text-gray-900">
+                                                                        <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-xs border border-emerald-200 font-bold">
+                                                                            {formatCurrency(
+                                                                                payment.amount
+                                                                            )}
+                                                                        </span>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="space-y-2">
+                                                                        <div className="flex items-center gap-2">
+                                                                            {methodIcon(
+                                                                                payment.payment_method
+                                                                            )}
+                                                                            <span className="text-sm font-medium text-gray-900">
+                                                                                {payment.payment_method
+                                                                                    .replace(
+                                                                                        "_",
+                                                                                        " "
+                                                                                    )
+                                                                                    .replace(
+                                                                                        /\b\w/g,
+                                                                                        (
+                                                                                            c
+                                                                                        ) =>
+                                                                                            c.toUpperCase()
+                                                                                    )}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="space-y-2">
+                                                                        {statusBadge(
+                                                                            payment.status
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                    <div className="flex items-center justify-center gap-2">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            asChild
+                                                                            className="h-8 w-8 p-0 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 hover:text-blue-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                                            title="View Payment Details"
+                                                                        >
+                                                                            <Link
+                                                                                href={route(
+                                                                                    "clinic.payments.show",
+                                                                                    [
+                                                                                        auth
+                                                                                            .clinic
+                                                                                            ?.id,
+                                                                                        payment.id,
+                                                                                    ]
+                                                                                )}
+                                                                            >
+                                                                                <Eye className="h-3 w-3" />
+                                                                            </Link>
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            asChild
+                                                                            className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                                            title="Edit Payment"
+                                                                        >
+                                                                            <Link
+                                                                                href={route(
+                                                                                    "clinic.payments.edit",
+                                                                                    [
+                                                                                        auth
+                                                                                            .clinic
+                                                                                            ?.id,
+                                                                                        payment.id,
+                                                                                    ]
+                                                                                )}
+                                                                            >
+                                                                                <Edit className="h-3 w-3" />
+                                                                            </Link>
+                                                                        </Button>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )
+                                                    )
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            colSpan={
+                                                                showBulkActions
+                                                                    ? 8
+                                                                    : 7
                                                             }
-                                                            className="mt-2"
+                                                            className="text-center py-12"
                                                         >
-                                                            <Plus className="h-4 w-4 mr-2" />
-                                                            Add Payment
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                                            <div className="flex flex-col items-center gap-3">
+                                                                <DollarSign className="h-12 w-12 text-gray-300" />
+                                                                <div>
+                                                                    <p className="text-lg font-medium text-gray-900">
+                                                                        No
+                                                                        payments
+                                                                        found
+                                                                    </p>
+                                                                    <p className="text-gray-500">
+                                                                        Get
+                                                                        started
+                                                                        by
+                                                                        adding
+                                                                        your
+                                                                        first
+                                                                        payment
+                                                                    </p>
+                                                                </div>
+                                                                <Button
+                                                                    onClick={() =>
+                                                                        router.visit(
+                                                                            route(
+                                                                                "clinic.payments.create",
+                                                                                {
+                                                                                    clinic: auth
+                                                                                        .clinic
+                                                                                        ?.id,
+                                                                                }
+                                                                            )
+                                                                        )
+                                                                    }
+                                                                    className="mt-2"
+                                                                >
+                                                                    <Plus className="h-4 w-4 mr-2" />
+                                                                    Add Payment
+                                                                </Button>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </CardContent>
+                            </Card>
 
-                            {/* Pagination */}
-                            {payments.links && payments.links.length > 1 && (
-                                <div className="px-6 py-4 border-t border-gray-200">
+                            {/* Enhanced Pagination */}
+                            {payments.links && (
+                                <div className="px-6 py-4 bg-gradient-to-r from-gray-50 via-blue-50/20 to-indigo-50/10 border-t border-gray-200/70">
                                     <div className="flex items-center justify-between">
-                                        <div className="text-sm text-gray-700">
-                                            Showing {payments.from} to{" "}
-                                            {payments.to} of {payments.total}{" "}
-                                            results
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-sm text-gray-600">
+                                                Showing{" "}
+                                                <span className="font-semibold text-gray-900">
+                                                    {payments.from || 0}
+                                                </span>{" "}
+                                                to{" "}
+                                                <span className="font-semibold text-gray-900">
+                                                    {payments.to || 0}
+                                                </span>{" "}
+                                                of{" "}
+                                                <span className="font-semibold text-gray-900">
+                                                    {payments.total || 0}
+                                                </span>{" "}
+                                                payments
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                Page{" "}
+                                                {payments.current_page || 1} of{" "}
+                                                {payments.last_page || 1}
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            {payments.links.map((link, i) => {
-                                                if (!link.url) return null;
-
-                                                const queryParams =
-                                                    link.url.includes("?")
-                                                        ? link.url.substring(
-                                                              link.url.indexOf(
-                                                                  "?"
-                                                              )
-                                                          )
-                                                        : "";
-
-                                                return (
-                                                    <Link
-                                                        key={i}
-                                                        href={
-                                                            route(
-                                                                "clinic.payments.index",
-                                                                [
-                                                                    auth.clinic
-                                                                        ?.id,
-                                                                ]
-                                                            ) + queryParams
-                                                        }
-                                                        className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
-                                                            link.active
-                                                                ? "bg-blue-600 text-white border-blue-600"
-                                                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                                                        }`}
-                                                    >
-                                                        {link.label
-                                                            .replace(
-                                                                "&laquo;",
-                                                                "«"
+                                            {payments.links.map((link, index) =>
+                                                link.url ? (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() =>
+                                                            router.visit(
+                                                                link.url
                                                             )
-                                                            .replace(
-                                                                "&raquo;",
-                                                                "»"
-                                                            )}
-                                                    </Link>
-                                                );
-                                            })}
+                                                        }
+                                                        className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                                            link.active
+                                                                ? "bg-blue-600 text-white"
+                                                                : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                                                        }`}
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: link.label,
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <span
+                                                        key={index}
+                                                        className="px-3 py-2 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: link.label,
+                                                        }}
+                                                    />
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                 </div>

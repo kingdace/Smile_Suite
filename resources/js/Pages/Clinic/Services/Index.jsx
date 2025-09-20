@@ -482,244 +482,294 @@ export default function Index({
                         </CardContent>
                     </Card>
 
-                    {/* Services Table */}
-                    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center gap-2">
-                                                <Scissors className="h-4 w-4" />
-                                                Service
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center gap-2">
-                                                <Tag className="h-4 w-4" />
-                                                Category
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center gap-2">
-                                                <Clock className="h-4 w-4" />
-                                                Duration
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center gap-2">
-                                                <DollarSign className="h-4 w-4" />
-                                                Price
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center gap-2">
-                                                <Activity className="h-4 w-4" />
-                                                Status
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center gap-2">
-                                                <Users className="h-4 w-4" />
-                                                Dentists
-                                            </div>
-                                        </th>
-                                        <th className="px-6 py-4 text-right text-xs font-semibold text-white uppercase tracking-wider">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Settings className="h-4 w-4" />
-                                                Actions
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-100">
-                                    {filteredServices.map((service) => (
-                                        <tr
-                                            key={service.id}
-                                            className="hover:bg-gradient-to-r hover:from-blue-50/60 hover:via-indigo-50/40 hover:to-cyan-50/60 transition-all duration-300 border-b border-gray-100/50 hover:border-blue-200/50"
-                                        >
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-12 w-12">
-                                                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                                            <Scissors className="h-6 w-6 text-white" />
+                    {/* Services Records Card */}
+                    <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden border border-blue-100/30">
+                        <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50">
+                            <div className="space-y-6">
+                                {/* Title Section - Top Row */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <Scissors className="h-4 w-4 text-white" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-xl font-bold text-gray-900">
+                                            Services Records
+                                        </CardTitle>
+                                        <p className="text-sm text-gray-600">
+                                            Manage and view all service
+                                            information
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardHeader>
+
+                        <CardContent className="p-0">
+                            {/* Services Records Table */}
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/70">
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center gap-2">
+                                                    <Scissors className="h-4 w-4 text-blue-600" />
+                                                    Service
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center gap-2">
+                                                    <Tag className="h-4 w-4 text-blue-600" />
+                                                    Category
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center gap-2">
+                                                    <Clock className="h-4 w-4 text-blue-600" />
+                                                    Duration
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center gap-2">
+                                                    <DollarSign className="h-4 w-4 text-blue-600" />
+                                                    Price
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center gap-2">
+                                                    <Activity className="h-4 w-4 text-blue-600" />
+                                                    Status
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center gap-2">
+                                                    <Users className="h-4 w-4 text-blue-600" />
+                                                    Dentists
+                                                </div>
+                                            </th>
+                                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <Settings className="h-4 w-4 text-blue-600" />
+                                                    Actions
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-100">
+                                        {filteredServices.map((service) => (
+                                            <tr
+                                                key={service.id}
+                                                className="hover:bg-gradient-to-r hover:from-blue-50/60 hover:via-indigo-50/40 hover:to-cyan-50/60 transition-all duration-300 border-b border-gray-100/50 hover:border-blue-200/50"
+                                            >
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                                            <Scissors className="h-5 w-5" />
                                                         </div>
-                                                    </div>
-                                                    <div className="ml-4">
-                                                        <div className="text-base font-bold text-gray-900 leading-tight">
-                                                            {service.name}
-                                                        </div>
-                                                        {service.code && (
-                                                            <div className="text-sm text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded text-xs mt-1 inline-block">
-                                                                {service.code}
+                                                        <div className="space-y-1">
+                                                            <div className="font-bold text-gray-900 text-base leading-tight">
+                                                                {service.name}
                                                             </div>
-                                                        )}
-                                                        {service.description && (
-                                                            <div className="text-sm text-gray-600 line-clamp-1 mt-1">
-                                                                {
-                                                                    service.description
-                                                                }
+                                                            <div className="flex items-center gap-1 flex-wrap">
+                                                                <span className="text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-medium">
+                                                                    ID:{" "}
+                                                                    {service.id}
+                                                                </span>
+                                                                {service.code && (
+                                                                    <span className="text-xs text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
+                                                                        {
+                                                                            service.code
+                                                                        }
+                                                                    </span>
+                                                                )}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="space-y-2">
-                                                    <Badge
-                                                        className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${getServiceColor(
-                                                            service.category
-                                                        )}`}
-                                                    >
-                                                        {service.category}
-                                                    </Badge>
-                                                    {service.subcategory && (
-                                                        <div className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded border">
-                                                            {
-                                                                service.subcategory
-                                                            }
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <div className="flex items-center gap-1">
-                                                    <Clock className="h-4 w-4 text-gray-400" />
-                                                    {service.duration_minutes ||
-                                                        30}{" "}
-                                                    min
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">
-                                                    ₱{service.price || 0}
-                                                </div>
-                                                {service.cost_price && (
-                                                    <div className="text-xs text-gray-500">
-                                                        Cost: ₱
-                                                        {service.cost_price}
-                                                    </div>
-                                                )}
-                                                {service.is_insurance_eligible && (
-                                                    <div className="text-xs text-blue-600">
-                                                        Insurance eligible
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="space-y-2">
-                                                    <Badge
-                                                        variant={
-                                                            service.is_active
-                                                                ? "default"
-                                                                : "secondary"
-                                                        }
-                                                        className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${
-                                                            service.is_active
-                                                                ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-300"
-                                                                : "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border-gray-300"
-                                                        }`}
-                                                    >
-                                                        {service.is_active
-                                                            ? "Active"
-                                                            : "Inactive"}
-                                                    </Badge>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {service.requires_consultation && (
-                                                            <span className="inline-flex px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full border border-yellow-200 font-medium">
-                                                                Consultation
-                                                            </span>
-                                                        )}
-                                                        {service.is_emergency_service && (
-                                                            <span className="inline-flex px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full border border-red-200 font-medium">
-                                                                Emergency
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {service.dentists &&
-                                                service.dentists.length > 0 ? (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {service.dentists
-                                                            .slice(0, 2)
-                                                            .map((dentist) => (
-                                                                <span
-                                                                    key={
-                                                                        dentist.id
-                                                                    }
-                                                                    className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded"
-                                                                >
+                                                            {service.description && (
+                                                                <div className="text-xs text-gray-500 line-clamp-1">
                                                                     {
-                                                                        dentist.name
+                                                                        service.description
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Tag className="h-3 w-3 text-gray-400" />
+                                                            <span className="text-sm font-medium text-gray-900">
+                                                                {service.category || (
+                                                                    <span className="text-gray-400 italic font-normal">
+                                                                        No
+                                                                        category
+                                                                    </span>
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        {service.subcategory && (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-gray-600 bg-gray-50 px-1.5 py-0.5 rounded font-medium">
+                                                                    {
+                                                                        service.subcategory
                                                                     }
                                                                 </span>
-                                                            ))}
-                                                        {service.dentists
-                                                            .length > 2 && (
-                                                            <span className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
-                                                                +
-                                                                {service
-                                                                    .dentists
-                                                                    .length - 2}
-                                                            </span>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                ) : (
-                                                    <span className="text-gray-400 text-xs">
-                                                        No dentists assigned
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleShow(service)
-                                                        }
-                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                        title="View Service Details"
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            handleEdit(service)
-                                                        }
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                        title="Edit Service"
-                                                    >
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setDeletingService(
-                                                                service
-                                                            );
-                                                            setShowDeleteDialog(
-                                                                true
-                                                            );
-                                                        }}
-                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                        title="Delete Service"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        <span className="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded text-xs border border-blue-200">
+                                                            {service.duration_minutes ||
+                                                                30}{" "}
+                                                            min
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-xs border border-emerald-200 font-bold">
+                                                            ₱
+                                                            {parseFloat(
+                                                                service.price ||
+                                                                    0
+                                                            ).toLocaleString()}
+                                                        </span>
+                                                        {service.cost_price && (
+                                                            <div className="mt-1 text-xs text-gray-500">
+                                                                Cost: ₱
+                                                                {parseFloat(
+                                                                    service.cost_price
+                                                                ).toLocaleString()}
+                                                            </div>
+                                                        )}
+                                                        {service.is_insurance_eligible && (
+                                                            <div className="mt-1 text-xs text-blue-600">
+                                                                Insurance
+                                                                eligible
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="space-y-2">
+                                                        <Badge
+                                                            className={`text-xs font-semibold px-2 py-1 rounded-full border ${
+                                                                service.is_active
+                                                                    ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-300"
+                                                                    : "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700 border-gray-300"
+                                                            }`}
+                                                        >
+                                                            {service.is_active
+                                                                ? "Active"
+                                                                : "Inactive"}
+                                                        </Badge>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {service.requires_consultation && (
+                                                                <span className="inline-flex px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded border border-yellow-200 font-medium">
+                                                                    Consultation
+                                                                </span>
+                                                            )}
+                                                            {service.is_emergency_service && (
+                                                                <span className="inline-flex px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded border border-red-200 font-medium">
+                                                                    Emergency
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {service.dentists &&
+                                                    service.dentists.length >
+                                                        0 ? (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {service.dentists
+                                                                .slice(0, 2)
+                                                                .map(
+                                                                    (
+                                                                        dentist
+                                                                    ) => (
+                                                                        <span
+                                                                            key={
+                                                                                dentist.id
+                                                                            }
+                                                                            className="inline-flex px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded border border-blue-200 font-medium"
+                                                                        >
+                                                                            {
+                                                                                dentist.name
+                                                                            }
+                                                                        </span>
+                                                                    )
+                                                                )}
+                                                            {service.dentists
+                                                                .length > 2 && (
+                                                                <span className="inline-flex px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 rounded border border-gray-200 font-medium">
+                                                                    +
+                                                                    {service
+                                                                        .dentists
+                                                                        .length -
+                                                                        2}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs italic">
+                                                            No dentists assigned
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                handleShow(
+                                                                    service
+                                                                )
+                                                            }
+                                                            className="h-8 w-8 p-0 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 hover:text-blue-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                            title="View Service Details"
+                                                        >
+                                                            <Eye className="h-3 w-3" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    service
+                                                                )
+                                                            }
+                                                            className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                            title="Edit Service"
+                                                        >
+                                                            <Edit className="h-3 w-3" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setDeletingService(
+                                                                    service
+                                                                );
+                                                                setShowDeleteDialog(
+                                                                    true
+                                                                );
+                                                            }}
+                                                            className="h-8 w-8 p-0 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 hover:text-red-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                            title="Delete Service"
+                                                        >
+                                                            <Trash2 className="h-3 w-3" />
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Enhanced Empty State */}
                     {filteredServices.length === 0 && (

@@ -33,6 +33,11 @@ import {
     Minus,
     XCircle,
     MoreHorizontal,
+    Settings,
+    Calendar,
+    AudioLines,
+    Shapes,
+    Activity,
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -230,14 +235,24 @@ export default function Index({ auth, clinic, inventory, filters }) {
                 </Card>
             </div>
 
-            {/* Inventory Table */}
-            <Card className="shadow-xl">
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl font-semibold flex items-center space-x-3">
-                            <Package className="h-5 w-5 text-blue-600" />
-                            <span>Inventory Items</span>
-                        </CardTitle>
+            {/* Inventory Records Card */}
+            <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden border border-blue-100/30">
+                <CardHeader className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/50">
+                    <div className="space-y-6">
+                        {/* Title Section - Top Row */}
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                <Package className="h-4 w-4 text-white" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-xl font-bold text-gray-900">
+                                    Inventory Records
+                                </CardTitle>
+                                <p className="text-sm text-gray-600">
+                                    Manage and view all inventory items
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Simple Search & Filters */}
@@ -305,30 +320,54 @@ export default function Index({ auth, clinic, inventory, filters }) {
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <TableHead className="font-semibold">
-                                    Item Name
+                            <TableRow className="bg-gradient-to-r from-gray-50 via-blue-50/30 to-indigo-50/20 border-b border-gray-200/70">
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <Package className="h-4 w-4 text-blue-600" />
+                                        Item Name
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Category
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <Shapes className="h-4 w-4 text-blue-600" />
+                                        Category
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Stock Status
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <AlertTriangle className="h-4 w-4 text-blue-600" />
+                                        Stock Status
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Quantity
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <Activity className="h-4 w-4 text-blue-600" />
+                                        Quantity
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Unit Price
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <DollarSign className="h-4 w-4 text-blue-600" />
+                                        Unit Price
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Total Value
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <DollarSign className="h-4 w-4 text-blue-600" />
+                                        Total Value
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Expiry
+                                <TableHead className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center gap-2">
+                                        <Calendar className="h-4 w-4 text-blue-600" />
+                                        Expiry
+                                    </div>
                                 </TableHead>
-                                <TableHead className="font-semibold">
-                                    Actions
+                                <TableHead className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Settings className="h-4 w-4 text-blue-600" />
+                                        Actions
+                                    </div>
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -337,146 +376,168 @@ export default function Index({ auth, clinic, inventory, filters }) {
                                 inventory.data.map((item) => (
                                     <TableRow
                                         key={item.id}
-                                        className="hover:bg-gray-50"
+                                        className="hover:bg-gradient-to-r hover:from-blue-50/60 hover:via-indigo-50/40 hover:to-cyan-50/60 transition-all duration-300 border-b border-gray-100/50 hover:border-blue-200/50"
                                     >
-                                        <TableCell className="py-4">
-                                            <div>
-                                                <div className="font-medium text-gray-900">
-                                                    {item.name}
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                                    <Package className="h-5 w-5" />
                                                 </div>
-                                                {item.description && (
-                                                    <div className="text-sm text-gray-500 mt-1">
-                                                        {item.description.substring(
-                                                            0,
-                                                            50
+                                                <div className="space-y-1">
+                                                    <div className="font-bold text-gray-900 text-base leading-tight">
+                                                        {item.name}
+                                                    </div>
+                                                    <div className="flex items-center gap-1 flex-wrap">
+                                                        <span className="text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-medium">
+                                                            ID: {item.id}
+                                                        </span>
+                                                    </div>
+                                                    {item.description && (
+                                                        <div className="text-xs text-gray-500 line-clamp-1">
+                                                            {item.description}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Package className="h-3 w-3 text-gray-400" />
+                                                    <span className="text-sm font-medium text-gray-900">
+                                                        {item.category ? (
+                                                            item.category
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                            item.category.slice(
+                                                                1
+                                                            )
+                                                        ) : (
+                                                            <span className="text-gray-400 italic font-normal">
+                                                                No category
+                                                            </span>
                                                         )}
-                                                        {item.description
-                                                            .length > 50
-                                                            ? "..."
-                                                            : ""}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="space-y-2">
+                                                <Badge
+                                                    className={`text-xs font-semibold px-2 py-1 rounded-full border ${getStockStatusColor(
+                                                        item
+                                                    )}`}
+                                                >
+                                                    {getStockStatusLabel(item)}
+                                                </Badge>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            adjustStock(
+                                                                item,
+                                                                -1
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            item.quantity <= 0
+                                                        }
+                                                        className="h-6 w-6 p-0"
+                                                    >
+                                                        <Minus className="h-3 w-3" />
+                                                    </Button>
+                                                    <span className="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded text-xs border border-blue-200 font-bold">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            adjustStock(item, 1)
+                                                        }
+                                                        className="h-6 w-6 p-0"
+                                                    >
+                                                        <Plus className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                                {item.minimum_quantity && (
+                                                    <div className="mt-1 text-xs text-gray-500">
+                                                        Min:{" "}
+                                                        {item.minimum_quantity}
                                                     </div>
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant="outline"
-                                                className="bg-blue-50 text-blue-700 border-blue-200"
-                                            >
-                                                {item.category
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    item.category.slice(1)}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                className={getStockStatusColor(
-                                                    item
-                                                )}
-                                            >
-                                                {getStockStatusLabel(item)}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center space-x-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        adjustStock(item, -1)
-                                                    }
-                                                    disabled={
-                                                        item.quantity <= 0
-                                                    }
-                                                    className="h-6 w-6 p-0"
-                                                >
-                                                    <Minus className="h-3 w-3" />
-                                                </Button>
-                                                <span className="font-semibold text-gray-900 min-w-[40px] text-center">
-                                                    {item.quantity}
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-xs border border-emerald-200 font-bold">
+                                                    {formatCurrency(
+                                                        item.unit_price
+                                                    )}
                                                 </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                <span className="text-green-700 bg-green-50 px-1.5 py-0.5 rounded text-xs border border-green-200 font-bold">
+                                                    {formatCurrency(
+                                                        item.quantity *
+                                                            parseFloat(
+                                                                item.unit_price
+                                                            )
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-medium text-gray-900">
+                                                <span className="text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded text-xs border border-cyan-200">
+                                                    {formatDate(
+                                                        item.expiry_date
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex items-center justify-center gap-2">
                                                 <Button
-                                                    variant="outline"
+                                                    variant="ghost"
                                                     size="sm"
-                                                    onClick={() =>
-                                                        adjustStock(item, 1)
-                                                    }
-                                                    className="h-6 w-6 p-0"
+                                                    asChild
+                                                    className="h-8 w-8 p-0 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 hover:text-blue-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                    title="View Item Details"
                                                 >
-                                                    <Plus className="h-3 w-3" />
+                                                    <Link
+                                                        href={route(
+                                                            "clinic.inventory.show",
+                                                            [clinic.id, item.id]
+                                                        )}
+                                                    >
+                                                        <Eye className="h-3 w-3" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    asChild
+                                                    className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                    title="Edit Item"
+                                                >
+                                                    <Link
+                                                        href={route(
+                                                            "clinic.inventory.edit",
+                                                            [clinic.id, item.id]
+                                                        )}
+                                                    >
+                                                        <Pencil className="h-3 w-3" />
+                                                    </Link>
                                                 </Button>
                                             </div>
-                                            {item.minimum_quantity && (
-                                                <div className="text-sm text-gray-500 mt-1">
-                                                    Min: {item.minimum_quantity}
-                                                </div>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="font-semibold text-gray-900">
-                                                {formatCurrency(
-                                                    item.unit_price
-                                                )}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="font-semibold text-green-700">
-                                                {formatCurrency(
-                                                    item.quantity *
-                                                        parseFloat(
-                                                            item.unit_price
-                                                        )
-                                                )}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="text-gray-700">
-                                                {formatDate(item.expiry_date)}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-8 w-8 p-0"
-                                                    >
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem asChild>
-                                                        <Link
-                                                            href={route(
-                                                                "clinic.inventory.show",
-                                                                [
-                                                                    clinic.id,
-                                                                    item.id,
-                                                                ]
-                                                            )}
-                                                        >
-                                                            <Eye className="h-4 w-4 mr-2" />
-                                                            View Details
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <Link
-                                                            href={route(
-                                                                "clinic.inventory.edit",
-                                                                [
-                                                                    clinic.id,
-                                                                    item.id,
-                                                                ]
-                                                            )}
-                                                        >
-                                                            <Pencil className="h-4 w-4 mr-2" />
-                                                            Edit Item
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))

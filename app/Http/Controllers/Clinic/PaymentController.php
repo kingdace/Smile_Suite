@@ -194,13 +194,13 @@ class PaymentController extends Controller
                 // Update treatment payment status based on total paid
                 if ($totalPaid >= $totalCost) {
                     $treatment->update(['payment_status' => 'completed']);
-                    
+
                     // Auto-update appointment status to "Completed" if treatment is completed and fully paid
                     if ($treatment->status === 'completed' && $treatment->appointment_id) {
                         $appointment = \App\Models\Appointment::find($treatment->appointment_id);
                         if ($appointment && $appointment->appointment_status_id != 3) { // 3 = "Completed" status
                             $appointment->update(['appointment_status_id' => 3]);
-                            
+
                             \Illuminate\Support\Facades\Log::info('Appointment status auto-updated to Completed', [
                                 'appointment_id' => $appointment->id,
                                 'treatment_id' => $treatment->id,
@@ -226,7 +226,7 @@ class PaymentController extends Controller
     public function show(Clinic $clinic, Payment $payment)
     {
         $this->authorize('view', $payment);
-        $payment->load(['patient', 'treatment', 'receivedBy']);
+        $payment->load(['patient', 'treatment.service', 'treatment.inventoryItems.inventory', 'receivedBy']);
 
         // Get related payments for this patient
         $relatedPayments = $clinic->payments()
@@ -272,6 +272,7 @@ class PaymentController extends Controller
                 'name' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'clinic_id' => $clinic->id,
+                'clinic' => $clinic,
             ],
         ]);
     }
@@ -429,7 +430,7 @@ class PaymentController extends Controller
     public function receipt(Clinic $clinic, Payment $payment)
     {
         $this->authorize('view', $payment);
-        $payment->load(['patient', 'treatment', 'receivedBy']);
+        $payment->load(['patient', 'treatment.service', 'treatment.inventoryItems.inventory', 'receivedBy']);
 
         return Inertia::render('Clinic/Payments/Receipt', [
             'clinic' => $clinic,
