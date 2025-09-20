@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Treatment;
 use App\Models\Service;
 use App\Models\Clinic;
+use App\Models\Inventory;
+use App\Services\TreatmentInventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Traits\SubscriptionAccessControl;
 
@@ -145,7 +150,7 @@ class TreatmentController extends Controller
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
             'dentist_id' => 'required|exists:users,id',
-            'service_id' => 'nullable|string',
+            'service_id' => 'nullable|integer|exists:services,id',
             'appointment_id' => 'nullable|exists:appointments,id',
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -173,6 +178,11 @@ class TreatmentController extends Controller
             'outcome' => 'nullable|string|max:50|in:successful,partial,failed,pending,none',
             'next_appointment_date' => 'nullable|date',
             'estimated_duration_minutes' => 'nullable|integer|min:1',
+            // Inventory integration fields
+            'inventory_items' => 'nullable|array',
+            'inventory_items.*.inventory_id' => 'required_with:inventory_items|exists:inventory,id',
+            'inventory_items.*.quantity_used' => 'required_with:inventory_items|integer|min:1',
+            'inventory_items.*.notes' => 'nullable|string|max:500',
         ]);
 
         // Map dentist_id to user_id for the database
@@ -199,13 +209,34 @@ class TreatmentController extends Controller
             $validated['payment_status'] = 'pending';
         }
 
-        // Create treatment first to get the ID
-        $treatment = Auth::user()->clinic->treatments()->create($validated);
+        // Handle inventory deduction when treatment is completed
+        $inventoryItems = $validated['inventory_items'] ?? [];
+        unset($validated['inventory_items']); // Remove from treatment creation data
+
+        $treatment = null;
+        try {
+            DB::transaction(function () use ($validated, $inventoryItems, &$treatment) {
+                // Create treatment first to get the ID
+                $treatment = Auth::user()->clinic->treatments()->create($validated);
+
+                // Handle inventory deduction if treatment is completed and has inventory items
+                if ($validated['status'] === Treatment::STATUS_COMPLETED &&
+                    !empty($inventoryItems)) {
+
+                    $inventoryService = new TreatmentInventoryService();
+                    $inventoryService->deductInventory($treatment, $inventoryItems);
+                }
+            });
+        } catch (\App\Services\InsufficientStockException $e) {
+            return back()->withErrors(['inventory_items' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to create treatment: ' . $e->getMessage()]);
+        }
 
         // Handle file uploads
         $uploadedImages = [];
 
-        if ($request->hasFile('imageFiles')) {
+        if ($request->hasFile('imageFiles') && $treatment) {
             $clinicId = Auth::user()->clinic->id;
             $treatmentId = $treatment->id;
 
@@ -225,16 +256,25 @@ class TreatmentController extends Controller
             }
 
             // Update treatment with uploaded images
-            if (!empty($uploadedImages)) {
+            if (!empty($uploadedImages) && $treatment) {
                 $allImages = array_merge($uploadedImages, $validated['images'] ?? []);
                 $treatment->update(['images' => $allImages]);
             }
         }
 
+        $message = 'Treatment created successfully.';
+        if (!empty($inventoryItems) && $validated['status'] === Treatment::STATUS_COMPLETED) {
+            $message .= ' Inventory has been deducted.';
+        }
+
+        if (!$treatment) {
+            return back()->withErrors(['error' => 'Failed to create treatment.']);
+        }
+
         return redirect()->route('clinic.treatments.show', [
             'clinic' => Auth::user()->clinic->id,
             'treatment' => $treatment->id
-        ])->with('success', 'Treatment created successfully.');
+        ])->with('success', $message);
     }
 
     public function show(Clinic $clinic, Treatment $treatment)
@@ -247,11 +287,36 @@ class TreatmentController extends Controller
             'service',
             'appointment' => function($query) {
                 $query->with(['patient.user', 'type', 'status', 'assignedDentist']);
+            },
+            'inventoryItems.inventory',
+            'payments' => function($query) {
+                $query->with('receivedBy')->orderBy('created_at', 'desc');
             }
         ]);
 
+        // Get inventory summary if treatment has inventory deduction
+        $inventorySummary = null;
+        if ($treatment->hasInventoryDeduction()) {
+            $inventoryService = new TreatmentInventoryService();
+            $inventorySummary = $inventoryService->getTreatmentInventorySummary($treatment);
+        }
+
+        // Debug: Log the loaded data
+        Log::info('Treatment Show - Loaded data', [
+            'treatment_id' => $treatment->id,
+            'inventory_items_count' => $treatment->inventoryItems->count(),
+            'inventory_items' => $treatment->inventoryItems->toArray(),
+            'inventory_deducted' => $treatment->inventory_deducted,
+            'inventory_deducted_at' => $treatment->inventory_deducted_at,
+        ]);
+
+        // Ensure inventory items are properly serialized
+        $treatmentData = $treatment->toArray();
+        $treatmentData['inventoryItems'] = $treatment->inventoryItems->toArray();
+
         return Inertia::render('Clinic/Treatments/Show', [
-            'treatment' => $treatment
+            'treatment' => $treatmentData,
+            'inventorySummary' => $inventorySummary
         ]);
     }
 
@@ -289,8 +354,26 @@ class TreatmentController extends Controller
                 ];
             });
 
+        // Load inventory items relationship
+        $treatment->load('inventoryItems.inventory');
+
+        // Debug: Log the loaded data
+        Log::info('Edit method - Treatment loaded with inventory items', [
+            'treatment_id' => $treatment->id,
+            'inventory_items_count' => $treatment->inventoryItems->count(),
+            'inventory_items' => $treatment->inventoryItems->toArray(),
+            'procedures_details' => $treatment->procedures_details,
+            'procedures_details_type' => gettype($treatment->procedures_details),
+            'procedures_details_count' => is_array($treatment->procedures_details) ? count($treatment->procedures_details) : 'Not an array',
+            'procedures_details_first_item' => is_array($treatment->procedures_details) && count($treatment->procedures_details) > 0 ? $treatment->procedures_details[0] : 'No items'
+        ]);
+
+        // Ensure inventory items are included in the response
+        $treatmentData = $treatment->toArray();
+        $treatmentData['inventoryItems'] = $treatment->inventoryItems->toArray();
+
         return Inertia::render('Clinic/Treatments/Edit', [
-            'treatment' => $treatment,
+            'treatment' => $treatmentData,
             'patients' => $patients,
             'dentists' => $dentists,
             'services' => $services,
@@ -302,10 +385,15 @@ class TreatmentController extends Controller
     {
         $this->authorize('update', $treatment);
 
+        Log::info('Treatment update request received', [
+            'treatment_id' => $treatment->id,
+            'request_data' => $request->all()
+        ]);
+
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
             'dentist_id' => 'required|exists:users,id',
-            'service_id' => 'nullable|string|in:none|exists:services,id',
+            'service_id' => 'nullable|integer|exists:services,id',
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'cost' => 'required|numeric|min:0',
@@ -331,6 +419,11 @@ class TreatmentController extends Controller
             'outcome' => 'nullable|string|max:50|in:successful,partial,failed,pending,none,no_outcome',
             'next_appointment_date' => 'nullable|date',
             'estimated_duration_minutes' => 'nullable|integer|min:1',
+            // Inventory integration fields
+            'inventory_items' => 'nullable|array',
+            'inventory_items.*.inventory_id' => 'required_with:inventory_items|exists:inventory,id',
+            'inventory_items.*.quantity_used' => 'required_with:inventory_items|integer|min:1',
+            'inventory_items.*.notes' => 'nullable|string|max:500',
         ]);
 
         // Map dentist_id to user_id for the database
@@ -352,10 +445,88 @@ class TreatmentController extends Controller
             $validated['outcome'] = null;
         }
 
-        $treatment->update($validated);
+        // Handle inventory deduction when treatment is completed
+        $inventoryItems = $validated['inventory_items'] ?? [];
+        unset($validated['inventory_items']); // Remove from treatment update data
 
-        return redirect()->route('clinic.treatments.show', $treatment)
-            ->with('success', 'Treatment updated successfully.');
+        try {
+            // Validate inventory changes BEFORE updating treatment (regardless of status)
+            if (!empty($inventoryItems)) {
+                $inventoryService = new TreatmentInventoryService();
+                $inventoryService->validateInventoryAdjustment($treatment, $inventoryItems);
+            }
+
+            DB::transaction(function () use ($treatment, $validated, $inventoryItems, $clinic) {
+                // Update treatment
+                $treatment->update($validated);
+
+                // Auto-update appointment status to "Completed" if treatment is completed and fully paid
+                if ($validated['status'] === Treatment::STATUS_COMPLETED && $treatment->appointment_id) {
+                    // Check if treatment is fully paid
+                    $totalPaid = $clinic->payments()
+                        ->where('treatment_id', $treatment->id)
+                        ->where('status', 'completed')
+                        ->sum('amount');
+                    
+                    $totalCost = $treatment->cost + ($treatment->inventoryItems->sum('total_cost') ?? 0);
+                    
+                    if ($totalPaid >= $totalCost) {
+                        $appointment = \App\Models\Appointment::find($treatment->appointment_id);
+                        if ($appointment && $appointment->appointment_status_id != 3) { // 3 = "Completed" status
+                            $appointment->update(['appointment_status_id' => 3]);
+                            
+                            Log::info('Appointment status auto-updated to Completed via treatment update', [
+                                'appointment_id' => $appointment->id,
+                                'treatment_id' => $treatment->id,
+                                'treatment_status' => $treatment->status,
+                                'treatment_payment_status' => $treatment->payment_status,
+                                'total_paid' => $totalPaid,
+                                'total_cost' => $totalCost
+                            ]);
+                        }
+                    }
+                }
+
+                // Handle inventory items update with smart adjustment
+                if (!empty($inventoryItems)) {
+                    $inventoryService = new TreatmentInventoryService();
+
+                    if ($validated['status'] === Treatment::STATUS_COMPLETED) {
+                        // Use smart adjustment logic that calculates differences
+                        $inventoryService->updateInventoryDeduction($treatment, $inventoryItems);
+                    } else {
+                        // If treatment is not completed, just update the inventory items without deducting
+                        // This allows validation to happen but doesn't affect actual stock
+                        $inventoryService->updateInventoryItemsOnly($treatment, $inventoryItems);
+                    }
+                } elseif ($treatment->inventory_deducted) {
+                    // If no inventory items provided but treatment had inventory deducted, reverse it
+                    $inventoryService = new TreatmentInventoryService();
+                    $inventoryService->reverseInventoryDeduction($treatment);
+                }
+            });
+
+            $message = 'Treatment updated successfully.';
+            if (!empty($inventoryItems) && $validated['status'] === Treatment::STATUS_COMPLETED) {
+                $message .= ' Inventory has been adjusted.';
+            }
+
+            Log::info('Treatment update completed successfully', [
+                'treatment_id' => $treatment->id,
+                'message' => $message,
+                'inventory_adjusted' => !empty($inventoryItems) && $validated['status'] === Treatment::STATUS_COMPLETED
+            ]);
+
+            return redirect()->route('clinic.treatments.show', [
+                'clinic' => $clinic->id,
+                'treatment' => $treatment->id
+            ])->with('success', $message);
+
+        } catch (\App\Services\InsufficientStockException $e) {
+            return back()->withErrors(['inventory_items' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to update treatment: ' . $e->getMessage()]);
+        }
     }
 
     public function destroy(Clinic $clinic, Treatment $treatment)
@@ -366,5 +537,194 @@ class TreatmentController extends Controller
 
         return redirect()->route('clinic.treatments.index')
             ->with('success', 'Treatment deleted successfully.');
+    }
+
+    /**
+     * Get available inventory items for a clinic
+     */
+    public function getAvailableInventory(Clinic $clinic)
+    {
+        // Check if user belongs to this clinic
+        if (Auth::user()->clinic_id !== $clinic->id) {
+            return response()->json(['error' => 'Unauthorized access to clinic inventory'], 403);
+        }
+
+        // Debug: Log the query
+        Log::info('Fetching available inventory for clinic', [
+            'clinic_id' => $clinic->id,
+            'clinic_name' => $clinic->name
+        ]);
+
+        // Check if is_active field exists, if not, just filter by quantity
+        $query = $clinic->inventory()->where('quantity', '>', 0);
+
+        // Only add is_active filter if the column exists
+        if (Schema::hasColumn('inventory', 'is_active')) {
+            $query->where('is_active', true);
+        }
+
+        $inventory = $query->orderBy('name')
+            ->get(['id', 'name', 'category', 'quantity', 'unit_price', 'minimum_quantity']);
+
+        // Debug: Log the results
+        Log::info('Available inventory found', [
+            'count' => $inventory->count(),
+            'items' => $inventory->toArray()
+        ]);
+
+        return response()->json($inventory);
+    }
+
+    /**
+     * Deduct inventory for a specific treatment
+     */
+    public function deductInventory(Request $request, Clinic $clinic, Treatment $treatment)
+    {
+        // Check if user belongs to this clinic and can update the treatment
+        if (Auth::user()->clinic_id !== $clinic->id || $treatment->clinic_id !== $clinic->id) {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $validated = $request->validate([
+            'inventory_items' => 'required|array|min:1',
+            'inventory_items.*.inventory_id' => 'required|exists:inventory,id',
+            'inventory_items.*.quantity_used' => 'required|integer|min:1',
+            'inventory_items.*.notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $inventoryService = new TreatmentInventoryService();
+            $inventoryService->deductInventory($treatment, $validated['inventory_items']);
+
+            return response()->json([
+                'message' => 'Inventory deducted successfully',
+                'treatment_id' => $treatment->id,
+                'items_count' => count($validated['inventory_items'])
+            ]);
+
+        } catch (\App\Services\InsufficientStockException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to deduct inventory: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Reverse inventory deduction for a treatment
+     */
+    public function reverseInventoryDeduction(Clinic $clinic, Treatment $treatment)
+    {
+        // Check if user belongs to this clinic and can update the treatment
+        if (Auth::user()->clinic_id !== $clinic->id || $treatment->clinic_id !== $clinic->id) {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        try {
+            $inventoryService = new TreatmentInventoryService();
+            $inventoryService->reverseInventoryDeduction($treatment);
+
+            return response()->json([
+                'message' => 'Inventory deduction reversed successfully',
+                'treatment_id' => $treatment->id
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to reverse inventory deduction: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get inventory usage summary for a treatment
+     */
+    public function getInventorySummary(Clinic $clinic, Treatment $treatment)
+    {
+        // Check if user belongs to this clinic and can view the treatment
+        if (Auth::user()->clinic_id !== $clinic->id || $treatment->clinic_id !== $clinic->id) {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $inventoryService = new TreatmentInventoryService();
+        $summary = $inventoryService->getTreatmentInventorySummary($treatment);
+
+        return response()->json($summary);
+    }
+
+    /**
+     * Complete treatment with inventory deduction
+     */
+    public function completeTreatment(Request $request, Clinic $clinic, Treatment $treatment)
+    {
+        // Check if user belongs to this clinic and can update the treatment
+        if (Auth::user()->clinic_id !== $clinic->id || $treatment->clinic_id !== $clinic->id) {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $validated = $request->validate([
+            'inventory_items' => 'nullable|array',
+            'inventory_items.*.inventory_id' => 'required_with:inventory_items|exists:inventory,id',
+            'inventory_items.*.quantity_used' => 'required_with:inventory_items|integer|min:1',
+            'inventory_items.*.notes' => 'nullable|string|max:500',
+            'outcome' => 'nullable|string|in:successful,partial,failed,pending',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            DB::transaction(function () use ($treatment, $validated, $clinic) {
+                // Update treatment status to completed
+                $treatment->update([
+                    'status' => Treatment::STATUS_COMPLETED,
+                    'outcome' => $validated['outcome'] ?? null,
+                    'notes' => $validated['notes'] ?? $treatment->notes,
+                ]);
+
+                // Auto-update appointment status to "Completed" if treatment is completed and fully paid
+                if ($treatment->appointment_id) {
+                    // Check if treatment is fully paid
+                    $totalPaid = $clinic->payments()
+                        ->where('treatment_id', $treatment->id)
+                        ->where('status', 'completed')
+                        ->sum('amount');
+                    
+                    $totalCost = $treatment->cost + ($treatment->inventoryItems->sum('total_cost') ?? 0);
+                    
+                    if ($totalPaid >= $totalCost) {
+                        $appointment = \App\Models\Appointment::find($treatment->appointment_id);
+                        if ($appointment && $appointment->appointment_status_id != 3) { // 3 = "Completed" status
+                            $appointment->update(['appointment_status_id' => 3]);
+                            
+                            Log::info('Appointment status auto-updated to Completed via completeTreatment', [
+                                'appointment_id' => $appointment->id,
+                                'treatment_id' => $treatment->id,
+                                'treatment_status' => $treatment->status,
+                                'treatment_payment_status' => $treatment->payment_status,
+                                'total_paid' => $totalPaid,
+                                'total_cost' => $totalCost
+                            ]);
+                        }
+                    }
+                }
+
+                // Deduct inventory if items provided
+                if (!empty($validated['inventory_items'])) {
+                    $inventoryService = new TreatmentInventoryService();
+                    $inventoryService->deductInventory($treatment, $validated['inventory_items']);
+                }
+            });
+
+            $message = 'Treatment completed successfully.';
+            if (!empty($validated['inventory_items'])) {
+                $message .= ' Inventory has been deducted.';
+            }
+
+            return redirect()->route('clinic.treatments.show', [
+                'clinic' => $clinic->id,
+                'treatment' => $treatment->id
+            ])->with('success', $message);
+
+        } catch (\App\Services\InsufficientStockException $e) {
+            return back()->withErrors(['inventory_items' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to complete treatment: ' . $e->getMessage()]);
+        }
     }
 }

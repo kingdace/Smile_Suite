@@ -65,7 +65,7 @@ import {
     ShoppingCart,
 } from "lucide-react";
 
-const navigation = (clinicId) => [
+const getNavigation = (clinicId) => [
     {
         name: "Dashboard",
         href: route("clinic.dashboard", [clinicId]),
@@ -236,7 +236,7 @@ export default function Sidebar({ className, auth }) {
         );
     }
 
-    const sidebarNavigation = navigation(clinicId);
+    const sidebarNavigation = getNavigation(clinicId);
 
     const toggleDropdown = (itemName) => {
         const newExpanded = new Set(expandedItems);

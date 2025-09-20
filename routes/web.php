@@ -5,6 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ClinicController;
@@ -204,33 +206,33 @@ Route::middleware('auth')->group(function () {
             $timeRange = $request->get('range', 'week');
             $clinicModel = \App\Models\Clinic::findOrFail($clinic);
             $metrics = app(\App\Services\DashboardMetricsService::class)->getAllMetrics($clinicModel, $timeRange);
-            
+
             return response()->json($metrics);
         })->name('clinic.dashboard.metrics');
-        
+
         Route::get('/clinic/{clinic}/dashboard/chart-data', function (Request $request, $clinic) {
             $timeRange = $request->get('range', 'week');
             $clinicModel = \App\Models\Clinic::findOrFail($clinic);
             $chartData = app(\App\Services\DashboardMetricsService::class)->getChartData($clinicModel, $timeRange);
-            
+
             return response()->json($chartData);
         })->name('clinic.dashboard.chart-data');
-        
+
         Route::get('/user/dashboard-layout', function (Request $request) {
             $user = $request->user();
             return response()->json([
                 'layout' => $user->dashboard_layout ?? null
             ]);
         })->name('user.dashboard-layout.get');
-        
+
         Route::post('/user/dashboard-layout', function (Request $request) {
             $user = $request->user();
             $layout = $request->validate([
                 'layout' => 'required|array'
             ]);
-            
+
             $user->update(['dashboard_layout' => $layout['layout']]);
-            
+
             return response()->json([
                 'success' => true,
                 'layout' => $user->dashboard_layout
@@ -292,6 +294,25 @@ Route::middleware('auth')->group(function () {
                 'update' => 'clinic.treatments.update',
                 'destroy' => 'clinic.treatments.destroy',
             ]);
+
+        // Treatment-Inventory Integration Routes
+        Route::get('clinic/{clinic}/treatments/inventory/available', [TreatmentController::class, 'getAvailableInventory'])
+            ->name('clinic.treatments.inventory.available');
+        Route::post('clinic/{clinic}/treatments/{treatment}/inventory/deduct', [TreatmentController::class, 'deductInventory'])
+            ->name('clinic.treatments.inventory.deduct');
+        Route::post('clinic/{clinic}/treatments/{treatment}/inventory/reverse', [TreatmentController::class, 'reverseInventoryDeduction'])
+            ->name('clinic.treatments.inventory.reverse');
+        Route::get('clinic/{clinic}/treatments/{treatment}/inventory/summary', [TreatmentController::class, 'getInventorySummary'])
+            ->name('clinic.treatments.inventory.summary');
+        Route::post('clinic/{clinic}/treatments/{treatment}/complete', [TreatmentController::class, 'completeTreatment'])
+            ->name('clinic.treatments.complete');
+
+        // Inventory Usage Reports
+        Route::get('clinic/{clinic}/reports/inventory-usage', [\App\Http\Controllers\Clinic\InventoryUsageReportController::class, 'index'])
+            ->name('clinic.reports.inventory-usage');
+        Route::get('clinic/{clinic}/reports/export/inventory-usage', [\App\Http\Controllers\Clinic\InventoryUsageReportController::class, 'export'])
+            ->name('clinic.reports.export.inventory-usage');
+
 
         // Inventory Management Routes
         Route::resource('clinic/{clinic}/inventory', InventoryController::class)

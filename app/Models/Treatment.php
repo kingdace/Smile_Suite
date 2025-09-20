@@ -41,6 +41,8 @@ class Treatment extends Model
         'outcome',
         'next_appointment_date',
         'estimated_duration_minutes',
+        'inventory_deducted',
+        'inventory_deducted_at',
     ];
 
     protected $casts = [
@@ -57,6 +59,8 @@ class Treatment extends Model
         'vital_signs' => 'array',
         'consent_forms' => 'array',
         'estimated_duration_minutes' => 'integer',
+        'inventory_deducted' => 'boolean',
+        'inventory_deducted_at' => 'datetime',
     ];
 
     // Status constants
@@ -118,6 +122,11 @@ class Treatment extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function inventoryItems()
+    {
+        return $this->hasMany(TreatmentInventoryItem::class);
     }
 
     // Scopes for filtering
@@ -227,5 +236,31 @@ class Treatment extends Model
         }
 
         return $minutes . ' minutes';
+    }
+
+    // Inventory integration methods
+    public function hasInventoryDeduction()
+    {
+        return $this->inventory_deducted;
+    }
+
+    public function canDeductInventory()
+    {
+        return $this->status === self::STATUS_COMPLETED && !$this->inventory_deducted;
+    }
+
+    public function getTotalInventoryCostAttribute()
+    {
+        return $this->inventoryItems()->sum('total_cost');
+    }
+
+    public function getFormattedTotalInventoryCostAttribute()
+    {
+        return '₱' . number_format($this->total_inventory_cost, 2);
+    }
+
+    public function getInventoryItemsCountAttribute()
+    {
+        return $this->inventoryItems()->count();
     }
 }

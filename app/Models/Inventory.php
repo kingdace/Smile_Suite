@@ -80,6 +80,11 @@ class Inventory extends Model
         return $this->hasMany(PurchaseOrderItem::class);
     }
 
+    public function treatmentItems(): HasMany
+    {
+        return $this->hasMany(TreatmentInventoryItem::class);
+    }
+
     /**
      * Get category label
      */
@@ -293,5 +298,31 @@ class Inventory extends Model
     public function getRouteKeyName()
     {
         return 'id';
+    }
+
+    // Treatment integration methods
+    public function canDeduct($quantity)
+    {
+        return $this->quantity >= $quantity && $this->is_active;
+    }
+
+    public function getUsageCountAttribute()
+    {
+        return $this->treatmentItems()->sum('quantity_used');
+    }
+
+    public function getTotalUsageValueAttribute()
+    {
+        return $this->treatmentItems()->sum('total_cost');
+    }
+
+    public function getFormattedTotalUsageValueAttribute()
+    {
+        return '₱' . number_format($this->total_usage_value, 2);
+    }
+
+    public function getTreatmentsCountAttribute()
+    {
+        return $this->treatmentItems()->distinct('treatment_id')->count();
     }
 }

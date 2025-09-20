@@ -33,15 +33,11 @@ class InventoryController extends Controller
 
         $query = $clinic->inventory()->with(['supplier']);
 
-        // Search functionality
+        // Search functionality (simplified)
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('description', 'like', "%{$request->search}%")
-                    ->orWhere('sku', 'like', "%{$request->search}%")
-                    ->orWhere('barcode', 'like', "%{$request->search}%")
-                    ->orWhere('brand', 'like', "%{$request->search}%")
-                    ->orWhere('model', 'like', "%{$request->search}%");
+                    ->orWhere('description', 'like', "%{$request->search}%");
             });
         }
 
@@ -50,11 +46,12 @@ class InventoryController extends Controller
             $query->where('category', $request->category);
         }
 
-        // Status filter
-        if ($request->status) {
-            switch ($request->status) {
+        // Simple stock filter
+        if ($request->stock_filter) {
+            switch ($request->stock_filter) {
                 case 'in_stock':
-                    $query->where('quantity', '>', 'minimum_quantity');
+                    $query->where('quantity', '>', 0)
+                          ->whereRaw('quantity > minimum_quantity');
                     break;
                 case 'low_stock':
                     $query->whereRaw('quantity <= minimum_quantity AND quantity > 0');
@@ -65,66 +62,15 @@ class InventoryController extends Controller
             }
         }
 
-        // Supplier filter
-        if ($request->supplier) {
-            $query->whereHas('supplier', function ($q) use ($request) {
-                $q->where('name', $request->supplier);
-            });
-        }
-
-        // Expiry filter
-        if ($request->expiry_status) {
-            switch ($request->expiry_status) {
-                case 'expired':
-                    $query->where('expiry_date', '<', now());
-                    break;
-                case 'expiring_soon':
-                    $query->where('expiry_date', '<=', now()->addDays(30))
-                          ->where('expiry_date', '>', now());
-                    break;
-                case 'valid':
-                    $query->where(function ($q) {
-                        $q->where('expiry_date', '>', now()->addDays(30))
-                          ->orWhereNull('expiry_date');
-                    });
-                    break;
-            }
-        }
-
-        // Sorting
-        $sortBy = $request->get('sort_by', 'name');
-        $sortOrder = $request->get('sort_order', 'asc');
-
-        $allowedSortFields = ['name', 'quantity', 'unit_price', 'category', 'expiry_date', 'created_at'];
-        if (in_array($sortBy, $allowedSortFields)) {
-            $query->orderBy($sortBy, $sortOrder);
-        } else {
-            $query->orderBy('name', 'asc');
-        }
+        // Simple sorting (name only)
+        $query->orderBy('name', 'asc');
 
         $inventory = $query->paginate(15);
-
-        // Get summary statistics
-        $summary = [
-            'total_items' => $clinic->inventory()->count(),
-            'low_stock_items' => $clinic->inventory()->whereRaw('quantity <= minimum_quantity')->count(),
-            'out_of_stock_items' => $clinic->inventory()->where('quantity', '<=', 0)->count(),
-            'expiring_items' => $clinic->inventory()
-                ->where('expiry_date', '<=', now()->addDays(30))
-                ->where('expiry_date', '>', now())
-                ->count(),
-            'total_value' => $clinic->inventory()
-                ->get()
-                ->sum(function ($item) {
-                    return $item->quantity * $item->unit_price;
-                }),
-        ];
 
         return Inertia::render('Clinic/Inventory/Index', [
             'clinic' => $clinic,
             'inventory' => $inventory,
-            'summary' => $summary,
-            'filters' => $request->only(['search', 'category', 'status', 'supplier', 'expiry_status', 'sort_by', 'sort_order']),
+            'filters' => $request->only(['search', 'category', 'stock_filter']),
         ]);
     }
 
@@ -317,34 +263,17 @@ class InventoryController extends Controller
         }
 
         $validated = $request->validate([
-            'quantity' => 'required|integer|min:0',
-            'notes' => 'nullable|string',
+            'adjustment' => 'required|integer', // Can be positive or negative
         ]);
 
         $oldQuantity = $inventory->quantity;
-        $newQuantity = $validated['quantity'];
+        $newQuantity = max(0, $oldQuantity + $validated['adjustment']); // Prevent negative quantities
 
         $inventory->update([
             'quantity' => $newQuantity,
         ]);
 
-        // Create transaction record
-        $inventory->transactions()->create([
-            'clinic_id' => $clinic->id,
-            'user_id' => $user->id,
-            'type' => 'adjustment',
-            'quantity' => abs($newQuantity - $oldQuantity),
-            'quantity_before' => $oldQuantity,
-            'quantity_after' => $newQuantity,
-            'notes' => $validated['notes'] ?? 'Quick quantity adjustment',
-            'transaction_date' => now(),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Quantity adjusted successfully',
-            'new_quantity' => $newQuantity,
-        ]);
+        return back()->with('success', 'Stock quantity adjusted successfully.');
     }
 
     /**

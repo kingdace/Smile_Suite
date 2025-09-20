@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
@@ -14,6 +14,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Badge } from "@/Components/ui/badge";
+import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector";
 import {
     CalendarIcon,
     Loader2,
@@ -126,10 +127,96 @@ export default function Edit({
             ? new Date(treatment.next_appointment_date)
             : undefined,
         estimated_duration_minutes: treatment?.estimated_duration_minutes || "",
-        appointment_id: treatment?.appointment_id || "no_appointment",
-        procedures_details: treatment?.procedures_details || [],
+        appointment_id: treatment?.appointment_id
+            ? treatment.appointment_id.toString()
+            : "no_appointment",
+        procedures_details: (() => {
+            const procedures = treatment?.procedures_details;
+            if (!procedures) return [];
+
+            // If it's already an array, process each item
+            if (Array.isArray(procedures)) {
+                return procedures.map((proc) => {
+                    // If it's an object with step and notes properties, return as is
+                    if (
+                        typeof proc === "object" &&
+                        proc !== null &&
+                        (proc.step !== undefined || proc.notes !== undefined)
+                    ) {
+                        return {
+                            step: proc.step || "",
+                            notes: proc.notes || "",
+                        };
+                    }
+                    // If it's an object with numeric keys (serialized array), convert it
+                    if (typeof proc === "object" && proc !== null) {
+                        const keys = Object.keys(proc);
+                        if (
+                            keys.length > 0 &&
+                            keys.every((key) => !isNaN(key))
+                        ) {
+                            const values = Object.values(proc);
+                            return {
+                                step: String(values[0] || ""),
+                                notes: String(values[1] || ""),
+                            };
+                        }
+                    }
+                    // If it's a string, treat as step
+                    return { step: String(proc), notes: "" };
+                });
+            }
+
+            // If it's an object with numeric keys, convert to array
+            if (typeof procedures === "object" && procedures !== null) {
+                const keys = Object.keys(procedures);
+                if (keys.length > 0 && keys.every((key) => !isNaN(key))) {
+                    const values = Object.values(procedures);
+                    return values.map((value) => {
+                        if (typeof value === "object" && value !== null) {
+                            const valueKeys = Object.keys(value);
+                            if (
+                                valueKeys.length > 0 &&
+                                valueKeys.every((key) => !isNaN(key))
+                            ) {
+                                const valueValues = Object.values(value);
+                                return {
+                                    step: String(valueValues[0] || ""),
+                                    notes: String(valueValues[1] || ""),
+                                };
+                            }
+                            return {
+                                step:
+                                    value.step ||
+                                    value.name ||
+                                    value.description ||
+                                    "",
+                                notes: value.notes || value.details || "",
+                            };
+                        }
+                        return { step: String(value), notes: "" };
+                    });
+                }
+            }
+
+            return [];
+        })(),
         images: treatment?.images || [],
         imageFiles: [],
+        inventory_items:
+            treatment?.inventoryItems?.map((item) => ({
+                inventory_id: item.inventory_id,
+                quantity_used: item.quantity_used,
+                unit_cost: item.unit_cost,
+                total_cost: item.total_cost,
+                notes: item.notes || "",
+                // Add fallback for missing inventory items
+                inventory_name:
+                    item.inventory?.name || "Unknown Item (Deleted)",
+                inventory_description:
+                    item.inventory?.description ||
+                    "This inventory item may have been deleted or renamed",
+            })) || [],
     });
 
     const statuses = [
@@ -161,12 +248,95 @@ export default function Edit({
 
     const submit = (e) => {
         e.preventDefault();
-        put(
-            route("clinic.treatments.update", {
-                clinic: auth.clinic_id,
-                treatment: treatment?.id,
-            })
+
+        console.log("Edit page - Submitting form with data:", data);
+        console.log(
+            "Edit page - inventory_items being sent:",
+            data.inventory_items
         );
+
+        // Prepare data for submission
+        const submitData = { ...data };
+
+        // Convert dates to ISO strings
+        if (submitData.start_date instanceof Date) {
+            submitData.start_date = submitData.start_date.toISOString();
+        }
+        if (submitData.end_date instanceof Date) {
+            submitData.end_date = submitData.end_date.toISOString();
+        }
+        if (submitData.next_appointment_date instanceof Date) {
+            submitData.next_appointment_date =
+                submitData.next_appointment_date.toISOString();
+        }
+
+        // Convert numeric fields
+        if (submitData.cost) {
+            submitData.cost = parseFloat(submitData.cost);
+        }
+        if (submitData.estimated_duration_minutes) {
+            submitData.estimated_duration_minutes = parseInt(
+                submitData.estimated_duration_minutes
+            );
+        }
+
+        // Convert ID fields to integers
+        if (submitData.patient_id) {
+            submitData.patient_id = parseInt(submitData.patient_id);
+        }
+        if (submitData.dentist_id) {
+            submitData.dentist_id = parseInt(submitData.dentist_id);
+        }
+        if (submitData.service_id && submitData.service_id !== "none") {
+            submitData.service_id = parseInt(submitData.service_id);
+        } else if (submitData.service_id === "none") {
+            submitData.service_id = null;
+        }
+        if (
+            submitData.appointment_id &&
+            submitData.appointment_id !== "no_appointment"
+        ) {
+            submitData.appointment_id = parseInt(submitData.appointment_id);
+        } else if (submitData.appointment_id === "no_appointment") {
+            submitData.appointment_id = null;
+        }
+
+        // Remove imageFiles from submission (we'll handle file uploads separately if needed)
+        delete submitData.imageFiles;
+
+        console.log("Edit page - Processed data for submission:", submitData);
+        console.log("Edit page - Treatment ID:", treatment?.id);
+        console.log("Edit page - Clinic ID:", auth.clinic_id);
+
+        const routeUrl = route("clinic.treatments.update", {
+            clinic: auth.clinic_id,
+            treatment: treatment?.id,
+        });
+        console.log("Edit page - Route URL:", routeUrl);
+
+        put(routeUrl, {
+            data: submitData,
+            onError: (errors) => {
+                console.error("Edit page - Update failed with errors:", errors);
+                // Show error message to user
+                alert("Update failed: " + JSON.stringify(errors));
+            },
+            onSuccess: (page) => {
+                console.log("Edit page - Update successful:", page);
+                // Show success message to user
+                alert("Treatment updated successfully!");
+                // Redirect to treatments list or show page
+                router.visit(
+                    route("clinic.treatments.show", {
+                        clinic: auth.clinic_id,
+                        treatment: treatment?.id,
+                    })
+                );
+            },
+            onFinish: () => {
+                console.log("Edit page - Request finished");
+            },
+        });
     };
 
     const addArrayItem = (field) => {
@@ -183,6 +353,11 @@ export default function Edit({
         const newArray = data[field].filter((_, i) => i !== index);
         setData(field, newArray);
     };
+
+    // Debug logging for inventory items
+    useEffect(() => {
+        // Removed debugging logs
+    }, [treatment, data.inventory_items]);
 
     return (
         <AuthenticatedLayout
@@ -495,6 +670,13 @@ export default function Edit({
                                                             >
                                                                 {patient.user
                                                                     ?.name ||
+                                                                    `${
+                                                                        patient.first_name ||
+                                                                        ""
+                                                                    } ${
+                                                                        patient.last_name ||
+                                                                        ""
+                                                                    }`.trim() ||
                                                                     "Unknown Patient"}
                                                             </SelectItem>
                                                         )
@@ -1060,6 +1242,24 @@ export default function Edit({
                                             <PlusCircle className="h-4 w-4" />
                                             Add Material
                                         </Button>
+                                    </div>
+                                </div>
+
+                                {/* Inventory Items Used */}
+                                <div className="space-y-6 -mx-8 px-8 py-8 bg-gradient-to-r from-white-50 to-indigo-50 border-y border-blue-100">
+                                    <div className="max-w-4xl mx-auto">
+                                        <TreatmentInventorySelector
+                                            clinicId={auth.clinic_id}
+                                            value={data.inventory_items}
+                                            onChange={(items) =>
+                                                setData(
+                                                    "inventory_items",
+                                                    items
+                                                )
+                                            }
+                                            disabled={processing}
+                                            showCosts={true}
+                                        />
                                     </div>
                                 </div>
 

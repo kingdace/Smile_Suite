@@ -8,10 +8,10 @@
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/png" sizes="16x16" href="/images/smile-suite-logo-16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/images/smile-suite-logo-32.png">
-<link rel="icon" type="image/png" sizes="48x48" href="/images/smile-suite-logo-48.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/images/smile-suite-logo-96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/smile-suite-logo.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/smile-suite-logo.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/images/smile-suite-logo.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/images/smile-suite-logo.png">
 
         <link rel="shortcut icon" type="image/png" href="/images/smile-suite-logo.png">
 

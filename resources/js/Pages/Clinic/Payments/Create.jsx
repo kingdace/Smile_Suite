@@ -37,8 +37,11 @@ import {
     FileText,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { usePage } from "@inertiajs/react";
 
 export default function Create({ auth, patients, treatments }) {
+    const { url } = usePage();
+    const urlParams = new URLSearchParams(url.split("?")[1]);
     const { data, setData, post, processing, errors, reset } = useForm({
         patient_id: "",
         treatment_id: "",
@@ -55,6 +58,47 @@ export default function Create({ auth, patients, treatments }) {
 
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedTreatment, setSelectedTreatment] = useState(null);
+
+    // Handle URL parameters for pre-filling data
+    useEffect(() => {
+        const treatmentId = urlParams.get("treatment_id");
+        const patientId = urlParams.get("patient_id");
+        const amount = urlParams.get("amount");
+
+        if (treatmentId) {
+            setData("treatment_id", treatmentId);
+            const treatment = treatments.find(
+                (t) => t.id.toString() === treatmentId
+            );
+            if (treatment) {
+                setSelectedTreatment(treatment);
+            }
+        }
+
+        if (patientId) {
+            setData("patient_id", patientId);
+            const patient = patients.find((p) => p.id.toString() === patientId);
+            if (patient) {
+                setSelectedPatient(patient);
+            }
+        }
+
+        if (amount) {
+            setData("amount", amount);
+        }
+
+        // Auto-generate reference number if not provided
+        if (!data.reference_number) {
+            const timestamp = new Date()
+                .toISOString()
+                .slice(0, 10)
+                .replace(/-/g, "");
+            const random = Math.floor(Math.random() * 1000)
+                .toString()
+                .padStart(3, "0");
+            setData("reference_number", `PAY-${timestamp}-${random}`);
+        }
+    }, []);
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat("en-US", {

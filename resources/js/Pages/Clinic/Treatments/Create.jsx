@@ -5,6 +5,7 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
+import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector";
 import InputError from "@/Components/InputError";
 import { Textarea } from "@/Components/ui/textarea";
 import {
@@ -84,6 +85,7 @@ export default function Create({
         prescriptions: [],
         follow_up_notes: "",
         materials_used: [],
+        inventory_items: [],
         insurance_info: [],
         payment_status: "pending",
         vital_signs: [],
@@ -159,6 +161,26 @@ export default function Create({
                 if (data[key] && data[key].length > 0) {
                     data[key].forEach((item, index) => {
                         formData.append(`${key}[${index}]`, item);
+                    });
+                }
+            } else if (key === "inventory_items") {
+                // Handle inventory_items array with object structure
+                if (data[key] && data[key].length > 0) {
+                    data[key].forEach((item, index) => {
+                        formData.append(
+                            `${key}[${index}][inventory_id]`,
+                            item.inventory_id
+                        );
+                        formData.append(
+                            `${key}[${index}][quantity_used]`,
+                            item.quantity_used
+                        );
+                        if (item.notes) {
+                            formData.append(
+                                `${key}[${index}][notes]`,
+                                item.notes
+                            );
+                        }
                     });
                 }
             } else if (data[key] !== undefined && data[key] !== null) {
@@ -968,139 +990,109 @@ export default function Create({
                                                         />
                                                     </div>
                                                 )}
+                                            </div>
 
-                                                {/* Selected Teeth Display - Always Visible */}
-                                                {data.tooth_numbers &&
-                                                    data.tooth_numbers.length >
-                                                        0 && (
-                                                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
-                                                            <div className="flex items-center justify-between mb-3">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-sm font-semibold text-blue-800">
-                                                                        Selected
-                                                                        Teeth
-                                                                    </span>
-                                                                    <Badge
-                                                                        variant="secondary"
-                                                                        className="bg-blue-100 text-blue-700"
-                                                                    >
-                                                                        {
-                                                                            data
-                                                                                .tooth_numbers
-                                                                                .length
-                                                                        }
-                                                                    </Badge>
-                                                                </div>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        setData(
-                                                                            "tooth_numbers",
-                                                                            []
-                                                                        )
-                                                                    }
-                                                                    className="h-7 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-100"
+                                            {/* Selected Teeth Display - Always Visible */}
+                                            {data.tooth_numbers &&
+                                                data.tooth_numbers.length >
+                                                    0 && (
+                                                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
+                                                        <div className="flex items-center justify-between mb-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-sm font-semibold text-blue-800">
+                                                                    Selected
+                                                                    Teeth
+                                                                </span>
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className="bg-blue-100 text-blue-700"
                                                                 >
-                                                                    Clear All
-                                                                </Button>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {data.tooth_numbers.map(
-                                                                    (
-                                                                        tooth,
-                                                                        index
-                                                                    ) => (
-                                                                        <div
-                                                                            key={
-                                                                                index
-                                                                            }
-                                                                            className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-blue-300 shadow-sm hover:shadow-md transition-shadow"
-                                                                        >
-                                                                            <span className="text-sm font-semibold text-blue-700">
-                                                                                {
-                                                                                    tooth
-                                                                                }
-                                                                            </span>
-                                                                            <Button
-                                                                                type="button"
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                onClick={() => {
-                                                                                    const newToothNumbers =
-                                                                                        (
-                                                                                            data.tooth_numbers ||
-                                                                                            []
-                                                                                        ).filter(
-                                                                                            (
-                                                                                                _,
-                                                                                                i
-                                                                                            ) =>
-                                                                                                i !==
-                                                                                                index
-                                                                                        );
-                                                                                    setData(
-                                                                                        "tooth_numbers",
-                                                                                        newToothNumbers
-                                                                                    );
-                                                                                }}
-                                                                                className="h-5 w-5 p-0 hover:bg-red-100 rounded-full"
-                                                                            >
-                                                                                <X className="h-3 w-3 text-red-500" />
-                                                                            </Button>
-                                                                        </div>
-                                                                    )
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                {/* Manual Input Section */}
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <Input
-                                                            placeholder="Enter tooth number (e.g., 12, 13, 14)"
-                                                            className="flex-1 h-10 text-sm border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                                            onKeyPress={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    e.preventDefault();
-                                                                    const value =
-                                                                        e.target.value.trim();
-                                                                    if (
-                                                                        value &&
-                                                                        !data.tooth_numbers?.includes(
-                                                                            value
-                                                                        )
-                                                                    ) {
-                                                                        setData(
-                                                                            "tooth_numbers",
-                                                                            [
-                                                                                ...(data.tooth_numbers ||
-                                                                                    []),
-                                                                                value,
-                                                                            ]
-                                                                        );
-                                                                        e.target.value =
-                                                                            "";
+                                                                    {
+                                                                        data
+                                                                            .tooth_numbers
+                                                                            .length
                                                                     }
+                                                                </Badge>
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    setData(
+                                                                        "tooth_numbers",
+                                                                        []
+                                                                    )
                                                                 }
-                                                            }}
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                const input =
-                                                                    document.querySelector(
-                                                                        'input[placeholder*="tooth number"]'
-                                                                    );
+                                                                className="h-7 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-100"
+                                                            >
+                                                                Clear All
+                                                            </Button>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {data.tooth_numbers.map(
+                                                                (
+                                                                    tooth,
+                                                                    index
+                                                                ) => (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-blue-300 shadow-sm hover:shadow-md transition-shadow"
+                                                                    >
+                                                                        <span className="text-sm font-semibold text-blue-700">
+                                                                            {
+                                                                                tooth
+                                                                            }
+                                                                        </span>
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            onClick={() => {
+                                                                                const newToothNumbers =
+                                                                                    (
+                                                                                        data.tooth_numbers ||
+                                                                                        []
+                                                                                    ).filter(
+                                                                                        (
+                                                                                            _,
+                                                                                            i
+                                                                                        ) =>
+                                                                                            i !==
+                                                                                            index
+                                                                                    );
+                                                                                setData(
+                                                                                    "tooth_numbers",
+                                                                                    newToothNumbers
+                                                                                );
+                                                                            }}
+                                                                            className="h-5 w-5 p-0 hover:bg-red-100 rounded-full"
+                                                                        >
+                                                                            <X className="h-3 w-3 text-red-500" />
+                                                                        </Button>
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                            {/* Manual Input Section */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-2">
+                                                    <Input
+                                                        placeholder="Enter tooth number (e.g., 12, 13, 14)"
+                                                        className="flex-1 h-10 text-sm border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                                        onKeyPress={(e) => {
+                                                            if (
+                                                                e.key ===
+                                                                "Enter"
+                                                            ) {
+                                                                e.preventDefault();
                                                                 const value =
-                                                                    input?.value?.trim();
+                                                                    e.target.value.trim();
                                                                 if (
                                                                     value &&
                                                                     !data.tooth_numbers?.includes(
@@ -1115,215 +1107,273 @@ export default function Create({
                                                                             value,
                                                                         ]
                                                                     );
-                                                                    input.value =
+                                                                    e.target.value =
                                                                         "";
                                                                 }
-                                                            }}
-                                                            className="h-10 px-4 text-sm bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700"
-                                                        >
-                                                            <PlusCircle className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                                                        <Circle className="h-3 w-3" />
-                                                        <span>
-                                                            Press Enter to add
-                                                            tooth number, or use
-                                                            the dental chart
-                                                            above
-                                                        </span>
-                                                    </div>
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            const input =
+                                                                document.querySelector(
+                                                                    'input[placeholder*="tooth number"]'
+                                                                );
+                                                            const value =
+                                                                input?.value?.trim();
+                                                            if (
+                                                                value &&
+                                                                !data.tooth_numbers?.includes(
+                                                                    value
+                                                                )
+                                                            ) {
+                                                                setData(
+                                                                    "tooth_numbers",
+                                                                    [
+                                                                        ...(data.tooth_numbers ||
+                                                                            []),
+                                                                        value,
+                                                                    ]
+                                                                );
+                                                                input.value =
+                                                                    "";
+                                                            }
+                                                        }}
+                                                        className="h-10 px-4 text-sm bg-blue-50 hover:bg-blue-100 border-blue-300 text-blue-700"
+                                                    >
+                                                        <PlusCircle className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Circle className="h-3 w-3" />
+                                                    <span>
+                                                        Press Enter to add tooth
+                                                        number, or use the
+                                                        dental chart above
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Prescriptions & Materials */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                            {/* Prescriptions */}
+                                            <div className="space-y-4">
+                                                <Label className="font-semibold text-gray-700 text-base flex items-center gap-2">
+                                                    <Pill className="h-4 w-4" />
+                                                    Prescriptions
+                                                </Label>
+                                                <div className="space-y-3">
+                                                    {data.prescriptions &&
+                                                        data.prescriptions.map(
+                                                            (
+                                                                prescription,
+                                                                index
+                                                            ) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex gap-2"
+                                                                >
+                                                                    <Input
+                                                                        value={
+                                                                            prescription
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            const newPrescriptions =
+                                                                                [
+                                                                                    ...(data.prescriptions ||
+                                                                                        []),
+                                                                                ];
+                                                                            newPrescriptions[
+                                                                                index
+                                                                            ] =
+                                                                                e.target.value;
+                                                                            setData(
+                                                                                "prescriptions",
+                                                                                newPrescriptions
+                                                                            );
+                                                                        }}
+                                                                        placeholder="Enter prescription details..."
+                                                                        className="flex-1"
+                                                                    />
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            const newPrescriptions =
+                                                                                (
+                                                                                    data.prescriptions ||
+                                                                                    []
+                                                                                ).filter(
+                                                                                    (
+                                                                                        _,
+                                                                                        i
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index
+                                                                                );
+                                                                            setData(
+                                                                                "prescriptions",
+                                                                                newPrescriptions
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <X className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            setData(
+                                                                "prescriptions",
+                                                                [
+                                                                    ...(data.prescriptions ||
+                                                                        []),
+                                                                    "",
+                                                                ]
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <PlusCircle className="h-4 w-4" />
+                                                        Add Prescription
+                                                    </Button>
                                                 </div>
                                             </div>
 
-                                            {/* Prescriptions & Materials */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                                {/* Prescriptions */}
-                                                <div className="space-y-4">
-                                                    <Label className="font-semibold text-gray-700 text-base flex items-center gap-2">
-                                                        <Pill className="h-4 w-4" />
-                                                        Prescriptions
-                                                    </Label>
-                                                    <div className="space-y-3">
-                                                        {data.prescriptions &&
-                                                            data.prescriptions.map(
-                                                                (
-                                                                    prescription,
-                                                                    index
-                                                                ) => (
-                                                                    <div
-                                                                        key={
-                                                                            index
+                                            {/* Materials Used */}
+                                            <div className="space-y-4">
+                                                <Label className="font-semibold text-gray-700 text-base flex items-center gap-2">
+                                                    <Package className="h-4 w-4" />
+                                                    Materials Used
+                                                </Label>
+                                                <div className="space-y-3">
+                                                    {data.materials_used &&
+                                                        data.materials_used.map(
+                                                            (
+                                                                material,
+                                                                index
+                                                            ) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex gap-2"
+                                                                >
+                                                                    <Input
+                                                                        value={
+                                                                            material
                                                                         }
-                                                                        className="flex gap-2"
-                                                                    >
-                                                                        <Input
-                                                                            value={
-                                                                                prescription
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) => {
-                                                                                const newPrescriptions =
-                                                                                    [
-                                                                                        ...(data.prescriptions ||
-                                                                                            []),
-                                                                                    ];
-                                                                                newPrescriptions[
-                                                                                    index
-                                                                                ] =
-                                                                                    e.target.value;
-                                                                                setData(
-                                                                                    "prescriptions",
-                                                                                    newPrescriptions
-                                                                                );
-                                                                            }}
-                                                                            placeholder="Enter prescription details..."
-                                                                            className="flex-1"
-                                                                        />
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="outline"
-                                                                            size="sm"
-                                                                            onClick={() => {
-                                                                                const newPrescriptions =
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            const newMaterials =
+                                                                                [
+                                                                                    ...(data.materials_used ||
+                                                                                        []),
+                                                                                ];
+                                                                            newMaterials[
+                                                                                index
+                                                                            ] =
+                                                                                e.target.value;
+                                                                            setData(
+                                                                                "materials_used",
+                                                                                newMaterials
+                                                                            );
+                                                                        }}
+                                                                        placeholder="Enter material details..."
+                                                                        className="flex-1"
+                                                                    />
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            const newMaterials =
+                                                                                (
+                                                                                    data.materials_used ||
+                                                                                    []
+                                                                                ).filter(
                                                                                     (
-                                                                                        data.prescriptions ||
-                                                                                        []
-                                                                                    ).filter(
-                                                                                        (
-                                                                                            _,
-                                                                                            i
-                                                                                        ) =>
-                                                                                            i !==
-                                                                                            index
-                                                                                    );
-                                                                                setData(
-                                                                                    "prescriptions",
-                                                                                    newPrescriptions
+                                                                                        _,
+                                                                                        i
+                                                                                    ) =>
+                                                                                        i !==
+                                                                                        index
                                                                                 );
-                                                                            }}
-                                                                        >
-                                                                            <X className="h-4 w-4" />
-                                                                        </Button>
-                                                                    </div>
-                                                                )
-                                                            )}
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            onClick={() =>
-                                                                setData(
-                                                                    "prescriptions",
-                                                                    [
-                                                                        ...(data.prescriptions ||
-                                                                            []),
-                                                                        "",
-                                                                    ]
-                                                                )
-                                                            }
-                                                            className="flex items-center gap-2"
-                                                        >
-                                                            <PlusCircle className="h-4 w-4" />
-                                                            Add Prescription
-                                                        </Button>
-                                                    </div>
-                                                </div>
-
-                                                {/* Materials Used */}
-                                                <div className="space-y-4">
-                                                    <Label className="font-semibold text-gray-700 text-base flex items-center gap-2">
-                                                        <Package className="h-4 w-4" />
-                                                        Materials Used
-                                                    </Label>
-                                                    <div className="space-y-3">
-                                                        {data.materials_used &&
-                                                            data.materials_used.map(
-                                                                (
-                                                                    material,
-                                                                    index
-                                                                ) => (
-                                                                    <div
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                        className="flex gap-2"
+                                                                            setData(
+                                                                                "materials_used",
+                                                                                newMaterials
+                                                                            );
+                                                                        }}
                                                                     >
-                                                                        <Input
-                                                                            value={
-                                                                                material
-                                                                            }
-                                                                            onChange={(
-                                                                                e
-                                                                            ) => {
-                                                                                const newMaterials =
-                                                                                    [
-                                                                                        ...(data.materials_used ||
-                                                                                            []),
-                                                                                    ];
-                                                                                newMaterials[
-                                                                                    index
-                                                                                ] =
-                                                                                    e.target.value;
-                                                                                setData(
-                                                                                    "materials_used",
-                                                                                    newMaterials
-                                                                                );
-                                                                            }}
-                                                                            placeholder="Enter material details..."
-                                                                            className="flex-1"
-                                                                        />
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="outline"
-                                                                            size="sm"
-                                                                            onClick={() => {
-                                                                                const newMaterials =
-                                                                                    (
-                                                                                        data.materials_used ||
-                                                                                        []
-                                                                                    ).filter(
-                                                                                        (
-                                                                                            _,
-                                                                                            i
-                                                                                        ) =>
-                                                                                            i !==
-                                                                                            index
-                                                                                    );
-                                                                                setData(
-                                                                                    "materials_used",
-                                                                                    newMaterials
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <X className="h-4 w-4" />
-                                                                        </Button>
-                                                                    </div>
-                                                                )
-                                                            )}
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            onClick={() =>
-                                                                setData(
-                                                                    "materials_used",
-                                                                    [
-                                                                        ...(data.materials_used ||
-                                                                            []),
-                                                                        "",
-                                                                    ]
-                                                                )
-                                                            }
-                                                            className="flex items-center gap-2"
-                                                        >
-                                                            <PlusCircle className="h-4 w-4" />
-                                                            Add Material
-                                                        </Button>
-                                                    </div>
+                                                                        <X className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            setData(
+                                                                "materials_used",
+                                                                [
+                                                                    ...(data.materials_used ||
+                                                                        []),
+                                                                    "",
+                                                                ]
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-2"
+                                                    >
+                                                        <PlusCircle className="h-4 w-4" />
+                                                        Add Material
+                                                    </Button>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            {/* Follow-up Notes */}
+                                        {/* Inventory Items Used - Full Width Section */}
+                                        <div className="mt-8 -mx-8 px-8 py-6 bg-gradient-to-r from-white-50 to-indigo-50 border-t border-gray-200">
+                                            <div className="flex items-center justify-center mb-6"></div>
+                                            <div className="w-full">
+                                                <TreatmentInventorySelector
+                                                    clinicId={
+                                                        auth.user.clinic.id
+                                                    }
+                                                    value={data.inventory_items}
+                                                    onChange={(items) =>
+                                                        setData(
+                                                            "inventory_items",
+                                                            items
+                                                        )
+                                                    }
+                                                    disabled={processing}
+                                                    showCosts={true}
+                                                />
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Follow-up Notes */}
+                                <Card className="shadow-md border border-gray-200">
+                                    <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200 py-4">
+                                        <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                            <FileText className="h-5 w-5 text-blue-600" />
+                                            Follow-up Notes
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-8">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                             <div className="space-y-3">
                                                 <Label
                                                     htmlFor="follow_up_notes"
