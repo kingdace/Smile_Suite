@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             AppointmentStatusSeeder::class,
             AppointmentTypeSeeder::class,
             ClinicGallerySeeder::class,
+            ClinicSeeder::class,
         ]);
     }
 }

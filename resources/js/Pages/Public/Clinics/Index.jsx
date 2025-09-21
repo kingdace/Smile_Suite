@@ -531,7 +531,7 @@ export default function ClinicDirectory({ clinics }) {
                                                 </div>
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 h-14 flex items-center">
+                                                <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">
                                                     {clinic.name}
                                                 </h3>
                                                 <div className="flex items-center space-x-3">

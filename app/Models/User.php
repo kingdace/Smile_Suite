@@ -83,6 +83,19 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Automatically add "Dr." prefix for dentists when setting the name
+     */
+    public function setNameAttribute($value)
+    {
+        // Only add "Dr." prefix if role is dentist and name doesn't already start with "Dr."
+        if ($this->role === 'dentist' && !str_starts_with(trim($value), 'Dr.')) {
+            $this->attributes['name'] = 'Dr. ' . trim($value);
+        } else {
+            $this->attributes['name'] = $value;
+        }
+    }
+
     public function clinic()
     {
         return $this->belongsTo(Clinic::class);
