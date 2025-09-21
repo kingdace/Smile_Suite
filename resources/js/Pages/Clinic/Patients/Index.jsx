@@ -31,6 +31,7 @@ import {
     UserCheck,
     Settings,
     Clock,
+    Download,
 } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
@@ -177,8 +178,27 @@ export default function Index({ auth, patients, filters, statistics }) {
             alert("Please select patients to export");
             return;
         }
-        console.log("Export patients:", selectedPatients);
-        alert("Export functionality will be implemented");
+
+        // Create export URL with selected patient IDs as comma-separated string
+        const exportUrl = route("clinic.patients.export", {
+            clinic: auth.clinic_id,
+            patient_ids: selectedPatients.join(","),
+            format: "excel",
+        });
+
+        // Open the export URL in a new window to trigger download
+        window.open(exportUrl, "_blank");
+    };
+
+    const handleExportAllPatients = () => {
+        // Create export URL for all patients
+        const exportUrl = route("clinic.patients.export", {
+            clinic: auth.clinic_id,
+            format: "excel",
+        });
+
+        // Open the export URL in a new window to trigger download
+        window.open(exportUrl, "_blank");
     };
 
     return (
@@ -216,6 +236,14 @@ export default function Index({ auth, patients, filters, statistics }) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
+                                <Button
+                                    onClick={handleExportAllPatients}
+                                    variant="outline"
+                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    Export All
+                                </Button>
                                 {auth.user.role === "clinic_admin" && (
                                     <Button
                                         variant="outline"
@@ -749,7 +777,7 @@ export default function Index({ auth, patients, filters, statistics }) {
                                                     }
                                                     className="text-blue-600 border-blue-300 hover:bg-blue-50"
                                                 >
-                                                    <FileText className="h-4 w-4 mr-2" />
+                                                    <Download className="h-4 w-4 mr-2" />
                                                     Export Selected
                                                 </Button>
                                             </div>

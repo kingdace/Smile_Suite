@@ -38,6 +38,7 @@ import {
     AudioLines,
     Shapes,
     Activity,
+    Download,
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -91,6 +92,23 @@ export default function Index({ auth, clinic, inventory, filters }) {
         setCategory("all");
         setStockFilter("all");
         router.get(route("clinic.inventory.index", [clinic.id]));
+    };
+
+    const handleExportAllInventory = () => {
+        // Create export URL for all inventory items
+        const exportUrl = route("clinic.inventory.export", {
+            clinic: clinic.id,
+            format: "excel",
+        });
+
+        // Fix the URL if it's using localhost instead of 127.0.0.1:8000
+        const correctedUrl = exportUrl.replace(
+            "http://localhost",
+            "http://127.0.0.1:8000"
+        );
+
+        // Open the export URL in a new window to trigger download
+        window.open(correctedUrl, "_blank");
     };
 
     const getStockStatusColor = (item) => {
@@ -151,12 +169,24 @@ export default function Index({ auth, clinic, inventory, filters }) {
                             </p>
                         </div>
                     </div>
-                    <Link href={route("clinic.inventory.create", [clinic.id])}>
-                        <Button className="bg-white/20 hover:bg-white/30 text-white border-white/40">
-                            <PlusCircle className="h-4 w-4 mr-2" />
-                            Add Item
+                    <div className="flex items-center gap-3">
+                        <Button
+                            onClick={handleExportAllInventory}
+                            variant="outline"
+                            className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
+                        >
+                            <Download className="h-4 w-4" />
+                            Export All
                         </Button>
-                    </Link>
+                        <Link
+                            href={route("clinic.inventory.create", [clinic.id])}
+                        >
+                            <Button className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm">
+                                <PlusCircle className="h-4 w-4" />
+                                Add Item
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
 

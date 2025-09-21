@@ -41,6 +41,7 @@ import {
     AlertCircle,
     XCircle,
     Timer,
+    Download,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -252,6 +253,23 @@ export default function Index({ auth, treatments, services, filters }) {
         }
     };
 
+    const handleExportAllTreatments = () => {
+        // Create export URL for all treatments
+        const exportUrl = route("clinic.treatments.export", {
+            clinic: auth.clinic_id,
+            format: "excel",
+        });
+
+        // Fix the URL if it's using localhost instead of 127.0.0.1:8000
+        const correctedUrl = exportUrl.replace(
+            "http://localhost",
+            "http://127.0.0.1:8000"
+        );
+
+        // Open the export URL in a new window to trigger download
+        window.open(correctedUrl, "_blank");
+    };
+
     return (
         <AuthenticatedLayout auth={auth}>
             <Head title="Treatment Management" />
@@ -287,6 +305,14 @@ export default function Index({ auth, treatments, services, filters }) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
+                                <Button
+                                    onClick={handleExportAllTreatments}
+                                    variant="outline"
+                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    Export All
+                                </Button>
                                 {auth.user.role === "clinic_admin" && (
                                     <Button
                                         variant="outline"

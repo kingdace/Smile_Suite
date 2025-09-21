@@ -52,7 +52,7 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                 return $this->formatExcelValue($value, $header);
             }, $mappedData, array_keys($mappedData));
         }
-        
+
         // Default mapping - extract values based on headers
         $mapped = [];
         foreach ($this->headers as $header) {
@@ -69,7 +69,7 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     private function formatExcelValue($value, $header = '')
     {
         $headerLower = strtolower($header);
-        
+
         // Handle null or empty values based on column type
         if ($value === null || $value === '' || $value === 'NULL') {
             // Numeric columns should show 0
@@ -136,9 +136,24 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
         return $value;
     }
 
+    /**
+     * Convert column number to Excel column letter (A, B, C, ..., Z, AA, AB, etc.)
+     */
+    private function getColumnLetter($columnNumber)
+    {
+        $columnLetter = '';
+        while ($columnNumber > 0) {
+            $columnNumber--;
+            $columnLetter = chr(65 + ($columnNumber % 26)) . $columnLetter;
+            $columnNumber = intval($columnNumber / 26);
+        }
+        return $columnLetter;
+    }
+
     public function styles(Worksheet $sheet)
     {
-        $lastColumn = chr(64 + count($this->headers)); // Convert to letter (A, B, C, etc.)
+        // Convert column number to Excel column letter (A, B, C, ..., Z, AA, AB, etc.)
+        $lastColumn = $this->getColumnLetter(count($this->headers));
         $lastRow = $this->data->count() + 1;
 
         // Apply styles after data is loaded
@@ -208,11 +223,11 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     public function columnFormats(): array
     {
         $formats = [];
-        
+
         // Apply specific formatting based on header names
         foreach ($this->headers as $index => $header) {
-            $columnLetter = chr(65 + $index); // A, B, C, etc.
-            
+            $columnLetter = $this->getColumnLetter($index + 1); // A, B, C, etc.
+
             switch (strtolower($header)) {
                 case 'amount':
                 case 'cost':
@@ -226,13 +241,13 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                 case 'total payments (₱)':
                     $formats[$columnLetter] = '"₱"#,##0.00;-"₱"#,##0.00;"₱"0.00';
                     break;
-                    
+
                 case 'date of birth':
                 case 'registration date':
                 case 'birth date':
                     $formats[$columnLetter] = 'yyyy-mm-dd';
                     break;
-                    
+
                 case 'date':
                 case 'created date':
                 case 'payment date':
@@ -241,7 +256,7 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                 case 'end date':
                     $formats[$columnLetter] = 'yyyy-mm-dd hh:mm:ss';
                     break;
-                    
+
                 case 'phone':
                 case 'phone number':
                 case 'emergency contact phone':
@@ -250,12 +265,12 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                 case 'telephone':
                     $formats[$columnLetter] = '@'; // Text format to preserve leading zeros
                     break;
-                    
+
                 case 'percentage':
                 case '%':
                     $formats[$columnLetter] = NumberFormat::FORMAT_PERCENTAGE_00;
                     break;
-                    
+
                 case 'quantity':
                 case 'count':
                 case 'number':
@@ -266,7 +281,7 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                 case 'id':
                     $formats[$columnLetter] = '0;-0;0'; // Integer format that shows 0 for zero values
                     break;
-                    
+
                 case 'email':
                 case 'email address':
                 case 'notes':
@@ -284,7 +299,7 @@ class ExcelExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                     break;
             }
         }
-        
+
         return $formats;
     }
 }

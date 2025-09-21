@@ -64,17 +64,25 @@ export default function Treatments({
     filters,
 }) {
     const [search, setSearch] = useState(filters?.search || "");
-    const [status, setStatus] = useState(filters?.status || "");
-    const [category, setCategory] = useState(filters?.category || "");
+    const [status, setStatus] = useState(filters?.status || "all");
+    const [category, setCategory] = useState(filters?.category || "all");
 
     const handleSearch = () => {
+        const searchParams = {
+            search,
+        };
+
+        if (status && status !== "all") {
+            searchParams.status = status;
+        }
+
+        if (category && category !== "all") {
+            searchParams.category = category;
+        }
+
         router.get(
             route("clinic.reports.treatments", clinic.id),
-            {
-                search,
-                status,
-                category,
-            },
+            searchParams,
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -84,8 +92,8 @@ export default function Treatments({
 
     const clearFilters = () => {
         setSearch("");
-        setStatus("");
-        setCategory("");
+        setStatus("all");
+        setCategory("all");
         router.get(
             route("clinic.reports.treatments", clinic.id),
             {},
@@ -207,41 +215,41 @@ export default function Treatments({
     ];
 
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AuthenticatedLayout auth={auth}>
             <Head title="Treatments Report" />
 
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg p-6 mb-6">
+            <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg p-4 mb-6">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-white/20 p-3 rounded-lg">
-                            <Stethoscope className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-3">
+                        <div className="bg-white/20 p-2 rounded-lg">
+                            <Stethoscope className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">
+                            <h1 className="text-xl font-bold text-white">
                                 Treatments Report
                             </h1>
-                            <p className="text-indigo-100">
+                            <p className="text-indigo-100 text-sm">
                                 Treatment performance and patient care analysis
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                         <ExportButton
                             exportRoute={`/clinic/${clinic.id}/reports/export/treatments`}
                             filters={filters}
                             clinic={clinic}
                             variant="outline"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-sm px-3 py-2"
                         />
                         <Link href={route("clinic.reports.index", clinic.id)}>
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-sm px-3 py-2"
                             >
-                                <ArrowLeft className="w-4 h-4 mr-2" />
-                                Back to Reports
+                                <ArrowLeft className="w-4 h-4 mr-1" />
+                                Back
                             </Button>
                         </Link>
                     </div>
@@ -249,80 +257,80 @@ export default function Treatments({
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <Card>
-                    <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600">
                                     Total Treatments
                                 </p>
-                                <p className="text-2xl font-bold text-gray-900">
+                                <p className="text-xl font-bold text-gray-900">
                                     {formatNumber(treatmentStats?.total || 0)}
                                 </p>
                             </div>
-                            <div className="bg-indigo-100 p-3 rounded-lg">
-                                <Stethoscope className="w-6 h-6 text-indigo-600" />
+                            <div className="bg-indigo-100 p-2 rounded-lg">
+                                <Stethoscope className="w-5 h-5 text-indigo-600" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="p-6">
+                <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600">
                                     Completed
                                 </p>
-                                <p className="text-2xl font-bold text-green-600">
+                                <p className="text-xl font-bold text-green-600">
                                     {formatNumber(
                                         treatmentStats?.completed || 0
                                     )}
                                 </p>
                             </div>
-                            <div className="bg-green-100 p-3 rounded-lg">
-                                <CheckCircle className="w-6 h-6 text-green-600" />
+                            <div className="bg-green-100 p-2 rounded-lg">
+                                <CheckCircle className="w-5 h-5 text-green-600" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="p-6">
+                <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600">
                                     This Month
                                 </p>
-                                <p className="text-2xl font-bold text-blue-600">
+                                <p className="text-xl font-bold text-blue-600">
                                     {formatNumber(
                                         treatmentStats?.this_month || 0
                                     )}
                                 </p>
                             </div>
-                            <div className="bg-blue-100 p-3 rounded-lg">
-                                <TrendingUp className="w-6 h-6 text-blue-600" />
+                            <div className="bg-blue-100 p-2 rounded-lg">
+                                <TrendingUp className="w-5 h-5 text-blue-600" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="p-6">
+                <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                    <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600">
                                     Total Revenue
                                 </p>
-                                <p className="text-2xl font-bold text-green-600">
+                                <p className="text-xl font-bold text-green-600">
                                     {formatCurrency(
                                         treatmentStats?.total_revenue || 0
                                     )}
                                 </p>
                             </div>
-                            <div className="bg-green-100 p-3 rounded-lg">
-                                <DollarSign className="w-6 h-6 text-green-600" />
+                            <div className="bg-green-100 p-2 rounded-lg">
+                                <DollarSign className="w-5 h-5 text-green-600" />
                             </div>
                         </div>
                     </CardContent>
@@ -330,16 +338,16 @@ export default function Treatments({
             </div>
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                            <BarChart3 className="w-5 h-5 text-indigo-600" />
                             Treatment Trends
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={250}>
                             <AreaChart data={treatmentTrends}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="month" />
@@ -364,21 +372,21 @@ export default function Treatments({
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5" />
+                <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                            <BarChart3 className="w-5 h-5 text-indigo-600" />
                             Status Distribution
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={250}>
                             <PieChart>
                                 <Pie
                                     data={statusDistribution}
                                     cx="50%"
                                     cy="50%"
-                                    outerRadius={80}
+                                    outerRadius={70}
                                     dataKey="value"
                                     label={({ name, value }) =>
                                         `${name}: ${value}`
@@ -399,17 +407,22 @@ export default function Treatments({
             </div>
 
             {/* Search and Filters */}
-            <Card className="mb-6">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Search className="w-5 h-5" />
+            <Card className="mb-4 border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <Search className="w-5 h-5 text-indigo-600" />
                         Search & Filter Treatments
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <Label htmlFor="search">Search</Label>
+                            <Label
+                                htmlFor="search"
+                                className="text-sm font-medium"
+                            >
+                                Search
+                            </Label>
                             <Input
                                 id="search"
                                 placeholder="Patient name, treatment name..."
@@ -418,16 +431,24 @@ export default function Treatments({
                                 onKeyPress={(e) =>
                                     e.key === "Enter" && handleSearch()
                                 }
+                                className="mt-1"
                             />
                         </div>
                         <div>
-                            <Label htmlFor="status">Status</Label>
+                            <Label
+                                htmlFor="status"
+                                className="text-sm font-medium"
+                            >
+                                Status
+                            </Label>
                             <Select value={status} onValueChange={setStatus}>
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1">
                                     <SelectValue placeholder="All Status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All Status</SelectItem>
+                                    <SelectItem value="all">
+                                        All Status
+                                    </SelectItem>
                                     <SelectItem value="completed">
                                         Completed
                                     </SelectItem>
@@ -444,16 +465,21 @@ export default function Treatments({
                             </Select>
                         </div>
                         <div>
-                            <Label htmlFor="category">Category</Label>
+                            <Label
+                                htmlFor="category"
+                                className="text-sm font-medium"
+                            >
+                                Category
+                            </Label>
                             <Select
                                 value={category}
                                 onValueChange={setCategory}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="mt-1">
                                     <SelectValue placeholder="All Categories" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">
+                                    <SelectItem value="all">
                                         All Categories
                                     </SelectItem>
                                     <SelectItem value="preventive">
@@ -472,15 +498,19 @@ export default function Treatments({
                             </Select>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3 mt-4">
+                    <div className="flex items-center gap-2 mt-4">
                         <Button
                             onClick={handleSearch}
-                            className="bg-indigo-600 hover:bg-indigo-700"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-sm px-4 py-2"
                         >
                             <Search className="w-4 h-4 mr-2" />
                             Search
                         </Button>
-                        <Button variant="outline" onClick={clearFilters}>
+                        <Button
+                            variant="outline"
+                            onClick={clearFilters}
+                            className="text-sm px-4 py-2"
+                        >
                             <Filter className="w-4 h-4 mr-2" />
                             Clear All
                         </Button>
@@ -489,11 +519,11 @@ export default function Treatments({
             </Card>
 
             {/* Treatments Table */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
+            <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center justify-between text-lg">
                         <span className="flex items-center gap-2">
-                            <Stethoscope className="w-5 h-5" />
+                            <Stethoscope className="w-5 h-5 text-indigo-600" />
                             Treatments ({treatments?.total || 0})
                         </span>
                     </CardTitle>
@@ -502,116 +532,154 @@ export default function Treatments({
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Patient</TableHead>
-                                    <TableHead>Treatment</TableHead>
-                                    <TableHead>Service</TableHead>
-                                    <TableHead>Dentist</TableHead>
-                                    <TableHead>Cost</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Start Date</TableHead>
-                                    <TableHead>Actions</TableHead>
+                                <TableRow className="bg-gray-50">
+                                    <TableHead className="font-semibold">
+                                        Patient
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Treatment
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Service
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Dentist
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Cost
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Status
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Start Date
+                                    </TableHead>
+                                    <TableHead className="font-semibold">
+                                        Actions
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {treatments?.data?.map((treatment) => (
-                                    <TableRow key={treatment.id}>
-                                        <TableCell>
-                                            <div>
-                                                <p className="font-medium">
-                                                    {
-                                                        treatment.patient?.user
-                                                            ?.name
-                                                    }
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {
-                                                        treatment.patient?.user
-                                                            ?.email
-                                                    }
-                                                </p>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <p className="font-medium">
-                                                    {treatment.name}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {treatment.description}
-                                                </p>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">
-                                                {treatment.service?.name}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <p className="font-medium">
-                                                    {treatment.dentist?.name}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {treatment.dentist?.email}
-                                                </p>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="font-medium text-green-600">
-                                                {formatCurrency(
-                                                    treatment.cost || 0
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            {getStatusBadge(treatment.status)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div>
-                                                <p className="font-medium">
-                                                    {formatDate(
-                                                        treatment.start_date
-                                                    )}
-                                                </p>
-                                                {treatment.end_date && (
+                                {treatments?.data?.length > 0 ? (
+                                    treatments.data.map((treatment) => (
+                                        <TableRow
+                                            key={treatment.id}
+                                            className="hover:bg-gray-50"
+                                        >
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {
+                                                            treatment.patient
+                                                                ?.user?.name
+                                                        }
+                                                    </p>
                                                     <p className="text-sm text-gray-500">
-                                                        End:{" "}
+                                                        {
+                                                            treatment.patient
+                                                                ?.user?.email
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {treatment.name}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        {treatment.description}
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant="outline">
+                                                    {treatment.service?.name}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
+                                                        {
+                                                            treatment.dentist
+                                                                ?.name
+                                                        }
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        {
+                                                            treatment.dentist
+                                                                ?.email
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="font-medium text-green-600">
+                                                    {formatCurrency(
+                                                        treatment.cost || 0
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {getStatusBadge(
+                                                    treatment.status
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className="font-medium">
                                                         {formatDate(
-                                                            treatment.end_date
+                                                            treatment.start_date
                                                         )}
                                                     </p>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <Link
-                                                    href={route(
-                                                        "clinic.treatments.show",
-                                                        [
-                                                            clinic.id,
-                                                            treatment.id,
-                                                        ]
+                                                    {treatment.end_date && (
+                                                        <p className="text-sm text-gray-500">
+                                                            End:{" "}
+                                                            {formatDate(
+                                                                treatment.end_date
+                                                            )}
+                                                        </p>
                                                     )}
-                                                >
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Link
+                                                        href={route(
+                                                            "clinic.treatments.show",
+                                                            [
+                                                                clinic.id,
+                                                                treatment.id,
+                                                            ]
+                                                        )}
                                                     >
-                                                        <Eye className="w-4 h-4" />
-                                                    </Button>
-                                                </Link>
-                                            </div>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                        >
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={8}
+                                            className="text-center py-8 text-gray-500"
+                                        >
+                                            No treatments found
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </div>
 
                     {/* Pagination */}
-                    {treatments?.links && (
+                    {treatments?.links && treatments.links.length > 0 && (
                         <div className="flex items-center justify-between mt-6">
                             <div className="text-sm text-gray-700">
                                 Showing {treatments.from} to {treatments.to} of{" "}
@@ -621,7 +689,7 @@ export default function Treatments({
                                 {treatments.links.map((link, index) => (
                                     <Link
                                         key={index}
-                                        href={link.url}
+                                        href={link.url || "#"}
                                         className={`px-3 py-2 text-sm rounded-md ${
                                             link.active
                                                 ? "bg-indigo-600 text-white"

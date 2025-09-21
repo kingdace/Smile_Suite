@@ -265,6 +265,7 @@ export default function Index({
 
     const handleExport = () => {
         const params = new URLSearchParams();
+        params.append("format", "excel"); // Default to Excel format
         if (filterState.date_from)
             params.append("date_from", filterState.date_from);
         if (filterState.date_to) params.append("date_to", filterState.date_to);
@@ -276,7 +277,14 @@ export default function Index({
             route("clinic.payments.export", { clinic: auth.clinic?.id }) +
             "?" +
             params.toString();
-        window.open(url, "_blank");
+
+        // Fix the URL if it's using localhost instead of 127.0.0.1:8000
+        const correctedUrl = url.replace(
+            "http://localhost",
+            "http://127.0.0.1:8000"
+        );
+
+        window.open(correctedUrl, "_blank");
     };
 
     const statusBadge = (status) => {
@@ -372,25 +380,7 @@ export default function Index({
                                     className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
                                 >
                                     <Download className="h-4 w-4" />
-                                    Export
-                                </Button>
-                                <Button
-                                    onClick={() =>
-                                        setShowAdvancedFilters(
-                                            !showAdvancedFilters
-                                        )
-                                    }
-                                    variant="outline"
-                                    className={`gap-2 text-sm px-4 py-2 rounded-lg transition-all duration-300 border backdrop-blur-sm ${
-                                        showAdvancedFilters
-                                            ? "bg-orange-50 border-orange-300 text-orange-700 hover:bg-orange-100"
-                                            : "bg-white/20 border-white/30 text-white hover:bg-white/30"
-                                    }`}
-                                >
-                                    <Filter className="h-4 w-4" />
-                                    {showAdvancedFilters
-                                        ? "Hide Filters"
-                                        : "Advanced Filters"}
+                                    Export All
                                 </Button>
                                 <Button
                                     onClick={toggleBulkActions}
@@ -414,7 +404,7 @@ export default function Index({
                                             })
                                         )
                                     }
-                                    className="gap-2 bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-all duration-300"
+                                    className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
                                 >
                                     <Plus className="h-4 w-4" />
                                     Add Payment

@@ -43,6 +43,7 @@ import {
     TrendingUp,
     Package,
     Settings,
+    Download,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -296,6 +297,17 @@ export default function Index({ auth, clinic, appointments, filters }) {
         }
     };
 
+    const handleExportAllAppointments = () => {
+        // Create export URL for all appointments
+        const exportUrl = route("clinic.appointments.export", {
+            clinic: clinic.id,
+            format: "excel",
+        });
+
+        // Open the export URL in a new window to trigger download
+        window.open(exportUrl, "_blank");
+    };
+
     return (
         <AuthenticatedLayout auth={auth}>
             <Head title={`${clinic.name} - Appointments`} />
@@ -324,6 +336,14 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
+                                <Button
+                                    onClick={handleExportAllAppointments}
+                                    variant="outline"
+                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    Export All
+                                </Button>
                                 <Link
                                     href={route(
                                         "clinic.appointments.calendar",

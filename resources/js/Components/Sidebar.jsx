@@ -47,7 +47,6 @@ import {
     Building2,
     UserCheck,
     Activity,
-    BarChart3,
     Bell,
     Shield,
     HelpCircle,
@@ -170,13 +169,6 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.payments.*",
         icon: DollarSign,
         description: "Financial tracking",
-    },
-    {
-        name: "Reports",
-        href: route("clinic.reports.index", [clinicId]),
-        routeName: "clinic.reports.*",
-        icon: BarChart3,
-        description: "Analytics & insights",
     },
 ];
 

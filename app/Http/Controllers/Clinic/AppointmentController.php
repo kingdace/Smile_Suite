@@ -11,6 +11,7 @@ use App\Models\Patient;
 use App\Services\AppointmentService;
 use App\Http\Controllers\PsgcApiController;
 use App\Traits\SubscriptionAccessControl;
+use App\Traits\ExportTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,10 +19,11 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\AppointmentApprovedMail;
 use App\Mail\AppointmentDeniedMail;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class AppointmentController extends Controller
 {
-    use SubscriptionAccessControl;
+    use SubscriptionAccessControl, ExportTrait;
 
     protected $appointmentService;
 
@@ -647,6 +649,127 @@ class AppointmentController extends Controller
                 'request' => $request->all()
             ]);
             return back()->withErrors(['general' => 'Failed to add to waitlist: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Export appointments data to Excel
+     */
+    public function export(Request $request, Clinic $clinic)
+    {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
+        $this->authorize('viewAny', [Appointment::class, $clinic]);
+
+        $query = $clinic->appointments()
+            ->with(['patient', 'type', 'status', 'assignedDentist', 'service']);
+
+        // Apply the same filters as the index method
+        if ($request->input('search')) {
+            $query->whereHas('patient', function ($query) use ($request) {
+                $query->where('first_name', 'like', "%{$request->input('search')}%")
+                    ->orWhere('last_name', 'like', "%{$request->input('search')}%")
+                    ->orWhere('email', 'like', "%{$request->input('search')}%")
+                    ->orWhere('phone_number', 'like', "%{$request->input('search')}%");
+            });
+        }
+
+        if ($request->input('status')) {
+            $query->whereHas('status', function ($query) use ($request) {
+                $query->where('name', $request->input('status'));
+            });
+        }
+
+        if ($request->input('type')) {
+            $query->whereHas('type', function ($query) use ($request) {
+                $query->where('name', $request->input('type'));
+            });
+        }
+
+        if ($request->input('date')) {
+            $query->whereDate('scheduled_at', $request->input('date'));
+        }
+
+        // If specific appointment IDs are provided, filter by them
+        if ($request->has('appointment_ids')) {
+            $appointmentIds = $request->input('appointment_ids');
+            if (is_string($appointmentIds)) {
+                $appointmentIds = explode(',', $appointmentIds);
+            }
+            if (is_array($appointmentIds) && !empty($appointmentIds)) {
+                $query->whereIn('id', array_filter($appointmentIds));
+            }
+        }
+
+        // Define headers for the Excel export
+        $headers = [
+            'Appointment ID',
+            'Patient Name',
+            'Patient Email',
+            'Patient Phone',
+            'Appointment Type',
+            'Service Name',
+            'Status',
+            'Scheduled Date',
+            'Scheduled Time',
+            'Duration (minutes)',
+            'Assigned Dentist',
+            'Dentist Email',
+            'Notes',
+            'Reason for Visit',
+            'Created Date',
+            'Updated Date'
+        ];
+
+        // Data mapper function to format the data for Excel
+        $dataMapper = function($appointment) {
+            return [
+                $appointment->id ?? 0,
+                $appointment->patient ? trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name) : 'N/A',
+                $appointment->patient->email ?? 'N/A',
+                $appointment->patient->phone_number ?? 'N/A',
+                $appointment->type->name ?? 'N/A',
+                $appointment->service->name ?? 'N/A',
+                $appointment->status->name ?? 'N/A',
+                $appointment->scheduled_at ? Carbon::parse($appointment->scheduled_at)->format('Y-m-d') : 'N/A',
+                $appointment->scheduled_at ? Carbon::parse($appointment->scheduled_at)->format('H:i:s') : 'N/A',
+                $appointment->duration ?? 'N/A',
+                $appointment->assignedDentist->name ?? 'N/A',
+                $appointment->assignedDentist->email ?? 'N/A',
+                $appointment->notes ?? 'N/A',
+                $appointment->reason_for_visit ?? 'N/A',
+                $appointment->created_at ? Carbon::parse($appointment->created_at)->format('Y-m-d H:i:s') : 'N/A',
+                $appointment->updated_at ? Carbon::parse($appointment->updated_at)->format('Y-m-d H:i:s') : 'N/A'
+            ];
+        };
+
+        try {
+            // Get the data first
+            $appointments = $query->get();
+
+            // Generate filename with clinic ID and timestamp
+            $generatedFilename = $this->generateFilename('appointments_export', $this->detectFormat(), $clinic->id);
+
+            // Determine format from request or parameter
+            $exportFormat = $this->detectFormat();
+
+            if ($exportFormat === 'excel') {
+                return $this->exportToExcel($appointments, $generatedFilename, $headers, $dataMapper);
+            } else {
+                return $this->exportToCsv($appointments, $generatedFilename, $headers, $dataMapper);
+            }
+        } catch (\Exception $e) {
+            Log::error('Appointments export failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'clinic_id' => $clinic->id,
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'Export failed. Please try again.',
+                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred during export.'
+            ], 500);
         }
     }
 }

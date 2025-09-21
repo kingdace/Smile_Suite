@@ -477,22 +477,31 @@ class ReportController extends Controller
 
     public function treatments(Request $request)
     {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
         $clinic = Auth::user()->clinic;
 
         $query = $clinic->treatments()
-            ->with(['patient', 'dentist', 'service']);
+            ->with(['patient.user', 'dentist', 'service']);
 
         if ($request->search) {
             $query->where(function ($q) use ($request) {
-                $q->where('notes', 'like', "%{$request->search}%");
+                $q->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%")
+                  ->orWhere('notes', 'like', "%{$request->search}%")
+                  ->orWhereHas('patient', function($patientQuery) use ($request) {
+                      $patientQuery->where('first_name', 'like', '%' . $request->search . '%')
+                                  ->orWhere('last_name', 'like', '%' . $request->search . '%');
+                  });
             });
         }
 
-        if ($request->status) {
+        if ($request->status && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
 
-        if ($request->category) {
+        if ($request->category && $request->category !== 'all') {
             $query->whereHas('service', function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->category}%");
             });
@@ -502,13 +511,27 @@ class ReportController extends Controller
 
         // Treatment statistics
         $treatmentStats = [
-            'total_treatments' => $clinic->treatments()->count(),
-            'completed_treatments' => $clinic->treatments()->where('status', 'completed')->count(),
-            'pending_treatments' => $clinic->treatments()->where('status', 'pending')->count(),
+            'total' => $clinic->treatments()->count(),
+            'completed' => $clinic->treatments()->where('status', 'completed')->count(),
+            'pending' => $clinic->treatments()->where('status', 'pending')->count(),
+            'in_progress' => $clinic->treatments()->where('status', 'in_progress')->count(),
+            'cancelled' => $clinic->treatments()->where('status', 'cancelled')->count(),
             'this_month' => $clinic->treatments()->whereMonth('created_at', now()->month)->count(),
-            'categories' => $clinic->treatments()->with('service')->get()->groupBy('service.name')->map(function ($group) {
-                return ['name' => $group->first()->service->name ?? 'Unknown', 'count' => $group->count()];
-            })->values(),
+            'total_revenue' => $clinic->treatments()->sum('cost'),
+            'categories' => [
+                'preventive' => $clinic->treatments()->whereHas('service', function($q) {
+                    $q->where('name', 'like', '%preventive%');
+                })->count(),
+                'restorative' => $clinic->treatments()->whereHas('service', function($q) {
+                    $q->where('name', 'like', '%restorative%');
+                })->count(),
+                'surgical' => $clinic->treatments()->whereHas('service', function($q) {
+                    $q->where('name', 'like', '%surgical%');
+                })->count(),
+                'cosmetic' => $clinic->treatments()->whereHas('service', function($q) {
+                    $q->where('name', 'like', '%cosmetic%');
+                })->count(),
+            ],
         ];
 
         return Inertia::render('Clinic/Reports/Treatments', [
@@ -537,7 +560,7 @@ class ReportController extends Controller
     public function exportPatients(Request $request)
     {
         $clinic = Auth::user()->clinic;
-        
+
         $query = $clinic->patients()
             ->withCount(['appointments', 'treatments'])
             ->withSum('payments', 'amount');
@@ -613,7 +636,7 @@ class ReportController extends Controller
     public function exportAppointments(Request $request)
     {
         $clinic = Auth::user()->clinic;
-        
+
         $query = $clinic->appointments()
             ->with(['patient', 'assignedDentist', 'type', 'status']);
 
@@ -635,14 +658,14 @@ class ReportController extends Controller
         $dataMapper = function($appointment) {
             return [
                 $appointment->id ?? 0,
-                $appointment->patient ? 
-                    trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name) : 
+                $appointment->patient ?
+                    trim($appointment->patient->first_name . ' ' . $appointment->patient->last_name) :
                     'N/A',
                 $appointment->assignedDentist ? $appointment->assignedDentist->name : 'N/A',
                 $appointment->type ? $appointment->type->name : 'N/A',
                 $appointment->status ? $appointment->status->name : 'N/A',
-                $appointment->scheduled_at ? 
-                    Carbon::parse($appointment->scheduled_at)->format('Y-m-d H:i:s') : 
+                $appointment->scheduled_at ?
+                    Carbon::parse($appointment->scheduled_at)->format('Y-m-d H:i:s') :
                     'N/A',
                 $appointment->duration ? $appointment->duration . ' minutes' : '0 minutes',
                 $appointment->notes ?? 'N/A',
@@ -666,7 +689,7 @@ class ReportController extends Controller
     public function exportRevenue(Request $request)
     {
         $clinic = Auth::user()->clinic;
-        
+
         $query = $clinic->payments()
             ->with(['patient', 'treatment']);
 
@@ -689,7 +712,7 @@ class ReportController extends Controller
     public function exportTreatments(Request $request)
     {
         $clinic = Auth::user()->clinic;
-        
+
         $query = $clinic->treatments()
             ->with(['patient', 'dentist', 'service']);
 
@@ -712,18 +735,18 @@ class ReportController extends Controller
         $dataMapper = function($treatment) {
             return [
                 $treatment->id,
-                $treatment->patient ? 
-                    trim($treatment->patient->first_name . ' ' . $treatment->patient->last_name) : 
+                $treatment->patient ?
+                    trim($treatment->patient->first_name . ' ' . $treatment->patient->last_name) :
                     'N/A',
                 $treatment->dentist ? $treatment->dentist->name : 'N/A',
                 $treatment->service ? $treatment->service->name : 'N/A',
                 $treatment->cost ?? 'N/A',
                 $treatment->status ?? 'N/A',
-                $treatment->start_date ? 
-                    Carbon::parse($treatment->start_date)->format('Y-m-d') : 
+                $treatment->start_date ?
+                    Carbon::parse($treatment->start_date)->format('Y-m-d') :
                     'N/A',
-                $treatment->end_date ? 
-                    Carbon::parse($treatment->end_date)->format('Y-m-d') : 
+                $treatment->end_date ?
+                    Carbon::parse($treatment->end_date)->format('Y-m-d') :
                     'N/A',
                 $treatment->diagnosis ?? 'N/A',
                 $treatment->notes ?? 'N/A'
@@ -746,7 +769,7 @@ class ReportController extends Controller
     public function exportInventory(Request $request)
     {
         $clinic = Auth::user()->clinic;
-        
+
         $query = $clinic->inventory()->with('supplier');
 
         // Apply filters
@@ -804,7 +827,7 @@ class ReportController extends Controller
     public function exportAnalytics(Request $request)
     {
         $clinic = Auth::user()->clinic;
-        
+
         // Get date range for filtering
         $dateFrom = $request->get('date_from', now()->startOfMonth()->format('Y-m-d'));
         $dateTo = $request->get('date_to', now()->endOfMonth()->format('Y-m-d'));

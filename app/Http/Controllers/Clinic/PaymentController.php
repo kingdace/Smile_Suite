@@ -9,6 +9,7 @@ use App\Models\Treatment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Models\Clinic;
 use Carbon\Carbon;
@@ -410,21 +411,116 @@ class PaymentController extends Controller
         return response()->json($statistics);
     }
 
-    public function export(Request $request, Clinic $clinic)
+    public function export(Request $request, $clinic)
     {
-        $query = $clinic->payments()->with(['patient', 'treatment']);
+        $clinicId = is_object($clinic) ? $clinic->id : $clinic;
 
-        // Apply filters using the trait method
-        $query = $this->applyExportFilters($query, $request);
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
 
-        return $this->exportData(
-            $query,
-            'payments',
-            $this->getPaymentExportHeaders(),
-            $this->detectFormat(),
-            [$this, 'mapPaymentData'],
-            $clinic->id
-        );
+        $user = Auth::user();
+
+        // Check if user belongs to this clinic
+        if ($user->clinic_id !== $clinicId) {
+            abort(403);
+        }
+
+        $query = Payment::where('clinic_id', $clinicId)->with(['patient', 'treatment', 'receivedBy']);
+
+        // Apply the same filters as the index method
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('reference_number', 'like', "%{$request->search}%")
+                    ->orWhere('notes', 'like', "%{$request->search}%")
+                    ->orWhere('transaction_id', 'like', "%{$request->search}%")
+                    ->orWhereHas('patient', function ($patientQuery) use ($request) {
+                        $patientQuery->where('first_name', 'like', "%{$request->search}%")
+                                    ->orWhere('last_name', 'like', "%{$request->search}%");
+                    })
+                    ->orWhereHas('treatment', function ($treatmentQuery) use ($request) {
+                        $treatmentQuery->where('name', 'like', "%{$request->search}%");
+                    });
+            });
+        }
+
+        // Date range filter
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            $query->whereBetween('payment_date', [$request->date_from, $request->date_to]);
+        } elseif ($request->filled('date_from')) {
+            $query->where('payment_date', '>=', $request->date_from);
+        } elseif ($request->filled('date_to')) {
+            $query->where('payment_date', '<=', $request->date_to);
+        }
+
+        // Status filter
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Payment method filter
+        if ($request->filled('payment_method') && $request->payment_method !== 'all') {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        // Sort by payment date (newest first)
+        $query->orderBy('payment_date', 'desc');
+
+        // Define headers for the Excel export
+        $headers = [
+            'Payment ID', 'Reference Number', 'Patient Name', 'Patient Contact', 'Treatment Name',
+            'Amount', 'Payment Method', 'Status', 'Payment Date', 'Received By', 'Notes',
+            'Transaction ID', 'Currency', 'Created Date', 'Updated Date'
+        ];
+
+        // Data mapper function to format the data for Excel
+        $dataMapper = function($payment) {
+            return [
+                $payment->id ?? 0,
+                $payment->reference_number ?? 'N/A',
+                $payment->patient ?
+                    trim($payment->patient->first_name . ' ' . $payment->patient->last_name) :
+                    'N/A',
+                $payment->patient ?
+                    ($payment->patient->phone_number ?? $payment->patient->email ?? 'N/A') :
+                    'N/A',
+                $payment->treatment ? $payment->treatment->name : 'N/A',
+                number_format($payment->amount ?? 0, 2),
+                $payment->payment_method ?? 'N/A',
+                $payment->status ?? 'N/A',
+                $payment->payment_date ? Carbon::parse($payment->payment_date)->format('Y-m-d H:i:s') : 'N/A',
+                $payment->receivedBy ?
+                    trim($payment->receivedBy->first_name . ' ' . $payment->receivedBy->last_name) :
+                    'N/A',
+                $payment->notes ?? 'N/A',
+                $payment->transaction_id ?? 'N/A',
+                $payment->currency ?? 'PHP',
+                $payment->created_at ? Carbon::parse($payment->created_at)->format('Y-m-d H:i:s') : 'N/A',
+                $payment->updated_at ? Carbon::parse($payment->updated_at)->format('Y-m-d H:i:s') : 'N/A'
+            ];
+        };
+
+        try {
+            $payments = $query->get();
+            $generatedFilename = $this->generateFilename('payments_export', $this->detectFormat(), $clinicId);
+            $exportFormat = $this->detectFormat();
+
+            if ($exportFormat === 'excel') {
+                return $this->exportToExcel($payments, $generatedFilename, $headers, $dataMapper);
+            } else {
+                return $this->exportToCsv($payments, $generatedFilename, $headers, $dataMapper);
+            }
+        } catch (\Exception $e) {
+            Log::error('Payments export failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'clinic_id' => $clinicId,
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'Export failed. Please try again.',
+                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred during export.'
+            ], 500);
+        }
     }
 
     public function receipt(Clinic $clinic, Payment $payment)

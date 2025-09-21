@@ -7,12 +7,15 @@ use App\Models\Clinic;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Traits\SubscriptionAccessControl;
+use App\Traits\ExportTrait;
+use Carbon\Carbon;
 
 class InventoryController extends Controller
 {
-    use SubscriptionAccessControl;
+    use SubscriptionAccessControl, ExportTrait;
 
     public function __construct()
     {
@@ -274,6 +277,137 @@ class InventoryController extends Controller
         ]);
 
         return back()->with('success', 'Stock quantity adjusted successfully.');
+    }
+
+    /**
+     * Export inventory data to Excel
+     */
+    public function export(Request $request, $clinic)
+    {
+        $clinicId = is_object($clinic) ? $clinic->id : $clinic;
+
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
+        $user = Auth::user();
+
+        // Check if user belongs to this clinic
+        if ($user->clinic_id !== $clinicId) {
+            abort(403);
+        }
+
+        $query = Inventory::where('clinic_id', $clinicId)->with(['supplier']);
+
+        // Apply the same filters as the index method
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        // Category filter
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        // Stock filter
+        if ($request->filled('stock_filter') && $request->stock_filter !== 'all') {
+            switch ($request->stock_filter) {
+                case 'in_stock':
+                    $query->where('quantity', '>', 0)
+                          ->whereRaw('quantity > minimum_quantity');
+                    break;
+                case 'low_stock':
+                    $query->whereRaw('quantity <= minimum_quantity AND quantity > 0');
+                    break;
+                case 'out_of_stock':
+                    $query->where('quantity', '<=', 0);
+                    break;
+            }
+        }
+
+        // Sort by name
+        $query->orderBy('name', 'asc');
+
+        // Define headers for the Excel export
+        $headers = [
+            'Item ID',
+            'Item Name',
+            'Description',
+            'Category',
+            'Current Quantity',
+            'Minimum Quantity',
+            'Unit Price',
+            'Total Value',
+            'Supplier Name',
+            'Supplier Contact',
+            'Expiry Date',
+            'Stock Status',
+            'Is Active',
+            'Notes',
+            'Created Date',
+            'Updated Date'
+        ];
+
+        // Data mapper function to format the data for Excel
+        $dataMapper = function($item) {
+            $totalValue = $item->quantity * $item->unit_price;
+            $stockStatus = 'In Stock';
+
+            if ($item->quantity <= 0) {
+                $stockStatus = 'Out of Stock';
+            } elseif ($item->quantity <= $item->minimum_quantity) {
+                $stockStatus = 'Low Stock';
+            }
+
+            return [
+                $item->id ?? 0,
+                $item->name ?? 'N/A',
+                $item->description ?? 'N/A',
+                ucfirst($item->category ?? 'N/A'),
+                $item->quantity ?? 0,
+                $item->minimum_quantity ?? 0,
+                number_format($item->unit_price ?? 0, 2),
+                number_format($totalValue, 2),
+                $item->supplier ? $item->supplier->name : 'N/A',
+                $item->supplier ? $item->supplier->contact_number : 'N/A',
+                $item->expiry_date ? Carbon::parse($item->expiry_date)->format('Y-m-d') : 'N/A',
+                $stockStatus,
+                $item->is_active ? 'Yes' : 'No',
+                $item->notes ?? 'N/A',
+                $item->created_at ? Carbon::parse($item->created_at)->format('Y-m-d H:i:s') : 'N/A',
+                $item->updated_at ? Carbon::parse($item->updated_at)->format('Y-m-d H:i:s') : 'N/A'
+            ];
+        };
+
+        try {
+            // Get the data first
+            $inventory = $query->get();
+
+            // Generate filename with clinic ID and timestamp
+            $generatedFilename = $this->generateFilename('inventory_export', $this->detectFormat(), $clinicId);
+
+            // Determine format from request or parameter
+            $exportFormat = $this->detectFormat();
+
+            if ($exportFormat === 'excel') {
+                return $this->exportToExcel($inventory, $generatedFilename, $headers, $dataMapper);
+            } else {
+                return $this->exportToCsv($inventory, $generatedFilename, $headers, $dataMapper);
+            }
+        } catch (\Exception $e) {
+            Log::error('Inventory export failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'clinic_id' => $clinicId,
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'Export failed. Please try again.',
+                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred during export.'
+            ], 500);
+        }
     }
 
     /**

@@ -247,6 +247,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('clinic/{clinic}/patients/bulk-destroy', [PatientController::class, 'bulkDestroy'])
             ->name('clinic.patients.bulk-destroy');
 
+        // Patient export route
+        Route::get('clinic/{clinic}/patients/export', [PatientController::class, 'export'])
+            ->name('clinic.patients.export');
+
         // Patient restore route (must be before resource routes)
         Route::patch('clinic/{clinic}/patients/{patient}/restore', [PatientController::class, 'restore'])
             ->name('clinic.patients.restore');
@@ -272,6 +276,8 @@ Route::middleware('auth')->group(function () {
             ->name('clinic.appointments.index');
         Route::get('clinic/{clinic}/appointments/calendar', [AppointmentController::class, 'calendar'])
             ->name('clinic.appointments.calendar');
+        Route::get('clinic/{clinic}/appointments/export', [AppointmentController::class, 'export'])
+            ->name('clinic.appointments.export');
         Route::post('clinic/{clinic}/appointments', [AppointmentController::class, 'store'])
             ->name('clinic.appointments.store');
         Route::get('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'show'])
@@ -282,6 +288,10 @@ Route::middleware('auth')->group(function () {
             ->name('clinic.appointments.update');
         Route::delete('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'destroy'])
             ->name('clinic.appointments.destroy');
+
+        // Treatment export route (MUST BE BEFORE RESOURCE ROUTE)
+        Route::get('clinic/{clinic}/treatments/export', [TreatmentController::class, 'export'])
+            ->name('clinic.treatments.export');
 
         // Treatment Management Routes
         Route::resource('clinic/{clinic}/treatments', TreatmentController::class)
@@ -294,6 +304,15 @@ Route::middleware('auth')->group(function () {
                 'update' => 'clinic.treatments.update',
                 'destroy' => 'clinic.treatments.destroy',
             ]);
+
+        // Test route to verify TreatmentController is working
+        Route::get('clinic/{clinic}/treatments/test-export', function($clinic) {
+            return response()->json([
+                'message' => 'Test route working!',
+                'clinic_id' => $clinic,
+                'timestamp' => now()
+            ]);
+        })->name('clinic.treatments.test-export');
 
         // Treatment-Inventory Integration Routes
         Route::get('clinic/{clinic}/treatments/inventory/available', [TreatmentController::class, 'getAvailableInventory'])
@@ -313,6 +332,10 @@ Route::middleware('auth')->group(function () {
         Route::get('clinic/{clinic}/reports/export/inventory-usage', [\App\Http\Controllers\Clinic\InventoryUsageReportController::class, 'export'])
             ->name('clinic.reports.export.inventory-usage');
 
+
+        // Inventory export route (MUST BE BEFORE RESOURCE ROUTE)
+        Route::get('clinic/{clinic}/inventory/export', [InventoryController::class, 'export'])
+            ->name('clinic.inventory.export');
 
         // Inventory Management Routes
         Route::resource('clinic/{clinic}/inventory', InventoryController::class)
@@ -366,6 +389,10 @@ Route::middleware('auth')->group(function () {
         Route::post('clinic/{clinic}/purchase-orders/{purchaseOrder}/items/{item}/receive', [\App\Http\Controllers\Clinic\PurchaseOrderController::class, 'receiveItem'])
             ->name('clinic.purchase-orders.receive-item');
 
+        // Payment export route (MUST BE BEFORE RESOURCE ROUTE)
+        Route::get('clinic/{clinic}/payments/export', [PaymentController::class, 'export'])
+            ->name('clinic.payments.export');
+
         // Payment Management Routes
         Route::resource('clinic/{clinic}/payments', PaymentController::class)
             ->names([
@@ -387,55 +414,53 @@ Route::middleware('auth')->group(function () {
         // Payment Advanced Features Routes
         Route::get('clinic/{clinic}/payments/statistics', [PaymentController::class, 'statistics'])
             ->name('clinic.payments.statistics');
-        Route::get('clinic/{clinic}/payments/export', [PaymentController::class, 'export'])
-            ->name('clinic.payments.export');
         Route::post('clinic/{clinic}/payments/{payment}/refund', [PaymentController::class, 'refund'])
             ->name('clinic.payments.refund');
 
-        // Reports Routes
-        Route::get('clinic/{clinic}/reports', [ReportController::class, 'index'])
-            ->name('clinic.reports.index');
-        Route::get('clinic/{clinic}/reports/patients', [ReportController::class, 'patients'])
-            ->name('clinic.reports.patients');
-        Route::get('clinic/{clinic}/reports/appointments', [ReportController::class, 'appointments'])
-            ->name('clinic.reports.appointments');
-        Route::get('clinic/{clinic}/reports/revenue', [ReportController::class, 'revenue'])
-            ->name('clinic.reports.revenue');
-        Route::get('clinic/{clinic}/reports/inventory', [ReportController::class, 'inventory'])
-            ->name('clinic.reports.inventory');
-        Route::get('clinic/{clinic}/reports/treatments', [ReportController::class, 'treatments'])
-            ->name('clinic.reports.treatments');
+        // Reports Routes - DISABLED
+        // Route::get('clinic/{clinic}/reports', [ReportController::class, 'index'])
+        //     ->name('clinic.reports.index');
+        // Route::get('clinic/{clinic}/reports/patients', [ReportController::class, 'patients'])
+        //     ->name('clinic.reports.patients');
+        // Route::get('clinic/{clinic}/reports/appointments', [ReportController::class, 'appointments'])
+        //     ->name('clinic.reports.appointments');
+        // Route::get('clinic/{clinic}/reports/revenue', [ReportController::class, 'revenue'])
+        //     ->name('clinic.reports.revenue');
+        // Route::get('clinic/{clinic}/reports/inventory', [ReportController::class, 'inventory'])
+        //     ->name('clinic.reports.inventory');
+        // Route::get('clinic/{clinic}/reports/treatments', [ReportController::class, 'treatments'])
+        //     ->name('clinic.reports.treatments');
 
-        // Export Routes for Reports
-        Route::get('clinic/{clinic}/reports/export/patients', [ReportController::class, 'exportPatients'])
-            ->name('clinic.reports.export.patients');
-        Route::get('clinic/{clinic}/reports/export/appointments', [ReportController::class, 'exportAppointments'])
-            ->name('clinic.reports.export.appointments');
-        Route::get('clinic/{clinic}/reports/export/revenue', [ReportController::class, 'exportRevenue'])
-            ->name('clinic.reports.export.revenue');
-        Route::get('clinic/{clinic}/reports/export/treatments', [ReportController::class, 'exportTreatments'])
-            ->name('clinic.reports.export.treatments');
-        Route::get('clinic/{clinic}/reports/export/inventory', [ReportController::class, 'exportInventory'])
-            ->name('clinic.reports.export.inventory');
-        Route::get('clinic/{clinic}/reports/export/analytics', [ReportController::class, 'exportAnalytics'])
-            ->name('clinic.reports.export.analytics');
+        // Export Routes for Reports - DISABLED
+        // Route::get('clinic/{clinic}/reports/export/patients', [ReportController::class, 'exportPatients'])
+        //     ->name('clinic.reports.export.patients');
+        // Route::get('clinic/{clinic}/reports/export/appointments', [ReportController::class, 'exportAppointments'])
+        //     ->name('clinic.reports.export.appointments');
+        // Route::get('clinic/{clinic}/reports/export/revenue', [ReportController::class, 'exportRevenue'])
+        //     ->name('clinic.reports.export.revenue');
+        // Route::get('clinic/{clinic}/reports/export/treatments', [ReportController::class, 'exportTreatments'])
+        //     ->name('clinic.reports.export.treatments');
+        // Route::get('clinic/{clinic}/reports/export/inventory', [ReportController::class, 'exportInventory'])
+        //     ->name('clinic.reports.export.inventory');
+        // Route::get('clinic/{clinic}/reports/export/analytics', [ReportController::class, 'exportAnalytics'])
+        //     ->name('clinic.reports.export.analytics');
 
-        // Test export route for debugging
-        Route::get('clinic/{clinic}/reports/test-export', function(\App\Models\Clinic $clinic) {
-            return response()->json([
-                'message' => 'Export routes are working!',
-                'clinic_id' => $clinic->id,
-                'clinic_name' => $clinic->name,
-                'available_exports' => [
-                    'patients' => route('clinic.reports.export.patients', $clinic->id),
-                    'appointments' => route('clinic.reports.export.appointments', $clinic->id),
-                    'revenue' => route('clinic.reports.export.revenue', $clinic->id),
-                    'treatments' => route('clinic.reports.export.treatments', $clinic->id),
-                    'inventory' => route('clinic.reports.export.inventory', $clinic->id),
-                    'analytics' => route('clinic.reports.export.analytics', $clinic->id),
-                ]
-            ]);
-        })->name('clinic.reports.test.export');
+        // Test export route for debugging - DISABLED
+        // Route::get('clinic/{clinic}/reports/test-export', function(\App\Models\Clinic $clinic) {
+        //     return response()->json([
+        //         'message' => 'Export routes are working!',
+        //         'clinic_id' => $clinic->id,
+        //         'clinic_name' => $clinic->name,
+        //         'available_exports' => [
+        //             'patients' => route('clinic.reports.export.patients', $clinic->id),
+        //             'appointments' => route('clinic.reports.export.appointments', $clinic->id),
+        //             'revenue' => route('clinic.reports.export.revenue', $clinic->id),
+        //             'treatments' => route('clinic.reports.export.treatments', $clinic->id),
+        //             'inventory' => route('clinic.reports.export.inventory', $clinic->id),
+        //             'analytics' => route('clinic.reports.export.analytics', $clinic->id),
+        //         ]
+        //     ]);
+        // })->name('clinic.reports.test.export');
 
         // Holidays Routes
         Route::get('clinic/{clinic}/holidays', [ClinicHolidayController::class, 'index'])->name('clinic.holidays.index');

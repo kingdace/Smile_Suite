@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\Clinic;
 use App\Models\Inventory;
 use App\Services\TreatmentInventoryService;
+use App\Traits\ExportTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,10 +17,11 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Traits\SubscriptionAccessControl;
+use Carbon\Carbon;
 
 class TreatmentController extends Controller
 {
-    use SubscriptionAccessControl;
+    use SubscriptionAccessControl, ExportTrait;
 
     public function __construct()
     {
@@ -467,14 +469,14 @@ class TreatmentController extends Controller
                         ->where('treatment_id', $treatment->id)
                         ->where('status', 'completed')
                         ->sum('amount');
-                    
+
                     $totalCost = $treatment->cost + ($treatment->inventoryItems->sum('total_cost') ?? 0);
-                    
+
                     if ($totalPaid >= $totalCost) {
                         $appointment = \App\Models\Appointment::find($treatment->appointment_id);
                         if ($appointment && $appointment->appointment_status_id != 3) { // 3 = "Completed" status
                             $appointment->update(['appointment_status_id' => 3]);
-                            
+
                             Log::info('Appointment status auto-updated to Completed via treatment update', [
                                 'appointment_id' => $appointment->id,
                                 'treatment_id' => $treatment->id,
@@ -684,14 +686,14 @@ class TreatmentController extends Controller
                         ->where('treatment_id', $treatment->id)
                         ->where('status', 'completed')
                         ->sum('amount');
-                    
+
                     $totalCost = $treatment->cost + ($treatment->inventoryItems->sum('total_cost') ?? 0);
-                    
+
                     if ($totalPaid >= $totalCost) {
                         $appointment = \App\Models\Appointment::find($treatment->appointment_id);
                         if ($appointment && $appointment->appointment_status_id != 3) { // 3 = "Completed" status
                             $appointment->update(['appointment_status_id' => 3]);
-                            
+
                             Log::info('Appointment status auto-updated to Completed via completeTreatment', [
                                 'appointment_id' => $appointment->id,
                                 'treatment_id' => $treatment->id,
@@ -725,6 +727,157 @@ class TreatmentController extends Controller
             return back()->withErrors(['inventory_items' => $e->getMessage()]);
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to complete treatment: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Export treatments data to Excel
+     */
+    public function export(Request $request, $clinic)
+    {
+        $clinicId = is_object($clinic) ? $clinic->id : $clinic;
+
+        // Debug: Log the request
+        Log::info('Treatment export called', [
+            'clinic_id' => $clinicId,
+            'user_id' => Auth::id(),
+            'format' => $request->get('format', 'excel'),
+            'request_data' => $request->all()
+        ]);
+
+        $query = Treatment::where('clinic_id', $clinicId)
+                         ->with(['patient.user', 'dentist', 'service', 'inventoryItems.inventory']);
+
+        // Apply the same filters as the index method
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%')
+                  ->orWhere('notes', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('patient', function($patientQuery) use ($request) {
+                      $patientQuery->where('first_name', 'like', '%' . $request->search . '%')
+                                  ->orWhere('last_name', 'like', '%' . $request->search . '%');
+                  })
+                  ->orWhereHas('dentist', function($dentistQuery) use ($request) {
+                      $dentistQuery->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        if ($request->filled('service_id') && $request->service_id !== 'all') {
+            $query->where('service_id', $request->service_id);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_status') && $request->payment_status !== 'all') {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        // If specific treatment IDs are provided, filter by them
+        if ($request->has('treatment_ids')) {
+            $treatmentIds = $request->input('treatment_ids');
+            if (is_string($treatmentIds)) {
+                $treatmentIds = explode(',', $treatmentIds);
+            }
+            if (is_array($treatmentIds) && !empty($treatmentIds)) {
+                $query->whereIn('id', array_filter($treatmentIds));
+            }
+        }
+
+        // Define headers for the Excel export
+        $headers = [
+            'Treatment ID',
+            'Treatment Name',
+            'Description',
+            'Patient Name',
+            'Patient Email',
+            'Patient Phone',
+            'Dentist Name',
+            'Dentist Email',
+            'Service Name',
+            'Service Category',
+            'Service Price',
+            'Status',
+            'Payment Status',
+            'Cost',
+            'Notes',
+            'Reason for Visit',
+            'Start Date',
+            'End Date',
+            'Created Date',
+            'Updated Date',
+            'Inventory Items Used',
+            'Total Inventory Cost'
+        ];
+
+        // Data mapper function to format the data for Excel
+        $dataMapper = function($treatment) {
+            // Calculate inventory items used and total cost
+            $inventoryItems = [];
+            $totalInventoryCost = 0;
+
+            if ($treatment->inventoryItems && $treatment->inventoryItems->count() > 0) {
+                foreach ($treatment->inventoryItems as $item) {
+                    $inventoryItems[] = $item->inventory->name . ' (Qty: ' . $item->quantity_used . ')';
+                    $totalInventoryCost += ($item->quantity_used * $item->unit_cost);
+                }
+            }
+
+            return [
+                $treatment->id ?? 0,
+                $treatment->name ?? 'N/A',
+                $treatment->description ?? 'N/A',
+                $treatment->patient ? trim($treatment->patient->first_name . ' ' . $treatment->patient->last_name) : 'N/A',
+                $treatment->patient->email ?? 'N/A',
+                $treatment->patient->phone_number ?? 'N/A',
+                $treatment->dentist->name ?? 'N/A',
+                $treatment->dentist->email ?? 'N/A',
+                $treatment->service->name ?? 'N/A',
+                $treatment->service->category ?? 'N/A',
+                number_format($treatment->service->price ?? 0, 2),
+                $treatment->status ?? 'N/A',
+                $treatment->payment_status ?? 'N/A',
+                number_format($treatment->cost ?? 0, 2),
+                $treatment->notes ?? 'N/A',
+                $treatment->reason_for_visit ?? 'N/A',
+                $treatment->start_date ? Carbon::parse($treatment->start_date)->format('Y-m-d') : 'N/A',
+                $treatment->end_date ? Carbon::parse($treatment->end_date)->format('Y-m-d') : 'N/A',
+                $treatment->created_at ? Carbon::parse($treatment->created_at)->format('Y-m-d H:i:s') : 'N/A',
+                $treatment->updated_at ? Carbon::parse($treatment->updated_at)->format('Y-m-d H:i:s') : 'N/A',
+                implode('; ', $inventoryItems) ?: 'N/A',
+                number_format($totalInventoryCost, 2)
+            ];
+        };
+
+        try {
+            // Get the data first
+            $treatments = $query->get();
+
+            // Generate filename with clinic ID and timestamp
+            $generatedFilename = $this->generateFilename('treatments_export', $this->detectFormat(), $clinicId);
+
+            // Determine format from request or parameter
+            $exportFormat = $this->detectFormat();
+
+            if ($exportFormat === 'excel') {
+                return $this->exportToExcel($treatments, $generatedFilename, $headers, $dataMapper);
+            } else {
+                return $this->exportToCsv($treatments, $generatedFilename, $headers, $dataMapper);
+            }
+        } catch (\Exception $e) {
+            Log::error('Treatments export failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'clinic_id' => $clinicId,
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'Export failed. Please try again.',
+                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred during export.'
+            ], 500);
         }
     }
 }
