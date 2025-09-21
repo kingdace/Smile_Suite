@@ -117,13 +117,13 @@ export default function SiteHeader() {
                     </div>
                     {/* Desktop Navigation - Hidden on mobile */}
                     <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
-                        {/* <Link
-                            href="/#features"
+                        <Link
+                            href="/#pricing"
                             className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
                             style={{ fontFamily: "Inter, sans-serif" }}
                         >
-                            Features
-                        </Link> */}
+                            Pricing
+                        </Link>
                         <Link
                             href={route("public.clinics.index") || "/clinics"}
                             className="text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-slate-200/50"
@@ -377,14 +377,14 @@ export default function SiteHeader() {
                 >
                     <div className="px-4 py-6 space-y-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-md">
                         {/* Mobile Navigation Links */}
-                        {/* <Link
-                            href="/#features"
+                        <Link
+                            href="/#pricing"
                             className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
                             style={{ fontFamily: "Inter, sans-serif" }}
                             onClick={() => setMobileMenuOpen(false)}
                         >
-                            Features
-                        </Link> */}
+                            Pricing
+                        </Link>
                         <Link
                             href={route("public.clinics.index") || "/clinics"}
                             className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"

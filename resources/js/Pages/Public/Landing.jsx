@@ -624,7 +624,10 @@ export default function Landing() {
             </section>
 
             {/* Enhanced Pricing Section */}
-            <div className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-gray-50 to-white z-10 relative">
+            <div
+                id="pricing"
+                className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-gray-50 to-white z-10 relative"
+            >
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12 sm:mb-16 lg:mb-20">
                         <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 rounded-full border border-blue-200/50 mb-4 sm:mb-6">
@@ -646,147 +649,226 @@ export default function Landing() {
                         </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-                        {/* Starter Plan */}
-                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-blue-200 hover:scale-105">
-                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-                                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                        {/* Basic Plan */}
+                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col animate-fade-in border border-gray-200 hover:border-blue-200 hover:scale-105">
+                            <div className="text-center mb-6">
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 shadow-lg mx-auto">
+                                    <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                                </div>
+                                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-gray-900">
+                                    Basic
+                                </h3>
+                                <p className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">
+                                    ₱999{" "}
+                                    <span className="text-base sm:text-lg font-medium text-gray-500">
+                                        /mo
+                                    </span>
+                                </p>
+                                <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
+                                    Perfect for small practices
+                                </p>
                             </div>
-                            <h3 className="text-xl sm:text-2xl font-bold mb-2 text-gray-900">
-                                Starter
-                            </h3>
-                            <p className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">
-                                ₱999{" "}
-                                <span className="text-base sm:text-lg font-medium text-gray-500">
-                                    /mo
-                                </span>
-                            </p>
-                            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
-                                Perfect for small practices
-                            </p>
-                            <ul className="text-gray-600 mb-6 sm:mb-8 space-y-2 sm:space-y-3 text-left w-full text-sm sm:text-base">
-                                <li className="flex items-center gap-2 sm:gap-3">
-                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                                    <span>Patient Management</span>
-                                </li>
-                                <li className="flex items-center gap-2 sm:gap-3">
-                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                                    <span>Appointment Scheduling</span>
-                                </li>
-                                <li className="flex items-center gap-2 sm:gap-3">
-                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                                    <span>Email Support</span>
-                                </li>
-                                <li className="flex items-center gap-2 sm:gap-3">
-                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                                    <span>Basic Reporting</span>
-                                </li>
-                                <li className="flex items-center gap-2 sm:gap-3">
-                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                                    <span>14-day Free Trial</span>
-                                </li>
-                            </ul>
-                            <Link href={route("register.clinic")}>
-                                <button className="w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base">
-                                    Start Free Trial
-                                </button>
-                            </Link>
+
+                            <div className="flex-1">
+                                <ul className="text-gray-600 mb-6 sm:mb-8 space-y-2 sm:space-y-3 text-left w-full text-sm sm:text-base">
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Patient Management (up to 500
+                                            patients)
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Appointment Scheduling (up to 2
+                                            dentists & staffs)
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Payment Processing (all methods)
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>Treatment Management</span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Service Management (up to 20
+                                            services)
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Standard Dashboard & Reports
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>Email Notifications</span>
+                                    </li>
+                                    <li className="flex items-center gap-2 sm:gap-3">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <span>14-day Free Trial</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="mt-auto">
+                                <Link href={route("register.clinic")}>
+                                    <button className="w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-sm sm:text-base">
+                                        Start Free Trial
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Premium Plan */}
-                        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center scale-105 animate-fade-in relative border-4 border-blue-500">
+                        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl p-8 flex flex-col scale-105 animate-fade-in relative border-4 border-blue-500">
                             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                                 <span className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold">
                                     MOST POPULAR
                                 </span>
                             </div>
-                            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                                <DollarSign className="w-8 h-8 text-white" />
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-lg mx-auto">
+                                    <ShieldCheck className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2 text-white">
+                                    Premium
+                                </h3>
+                                <p className="text-4xl font-extrabold text-white mb-2">
+                                    ₱1,999{" "}
+                                    <span className="text-lg font-medium text-blue-100">
+                                        /mo
+                                    </span>
+                                </p>
+                                <p className="text-blue-100 mb-6">
+                                    For growing practices
+                                </p>
                             </div>
-                            <h3 className="text-2xl font-bold mb-2 text-white">
-                                Professional
-                            </h3>
-                            <p className="text-4xl font-extrabold text-white mb-2">
-                                ₱1,999{" "}
-                                <span className="text-lg font-medium text-blue-100">
-                                    /mo
-                                </span>
-                            </p>
-                            <p className="text-blue-100 mb-6">
-                                For growing practices
-                            </p>
-                            <ul className="text-blue-100 mb-8 space-y-3 text-left w-full">
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
-                                    <span>Everything in Starter</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
-                                    <span>Treatment Records</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
-                                    <span>SMS Reminders</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
-                                    <span>Priority Support</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
-                                    <span>Advanced Analytics</span>
-                                </li>
-                            </ul>
-                            <Link href={route("register.clinic")}>
-                                <button className="w-full px-8 py-4 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                    Get Started
-                                </button>
-                            </Link>
+
+                            <div className="flex-1">
+                                <ul className="text-blue-100 mb-8 space-y-3 text-left w-full">
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Everything in Basic</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>
+                                            Up to 5 dentist and staff accounts
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Inventory Management</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Supplier Management</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Clinic Profile Management</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Export Feature</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Bulk Operations</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0" />
+                                        <span>Priority Support</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="mt-auto">
+                                <Link href={route("register.clinic")}>
+                                    <button className="w-full px-8 py-4 rounded-xl bg-white text-blue-700 font-bold hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                        Get Started
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Enterprise Plan */}
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center animate-fade-in border border-gray-200 hover:border-cyan-200 hover:scale-105">
-                            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                                <DollarSign className="w-8 h-8 text-white" />
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col animate-fade-in border border-gray-200 hover:border-cyan-200 hover:scale-105">
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg mx-auto">
+                                    <Star className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2 text-gray-900">
+                                    Enterprise
+                                </h3>
+                                <p className="text-4xl font-extrabold text-gray-900 mb-2">
+                                    ₱2,999{" "}
+                                    <span className="text-lg font-medium text-gray-500">
+                                        /mo
+                                    </span>
+                                </p>
+                                <p className="text-gray-600 mb-6">
+                                    For large practices
+                                </p>
                             </div>
-                            <h3 className="text-2xl font-bold mb-2 text-gray-900">
-                                Enterprise
-                            </h3>
-                            <p className="text-4xl font-extrabold text-gray-900 mb-2">
-                                ₱2,999{" "}
-                                <span className="text-lg font-medium text-gray-500">
-                                    /mo
-                                </span>
-                            </p>
-                            <p className="text-gray-600 mb-6">
-                                For large practices
-                            </p>
-                            <ul className="text-gray-600 mb-8 space-y-3 text-left w-full">
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>Everything in Professional</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>Multi-branch Management</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>Custom Reporting</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>API Access</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                    <span>24/7 Priority Support</span>
-                                </li>
-                            </ul>
-                            <Link href={route("register.clinic")}>
-                                <button className="w-full px-8 py-4 rounded-xl bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                                    Get Started
-                                </button>
-                            </Link>
+
+                            <div className="flex-1">
+                                <ul className="text-gray-600 mb-8 space-y-3 text-left w-full">
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>Everything in Premium</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Unlimited dentist and staff accounts
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>Multi-branch Management</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>
+                                            Advanced Analytics & Insights
+                                        </span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>Custom Reporting</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>API Access</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>24/7 Priority Support</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        <span>Training & Onboarding</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="mt-auto">
+                                <Link href={route("register.clinic")}>
+                                    <button className="w-full px-8 py-4 rounded-xl bg-cyan-600 text-white font-bold hover:bg-cyan-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                        Get Started
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

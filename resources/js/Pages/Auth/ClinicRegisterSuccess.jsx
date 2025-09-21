@@ -453,7 +453,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                         </span>
                                                         <span>
                                                             Appointment
-                                                            scheduling
+                                                            scheduling (up to 2
+                                                            dentists & staffs)
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -461,7 +462,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Treatment tracking
+                                                            Treatment Management
                                                         </span>
                                                     </div>
                                                 </div>
@@ -471,7 +472,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Inventory management
+                                                            Standard Dashboard &
+                                                            Reports
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -527,8 +529,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            All Basic features
-                                                            included
+                                                            Everything in Basic
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -536,8 +537,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Advanced analytics &
-                                                            reporting
+                                                            Up to 5 dentist and
+                                                            staff accounts
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -545,8 +546,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Multi-location
-                                                            support
+                                                            Inventory Management
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -554,8 +554,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Priority email
-                                                            support
+                                                            Supplier Management
                                                         </span>
                                                     </div>
                                                 </div>
@@ -565,8 +564,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Custom branding
-                                                            options
+                                                            Clinic Profile
+                                                            Management
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -574,8 +573,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Advanced appointment
-                                                            features
+                                                            Export Feature
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -583,8 +581,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Enhanced security
-                                                            features
+                                                            Bulk Operations
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -592,8 +589,7 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Data export
-                                                            capabilities
+                                                            Priority Support
                                                         </span>
                                                     </div>
                                                 </div>
@@ -626,8 +622,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            All Pro features
-                                                            included
+                                                            Everything in
+                                                            Premium
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -635,7 +631,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Custom integrations
+                                                            Unlimited dentist
+                                                            and staff accounts
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -643,8 +640,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Dedicated account
-                                                            manager
+                                                            Multi-branch
+                                                            Management
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -652,7 +649,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            24/7 phone support
+                                                            Advanced Analytics &
+                                                            Insights
                                                         </span>
                                                     </div>
                                                 </div>
@@ -662,8 +660,22 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Advanced analytics
-                                                            dashboard
+                                                            Custom Reporting
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>API Access</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-purple-600">
+                                                            ✅
+                                                        </span>
+                                                        <span>
+                                                            24/7 Priority
+                                                            Support
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -671,22 +683,8 @@ export default function ClinicRegisterSuccess({ request }) {
                                                             ✅
                                                         </span>
                                                         <span>
-                                                            Custom training
-                                                            sessions
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-purple-600">
-                                                            ✅
-                                                        </span>
-                                                        <span>API access</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-purple-600">
-                                                            ✅
-                                                        </span>
-                                                        <span>
-                                                            SLA guarantees
+                                                            Training &
+                                                            Onboarding
                                                         </span>
                                                     </div>
                                                 </div>
