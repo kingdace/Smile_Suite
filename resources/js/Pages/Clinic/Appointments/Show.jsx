@@ -100,7 +100,9 @@ export default function Show({ auth, clinic, appointment, flash }) {
                         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-sm mb-4">
                             <div className="flex items-center">
                                 <CheckCircle className="w-5 h-5 mr-2" />
-                                <span className="font-medium">{flash.success}</span>
+                                <span className="font-medium">
+                                    {flash.success}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -724,12 +726,10 @@ export default function Show({ auth, clinic, appointment, flash }) {
                                                         Assigned Dentist
                                                     </p>
                                                     <p className="font-semibold">
-                                                        {appointment.assigned_dentist &&
-                                                        appointment
+                                                        {appointment
                                                             .assigned_dentist
-                                                            .name
-                                                            ? `Dr. ${appointment.assigned_dentist.name}`
-                                                            : "Not assigned"}
+                                                            ?.name ||
+                                                            "Not assigned"}
                                                     </p>
                                                 </div>
                                             </div>

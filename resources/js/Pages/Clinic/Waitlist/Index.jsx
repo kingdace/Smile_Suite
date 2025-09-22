@@ -566,7 +566,6 @@ export default function Index({
                                                                 <UserCheck className="h-4 w-4 text-green-600" />
                                                             </div>
                                                             <span className="text-sm font-semibold text-gray-900">
-                                                                Dr.{" "}
                                                                 {
                                                                     entry
                                                                         .preferred_dentist

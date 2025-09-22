@@ -826,7 +826,6 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                                                         <Stethoscope className="h-4 w-4 text-green-600" />
                                                                     </div>
                                                                     <span className="font-medium">
-                                                                        Dr.{" "}
                                                                         {appointment
                                                                             .assigned_dentist
                                                                             ?.name ||

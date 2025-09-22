@@ -259,7 +259,7 @@ export default function PatientTreatmentShow({
                                 <div className="space-y-4">
                                     <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
                                         <h4 className="font-bold text-gray-900 text-lg">
-                                            Dr. {treatment.dentist.name}
+                                            {treatment.dentist.name}
                                         </h4>
                                         {treatment.dentist.specialization && (
                                             <p className="text-gray-600 mt-1">
