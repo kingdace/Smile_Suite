@@ -3,7 +3,6 @@
 /public/build
 /public/hot
 
-
 /vendor
 .phpunit.result.cache
 Homestead.json
@@ -14,3 +13,23 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Logs
+/storage/logs/*.log
+
+# Cache
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Deployment files
+deploy.sh
+DEPLOYMENT_GUIDE.md
+backup_database.sql
+public_html.htaccess
