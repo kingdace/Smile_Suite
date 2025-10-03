@@ -139,6 +139,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\HttpClientServiceProvider::class,
+        App\Providers\SmtpSslFixServiceProvider::class,
     ])->toArray(),
 
 ];

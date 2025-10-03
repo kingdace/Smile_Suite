@@ -1389,6 +1389,12 @@ export default function Show({ auth, request, flash }) {
                 onOpenChange={setApproveDialogOpen}
             >
                 <AlertDialogContent className="max-w-lg bg-white border-0 shadow-2xl rounded-3xl overflow-hidden">
+                    <AlertDialogTitle className="sr-only">
+                        Approve Clinic Registration
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="sr-only">
+                        Confirm approval of clinic registration request
+                    </AlertDialogDescription>
                     {/* Header Section */}
                     <div className="bg-gradient-to-br from-emerald-500 to-green-600 px-8 py-6 text-center relative overflow-hidden">
                         {/* Background Pattern */}
@@ -1482,6 +1488,12 @@ export default function Show({ auth, request, flash }) {
                 onOpenChange={setRejectDialogOpen}
             >
                 <AlertDialogContent className="max-w-lg bg-white border-0 shadow-2xl rounded-3xl overflow-hidden">
+                    <AlertDialogTitle className="sr-only">
+                        Reject Clinic Registration
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="sr-only">
+                        Confirm rejection of clinic registration request
+                    </AlertDialogDescription>
                     {/* Header Section */}
                     <div className="bg-gradient-to-br from-red-500 to-pink-600 px-8 py-6 text-center relative overflow-hidden">
                         {/* Background Pattern */}
