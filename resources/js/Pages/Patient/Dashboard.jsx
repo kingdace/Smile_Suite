@@ -71,24 +71,24 @@ const AppointmentsSection = ({ appointments = [] }) => {
 
     const formatAppointmentNotes = (notes) => {
         if (!notes) return null;
-
+        
         // Check if it's a system-generated reschedule message
         if (notes.includes("Reschedule") || notes.includes("BROAWS")) {
             // Count reschedule attempts
             const rescheduleCount = (notes.match(/Reschedule/g) || []).length;
-
+            
             // Extract meaningful reasons (filter out system codes)
             const reasonMatches = notes.match(/Reason: ([^.]+)/g);
             const meaningfulReasons = [];
-
+            
             if (reasonMatches) {
                 reasonMatches.forEach((match) => {
                     const reason = match.replace("Reason: ", "").trim();
                     // Filter out system codes and meaningless text
                     if (
                         reason &&
-                        !reason.includes("BROAWS") &&
-                        !reason.includes("qwe") &&
+                        !reason.includes("BROAWS") && 
+                        !reason.includes("qwe") && 
                         !reason.includes("No available slots") &&
                         reason.length > 3
                     ) {
@@ -96,43 +96,43 @@ const AppointmentsSection = ({ appointments = [] }) => {
                     }
                 });
             }
-
+            
             let formattedNote = "📅 Rescheduled";
-
+            
             if (rescheduleCount > 1) {
                 formattedNote += ` (${rescheduleCount}x)`;
             }
-
+            
             if (meaningfulReasons.length > 0) {
                 // Show the most recent meaningful reason
                 const lastReason =
                     meaningfulReasons[meaningfulReasons.length - 1];
                 formattedNote += ` - ${lastReason}`;
             }
-
+            
             // Check if appointment was approved
             if (notes.includes("approved by clinic")) {
                 formattedNote += " ✅";
             }
-
+            
             return formattedNote;
         }
-
+        
         // Check for other system messages
         if (notes.includes("denied by clinic")) {
             return "❌ Reschedule request denied";
         }
-
+        
         if (notes.includes("cancelled")) {
             return "🚫 Appointment cancelled";
         }
-
+        
         // For regular notes, clean up and format nicely
         const cleanNotes = notes.trim();
         if (cleanNotes.length > 80) {
             return cleanNotes.substring(0, 80) + "...";
         }
-
+        
         return cleanNotes;
     };
     const getStatusIcon = (status) => {
@@ -325,7 +325,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 delay={index * 100}
                             >
                                 <div
-                                    className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl border border-gray-200/50 p-6 hover:shadow-xl hover:border-blue-300/50 transition-all duration-300 group cursor-pointer"
+                                    className="bg-white rounded-2xl border-2 border-gray-200 p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 group cursor-pointer shadow-lg"
                                     role="article"
                                     aria-label={`Appointment at ${
                                         appointment.clinic?.name || "Clinic"
@@ -354,7 +354,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                             : "bg-red-500"
                                                     )}
                                                 />
-                                                <Badge
+                                            <Badge
                                                     className={cn(
                                                         getStatusColor(
                                                             appointment.status
@@ -367,10 +367,10 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         appointment.status
                                                             ?.name || "Unknown"
                                                     }`}
-                                                >
-                                                    {appointment.status?.name ||
-                                                        "Unknown"}
-                                                </Badge>
+                                            >
+                                                {appointment.status?.name ||
+                                                    "Unknown"}
+                                            </Badge>
                                             </div>
                                             {/* Show special indicators for patient actions */}
                                             {appointment.status?.name ===
@@ -415,9 +415,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-bold text-gray-900 text-lg mb-1">
-                                                    {appointment.clinic?.name ||
+                                            {appointment.clinic?.name ||
                                                         "Dental Clinic"}
-                                                </h4>
+                                        </h4>
                                                 <div className="flex items-center gap-2 text-gray-600">
                                                     <MapPin className="w-3 h-3 text-blue-500" />
                                                     <p className="text-xs line-clamp-1">
@@ -439,8 +439,8 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-gray-900 text-base">
-                                                        {new Date(
-                                                            appointment.scheduled_at
+                                            {new Date(
+                                                appointment.scheduled_at
                                                         ).toLocaleDateString(
                                                             "en-US",
                                                             {
@@ -454,13 +454,13 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     <div className="flex items-center gap-2 text-gray-600">
                                                         <Clock className="w-3 h-3 text-purple-500" />
                                                         <span className="text-sm font-medium">
-                                                            {new Date(
-                                                                appointment.scheduled_at
+                                            {new Date(
+                                                appointment.scheduled_at
                                                             ).toLocaleTimeString(
                                                                 "en-US",
                                                                 {
-                                                                    hour: "2-digit",
-                                                                    minute: "2-digit",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
                                                                 }
                                                             )}
                                                         </span>
@@ -511,7 +511,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         )}
                                         {appointment.reason && (
                                             <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-                                                <div className="flex items-start gap-2">
+                                                    <div className="flex items-start gap-2">
                                                     <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-md flex items-center justify-center">
                                                         <FileText className="w-3 h-3 text-white" />
                                                     </div>
@@ -554,16 +554,16 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     {/* Compact Action Buttons */}
                                     <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
                                         <div className="flex items-center gap-2">
-                                            {appointment.status?.name?.toLowerCase() ===
-                                                "pending" && (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
+                                        {appointment.status?.name?.toLowerCase() ===
+                                            "pending" && (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
                                                     className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg text-xs font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleCancelAppointment(
-                                                            appointment
+                                                    handleCancelAppointment(
+                                                        appointment
                                                         );
                                                     }}
                                                     aria-label={`Cancel appointment at ${
@@ -574,19 +574,19 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     ).toLocaleDateString()}`}
                                                 >
                                                     <XCircle className="w-3 h-3" />
-                                                    Cancel
-                                                </Button>
-                                            )}
-                                            {appointment.status?.name?.toLowerCase() ===
-                                                "confirmed" && (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
+                                                Cancel
+                                            </Button>
+                                        )}
+                                        {appointment.status?.name?.toLowerCase() ===
+                                            "confirmed" && (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
                                                     className="flex items-center gap-1 px-3 py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 rounded-lg text-xs font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleRescheduleAppointment(
-                                                            appointment
+                                                    handleRescheduleAppointment(
+                                                        appointment
                                                         );
                                                     }}
                                                     aria-label={`Reschedule appointment at ${
@@ -597,9 +597,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     ).toLocaleDateString()}`}
                                                 >
                                                     <Clock className="w-3 h-3" />
-                                                    Reschedule
-                                                </Button>
-                                            )}
+                                                Reschedule
+                                            </Button>
+                                        )}
                                         </div>
                                         <Button
                                             size="sm"
@@ -781,7 +781,7 @@ const QuickActions = ({ loading = false }) => {
     ];
 
     if (loading) {
-        return (
+    return (
             <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sm:p-8">
                 <div className="mb-6 sm:mb-8">
                     <div className="flex items-center gap-3 mb-2">
@@ -789,13 +789,13 @@ const QuickActions = ({ loading = false }) => {
                             <Zap className="w-5 h-5 text-white" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900">
-                            Quick Actions
-                        </h3>
+                    Quick Actions
+                </h3>
                     </div>
                     <p className="text-gray-600 text-sm">
-                        Access your most important features
-                    </p>
-                </div>
+                    Access your most important features
+                </p>
+            </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {Array.from({ length: 4 }).map((_, i) => (
                         <QuickActionSkeleton key={i} />
@@ -835,7 +835,7 @@ const QuickActions = ({ loading = false }) => {
                         >
                             <Link href={action.href}>
                                 <div
-                                    className={`relative flex flex-col items-center gap-3 px-4 py-5 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[100px] justify-center`}
+                                    className={`relative flex flex-col items-center gap-2 px-3 py-4 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[80px] justify-center`}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`${action.name} - ${action.description}`}
@@ -846,33 +846,33 @@ const QuickActions = ({ loading = false }) => {
                                             className={`absolute -top-1 -right-1 px-2 py-1 text-xs font-bold rounded-full ${action.badgeColor} shadow-md z-10`}
                                         >
                                             {action.badge}
-                                        </div>
+                                </div>
                                     )}
 
                                     {/* Icon */}
                                     <div
-                                        className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}
+                                        className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-md`}
                                         aria-hidden="true"
                                     >
-                                        <Icon className="w-6 h-6 text-white" />
+                                        <Icon className="w-5 h-5 text-white" />
                                     </div>
 
                                     {/* Content */}
                                     <div className="text-center space-y-1">
-                                        <h4 className="font-bold text-sm mb-1">
-                                            {action.name}
-                                        </h4>
+                                        <h4 className="font-bold text-xs mb-1">
+                                        {action.name}
+                                    </h4>
                                         <p className="text-xs text-gray-500 leading-tight">
-                                            {action.description}
-                                        </p>
-                                    </div>
+                                        {action.description}
+                                    </p>
+                                </div>
 
                                     {/* Hover indicator */}
                                     <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-1">
-                                        <ArrowRight className="w-4 h-4 text-gray-400" />
+                                        <ArrowRight className="w-3 h-3 text-gray-400" />
                                     </div>
-                                </div>
-                            </Link>
+                            </div>
+                        </Link>
                         </SlideIn>
                     );
                 })}
