@@ -64,7 +64,10 @@ export default function AppointmentDetailsModal({
             aria-labelledby="appointment-details-title"
             aria-describedby="appointment-details-description"
         >
-            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto" style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#d1d5db #f3f4f6'
+            }}>
                 <button
                     className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-2 hover:bg-gray-100"
                     onClick={onClose}
@@ -267,7 +270,8 @@ export default function AppointmentDetailsModal({
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-900">
-                                            {appointment.clinic?.street_address ||
+                                            {appointment.clinic
+                                                ?.street_address ||
                                                 "Address not available"}
                                         </p>
                                     </div>
