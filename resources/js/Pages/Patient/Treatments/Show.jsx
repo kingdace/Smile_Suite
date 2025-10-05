@@ -92,7 +92,7 @@ export default function PatientTreatmentShow({
                                     className="flex items-center gap-2 hover:bg-gray-50"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
-                                    Back
+                                    Back to Treatments
                                 </Button>
                             </Link>
                             <div>
@@ -515,11 +515,19 @@ export default function PatientTreatmentShow({
                                     <div className="text-center">
                                         <div className="w-16 h-16 rounded-xl mx-auto mb-3 overflow-hidden border-2 border-gray-200 shadow-sm">
                                             <img
-                                                src={treatment?.clinic?.logo_url || "/images/clinic-logo.png"}
-                                                alt={`${treatment?.clinic?.name || "Clinic"} Logo`}
+                                                src={
+                                                    treatment?.clinic
+                                                        ?.logo_url ||
+                                                    "/images/clinic-logo.png"
+                                                }
+                                                alt={`${
+                                                    treatment?.clinic?.name ||
+                                                    "Clinic"
+                                                } Logo`}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    e.target.src = "/images/clinic-logo.png";
+                                                    e.target.src =
+                                                        "/images/clinic-logo.png";
                                                 }}
                                             />
                                         </div>
@@ -720,7 +728,6 @@ export default function PatientTreatmentShow({
                                 </CardContent>
                             </Card>
                         )}
-
                     </div>
                 </div>
             </main>

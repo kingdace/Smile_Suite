@@ -8,6 +8,7 @@ import {
     CheckCircle,
     FileText,
     ArrowRight,
+    ArrowLeft,
     Plus,
     Search,
     MapPin,
@@ -88,19 +89,24 @@ export default function PatientTreatmentsIndex({
                                 My Treatments
                             </h1>
                             <p className="text-gray-600 text-sm">
-                                Your dental treatment history across all connected clinics
+                                Your dental treatment history across all
+                                connected clinics
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
+                            <Link href={route("patient.dashboard")}>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex items-center gap-2 hover:bg-gray-50"
+                                >
+                                    <ArrowLeft className="w-4 h-4" />
+                                    Back to Dashboard
+                                </Button>
+                            </Link>
                             <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-3 py-1">
                                 {treatments?.data?.length || 0} Total
                             </Badge>
-                            <Link href="/clinics">
-                                <Button size="sm" className="flex items-center gap-2">
-                                    <Plus className="w-4 h-4" />
-                                    Find Clinics
-                                </Button>
-                            </Link>
                         </div>
                     </div>
                 </div>
@@ -115,7 +121,9 @@ export default function PatientTreatmentsIndex({
                                         <Building2 className="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-600">Clinics</p>
+                                        <p className="text-xs text-gray-600">
+                                            Clinics
+                                        </p>
                                         <p className="text-lg font-bold text-gray-900">
                                             {clinicRecords?.length || 0}
                                         </p>
@@ -133,7 +141,9 @@ export default function PatientTreatmentsIndex({
                                         <Stethoscope className="w-5 h-5 text-green-600" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-600">Treatments</p>
+                                        <p className="text-xs text-gray-600">
+                                            Treatments
+                                        </p>
                                         <p className="text-lg font-bold text-gray-900">
                                             {treatments?.data?.length || 0}
                                         </p>
@@ -151,10 +161,14 @@ export default function PatientTreatmentsIndex({
                                         <CheckCircle className="w-5 h-5 text-emerald-600" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-600">Completed</p>
+                                        <p className="text-xs text-gray-600">
+                                            Completed
+                                        </p>
                                         <p className="text-lg font-bold text-gray-900">
                                             {treatments?.data?.filter(
-                                                (t) => t.status?.toLowerCase() === "completed"
+                                                (t) =>
+                                                    t.status?.toLowerCase() ===
+                                                    "completed"
                                             ).length || 0}
                                         </p>
                                     </div>
@@ -171,8 +185,12 @@ export default function PatientTreatmentsIndex({
                                         <Star className="w-5 h-5 text-purple-600" />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-600">Quality</p>
-                                        <p className="text-lg font-bold text-gray-900">4.8</p>
+                                        <p className="text-xs text-gray-600">
+                                            Quality
+                                        </p>
+                                        <p className="text-lg font-bold text-gray-900">
+                                            4.8
+                                        </p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -214,15 +232,22 @@ export default function PatientTreatmentsIndex({
                                                 <div className="flex items-center gap-3">
                                                     <Badge
                                                         className={cn(
-                                                            getStatusColor(treatment.status),
+                                                            getStatusColor(
+                                                                treatment.status
+                                                            ),
                                                             "px-3 py-1 text-sm font-semibold flex items-center gap-2"
                                                         )}
                                                     >
-                                                        {getStatusIcon(treatment.status)}
-                                                        {treatment.status || "Unknown"}
+                                                        {getStatusIcon(
+                                                            treatment.status
+                                                        )}
+                                                        {treatment.status ||
+                                                            "Unknown"}
                                                     </Badge>
                                                     <div className="text-sm text-gray-600">
-                                                        {new Date(treatment.created_at).toLocaleDateString()}
+                                                        {new Date(
+                                                            treatment.created_at
+                                                        ).toLocaleDateString()}
                                                     </div>
                                                 </div>
                                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -236,11 +261,19 @@ export default function PatientTreatmentsIndex({
                                                 <div className="lg:col-span-2 space-y-4">
                                                     <div>
                                                         <h4 className="text-lg font-bold text-gray-900 mb-2">
-                                                            {treatment.service?.name || treatment.name || "Dental Treatment"}
+                                                            {treatment.service
+                                                                ?.name ||
+                                                                treatment.name ||
+                                                                "Dental Treatment"}
                                                         </h4>
-                                                        {treatment.service?.description && (
+                                                        {treatment.service
+                                                            ?.description && (
                                                             <p className="text-gray-600 text-sm">
-                                                                {treatment.service.description}
+                                                                {
+                                                                    treatment
+                                                                        .service
+                                                                        .description
+                                                                }
                                                             </p>
                                                         )}
                                                     </div>
@@ -250,20 +283,39 @@ export default function PatientTreatmentsIndex({
                                                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                             <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
                                                                 <img
-                                                                    src={treatment.clinic?.logo_url || "/images/clinic-logo.png"}
-                                                                    alt={`${treatment.clinic?.name || "Clinic"} Logo`}
+                                                                    src={
+                                                                        treatment
+                                                                            .clinic
+                                                                            ?.logo_url ||
+                                                                        "/images/clinic-logo.png"
+                                                                    }
+                                                                    alt={`${
+                                                                        treatment
+                                                                            .clinic
+                                                                            ?.name ||
+                                                                        "Clinic"
+                                                                    } Logo`}
                                                                     className="w-full h-full object-cover"
-                                                                    onError={(e) => {
-                                                                        e.target.src = "/images/clinic-logo.png";
+                                                                    onError={(
+                                                                        e
+                                                                    ) => {
+                                                                        e.target.src =
+                                                                            "/images/clinic-logo.png";
                                                                     }}
                                                                 />
                                                             </div>
                                                             <div>
                                                                 <p className="font-semibold text-gray-900 text-sm">
-                                                                    {treatment.clinic?.name || "Clinic"}
+                                                                    {treatment
+                                                                        .clinic
+                                                                        ?.name ||
+                                                                        "Clinic"}
                                                                 </p>
                                                                 <p className="text-xs text-gray-600">
-                                                                    {treatment.clinic?.street_address || "Address not available"}
+                                                                    {treatment
+                                                                        .clinic
+                                                                        ?.street_address ||
+                                                                        "Address not available"}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -275,9 +327,16 @@ export default function PatientTreatmentsIndex({
                                                                 </div>
                                                                 <div>
                                                                     <p className="font-semibold text-gray-900 text-sm">
-                                                                        Dr. {treatment.dentist.name}
+                                                                        Dr.{" "}
+                                                                        {
+                                                                            treatment
+                                                                                .dentist
+                                                                                .name
+                                                                        }
                                                                     </p>
-                                                                    <p className="text-xs text-gray-600">Dentist</p>
+                                                                    <p className="text-xs text-gray-600">
+                                                                        Dentist
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -291,18 +350,29 @@ export default function PatientTreatmentsIndex({
                                                             </div>
                                                             <div>
                                                                 <p className="font-semibold text-gray-900 text-sm">
-                                                                    {new Date(treatment.appointment.scheduled_at).toLocaleDateString("en-US", {
-                                                                        weekday: "long",
-                                                                        year: "numeric",
-                                                                        month: "long",
-                                                                        day: "numeric",
-                                                                    })}
+                                                                    {new Date(
+                                                                        treatment.appointment.scheduled_at
+                                                                    ).toLocaleDateString(
+                                                                        "en-US",
+                                                                        {
+                                                                            weekday:
+                                                                                "long",
+                                                                            year: "numeric",
+                                                                            month: "long",
+                                                                            day: "numeric",
+                                                                        }
+                                                                    )}
                                                                 </p>
                                                                 <p className="text-xs text-gray-600">
-                                                                    {new Date(treatment.appointment.scheduled_at).toLocaleTimeString("en-US", {
-                                                                        hour: "2-digit",
-                                                                        minute: "2-digit",
-                                                                    })}
+                                                                    {new Date(
+                                                                        treatment.appointment.scheduled_at
+                                                                    ).toLocaleTimeString(
+                                                                        "en-US",
+                                                                        {
+                                                                            hour: "2-digit",
+                                                                            minute: "2-digit",
+                                                                        }
+                                                                    )}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -316,11 +386,13 @@ export default function PatientTreatmentsIndex({
                                                             <div className="flex items-center gap-2 mb-2">
                                                                 <DollarSign className="w-4 h-4 text-green-600" />
                                                                 <span className="text-sm font-semibold text-green-700">
-                                                                    Treatment Cost
+                                                                    Treatment
+                                                                    Cost
                                                                 </span>
                                                             </div>
                                                             <p className="text-xl font-bold text-green-800">
-                                                                ₱{treatment.cost.toLocaleString()}
+                                                                ₱
+                                                                {treatment.cost.toLocaleString()}
                                                             </p>
                                                         </div>
                                                     )}
@@ -334,7 +406,14 @@ export default function PatientTreatmentsIndex({
                                                                 </span>
                                                             </div>
                                                             <p className="text-lg font-bold text-orange-800">
-                                                                {Math.floor(treatment.estimated_duration_minutes / 60)}h {treatment.estimated_duration_minutes % 60}m
+                                                                {Math.floor(
+                                                                    treatment.estimated_duration_minutes /
+                                                                        60
+                                                                )}
+                                                                h{" "}
+                                                                {treatment.estimated_duration_minutes %
+                                                                    60}
+                                                                m
                                                             </p>
                                                         </div>
                                                     )}
@@ -348,7 +427,9 @@ export default function PatientTreatmentsIndex({
                                                                 </span>
                                                             </div>
                                                             <p className="text-sm text-gray-700 line-clamp-2">
-                                                                {treatment.notes}
+                                                                {
+                                                                    treatment.notes
+                                                                }
                                                             </p>
                                                         </div>
                                                     )}
@@ -357,8 +438,14 @@ export default function PatientTreatmentsIndex({
 
                                             {/* Action Button */}
                                             <div className="flex justify-end pt-4 border-t border-gray-200">
-                                                {treatment.id && treatment.id > 0 ? (
-                                                    <Link href={route("patient.treatments.show", treatment.id)}>
+                                                {treatment.id &&
+                                                treatment.id > 0 ? (
+                                                    <Link
+                                                        href={route(
+                                                            "patient.treatments.show",
+                                                            treatment.id
+                                                        )}
+                                                    >
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
@@ -396,7 +483,10 @@ export default function PatientTreatmentsIndex({
                                         No Treatments Yet
                                     </h3>
                                     <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                                        You haven't received any dental treatments yet. Book an appointment with one of our partner clinics to start your dental care journey!
+                                        You haven't received any dental
+                                        treatments yet. Book an appointment with
+                                        one of our partner clinics to start your
+                                        dental care journey!
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                         <Link href="/clinics">
