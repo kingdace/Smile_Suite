@@ -2,16 +2,12 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 // Spinner Component
-export const Spinner = ({ 
-    size = "md", 
-    className = "", 
-    color = "blue" 
-}) => {
+export const Spinner = ({ size = "md", className = "", color = "blue" }) => {
     const sizeClasses = {
         sm: "w-4 h-4",
-        md: "w-6 h-6", 
+        md: "w-6 h-6",
         lg: "w-8 h-8",
-        xl: "w-12 h-12"
+        xl: "w-12 h-12",
     };
 
     const colorClasses = {
@@ -19,7 +15,7 @@ export const Spinner = ({
         green: "border-green-600 border-t-transparent",
         red: "border-red-600 border-t-transparent",
         gray: "border-gray-600 border-t-transparent",
-        white: "border-white border-t-transparent"
+        white: "border-white border-t-transparent",
     };
 
     return (
@@ -39,16 +35,16 @@ export const Spinner = ({
 };
 
 // Skeleton Loader Component
-export const Skeleton = ({ 
-    className = "", 
+export const Skeleton = ({
+    className = "",
     variant = "default",
-    lines = 1 
+    lines = 1,
 }) => {
     const variants = {
         default: "h-4 bg-gray-200 rounded",
         text: "h-4 bg-gray-200 rounded",
         circle: "rounded-full bg-gray-200",
-        rectangle: "h-20 bg-gray-200 rounded"
+        rectangle: "h-20 bg-gray-200 rounded",
     };
 
     if (lines > 1) {
@@ -69,13 +65,7 @@ export const Skeleton = ({
     }
 
     return (
-        <div
-            className={cn(
-                "animate-pulse",
-                variants[variant],
-                className
-            )}
-        />
+        <div className={cn("animate-pulse", variants[variant], className)} />
     );
 };
 
@@ -98,12 +88,12 @@ export const CardSkeleton = ({ className = "" }) => (
 );
 
 // Button Loading State
-export const ButtonWithLoading = ({ 
-    children, 
-    loading = false, 
+export const ButtonWithLoading = ({
+    children,
+    loading = false,
     loadingText = "Loading...",
     className = "",
-    ...props 
+    ...props
 }) => (
     <button
         className={cn(
@@ -154,35 +144,18 @@ export const Shimmer = ({ className = "" }) => (
 
 // Pulse Animation Component
 export const Pulse = ({ children, className = "" }) => (
-    <div
-        className={cn(
-            "animate-pulse",
-            className
-        )}
-    >
-        {children}
-    </div>
+    <div className={cn("animate-pulse", className)}>{children}</div>
 );
 
 // Bounce Animation Component
 export const Bounce = ({ children, className = "" }) => (
-    <div
-        className={cn(
-            "animate-bounce",
-            className
-        )}
-    >
-        {children}
-    </div>
+    <div className={cn("animate-bounce", className)}>{children}</div>
 );
 
 // Fade In Animation Component
 export const FadeIn = ({ children, delay = 0, className = "" }) => (
     <div
-        className={cn(
-            "animate-fade-in",
-            className
-        )}
+        className={cn("animate-fade-in", className)}
         style={{ animationDelay: `${delay}ms` }}
     >
         {children}
@@ -190,25 +163,22 @@ export const FadeIn = ({ children, delay = 0, className = "" }) => (
 );
 
 // Slide In Animation Component
-export const SlideIn = ({ 
-    children, 
-    direction = "up", 
-    delay = 0, 
-    className = "" 
+export const SlideIn = ({
+    children,
+    direction = "up",
+    delay = 0,
+    className = "",
 }) => {
     const directionClasses = {
         up: "animate-slide-in-up",
         down: "animate-slide-in-down",
         left: "animate-slide-in-left",
-        right: "animate-slide-in-right"
+        right: "animate-slide-in-right",
     };
 
     return (
         <div
-            className={cn(
-                directionClasses[direction],
-                className
-            )}
+            className={cn(directionClasses[direction], className)}
             style={{ animationDelay: `${delay}ms` }}
         >
             {children}
@@ -217,11 +187,11 @@ export const SlideIn = ({
 };
 
 // Loading Overlay Component
-export const LoadingOverlay = ({ 
-    loading = false, 
-    children, 
+export const LoadingOverlay = ({
+    loading = false,
+    children,
     message = "Loading...",
-    className = "" 
+    className = "",
 }) => (
     <div className={cn("relative", className)}>
         {children}
@@ -237,23 +207,25 @@ export const LoadingOverlay = ({
 );
 
 // Progress Bar Component
-export const ProgressBar = ({ 
-    progress = 0, 
+export const ProgressBar = ({
+    progress = 0,
     className = "",
     showPercentage = true,
-    color = "blue"
+    color = "blue",
 }) => {
     const colorClasses = {
         blue: "bg-blue-600",
         green: "bg-green-600",
         red: "bg-red-600",
-        yellow: "bg-yellow-600"
+        yellow: "bg-yellow-600",
     };
 
     return (
         <div className={cn("w-full", className)}>
             <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Progress</span>
+                <span className="text-sm font-medium text-gray-700">
+                    Progress
+                </span>
                 {showPercentage && (
                     <span className="text-sm font-medium text-gray-700">
                         {Math.round(progress)}%
@@ -266,7 +238,9 @@ export const ProgressBar = ({
                         "h-2 rounded-full transition-all duration-300 ease-out",
                         colorClasses[color]
                     )}
-                    style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+                    style={{
+                        width: `${Math.min(100, Math.max(0, progress))}%`,
+                    }}
                 />
             </div>
         </div>

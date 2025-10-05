@@ -33,16 +33,16 @@ import {
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
-import { 
-    Spinner, 
-    Skeleton, 
-    CardSkeleton, 
-    AppointmentCardSkeleton, 
-    StatCardSkeleton, 
+import {
+    Spinner,
+    Skeleton,
+    CardSkeleton,
+    AppointmentCardSkeleton,
+    StatCardSkeleton,
     QuickActionSkeleton,
     LoadingOverlay,
     FadeIn,
-    SlideIn
+    SlideIn,
 } from "@/Components/ui/loading";
 import { Progress } from "@/Components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
@@ -564,7 +564,11 @@ const QuickActions = ({ loading = false }) => {
                 {actions.map((action, index) => {
                     const Icon = action.icon;
                     return (
-                        <SlideIn key={action.name} direction="up" delay={index * 100}>
+                        <SlideIn
+                            key={action.name}
+                            direction="up"
+                            delay={index * 100}
+                        >
                             <Link href={action.href}>
                                 <div
                                     className={`flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-4 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105`}
