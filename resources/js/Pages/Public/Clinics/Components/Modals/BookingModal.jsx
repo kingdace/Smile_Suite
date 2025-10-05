@@ -46,26 +46,38 @@ export default function BookingModal({
     if (!showModal) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full relative mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
+            <div
+                className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto"
+                style={{
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#d1d5db #f3f4f6",
+                }}
+            >
                 <button
-                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-2 hover:bg-gray-100"
                     onClick={onClose}
-                    aria-label="Close modal"
+                    aria-label="Close booking modal"
                 >
-                    <X className="w-6 h-6" />
+                    <X className="w-5 h-5" aria-hidden="true" />
                 </button>
 
-                <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        Book Appointment
-                    </h2>
-                    <p className="text-gray-600">
-                        Schedule your visit at {clinic?.name}
-                    </p>
+                {/* Compact Header */}
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <Calendar className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-900">
+                            Book Appointment
+                        </h2>
+                        <p className="text-gray-500 text-sm">
+                            Schedule your visit at {clinic?.name}
+                        </p>
+                    </div>
                 </div>
 
-                <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={onSubmit} className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                             <Calendar className="w-4 h-4" />
@@ -223,12 +235,16 @@ export default function BookingModal({
                         </p>
                     </div>
 
-                    {/* Important Information */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-                        <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4" />
-                            Important Information
-                        </h4>
+                    {/* Compact Important Information */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <AlertCircle className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <h4 className="font-medium text-blue-900">
+                                Important Information
+                            </h4>
+                        </div>
                         <ul className="text-sm text-blue-800 space-y-1">
                             <li>
                                 • This is a booking request that requires clinic
@@ -253,10 +269,10 @@ export default function BookingModal({
                         </ul>
                     </div>
 
-                    <div className="flex justify-end gap-3 mt-6">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                         <button
                             type="button"
-                            className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 font-medium"
+                            className="px-6 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 font-medium"
                             onClick={onClose}
                             disabled={processing}
                         >
@@ -264,7 +280,7 @@ export default function BookingModal({
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                             disabled={processing}
                         >
                             {processing ? (
