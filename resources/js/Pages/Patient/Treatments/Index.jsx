@@ -56,6 +56,10 @@ export default function PatientTreatmentsIndex({
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20">
             <Head title="My Treatments - Smile Suite" />
+            <div className="sr-only">
+                <h1>My Treatments</h1>
+                <p>View your dental treatment history and records</p>
+            </div>
 
             {/* Site Header */}
             <SiteHeader />

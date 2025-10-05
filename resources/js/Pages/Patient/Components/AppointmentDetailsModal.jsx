@@ -56,28 +56,34 @@ export default function AppointmentDetailsModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="appointment-details-title"
+            aria-describedby="appointment-details-description"
+        >
             <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto">
                 <button
-                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-1"
                     onClick={onClose}
-                    aria-label="Close modal"
+                    aria-label="Close appointment details modal"
                 >
-                    <X className="w-6 h-6" />
+                    <X className="w-6 h-6" aria-hidden="true" />
                 </button>
 
                 <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h2 id="appointment-details-title" className="text-2xl font-bold text-gray-900 mb-2">
                         Appointment Details
                     </h2>
-                    <p className="text-gray-600">
+                    <p id="appointment-details-description" className="text-gray-600">
                         View your appointment information
                     </p>
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center py-8">
-                        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="flex items-center justify-center py-8" role="status" aria-live="polite">
+                        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
                         <span className="ml-2 text-gray-600">
                             Loading appointment details...
                         </span>
