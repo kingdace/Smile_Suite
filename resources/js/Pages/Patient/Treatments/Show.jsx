@@ -21,12 +21,6 @@ import {
     AlertCircle,
     CalendarDays,
     Timer,
-    ChevronRight,
-    Award,
-    TrendingUp,
-    Eye,
-    Download,
-    Share2,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -103,7 +97,9 @@ export default function PatientTreatmentShow({
                             </Link>
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900">
-                                    {treatment?.service?.name || treatment?.name || "Treatment Details"}
+                                    {treatment?.service?.name ||
+                                        treatment?.name ||
+                                        "Treatment Details"}
                                 </h1>
                                 <p className="text-gray-600 text-sm">
                                     Treatment ID: #{treatment?.id || "N/A"}
@@ -121,12 +117,15 @@ export default function PatientTreatmentShow({
                                 {treatment?.status || "Unknown"}
                             </Badge>
                             <div className="text-right">
-                                <p className="text-xs text-gray-500">Treatment Date</p>
+                                <p className="text-xs text-gray-500">
+                                    Treatment Date
+                                </p>
                                 <p className="text-sm font-semibold text-gray-900">
-                                    {treatment?.created_at 
-                                        ? new Date(treatment.created_at).toLocaleDateString()
-                                        : "N/A"
-                                    }
+                                    {treatment?.created_at
+                                        ? new Date(
+                                              treatment.created_at
+                                          ).toLocaleDateString()
+                                        : "N/A"}
                                 </p>
                             </div>
                         </div>
@@ -141,9 +140,13 @@ export default function PatientTreatmentShow({
                                 <AlertCircle className="w-5 h-5 text-orange-600" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-orange-900">Treatment Not Available</h3>
+                                <h3 className="font-semibold text-orange-900">
+                                    Treatment Not Available
+                                </h3>
                                 <p className="text-orange-800 text-sm">
-                                    This treatment record could not be found. Please contact your clinic for more information.
+                                    This treatment record could not be found.
+                                    Please contact your clinic for more
+                                    information.
                                 </p>
                             </div>
                         </div>
@@ -163,8 +166,12 @@ export default function PatientTreatmentShow({
                                             <Stethoscope className="w-5 h-5 text-blue-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-900">Treatment Overview</h3>
-                                            <p className="text-gray-600 text-sm">Service and cost information</p>
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Treatment Overview
+                                            </h3>
+                                            <p className="text-gray-600 text-sm">
+                                                Service and cost information
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -174,21 +181,31 @@ export default function PatientTreatmentShow({
                                     {/* Service Info */}
                                     <div className="space-y-4">
                                         <div>
-                                            <h4 className="font-semibold text-gray-900 mb-2">Service Details</h4>
+                                            <h4 className="font-semibold text-gray-900 mb-2">
+                                                Service Details
+                                            </h4>
                                             <div className="bg-gray-50 rounded-lg p-4">
                                                 <p className="font-bold text-gray-900 text-lg">
-                                                    {treatment?.service?.name || treatment?.name || "N/A"}
+                                                    {treatment?.service?.name ||
+                                                        treatment?.name ||
+                                                        "N/A"}
                                                 </p>
-                                                {treatment?.service?.description && (
+                                                {treatment?.service
+                                                    ?.description && (
                                                     <p className="text-gray-600 text-sm mt-1">
-                                                        {treatment.service.description}
+                                                        {
+                                                            treatment.service
+                                                                .description
+                                                        }
                                                     </p>
                                                 )}
                                             </div>
                                         </div>
                                         {treatment?.cost && (
                                             <div>
-                                                <h4 className="font-semibold text-gray-900 mb-2">Cost</h4>
+                                                <h4 className="font-semibold text-gray-900 mb-2">
+                                                    Cost
+                                                </h4>
                                                 <div className="bg-green-50 rounded-lg p-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
@@ -196,9 +213,12 @@ export default function PatientTreatmentShow({
                                                         </div>
                                                         <div>
                                                             <p className="text-2xl font-bold text-green-600">
-                                                                ₱{treatment.cost.toLocaleString()}
+                                                                ₱
+                                                                {treatment.cost.toLocaleString()}
                                                             </p>
-                                                            <p className="text-sm text-gray-600">Total cost</p>
+                                                            <p className="text-sm text-gray-600">
+                                                                Total cost
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -208,7 +228,9 @@ export default function PatientTreatmentShow({
 
                                     {/* Timeline Info */}
                                     <div className="space-y-4">
-                                        <h4 className="font-semibold text-gray-900 mb-2">Timeline</h4>
+                                        <h4 className="font-semibold text-gray-900 mb-2">
+                                            Timeline
+                                        </h4>
                                         <div className="space-y-3">
                                             {treatment?.start_date && (
                                                 <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
@@ -216,9 +238,13 @@ export default function PatientTreatmentShow({
                                                         <Calendar className="w-4 h-4 text-blue-600" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm text-gray-600">Start Date</p>
+                                                        <p className="text-sm text-gray-600">
+                                                            Start Date
+                                                        </p>
                                                         <p className="font-semibold text-gray-900">
-                                                            {new Date(treatment.start_date).toLocaleDateString()}
+                                                            {new Date(
+                                                                treatment.start_date
+                                                            ).toLocaleDateString()}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -229,9 +255,13 @@ export default function PatientTreatmentShow({
                                                         <CheckCircle className="w-4 h-4 text-green-600" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm text-gray-600">End Date</p>
+                                                        <p className="text-sm text-gray-600">
+                                                            End Date
+                                                        </p>
                                                         <p className="font-semibold text-gray-900">
-                                                            {new Date(treatment.end_date).toLocaleDateString()}
+                                                            {new Date(
+                                                                treatment.end_date
+                                                            ).toLocaleDateString()}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -242,9 +272,18 @@ export default function PatientTreatmentShow({
                                                         <Timer className="w-4 h-4 text-orange-600" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm text-gray-600">Duration</p>
+                                                        <p className="text-sm text-gray-600">
+                                                            Duration
+                                                        </p>
                                                         <p className="font-semibold text-gray-900">
-                                                            {Math.floor(treatment.estimated_duration_minutes / 60)}h {treatment.estimated_duration_minutes % 60}m
+                                                            {Math.floor(
+                                                                treatment.estimated_duration_minutes /
+                                                                    60
+                                                            )}
+                                                            h{" "}
+                                                            {treatment.estimated_duration_minutes %
+                                                                60}
+                                                            m
                                                         </p>
                                                     </div>
                                                 </div>
@@ -263,8 +302,13 @@ export default function PatientTreatmentShow({
                                         <Heart className="w-5 h-5 text-purple-600" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900">Medical Information</h3>
-                                        <p className="text-gray-600 text-sm">Diagnosis, outcome, and recommendations</p>
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            Medical Information
+                                        </h3>
+                                        <p className="text-gray-600 text-sm">
+                                            Diagnosis, outcome, and
+                                            recommendations
+                                        </p>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -274,26 +318,36 @@ export default function PatientTreatmentShow({
                                     <div className="space-y-4">
                                         {treatment?.diagnosis && (
                                             <div>
-                                                <h4 className="font-semibold text-gray-900 mb-2">Diagnosis</h4>
+                                                <h4 className="font-semibold text-gray-900 mb-2">
+                                                    Diagnosis
+                                                </h4>
                                                 <div className="bg-red-50 rounded-lg p-4">
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                                                             <Heart className="w-4 h-4 text-red-600" />
                                                         </div>
-                                                        <p className="text-gray-900 font-medium">{treatment.diagnosis}</p>
+                                                        <p className="text-gray-900 font-medium">
+                                                            {
+                                                                treatment.diagnosis
+                                                            }
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
                                         {treatment?.outcome && (
                                             <div>
-                                                <h4 className="font-semibold text-gray-900 mb-2">Outcome</h4>
+                                                <h4 className="font-semibold text-gray-900 mb-2">
+                                                    Outcome
+                                                </h4>
                                                 <div className="bg-emerald-50 rounded-lg p-4">
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
                                                             <Activity className="w-4 h-4 text-emerald-600" />
                                                         </div>
-                                                        <p className="text-gray-900 font-medium capitalize">{treatment.outcome}</p>
+                                                        <p className="text-gray-900 font-medium capitalize">
+                                                            {treatment.outcome}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -304,7 +358,9 @@ export default function PatientTreatmentShow({
                                     <div className="space-y-4">
                                         {treatment?.next_appointment_date && (
                                             <div>
-                                                <h4 className="font-semibold text-gray-900 mb-2">Next Appointment</h4>
+                                                <h4 className="font-semibold text-gray-900 mb-2">
+                                                    Next Appointment
+                                                </h4>
                                                 <div className="bg-indigo-50 rounded-lg p-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -312,9 +368,14 @@ export default function PatientTreatmentShow({
                                                         </div>
                                                         <div>
                                                             <p className="font-semibold text-gray-900">
-                                                                {new Date(treatment.next_appointment_date).toLocaleDateString()}
+                                                                {new Date(
+                                                                    treatment.next_appointment_date
+                                                                ).toLocaleDateString()}
                                                             </p>
-                                                            <p className="text-sm text-gray-600">Scheduled follow-up</p>
+                                                            <p className="text-sm text-gray-600">
+                                                                Scheduled
+                                                                follow-up
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -322,13 +383,19 @@ export default function PatientTreatmentShow({
                                         )}
                                         {treatment?.recommendations && (
                                             <div>
-                                                <h4 className="font-semibold text-gray-900 mb-2">Recommendations</h4>
+                                                <h4 className="font-semibold text-gray-900 mb-2">
+                                                    Recommendations
+                                                </h4>
                                                 <div className="bg-yellow-50 rounded-lg p-4">
                                                     <div className="flex items-start gap-3">
                                                         <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
                                                             <Star className="w-4 h-4 text-yellow-600" />
                                                         </div>
-                                                        <p className="text-gray-900 text-sm">{treatment.recommendations}</p>
+                                                        <p className="text-gray-900 text-sm">
+                                                            {
+                                                                treatment.recommendations
+                                                            }
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -339,9 +406,13 @@ export default function PatientTreatmentShow({
                                 {/* Treatment Notes */}
                                 {treatment?.notes && (
                                     <div className="mt-6">
-                                        <h4 className="font-semibold text-gray-900 mb-3">Treatment Notes</h4>
+                                        <h4 className="font-semibold text-gray-900 mb-3">
+                                            Treatment Notes
+                                        </h4>
                                         <div className="bg-gray-50 rounded-lg p-4">
-                                            <p className="text-gray-900 whitespace-pre-wrap text-sm">{treatment.notes}</p>
+                                            <p className="text-gray-900 whitespace-pre-wrap text-sm">
+                                                {treatment.notes}
+                                            </p>
                                         </div>
                                     </div>
                                 )}
@@ -349,49 +420,75 @@ export default function PatientTreatmentShow({
                         </Card>
 
                         {/* Prescriptions Card */}
-                        {treatment?.prescriptions && Array.isArray(treatment.prescriptions) && treatment.prescriptions.length > 0 && (
-                            <Card className="bg-white border-0 shadow-lg">
-                                <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                            <Pill className="w-5 h-5 text-green-600" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-gray-900">Prescriptions</h3>
-                                            <p className="text-gray-600 text-sm">Medications and instructions</p>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-6">
-                                    <div className="space-y-4">
-                                        {treatment.prescriptions.map((prescription, index) => (
-                                            <div key={index} className="bg-green-50 rounded-lg p-4 border border-green-100">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                                        <Pill className="w-4 h-4 text-green-600" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="font-semibold text-gray-900">
-                                                            {prescription.medication || prescription.name || `Prescription ${index + 1}`}
-                                                        </h4>
-                                                        {prescription.dosage && (
-                                                            <p className="text-sm text-gray-600 mt-1">
-                                                                <span className="font-medium">Dosage:</span> {prescription.dosage}
-                                                            </p>
-                                                        )}
-                                                        {prescription.instructions && (
-                                                            <p className="text-sm text-gray-600 mt-1">
-                                                                <span className="font-medium">Instructions:</span> {prescription.instructions}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
+                        {treatment?.prescriptions &&
+                            Array.isArray(treatment.prescriptions) &&
+                            treatment.prescriptions.length > 0 && (
+                                <Card className="bg-white border-0 shadow-lg">
+                                    <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                                <Pill className="w-5 h-5 text-green-600" />
                                             </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
+                                            <div>
+                                                <h3 className="text-lg font-bold text-gray-900">
+                                                    Prescriptions
+                                                </h3>
+                                                <p className="text-gray-600 text-sm">
+                                                    Medications and instructions
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="p-6">
+                                        <div className="space-y-4">
+                                            {treatment.prescriptions.map(
+                                                (prescription, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="bg-green-50 rounded-lg p-4 border border-green-100"
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                                <Pill className="w-4 h-4 text-green-600" />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="font-semibold text-gray-900">
+                                                                    {prescription.medication ||
+                                                                        prescription.name ||
+                                                                        `Prescription ${
+                                                                            index +
+                                                                            1
+                                                                        }`}
+                                                                </h4>
+                                                                {prescription.dosage && (
+                                                                    <p className="text-sm text-gray-600 mt-1">
+                                                                        <span className="font-medium">
+                                                                            Dosage:
+                                                                        </span>{" "}
+                                                                        {
+                                                                            prescription.dosage
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                                {prescription.instructions && (
+                                                                    <p className="text-sm text-gray-600 mt-1">
+                                                                        <span className="font-medium">
+                                                                            Instructions:
+                                                                        </span>{" "}
+                                                                        {
+                                                                            prescription.instructions
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
                     </div>
 
                     {/* Right Column - Sidebar Info */}
@@ -404,25 +501,39 @@ export default function PatientTreatmentShow({
                                         <Building2 className="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900">Clinic</h3>
-                                        <p className="text-gray-600 text-sm">Healthcare provider</p>
+                                        <h3 className="text-lg font-bold text-gray-900">
+                                            Clinic
+                                        </h3>
+                                        <p className="text-gray-600 text-sm">
+                                            Healthcare provider
+                                        </p>
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6">
                                 <div className="space-y-4">
                                     <div className="text-center">
-                                        <div className="w-16 h-16 bg-gray-100 rounded-xl mx-auto mb-3 flex items-center justify-center">
-                                            <Building2 className="w-8 h-8 text-gray-600" />
+                                        <div className="w-16 h-16 rounded-xl mx-auto mb-3 overflow-hidden border-2 border-gray-200 shadow-sm">
+                                            <img
+                                                src={treatment?.clinic?.logo_url || "/images/clinic-logo.png"}
+                                                alt={`${treatment?.clinic?.name || "Clinic"} Logo`}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = "/images/clinic-logo.png";
+                                                }}
+                                            />
                                         </div>
                                         <h4 className="font-bold text-gray-900 text-lg">
-                                            {treatment?.clinic?.name || "Clinic Name"}
+                                            {treatment?.clinic?.name ||
+                                                "Clinic Name"}
                                         </h4>
                                         <p className="text-gray-600 text-sm">
-                                            {treatment?.clinic?.street_address || "Address not available"}
+                                            {treatment?.clinic
+                                                ?.street_address ||
+                                                "Address not available"}
                                         </p>
                                     </div>
-                                    
+
                                     <div className="space-y-3">
                                         {treatment?.clinic?.contact_number && (
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -430,8 +541,15 @@ export default function PatientTreatmentShow({
                                                     <Phone className="w-4 h-4 text-green-600" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-600">Phone</p>
-                                                    <p className="font-semibold text-gray-900">{treatment.clinic.contact_number}</p>
+                                                    <p className="text-sm text-gray-600">
+                                                        Phone
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {
+                                                            treatment.clinic
+                                                                .contact_number
+                                                        }
+                                                    </p>
                                                 </div>
                                             </div>
                                         )}
@@ -441,8 +559,12 @@ export default function PatientTreatmentShow({
                                                     <Mail className="w-4 h-4 text-blue-600" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-600">Email</p>
-                                                    <p className="font-semibold text-gray-900 text-sm">{treatment.clinic.email}</p>
+                                                    <p className="text-sm text-gray-600">
+                                                        Email
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900 text-sm">
+                                                        {treatment.clinic.email}
+                                                    </p>
                                                 </div>
                                             </div>
                                         )}
@@ -460,8 +582,12 @@ export default function PatientTreatmentShow({
                                             <User className="w-5 h-5 text-green-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-900">Dentist</h3>
-                                            <p className="text-gray-600 text-sm">Healthcare professional</p>
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Dentist
+                                            </h3>
+                                            <p className="text-gray-600 text-sm">
+                                                Healthcare professional
+                                            </p>
                                         </div>
                                     </div>
                                 </CardHeader>
@@ -474,21 +600,32 @@ export default function PatientTreatmentShow({
                                             <h4 className="font-bold text-gray-900 text-lg">
                                                 {treatment.dentist.name}
                                             </h4>
-                                            {treatment.dentist.specialties && treatment.dentist.specialties.length > 0 && (
-                                                <p className="text-gray-600 text-sm">
-                                                    {treatment.dentist.specialties.join(", ")}
-                                                </p>
-                                            )}
+                                            {treatment.dentist.specialties &&
+                                                treatment.dentist.specialties
+                                                    .length > 0 && (
+                                                    <p className="text-gray-600 text-sm">
+                                                        {treatment.dentist.specialties.join(
+                                                            ", "
+                                                        )}
+                                                    </p>
+                                                )}
                                         </div>
-                                        
+
                                         {treatment.dentist.phone_number && (
                                             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                                                     <Phone className="w-4 h-4 text-green-600" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-gray-600">Phone</p>
-                                                    <p className="font-semibold text-gray-900">{treatment.dentist.phone_number}</p>
+                                                    <p className="text-sm text-gray-600">
+                                                        Phone
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {
+                                                            treatment.dentist
+                                                                .phone_number
+                                                        }
+                                                    </p>
                                                 </div>
                                             </div>
                                         )}
@@ -506,8 +643,12 @@ export default function PatientTreatmentShow({
                                             <Calendar className="w-5 h-5 text-purple-600" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-900">Appointment</h3>
-                                            <p className="text-gray-600 text-sm">Related visit details</p>
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Appointment
+                                            </h3>
+                                            <p className="text-gray-600 text-sm">
+                                                Related visit details
+                                            </p>
                                         </div>
                                     </div>
                                 </CardHeader>
@@ -518,21 +659,29 @@ export default function PatientTreatmentShow({
                                                 <Calendar className="w-4 h-4 text-blue-600" />
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-600">Date</p>
+                                                <p className="text-sm text-gray-600">
+                                                    Date
+                                                </p>
                                                 <p className="font-semibold text-gray-900">
-                                                    {new Date(treatment.appointment.scheduled_at).toLocaleDateString()}
+                                                    {new Date(
+                                                        treatment.appointment.scheduled_at
+                                                    ).toLocaleDateString()}
                                                 </p>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
                                             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                                                 <Clock className="w-4 h-4 text-green-600" />
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-600">Time</p>
+                                                <p className="text-sm text-gray-600">
+                                                    Time
+                                                </p>
                                                 <p className="font-semibold text-gray-900">
-                                                    {new Date(treatment.appointment.scheduled_at).toLocaleTimeString([], {
+                                                    {new Date(
+                                                        treatment.appointment.scheduled_at
+                                                    ).toLocaleTimeString([], {
                                                         hour: "2-digit",
                                                         minute: "2-digit",
                                                     })}
@@ -542,15 +691,29 @@ export default function PatientTreatmentShow({
 
                                         {treatment.appointment.reason && (
                                             <div className="p-3 bg-gray-50 rounded-lg">
-                                                <p className="text-sm text-gray-600 mb-1">Reason</p>
-                                                <p className="font-semibold text-gray-900">{treatment.appointment.reason}</p>
+                                                <p className="text-sm text-gray-600 mb-1">
+                                                    Reason
+                                                </p>
+                                                <p className="font-semibold text-gray-900">
+                                                    {
+                                                        treatment.appointment
+                                                            .reason
+                                                    }
+                                                </p>
                                             </div>
                                         )}
 
                                         {treatment.appointment.notes && (
                                             <div className="p-3 bg-gray-50 rounded-lg">
-                                                <p className="text-sm text-gray-600 mb-1">Notes</p>
-                                                <p className="text-gray-900 text-sm">{treatment.appointment.notes}</p>
+                                                <p className="text-sm text-gray-600 mb-1">
+                                                    Notes
+                                                </p>
+                                                <p className="text-gray-900 text-sm">
+                                                    {
+                                                        treatment.appointment
+                                                            .notes
+                                                    }
+                                                </p>
                                             </div>
                                         )}
                                     </div>
@@ -558,36 +721,6 @@ export default function PatientTreatmentShow({
                             </Card>
                         )}
 
-                        {/* Quick Actions Card */}
-                        <Card className="bg-white border-0 shadow-lg">
-                            <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-100">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                                        <Share2 className="w-5 h-5 text-gray-600" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900">Quick Actions</h3>
-                                        <p className="text-gray-600 text-sm">Available options</p>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="p-6">
-                                <div className="space-y-3">
-                                    <Button variant="outline" className="w-full justify-start" size="sm">
-                                        <Download className="w-4 h-4 mr-2" />
-                                        Download Report
-                                    </Button>
-                                    <Button variant="outline" className="w-full justify-start" size="sm">
-                                        <Share2 className="w-4 h-4 mr-2" />
-                                        Share Details
-                                    </Button>
-                                    <Button variant="outline" className="w-full justify-start" size="sm">
-                                        <Eye className="w-4 h-4 mr-2" />
-                                        View Images
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
                     </div>
                 </div>
             </main>
