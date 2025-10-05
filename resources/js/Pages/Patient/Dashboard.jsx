@@ -268,7 +268,11 @@ const AppointmentsSection = ({ appointments = [] }) => {
                 {appointments.length > 0 ? (
                     <div className="space-y-4">
                         {appointments.map((appointment, index) => (
-                            <SlideIn key={appointment.id} direction="up" delay={index * 100}>
+                            <SlideIn
+                                key={appointment.id}
+                                direction="up"
+                                delay={index * 100}
+                            >
                                 <div
                                     className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl border border-gray-200/50 p-6 hover:shadow-xl hover:border-blue-300/50 transition-all duration-300 group cursor-pointer"
                                     role="article"
@@ -277,35 +281,54 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     } on ${new Date(
                                         appointment.scheduled_at
                                     ).toLocaleDateString()}`}
-                                    onClick={() => handleViewDetails(appointment)}
+                                    onClick={() =>
+                                        handleViewDetails(appointment)
+                                    }
                                 >
                                     {/* Header with Status and Service */}
                                     <div className="flex items-start justify-between mb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "w-3 h-3 rounded-full",
-                                                appointment.status?.name?.toLowerCase() === "confirmed" || appointment.status?.name?.toLowerCase() === "pending" ? "bg-blue-500" :
-                                                appointment.status?.name?.toLowerCase() === "completed" ? "bg-green-500" :
-                                                "bg-red-500"
-                                            )} />
+                                            <div
+                                                className={cn(
+                                                    "w-3 h-3 rounded-full",
+                                                    appointment.status?.name?.toLowerCase() ===
+                                                        "confirmed" ||
+                                                        appointment.status?.name?.toLowerCase() ===
+                                                            "pending"
+                                                        ? "bg-blue-500"
+                                                        : appointment.status?.name?.toLowerCase() ===
+                                                          "completed"
+                                                        ? "bg-green-500"
+                                                        : "bg-red-500"
+                                                )}
+                                            />
                                             <Badge
-                                                className={getStatusColor(appointment.status?.name)}
+                                                className={getStatusColor(
+                                                    appointment.status?.name
+                                                )}
                                                 role="status"
-                                                aria-label={`Appointment status: ${appointment.status?.name || "Unknown"}`}
+                                                aria-label={`Appointment status: ${
+                                                    appointment.status?.name ||
+                                                    "Unknown"
+                                                }`}
                                             >
-                                                {appointment.status?.name || "Unknown"}
+                                                {appointment.status?.name ||
+                                                    "Unknown"}
                                             </Badge>
                                             {/* Show special indicators for patient actions */}
-                                            {appointment.status?.name === "Pending Reschedule" && (
+                                            {appointment.status?.name ===
+                                                "Pending Reschedule" && (
                                                 <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-orange-100 text-orange-700 border-orange-300">
                                                     Awaiting Clinic Response
                                                 </Badge>
                                             )}
-                                            {appointment.status?.name === "Cancelled" && appointment.cancelled_at && (
-                                                <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-red-100 text-red-700 border-red-300">
-                                                    You Cancelled
-                                                </Badge>
-                                            )}
+                                            {appointment.status?.name ===
+                                                "Cancelled" &&
+                                                appointment.cancelled_at && (
+                                                    <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-red-100 text-red-700 border-red-300">
+                                                        You Cancelled
+                                                    </Badge>
+                                                )}
                                         </div>
                                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                                             <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -320,10 +343,13 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-gray-900 text-lg">
-                                                    {appointment.clinic?.name || "Dental Clinic"}
+                                                    {appointment.clinic?.name ||
+                                                        "Dental Clinic"}
                                                 </h4>
                                                 <p className="text-gray-600 text-sm">
-                                                    {appointment.clinic?.address || "Clinic Address"}
+                                                    {appointment.clinic
+                                                        ?.address ||
+                                                        "Clinic Address"}
                                                 </p>
                                             </div>
                                         </div>
@@ -337,20 +363,30 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-gray-900">
-                                                    {new Date(appointment.scheduled_at).toLocaleDateString("en-US", {
-                                                        weekday: "long",
-                                                        year: "numeric",
-                                                        month: "long",
-                                                        day: "numeric",
-                                                    })}
+                                                    {new Date(
+                                                        appointment.scheduled_at
+                                                    ).toLocaleDateString(
+                                                        "en-US",
+                                                        {
+                                                            weekday: "long",
+                                                            year: "numeric",
+                                                            month: "long",
+                                                            day: "numeric",
+                                                        }
+                                                    )}
                                                 </p>
                                                 <div className="flex items-center gap-2 text-gray-600">
                                                     <Clock className="w-4 h-4" />
                                                     <span className="text-sm">
-                                                        {new Date(appointment.scheduled_at).toLocaleTimeString("en-US", {
-                                                            hour: "2-digit",
-                                                            minute: "2-digit",
-                                                        })}
+                                                        {new Date(
+                                                            appointment.scheduled_at
+                                                        ).toLocaleTimeString(
+                                                            "en-US",
+                                                            {
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            }
+                                                        )}
                                                     </span>
                                                 </div>
                                             </div>
@@ -362,19 +398,30 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         {appointment.dentist && (
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
                                                 <User className="w-4 h-4" />
-                                                <span>Dr. {appointment.dentist.name}</span>
+                                                <span>
+                                                    Dr.{" "}
+                                                    {appointment.dentist.name}
+                                                </span>
                                             </div>
                                         )}
                                         {appointment.reason && (
                                             <div className="flex items-start gap-2 text-sm text-gray-600">
                                                 <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                                <span className="line-clamp-2">{appointment.reason}</span>
+                                                <span className="line-clamp-2">
+                                                    {appointment.reason}
+                                                </span>
                                             </div>
                                         )}
-                                        {formatAppointmentNotes(appointment.notes) && (
+                                        {formatAppointmentNotes(
+                                            appointment.notes
+                                        ) && (
                                             <div className="flex items-start gap-2 text-sm text-blue-600 bg-blue-50 rounded-lg p-2">
                                                 <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                                <span className="font-medium">{formatAppointmentNotes(appointment.notes)}</span>
+                                                <span className="font-medium">
+                                                    {formatAppointmentNotes(
+                                                        appointment.notes
+                                                    )}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
@@ -382,35 +429,47 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     {/* Action Buttons */}
                                     <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
                                         <div className="flex items-center gap-2">
-                                            {appointment.status?.name?.toLowerCase() === "pending" && (
+                                            {appointment.status?.name?.toLowerCase() ===
+                                                "pending" && (
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
                                                     className="text-xs px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleCancelAppointment(appointment);
+                                                        handleCancelAppointment(
+                                                            appointment
+                                                        );
                                                     }}
                                                     aria-label={`Cancel appointment at ${
-                                                        appointment.clinic?.name || "Clinic"
-                                                    } on ${new Date(appointment.scheduled_at).toLocaleDateString()}`}
+                                                        appointment.clinic
+                                                            ?.name || "Clinic"
+                                                    } on ${new Date(
+                                                        appointment.scheduled_at
+                                                    ).toLocaleDateString()}`}
                                                 >
                                                     <XCircle className="w-3 h-3 mr-1" />
                                                     Cancel
                                                 </Button>
                                             )}
-                                            {appointment.status?.name?.toLowerCase() === "confirmed" && (
+                                            {appointment.status?.name?.toLowerCase() ===
+                                                "confirmed" && (
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
                                                     className="text-xs px-3 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleRescheduleAppointment(appointment);
+                                                        handleRescheduleAppointment(
+                                                            appointment
+                                                        );
                                                     }}
                                                     aria-label={`Reschedule appointment at ${
-                                                        appointment.clinic?.name || "Clinic"
-                                                    } on ${new Date(appointment.scheduled_at).toLocaleDateString()}`}
+                                                        appointment.clinic
+                                                            ?.name || "Clinic"
+                                                    } on ${new Date(
+                                                        appointment.scheduled_at
+                                                    ).toLocaleDateString()}`}
                                                 >
                                                     <Clock className="w-3 h-3 mr-1" />
                                                     Reschedule
@@ -426,8 +485,11 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 handleViewDetails(appointment);
                                             }}
                                             aria-label={`View details for appointment at ${
-                                                appointment.clinic?.name || "Clinic"
-                                            } on ${new Date(appointment.scheduled_at).toLocaleDateString()}`}
+                                                appointment.clinic?.name ||
+                                                "Clinic"
+                                            } on ${new Date(
+                                                appointment.scheduled_at
+                                            ).toLocaleDateString()}`}
                                         >
                                             <Eye className="w-3 h-3 mr-1" />
                                             View Details
