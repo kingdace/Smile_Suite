@@ -37,9 +37,22 @@ class PatientDashboardController extends Controller
             ->orderBy('scheduled_at')
             ->get();
 
+        // Get all treatments for all patient records
+        $treatments = \App\Models\Treatment::with(['clinic', 'service', 'dentist', 'appointment'])
+            ->whereIn('patient_id', $patients->pluck('id'))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Get clinic records for statistics using PatientLinkingService
+        $patientLinkingService = new \App\Services\PatientLinkingService();
+        $clinicRecords = $patientLinkingService->getPatientClinicRecords($user);
+
         return Inertia::render('Patient/Dashboard', [
+            'user' => $user,
             'patients' => $patients,
             'appointments' => $appointments,
+            'treatments' => $treatments,
+            'clinicRecords' => $clinicRecords,
             'flash' => [
                 'success' => session('success'),
             ],
