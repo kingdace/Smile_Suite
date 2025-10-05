@@ -939,7 +939,8 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                             Treatment History
                         </h3>
                         <p className="text-gray-500 text-sm">
-                            Your dental treatment records ({(treatments?.length || 0)} total)
+                            Your dental treatment records (
+                            {treatments?.length || 0} total)
                         </p>
                     </div>
                 </div>
@@ -1413,6 +1414,16 @@ export default function PatientDashboard({
 }) {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
+
+    // Debug: Log the data being received
+    console.log('PatientDashboard Debug:', {
+        user,
+        clinicRecords,
+        appointments: appointments?.length || 0,
+        appointmentsData: appointments,
+        treatments: treatments?.length || 0,
+        treatmentsData: treatments,
+    });
 
     const handleRefresh = () => {
         setIsRefreshing(true);

@@ -30,12 +30,20 @@ class PatientDashboardController extends Controller
         // Get all patient records for this user (one per clinic)
         $patients = \App\Models\Patient::where('user_id', $user->id)->with('clinic')->get();
 
-        // Get all upcoming appointments for all patient records
+        // Get all appointments for all patient records (not just future ones)
         $appointments = \App\Models\Appointment::with(['clinic', 'status'])
             ->whereIn('patient_id', $patients->pluck('id'))
-            ->where('scheduled_at', '>=', now())
-            ->orderBy('scheduled_at')
+            ->orderBy('scheduled_at', 'desc')
             ->get();
+
+        // Debug: Log the appointments data
+        \Log::info('PatientDashboardController::index - Appointments data', [
+            'user_id' => $user->id,
+            'patients_count' => $patients->count(),
+            'patient_ids' => $patients->pluck('id')->toArray(),
+            'appointments_count' => $appointments->count(),
+            'appointments_data' => $appointments->toArray(),
+        ]);
 
         // Get all treatments for all patient records
         $treatments = \App\Models\Treatment::with(['clinic', 'service', 'dentist', 'appointment'])
