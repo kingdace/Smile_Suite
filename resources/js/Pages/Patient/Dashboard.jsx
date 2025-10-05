@@ -257,9 +257,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 key={appointment.id}
                                 className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4 hover:shadow-md transition-all duration-300 group"
                             >
-                                <div className="flex items-start justify-between">
+                                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                     <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
                                             {getStatusIcon(
                                                 appointment.status?.name
                                             )}
@@ -286,11 +286,11 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     </Badge>
                                                 )}
                                         </div>
-                                        <h4 className="font-semibold text-gray-900">
+                                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
                                             {appointment.clinic?.name ||
                                                 "Clinic"}
                                         </h4>
-                                        <p className="text-sm text-gray-600 mb-1">
+                                        <p className="text-xs sm:text-sm text-gray-600 mb-1">
                                             {new Date(
                                                 appointment.scheduled_at
                                             ).toLocaleDateString()}{" "}
@@ -302,7 +302,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 minute: "2-digit",
                                             })}
                                         </p>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-xs sm:text-sm text-gray-500">
                                             {appointment.reason ||
                                                 "No reason specified"}
                                         </p>
@@ -319,13 +319,13 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-row sm:flex-col gap-2">
                                         {appointment.status?.name?.toLowerCase() ===
                                             "pending" && (
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                className="text-red-600 hover:text-red-700"
+                                                className="text-red-600 hover:text-red-700 text-xs px-3 py-1"
                                                 onClick={() =>
                                                     handleCancelAppointment(
                                                         appointment
@@ -340,7 +340,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                className="text-blue-600 hover:text-blue-700"
+                                                className="text-blue-600 hover:text-blue-700 text-xs px-3 py-1"
                                                 onClick={() =>
                                                     handleRescheduleAppointment(
                                                         appointment
@@ -353,6 +353,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         <Button
                                             size="sm"
                                             variant="outline"
+                                            className="text-xs px-3 py-1"
                                             onClick={() =>
                                                 handleViewDetails(appointment)
                                             }
@@ -454,8 +455,8 @@ const QuickActions = () => {
     ];
 
     return (
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6">
-            <div className="mb-6">
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6">
+            <div className="mb-4 sm:mb-6">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <Zap className="w-5 h-5 text-yellow-600" />
                     Quick Actions
@@ -464,24 +465,24 @@ const QuickActions = () => {
                     Access your most important features
                 </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {actions.map((action) => {
                     const Icon = action.icon;
                     return (
                         <Link key={action.name} href={action.href}>
                             <div
-                                className={`flex items-center gap-3 px-4 py-4 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent ${action.hoverBorder}`}
+                                className={`flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-4 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent ${action.hoverBorder}`}
                             >
                                 <div
-                                    className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}
+                                    className={`w-10 h-10 sm:w-12 sm:h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}
                                 >
-                                    <Icon className="w-6 h-6 text-white" />
+                                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                                 </div>
-                                <div className="flex-1">
-                                    <h4 className="font-semibold text-sm">
+                                <div className="flex-1 text-center sm:text-left">
+                                    <h4 className="font-semibold text-xs sm:text-sm">
                                         {action.name}
                                     </h4>
-                                    <p className="text-xs text-gray-500">
+                                    <p className="text-xs text-gray-500 hidden sm:block">
                                         {action.description}
                                     </p>
                                 </div>
@@ -686,7 +687,7 @@ const StatisticsSection = ({ clinicRecords = [] }) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {stats.map((stat) => {
                 const Icon = stat.icon;
                 return (
@@ -763,43 +764,43 @@ export default function PatientDashboard({
             )}
 
             {/* Main Container */}
-            <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
+            <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-4 sm:py-6 lg:py-8">
                 <div className="bg-gradient-to-br from-blue-50 via-blue-80 to-cyan-80 rounded-2xl shadow-2xl border border-blue-200/50 overflow-hidden">
                     {/* Enhanced Header Section */}
-                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 px-8 py-8">
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                         <div className="absolute inset-0 bg-black/5"></div>
                         <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
                         <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-10 -translate-x-10"></div>
                         <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white/3 rounded-full -translate-y-8 -translate-x-8"></div>
 
                         <div className="relative">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-3 sm:gap-4">
                                     <div className="relative">
-                                        <div className="p-3 bg-white/25 rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg">
-                                            <LayoutDashboard className="h-6 w-6 text-white" />
+                                        <div className="p-2 sm:p-3 bg-white/25 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                            <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                                         </div>
                                     </div>
                                     <div>
-                                        <h1 className="text-2xl font-bold text-white mb-1">
+                                        <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
                                             Patient Dashboard
                                         </h1>
-                                        <p className="text-blue-100 text-sm font-medium">
+                                        <p className="text-blue-100 text-xs sm:text-sm font-medium">
                                             Welcome back,{" "}
                                             {user?.name || auth?.user?.name}!
-                                            Here's your dental health overview
+                                            <span className="hidden sm:inline"> Here's your dental health overview</span>
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-6 py-3 rounded-xl border border-blue-200/50 shadow-lg">
-                                        <span className="text-sm font-bold text-gray-700">
+                                    <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl border border-blue-200/50 shadow-lg">
+                                        <span className="text-xs sm:text-sm font-bold text-gray-700">
                                             {new Date().toLocaleDateString(
                                                 "en-US",
                                                 {
-                                                    weekday: "long",
+                                                    weekday: "short",
                                                     year: "numeric",
-                                                    month: "long",
+                                                    month: "short",
                                                     day: "numeric",
                                                 }
                                             )}
@@ -811,7 +812,7 @@ export default function PatientDashboard({
                     </div>
 
                     {/* Main Content */}
-                    <div className="px-8 py-10">
+                    <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
                         {/* Statistics */}
                         <div className="mb-8">
                             <StatisticsSection clinicRecords={clinicRecords} />
@@ -823,7 +824,7 @@ export default function PatientDashboard({
                         </div>
 
                         {/* Main Content Grid */}
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                             {/* Appointments Section */}
                             <div>
                                 <AppointmentsSection
@@ -859,7 +860,7 @@ export default function PatientDashboard({
                                             <BarChart3 className="w-4 h-4 text-green-600" />
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {clinicRecords
                                             .slice(0, 6)
                                             .map((record) => (

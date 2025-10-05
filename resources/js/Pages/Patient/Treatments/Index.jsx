@@ -90,7 +90,7 @@ export default function PatientTreatmentsIndex({
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
                     <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-4">
@@ -196,7 +196,7 @@ export default function PatientTreatmentsIndex({
                                                     </span>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                                     <div>
                                                         <h4 className="font-semibold text-gray-900 mb-2">
                                                             {treatment.service

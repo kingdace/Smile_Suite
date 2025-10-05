@@ -58,7 +58,7 @@ export default function PatientProfileShow({ user, patients }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                         {/* Main Profile Card */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Personal Information */}
@@ -83,7 +83,7 @@ export default function PatientProfileShow({ user, patients }) {
                                     </div>
                                 </div>
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                         <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
                                             <label className="text-sm font-medium text-gray-500 mb-2 block">
                                                 Full Name

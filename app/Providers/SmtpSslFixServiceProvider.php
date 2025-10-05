@@ -30,7 +30,7 @@ class SmtpSslFixServiceProvider extends ServiceProvider
                 $stream->setHost($config['host']);
                 $stream->setPort($config['port']);
                 $stream->setTimeout($config['timeout'] ?? 30);
-                
+
                 // Set SSL context options to disable certificate verification
                 $stream->setStreamOptions([
                     'ssl' => [
