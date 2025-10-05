@@ -356,15 +356,17 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     }}
                                                 />
                                             </div>
-                                        <div className="flex-1">
-                                            <h4 className="font-bold text-gray-900 text-lg">
-                                                {appointment.clinic?.name ||
-                                                    "Dental Clinic"}
-                                            </h4>
-                                            <p className="text-gray-600 text-sm line-clamp-2">
-                                                {appointment.clinic?.street_address || "Address not available"}
-                                            </p>
-                                        </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-gray-900 text-lg">
+                                                    {appointment.clinic?.name ||
+                                                        "Dental Clinic"}
+                                                </h4>
+                                                <p className="text-gray-600 text-sm line-clamp-2">
+                                                    {appointment.clinic
+                                                        ?.street_address ||
+                                                        "Address not available"}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 

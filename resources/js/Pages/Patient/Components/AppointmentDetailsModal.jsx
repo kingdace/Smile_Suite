@@ -24,7 +24,6 @@ export default function AppointmentDetailsModal({
     appointment,
     loading = false,
 }) {
-
     if (!showModal || !appointment) return null;
 
     const getStatusIcon = (status) => {
@@ -285,7 +284,8 @@ export default function AppointmentDetailsModal({
                                         Complete Address
                                     </div>
                                     <div className="text-gray-800 font-medium">
-                                        {appointment.clinic?.street_address || "Address not available"}
+                                        {appointment.clinic?.street_address ||
+                                            "Address not available"}
                                     </div>
                                 </div>
                             </div>
