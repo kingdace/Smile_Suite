@@ -19,7 +19,7 @@ class PatientTreatmentController extends Controller
 
         // First, let's check if the user has any patient records
         $patients = \App\Models\Patient::where('user_id', $user->id)->get();
-        \Log::info('PatientTreatmentController::index - User patients', [
+        Log::info('PatientTreatmentController::index - User patients', [
             'user_id' => $user->id,
             'patients_count' => $patients->count(),
             'patients_data' => $patients->toArray(),
@@ -33,7 +33,7 @@ class PatientTreatmentController extends Controller
         ->orderBy('created_at', 'desc')
         ->paginate(10);
 
-        \Log::info('PatientTreatmentController::index - Treatments found', [
+        Log::info('PatientTreatmentController::index - Treatments found', [
             'user_id' => $user->id,
             'treatments_count' => $treatments->count(),
             'treatments_data' => $treatments->toArray(),
@@ -67,7 +67,7 @@ public function show($id)
 
             // First, let's check if the user has any patient records
             $patients = \App\Models\Patient::where('user_id', $user->id)->get();
-            \Log::info('PatientTreatmentController::show - User patients', [
+            Log::info('PatientTreatmentController::show - User patients', [
                 'user_id' => $user->id,
                 'patients_count' => $patients->count(),
                 'patients_data' => $patients->toArray(),
@@ -75,7 +75,7 @@ public function show($id)
 
             // Check if there are any treatments for this user's patients
             $allTreatments = \App\Models\Treatment::whereIn('patient_id', $patients->pluck('id'))->get();
-            \Log::info('PatientTreatmentController::show - All treatments for user', [
+            Log::info('PatientTreatmentController::show - All treatments for user', [
                 'user_id' => $user->id,
                 'treatments_count' => $allTreatments->count(),
                 'treatments_data' => $allTreatments->toArray(),
@@ -88,7 +88,7 @@ public function show($id)
             ->find($treatmentId);
 
             // Debug: Log the treatment data
-            \Log::info('PatientTreatmentController::show - Treatment found', [
+            Log::info('PatientTreatmentController::show - Treatment found', [
                 'user_id' => $user->id,
                 'treatment_id' => $treatmentId,
                 'treatment_found' => $treatment ? true : false,

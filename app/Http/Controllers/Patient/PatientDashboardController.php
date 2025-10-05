@@ -37,7 +37,7 @@ class PatientDashboardController extends Controller
             ->get();
 
         // Debug: Log the appointments data
-        \Log::info('PatientDashboardController::index - Appointments data', [
+        Log::info('PatientDashboardController::index - Appointments data', [
             'user_id' => $user->id,
             'patients_count' => $patients->count(),
             'patient_ids' => $patients->pluck('id')->toArray(),
