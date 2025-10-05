@@ -57,14 +57,6 @@ class PatientTreatmentController extends Controller
             ->with(['clinic', 'service', 'dentist', 'appointment', 'patient'])
             ->find($treatmentId);
 
-            // Debug: Log the treatment data
-            \Log::info('PatientTreatmentController::show - Treatment found', [
-                'user_id' => $user->id,
-                'treatment_id' => $treatmentId,
-                'treatment_found' => $treatment ? true : false,
-                'treatment_data' => $treatment ? $treatment->toArray() : null,
-            ]);
-
             // If treatment not found, return a placeholder treatment
             if (!$treatment) {
                 $treatment = $this->getPlaceholderTreatment($user);

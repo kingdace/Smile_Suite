@@ -918,10 +918,10 @@ const TreatmentsOverview = ({ treatments = [] }) => {
         }
     };
 
-    const totalPages = Math.ceil(treatments.length / treatmentsPerPage);
+    const totalPages = Math.ceil((treatments?.length || 0) / treatmentsPerPage);
     const startIndex = (currentPage - 1) * treatmentsPerPage;
     const endIndex = startIndex + treatmentsPerPage;
-    const currentTreatments = treatments.slice(startIndex, endIndex);
+    const currentTreatments = (treatments || []).slice(startIndex, endIndex);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -939,7 +939,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                             Treatment History
                         </h3>
                         <p className="text-gray-500 text-sm">
-                            Your dental treatment records
+                            Your dental treatment records ({(treatments?.length || 0)} total)
                         </p>
                     </div>
                 </div>
@@ -948,7 +948,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                 </div>
             </div>
             <div>
-                {treatments.length > 0 ? (
+                {(treatments?.length || 0) > 0 ? (
                     <div className="space-y-4">
                         {currentTreatments.map((treatment, index) => (
                             <SlideIn
@@ -1156,7 +1156,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                             treatment.id > 0 ? (
                                                 <Link
                                                     href={route(
-                                                        "treatments.show",
+                                                        "patient.treatments.show",
                                                         treatment.id
                                                     )}
                                                 >
@@ -1217,13 +1217,13 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                 )}
 
                 {/* Pagination Controls */}
-                {treatments.length > treatmentsPerPage && (
+                {(treatments?.length || 0) > treatmentsPerPage && (
                     <div className="mt-8 pt-6 border-t border-gray-200/50">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-600">
                                 Showing {startIndex + 1} to{" "}
-                                {Math.min(endIndex, treatments.length)} of{" "}
-                                {treatments.length} treatments
+                                {Math.min(endIndex, treatments?.length || 0)} of{" "}
+                                {treatments?.length || 0} treatments
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button

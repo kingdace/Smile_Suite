@@ -17,12 +17,12 @@ class TreatmentPolicy
         if ($user->isClinicStaff() && $clinic && $user->clinic_id === $clinic->id) {
             return true;
         }
-        
+
         // Allow patients to view their own treatments (no clinic parameter needed)
         if ($user->isPatient()) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -32,12 +32,12 @@ class TreatmentPolicy
         if ($user->isClinicStaff() && $user->clinic_id === $treatment->clinic_id) {
             return true;
         }
-        
+
         // Allow patients to view their own treatments
         if ($user->isPatient()) {
             return $treatment->patient->user_id === $user->id;
         }
-        
+
         return false;
     }
 
