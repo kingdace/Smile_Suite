@@ -1,5 +1,5 @@
 import { Head, usePage, Link, router } from "@inertiajs/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Calendar,
     User,
@@ -61,6 +61,84 @@ const AppointmentsSection = ({ appointments = [] }) => {
     const [showRescheduleModal, setShowRescheduleModal] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [psgcData, setPsgcData] = useState({
+        regions: [],
+        provinces: [],
+        cities: [],
+        municipalities: [],
+        barangays: [],
+    });
+
+    // Fetch PSGC data for address formatting
+    useEffect(() => {
+        const fetchPSGCData = async () => {
+            try {
+                const [regionsResponse, provincesResponse, citiesResponse, municipalitiesResponse, barangaysResponse] = await Promise.all([
+                    fetch('/api/psgc/regions'),
+                    fetch('/api/psgc/provinces'),
+                    fetch('/api/psgc/cities'),
+                    fetch('/api/psgc/municipalities'),
+                    fetch('/api/psgc/barangays'),
+                ]);
+
+                const [regions, provinces, cities, municipalities, barangays] = await Promise.all([
+                    regionsResponse.json(),
+                    provincesResponse.json(),
+                    citiesResponse.json(),
+                    municipalitiesResponse.json(),
+                    barangaysResponse.json(),
+                ]);
+
+                setPsgcData({
+                    regions: regions.data || [],
+                    provinces: provinces.data || [],
+                    cities: cities.data || [],
+                    municipalities: municipalities.data || [],
+                    barangays: barangays.data || [],
+                });
+            } catch (error) {
+                console.error('Error fetching PSGC data:', error);
+            }
+        };
+
+        fetchPSGCData();
+    }, []);
+
+    // Format clinic address using PSGC data
+    const formatClinicAddress = (clinic) => {
+        if (!clinic) return "Address not available";
+
+        const getPSGCName = (type, code) => {
+            if (!code) return "";
+            const list = psgcData[type];
+            if (!list) return code;
+            let found = list.find((item) => item.code === String(code));
+            if (!found && list[0] && list[0].psgc_id) {
+                found = list.find((item) => item.psgc_id === String(code));
+            }
+            if (found) return found.name;
+            let nameMatch = list.find(
+                (item) =>
+                    item.name.toLowerCase().trim() ===
+                    String(code).toLowerCase().trim()
+            );
+            if (nameMatch) return nameMatch.name;
+            return code;
+        };
+
+        const cityOrMunicipality =
+            getPSGCName("cities", clinic.city_municipality_code) ||
+            getPSGCName("municipalities", clinic.city_municipality_code);
+
+        const parts = [
+            clinic.street_address,
+            getPSGCName("barangays", clinic.barangay_code),
+            cityOrMunicipality,
+            getPSGCName("provinces", clinic.province_code),
+            getPSGCName("regions", clinic.region_code),
+        ];
+        return parts.filter(Boolean).join(", ") || "Address not available";
+    };
 
     const formatAppointmentNotes = (notes) => {
         if (!notes) return null;
@@ -338,18 +416,26 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     {/* Clinic Information */}
                                     <div className="mb-4">
                                         <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                                <Building2 className="w-5 h-5 text-white" />
+                                            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-blue-200 hover:shadow-xl transition-all duration-300">
+                                                <img
+                                                    src={
+                                                        appointment.clinic?.logo_url ||
+                                                        "/images/clinic-logo.png"
+                                                    }
+                                                    alt={`${appointment.clinic?.name || "Clinic"} Logo`}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.src = "/images/clinic-logo.png";
+                                                    }}
+                                                />
                                             </div>
-                                            <div>
+                                            <div className="flex-1">
                                                 <h4 className="font-bold text-gray-900 text-lg">
                                                     {appointment.clinic?.name ||
                                                         "Dental Clinic"}
                                                 </h4>
-                                                <p className="text-gray-600 text-sm">
-                                                    {appointment.clinic
-                                                        ?.address ||
-                                                        "Clinic Address"}
+                                                <p className="text-gray-600 text-sm line-clamp-2">
+                                                    {formatClinicAddress(appointment.clinic)}
                                                 </p>
                                             </div>
                                         </div>

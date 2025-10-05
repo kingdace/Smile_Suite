@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     X,
     Calendar,
@@ -24,6 +24,85 @@ export default function AppointmentDetailsModal({
     appointment,
     loading = false,
 }) {
+    const [psgcData, setPsgcData] = useState({
+        regions: [],
+        provinces: [],
+        cities: [],
+        municipalities: [],
+        barangays: [],
+    });
+
+    // Fetch PSGC data for address formatting
+    useEffect(() => {
+        const fetchPSGCData = async () => {
+            try {
+                const [regionsResponse, provincesResponse, citiesResponse, municipalitiesResponse, barangaysResponse] = await Promise.all([
+                    fetch('/api/psgc/regions'),
+                    fetch('/api/psgc/provinces'),
+                    fetch('/api/psgc/cities'),
+                    fetch('/api/psgc/municipalities'),
+                    fetch('/api/psgc/barangays'),
+                ]);
+
+                const [regions, provinces, cities, municipalities, barangays] = await Promise.all([
+                    regionsResponse.json(),
+                    provincesResponse.json(),
+                    citiesResponse.json(),
+                    municipalitiesResponse.json(),
+                    barangaysResponse.json(),
+                ]);
+
+                setPsgcData({
+                    regions: regions.data || [],
+                    provinces: provinces.data || [],
+                    cities: cities.data || [],
+                    municipalities: municipalities.data || [],
+                    barangays: barangays.data || [],
+                });
+            } catch (error) {
+                console.error('Error fetching PSGC data:', error);
+            }
+        };
+
+        fetchPSGCData();
+    }, []);
+
+    // Format clinic address using PSGC data
+    const formatClinicAddress = (clinic) => {
+        if (!clinic) return "Address not available";
+
+        const getPSGCName = (type, code) => {
+            if (!code) return "";
+            const list = psgcData[type];
+            if (!list) return code;
+            let found = list.find((item) => item.code === String(code));
+            if (!found && list[0] && list[0].psgc_id) {
+                found = list.find((item) => item.psgc_id === String(code));
+            }
+            if (found) return found.name;
+            let nameMatch = list.find(
+                (item) =>
+                    item.name.toLowerCase().trim() ===
+                    String(code).toLowerCase().trim()
+            );
+            if (nameMatch) return nameMatch.name;
+            return code;
+        };
+
+        const cityOrMunicipality =
+            getPSGCName("cities", clinic.city_municipality_code) ||
+            getPSGCName("municipalities", clinic.city_municipality_code);
+
+        const parts = [
+            clinic.street_address,
+            getPSGCName("barangays", clinic.barangay_code),
+            cityOrMunicipality,
+            getPSGCName("provinces", clinic.province_code),
+            getPSGCName("regions", clinic.region_code),
+        ];
+        return parts.filter(Boolean).join(", ") || "Address not available";
+    };
+
     if (!showModal || !appointment) return null;
 
     const getStatusIcon = (status) => {
@@ -199,13 +278,24 @@ export default function AppointmentDetailsModal({
 
                         {/* Enhanced Clinic Information */}
                         <div className="bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30 rounded-2xl p-8 border border-gray-200/50 shadow-lg">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                    <Building2 className="w-5 h-5 text-white" />
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-blue-200 hover:shadow-xl transition-all duration-300">
+                                    <img
+                                        src={
+                                            appointment.clinic?.logo_url ||
+                                            "/images/clinic-logo.png"
+                                        }
+                                        alt={`${appointment.clinic?.name || "Clinic"} Logo`}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.src = "/images/clinic-logo.png";
+                                        }}
+                                    />
                                 </div>
-                                <h4 className="text-xl font-bold text-gray-900">
-                                    Clinic Information
-                                </h4>
+                                <div>
+                                    <h4 className="text-xl font-bold text-gray-900">Clinic Information</h4>
+                                    <p className="text-gray-600 text-sm">Complete clinic details</p>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -217,7 +307,7 @@ export default function AppointmentDetailsModal({
                                                 Clinic Name
                                             </span>
                                         </div>
-                                        <p className="text-gray-700">
+                                        <p className="text-gray-700 font-medium">
                                             {appointment.clinic?.name ||
                                                 "Clinic Name"}
                                         </p>
@@ -255,23 +345,19 @@ export default function AppointmentDetailsModal({
                                             </p>
                                         </div>
                                     )}
+                                </div>
+                            </div>
 
-                                    {appointment.clinic?.street_address && (
-                                        <div className="bg-white/60 rounded-xl p-4 border border-white/50">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <MapPin className="w-5 h-5 text-orange-600" />
-                                                <span className="font-semibold text-gray-900">
-                                                    Address
-                                                </span>
-                                            </div>
-                                            <p className="text-gray-700">
-                                                {
-                                                    appointment.clinic
-                                                        .street_address
-                                                }
-                                            </p>
-                                        </div>
-                                    )}
+                            {/* Complete Address Section */}
+                            <div className="mt-6">
+                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                                    <div className="text-sm font-semibold text-blue-700 mb-2 flex items-center gap-2">
+                                        <MapPin className="h-4 w-4" />
+                                        Complete Address
+                                    </div>
+                                    <div className="text-gray-800 font-medium">
+                                        {formatClinicAddress(appointment.clinic)}
+                                    </div>
                                 </div>
                             </div>
                         </div>
