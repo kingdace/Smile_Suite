@@ -20,6 +20,9 @@ module.exports = {
             },
         },
         extend: {
+            scrollbar: {
+                thin: 'thin',
+            },
             colors: {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
@@ -202,5 +205,6 @@ module.exports = {
         forms,
         require("tailwindcss-animate"),
         require("@tailwindcss/line-clamp"),
+        require("tailwind-scrollbar"),
     ],
 };

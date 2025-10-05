@@ -58,13 +58,13 @@ export default function AppointmentDetailsModal({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
             role="dialog"
             aria-modal="true"
             aria-labelledby="appointment-details-title"
             aria-describedby="appointment-details-description"
         >
-            <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl shadow-2xl border border-gray-200/50 p-6 sm:p-8 lg:p-10 max-w-4xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
                 <button
                     className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-2 hover:bg-gray-100"
                     onClick={onClose}
@@ -73,23 +73,25 @@ export default function AppointmentDetailsModal({
                     <X className="w-5 h-5" aria-hidden="true" />
                 </button>
 
-                {/* Enhanced Header */}
-                <div className="text-center mb-8">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <Calendar className="w-10 h-10 text-white" />
+                {/* Compact Header */}
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <Calendar className="w-5 h-5 text-white" />
                     </div>
-                    <h2
-                        id="appointment-details-title"
-                        className="text-3xl font-bold text-gray-900 mb-2"
-                    >
-                        Appointment Details
-                    </h2>
-                    <p
-                        id="appointment-details-description"
-                        className="text-gray-600 text-lg"
-                    >
-                        Complete information about your appointment
-                    </p>
+                    <div>
+                        <h2
+                            id="appointment-details-title"
+                            className="text-xl font-bold text-gray-900"
+                        >
+                            Appointment Details
+                        </h2>
+                        <p
+                            id="appointment-details-description"
+                            className="text-gray-500 text-sm"
+                        >
+                            Complete information about your appointment
+                        </p>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -107,12 +109,12 @@ export default function AppointmentDetailsModal({
                         </span>
                     </div>
                 ) : (
-                    <div className="space-y-8">
-                        {/* Enhanced Status and Basic Info */}
-                        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-8 border border-blue-200/50 shadow-lg">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <div className="space-y-6">
+                        {/* Compact Status and Basic Info */}
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                                         {getStatusIcon(
                                             appointment.status?.name
                                         )}
@@ -123,49 +125,47 @@ export default function AppointmentDetailsModal({
                                                 getStatusColor(
                                                     appointment.status?.name
                                                 ),
-                                                "text-sm font-semibold px-4 py-2"
+                                                "text-xs font-semibold px-3 py-1"
                                             )}
                                         >
                                             {appointment.status?.name ||
                                                 "Unknown"}
                                         </Badge>
                                         <p className="text-xs text-gray-500 mt-1">
-                                            Appointment Status
+                                            Status
                                         </p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-sm font-medium text-gray-500">
-                                        Appointment ID
+                                    <div className="text-xs text-gray-500">
+                                        ID
                                     </div>
-                                    <div className="text-lg font-bold text-gray-900">
+                                    <div className="text-sm font-bold text-gray-900">
                                         #{appointment.id}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="text-center mb-6">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                            <div className="text-center mb-4">
+                                <h3 className="text-lg font-bold text-gray-900 mb-1">
                                     {appointment.clinic?.name ||
                                         "Dental Clinic"}
                                 </h3>
-                                <p className="text-gray-600">
+                                <p className="text-gray-600 text-sm">
                                     {appointment.service?.name ||
                                         "General Checkup"}
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-white/60 rounded-xl p-4 border border-white/50">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                            <Calendar className="w-4 h-4 text-white" />
-                                        </div>
-                                        <span className="font-semibold text-gray-900">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Calendar className="w-4 h-4 text-purple-600" />
+                                        <span className="text-xs font-semibold text-gray-700">
                                             Date
                                         </span>
                                     </div>
-                                    <p className="text-gray-700">
+                                    <p className="text-sm text-gray-900">
                                         {new Date(
                                             appointment.scheduled_at
                                         ).toLocaleDateString("en-US", {
@@ -176,16 +176,14 @@ export default function AppointmentDetailsModal({
                                         })}
                                     </p>
                                 </div>
-                                <div className="bg-white/60 rounded-xl p-4 border border-white/50">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                                            <Clock className="w-4 h-4 text-white" />
-                                        </div>
-                                        <span className="font-semibold text-gray-900">
+                                <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Clock className="w-4 h-4 text-green-600" />
+                                        <span className="text-xs font-semibold text-gray-700">
                                             Time
                                         </span>
                                     </div>
-                                    <p className="text-gray-700">
+                                    <p className="text-sm text-gray-900">
                                         {new Date(
                                             appointment.scheduled_at
                                         ).toLocaleTimeString("en-US", {
@@ -197,59 +195,46 @@ export default function AppointmentDetailsModal({
                             </div>
                         </div>
 
-                        {/* Enhanced Clinic Information */}
-                        <div className="bg-gradient-to-br from-white via-gray-50/50 to-blue-50/30 rounded-2xl p-8 border border-gray-200/50 shadow-lg">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-blue-200 hover:shadow-xl transition-all duration-300">
-                                    <img
-                                        src={
-                                            appointment.clinic?.logo_url ||
-                                            "/images/clinic-logo.png"
-                                        }
-                                        alt={`${
-                                            appointment.clinic?.name || "Clinic"
-                                        } Logo`}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.target.src =
-                                                "/images/clinic-logo.png";
-                                        }}
-                                    />
+                        {/* Compact Clinic Information */}
+                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <Building2 className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold text-gray-900">
+                                    <h4 className="text-lg font-bold text-gray-900">
                                         Clinic Information
                                     </h4>
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-500 text-sm">
                                         Complete clinic details
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-4">
-                                    <div className="bg-white/60 rounded-xl p-4 border border-white/50">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <Building2 className="w-5 h-5 text-blue-600" />
-                                            <span className="font-semibold text-gray-900">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-3">
+                                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Building2 className="w-4 h-4 text-blue-600" />
+                                            <span className="text-xs font-semibold text-gray-700">
                                                 Clinic Name
                                             </span>
                                         </div>
-                                        <p className="text-gray-700 font-medium">
+                                        <p className="text-sm text-gray-900 font-medium">
                                             {appointment.clinic?.name ||
                                                 "Clinic Name"}
                                         </p>
                                     </div>
 
                                     {appointment.clinic?.contact_number && (
-                                        <div className="bg-white/60 rounded-xl p-4 border border-white/50">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <Phone className="w-5 h-5 text-green-600" />
-                                                <span className="font-semibold text-gray-900">
+                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Phone className="w-4 h-4 text-green-600" />
+                                                <span className="text-xs font-semibold text-gray-700">
                                                     Phone
                                                 </span>
                                             </div>
-                                            <p className="text-gray-700">
+                                            <p className="text-sm text-gray-900">
                                                 {
                                                     appointment.clinic
                                                         .contact_number
@@ -259,33 +244,32 @@ export default function AppointmentDetailsModal({
                                     )}
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {appointment.clinic?.email && (
-                                        <div className="bg-white/60 rounded-xl p-4 border border-white/50">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <Mail className="w-5 h-5 text-purple-600" />
-                                                <span className="font-semibold text-gray-900">
+                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Mail className="w-4 h-4 text-purple-600" />
+                                                <span className="text-xs font-semibold text-gray-700">
                                                     Email
                                                 </span>
                                             </div>
-                                            <p className="text-gray-700">
+                                            <p className="text-sm text-gray-900">
                                                 {appointment.clinic.email}
                                             </p>
                                         </div>
                                     )}
-                                </div>
-                            </div>
 
-                            {/* Complete Address Section */}
-                            <div className="mt-6">
-                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
-                                    <div className="text-sm font-semibold text-blue-700 mb-2 flex items-center gap-2">
-                                        <MapPin className="h-4 w-4" />
-                                        Complete Address
-                                    </div>
-                                    <div className="text-gray-800 font-medium">
-                                        {appointment.clinic?.street_address ||
-                                            "Address not available"}
+                                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <MapPin className="w-4 h-4 text-orange-600" />
+                                            <span className="text-xs font-semibold text-gray-700">
+                                                Address
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-gray-900">
+                                            {appointment.clinic?.street_address ||
+                                                "Address not available"}
+                                        </p>
                                     </div>
                                 </div>
                             </div>

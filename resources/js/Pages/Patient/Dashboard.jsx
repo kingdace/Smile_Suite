@@ -791,10 +791,10 @@ const QuickActions = ({ loading = false }) => {
                         <h3 className="text-xl font-bold text-gray-900">
                             Quick Actions
                         </h3>
+                        <p className="text-gray-600 text-sm">
+                            Access your most important features
+                        </p>
                     </div>
-                    <p className="text-gray-600 text-sm">
-                        Access your most important features
-                    </p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {Array.from({ length: 4 }).map((_, i) => (
@@ -812,13 +812,15 @@ const QuickActions = ({ loading = false }) => {
                     <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
                         <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900">
-                        Quick Actions
-                    </h3>
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900">
+                            Quick Actions
+                        </h3>
+                        <p className="text-gray-600 text-xs">
+                            Access your most important features and services
+                        </p>
+                    </div>
                 </div>
-                <p className="text-gray-600 text-xs">
-                    Access your most important features and services
-                </p>
             </div>
             <nav
                 className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6"
