@@ -34,6 +34,7 @@ import {
     HelpCircle,
     ArrowRight,
     ChevronLeft,
+    MapPin,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -272,7 +273,8 @@ const AppointmentsSection = ({ appointments = [] }) => {
                             My Appointments
                         </h3>
                         <p className="text-gray-600 text-sm">
-                            Your latest dental appointments ({appointments.length} total)
+                            Your latest dental appointments (
+                            {appointments.length} total)
                         </p>
                     </div>
                 </div>
@@ -286,7 +288,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    onClick={() =>
+                                        handlePageChange(currentPage - 1)
+                                    }
                                     disabled={currentPage === 1}
                                     className="w-8 h-8 p-0"
                                 >
@@ -295,7 +299,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    onClick={() =>
+                                        handlePageChange(currentPage + 1)
+                                    }
                                     disabled={currentPage === totalPages}
                                     className="w-8 h-8 p-0"
                                 >
@@ -311,7 +317,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
             </div>
             <div>
                 {appointments.length > 0 ? (
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         {currentAppointments.map((appointment, index) => (
                             <SlideIn
                                 key={appointment.id}
@@ -351,14 +357,15 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 <Badge
                                                     className={cn(
                                                         getStatusColor(
-                                                            appointment.status?.name
+                                                            appointment.status
+                                                                ?.name
                                                         ),
                                                         "px-3 py-1 text-sm font-semibold"
                                                     )}
                                                     role="status"
                                                     aria-label={`Appointment status: ${
-                                                        appointment.status?.name ||
-                                                        "Unknown"
+                                                        appointment.status
+                                                            ?.name || "Unknown"
                                                     }`}
                                                 >
                                                     {appointment.status?.name ||
@@ -385,10 +392,10 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         </div>
                                     </div>
 
-                                    {/* Enhanced Clinic Information */}
-                                    <div className="mb-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all duration-300 group-hover:scale-105">
+                                    {/* Compact Clinic Information */}
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-blue-200 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                                                 <img
                                                     src={
                                                         appointment.clinic
@@ -407,13 +414,13 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-gray-900 text-xl mb-1">
+                                                <h4 className="font-bold text-gray-900 text-lg mb-1">
                                                     {appointment.clinic?.name ||
                                                         "Dental Clinic"}
                                                 </h4>
                                                 <div className="flex items-center gap-2 text-gray-600">
-                                                    <MapPin className="w-4 h-4 text-blue-500" />
-                                                    <p className="text-sm line-clamp-1">
+                                                    <MapPin className="w-3 h-3 text-blue-500" />
+                                                    <p className="text-xs line-clamp-1">
                                                         {appointment.clinic
                                                             ?.street_address ||
                                                             "Address not available"}
@@ -423,15 +430,15 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         </div>
                                     </div>
 
-                                    {/* Enhanced Date and Time Information */}
-                                    <div className="bg-gradient-to-r from-white/80 to-blue-50/50 rounded-2xl p-6 mb-6 border border-blue-200/50 shadow-sm">
+                                    {/* Compact Date and Time Information */}
+                                    <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200 shadow-sm">
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                                                    <Calendar className="w-6 h-6 text-white" />
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                                                    <Calendar className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 text-lg">
+                                                    <p className="font-bold text-gray-900 text-base">
                                                         {new Date(
                                                             appointment.scheduled_at
                                                         ).toLocaleDateString(
@@ -445,7 +452,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         )}
                                                     </p>
                                                     <div className="flex items-center gap-2 text-gray-600">
-                                                        <Clock className="w-4 h-4 text-purple-500" />
+                                                        <Clock className="w-3 h-3 text-purple-500" />
                                                         <span className="text-sm font-medium">
                                                             {new Date(
                                                                 appointment.scheduled_at
@@ -461,82 +468,98 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-2xl font-bold text-purple-600">
-                                                    {new Date(appointment.scheduled_at).getDate()}
+                                                <div className="text-xl font-bold text-purple-600">
+                                                    {new Date(
+                                                        appointment.scheduled_at
+                                                    ).getDate()}
                                                 </div>
                                                 <div className="text-xs text-gray-500 uppercase">
-                                                    {new Date(appointment.scheduled_at).toLocaleDateString("en-US", { month: "short" })}
+                                                    {new Date(
+                                                        appointment.scheduled_at
+                                                    ).toLocaleDateString(
+                                                        "en-US",
+                                                        { month: "short" }
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Enhanced Additional Information */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    {/* Compact Additional Information */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                                         {appointment.dentist && (
-                                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200/50">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                                                        <User className="w-4 h-4 text-white" />
+                                            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-md flex items-center justify-center">
+                                                        <User className="w-3 h-3 text-white" />
                                                     </div>
                                                     <div>
                                                         <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
                                                             Dentist
                                                         </p>
                                                         <p className="text-sm font-bold text-gray-900">
-                                                            Dr. {appointment.dentist.name}
+                                                            Dr.{" "}
+                                                            {
+                                                                appointment
+                                                                    .dentist
+                                                                    .name
+                                                            }
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
                                         {appointment.reason && (
-                                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200/50">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                                                        <FileText className="w-4 h-4 text-white" />
+                                            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                                                <div className="flex items-start gap-2">
+                                                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-md flex items-center justify-center">
+                                                        <FileText className="w-3 h-3 text-white" />
                                                     </div>
                                                     <div className="flex-1">
                                                         <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
                                                             Reason
                                                         </p>
-                                                        <p className="text-sm text-gray-900 line-clamp-2">{appointment.reason}</p>
+                                                        <p className="text-sm text-gray-900 line-clamp-2">
+                                                            {appointment.reason}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Enhanced Notes Section */}
+                                    {/* Compact Notes Section */}
                                     {formatAppointmentNotes(
                                         appointment.notes
                                     ) && (
-                                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 mb-6 border border-yellow-200/50">
-                                            <div className="flex items-start gap-3">
-                                                <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center">
-                                                    <AlertCircle className="w-4 h-4 text-white" />
+                                        <div className="bg-white rounded-lg p-3 mb-4 border border-yellow-200 shadow-sm">
+                                            <div className="flex items-start gap-2">
+                                                <div className="w-6 h-6 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-md flex items-center justify-center">
+                                                    <AlertCircle className="w-3 h-3 text-white" />
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">
                                                         Notes
                                                     </p>
-                                                    <p className="text-sm font-medium text-gray-900">{formatAppointmentNotes(
-                                                        appointment.notes
-                                                    )}</p>
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        {formatAppointmentNotes(
+                                                            appointment.notes
+                                                        )}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* Enhanced Action Buttons */}
-                                    <div className="flex items-center justify-between pt-6 border-t border-gray-200/50">
-                                        <div className="flex items-center gap-3">
+                                    {/* Compact Action Buttons */}
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
+                                        <div className="flex items-center gap-2">
                                             {appointment.status?.name?.toLowerCase() ===
                                                 "pending" && (
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-xl font-semibold"
+                                                    className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg text-xs font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleCancelAppointment(
@@ -550,7 +573,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         appointment.scheduled_at
                                                     ).toLocaleDateString()}`}
                                                 >
-                                                    <XCircle className="w-4 h-4" />
+                                                    <XCircle className="w-3 h-3" />
                                                     Cancel
                                                 </Button>
                                             )}
@@ -559,7 +582,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 rounded-xl font-semibold"
+                                                    className="flex items-center gap-1 px-3 py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 rounded-lg text-xs font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleRescheduleAppointment(
@@ -573,7 +596,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         appointment.scheduled_at
                                                     ).toLocaleDateString()}`}
                                                 >
-                                                    <Clock className="w-4 h-4" />
+                                                    <Clock className="w-3 h-3" />
                                                     Reschedule
                                                 </Button>
                                             )}
@@ -581,7 +604,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="flex items-center gap-2 px-6 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-xl font-semibold"
+                                            className="flex items-center gap-1 px-4 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-lg text-xs font-semibold"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleViewDetails(appointment);
@@ -593,7 +616,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 appointment.scheduled_at
                                             ).toLocaleDateString()}`}
                                         >
-                                            <Eye className="w-4 h-4" />
+                                            <Eye className="w-3 h-3" />
                                             View Details
                                         </Button>
                                     </div>
@@ -626,13 +649,17 @@ const AppointmentsSection = ({ appointments = [] }) => {
                     <div className="mt-8 pt-6 border-t border-gray-200/50">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-600">
-                                Showing {startIndex + 1} to {Math.min(endIndex, appointments.length)} of {appointments.length} appointments
+                                Showing {startIndex + 1} to{" "}
+                                {Math.min(endIndex, appointments.length)} of{" "}
+                                {appointments.length} appointments
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    onClick={() =>
+                                        handlePageChange(currentPage - 1)
+                                    }
                                     disabled={currentPage === 1}
                                     className="flex items-center gap-2"
                                 >
@@ -640,12 +667,21 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     Previous
                                 </Button>
                                 <div className="flex items-center gap-1">
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    {Array.from(
+                                        { length: totalPages },
+                                        (_, i) => i + 1
+                                    ).map((page) => (
                                         <Button
                                             key={page}
-                                            variant={page === currentPage ? "default" : "outline"}
+                                            variant={
+                                                page === currentPage
+                                                    ? "default"
+                                                    : "outline"
+                                            }
                                             size="sm"
-                                            onClick={() => handlePageChange(page)}
+                                            onClick={() =>
+                                                handlePageChange(page)
+                                            }
                                             className={`w-8 h-8 p-0 ${
                                                 page === currentPage
                                                     ? "bg-blue-500 text-white"
@@ -659,7 +695,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    onClick={() =>
+                                        handlePageChange(currentPage + 1)
+                                    }
                                     disabled={currentPage === totalPages}
                                     className="flex items-center gap-2"
                                 >
@@ -797,7 +835,7 @@ const QuickActions = ({ loading = false }) => {
                         >
                             <Link href={action.href}>
                                 <div
-                                    className={`relative flex flex-col items-center gap-4 px-6 py-8 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-xl border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[140px] justify-center`}
+                                    className={`relative flex flex-col items-center gap-3 px-4 py-5 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[100px] justify-center`}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`${action.name} - ${action.description}`}
@@ -805,7 +843,7 @@ const QuickActions = ({ loading = false }) => {
                                     {/* Badge */}
                                     {action.badge && (
                                         <div
-                                            className={`absolute -top-2 -right-2 px-3 py-1 text-xs font-bold rounded-full ${action.badgeColor} shadow-lg z-10`}
+                                            className={`absolute -top-1 -right-1 px-2 py-1 text-xs font-bold rounded-full ${action.badgeColor} shadow-md z-10`}
                                         >
                                             {action.badge}
                                         </div>
@@ -813,25 +851,25 @@ const QuickActions = ({ loading = false }) => {
 
                                     {/* Icon */}
                                     <div
-                                        className={`w-16 h-16 ${action.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-xl`}
+                                        className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}
                                         aria-hidden="true"
                                     >
-                                        <Icon className="w-8 h-8 text-white" />
+                                        <Icon className="w-6 h-6 text-white" />
                                     </div>
 
                                     {/* Content */}
-                                    <div className="text-center space-y-2">
-                                        <h4 className="font-bold text-base mb-2">
+                                    <div className="text-center space-y-1">
+                                        <h4 className="font-bold text-sm mb-1">
                                             {action.name}
                                         </h4>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                        <p className="text-xs text-gray-500 leading-tight">
                                             {action.description}
                                         </p>
                                     </div>
 
                                     {/* Hover indicator */}
                                     <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-1">
-                                        <ArrowRight className="w-5 h-5 text-gray-400" />
+                                        <ArrowRight className="w-4 h-4 text-gray-400" />
                                     </div>
                                 </div>
                             </Link>
