@@ -50,10 +50,10 @@ class PatientTreatmentController extends Controller
         ]);
     }
 
-        /**
+    /**
      * Show specific treatment details
      */
-    public function show($id)
+public function show($id)
     {
         $user = Auth::user();
 

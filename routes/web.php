@@ -133,7 +133,7 @@ Route::middleware('auth')->group(function () {
 
         // Patient Treatment Routes
         Route::get('/treatments', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'index'])->name('treatments.index');
-        Route::get('/treatments/{treatment}', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'show'])->name('treatments.show');
+        Route::get('/treatments/{id}', [App\Http\Controllers\Patient\PatientTreatmentController::class, 'show'])->name('treatments.show');
 
         // Patient Appointment Management Routes
         Route::get('/appointments/{appointment}', [App\Http\Controllers\Patient\PatientDashboardController::class, 'showAppointment'])->name('appointments.show');
