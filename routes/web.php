@@ -116,7 +116,7 @@ Route::get('/dashboard', function () {
     });
 
     // Patient Dashboard (requires authentication)
-    Route::get('/patient/dashboard', [App\Http\Controllers\Public\PatientRegistrationController::class, 'dashboard'])
+    Route::get('/patient/dashboard', [App\Http\Controllers\Patient\PatientDashboardController::class, 'index'])
         ->middleware(['auth', 'verified'])
         ->name('patient.dashboard');
 

@@ -939,41 +939,12 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                             Treatment History
                         </h3>
                         <p className="text-gray-500 text-sm">
-                            Your dental treatment records ({treatments.length} total)
+                            Your dental treatment records
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    {totalPages > 1 && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">
-                                Page {currentPage} of {totalPages}
-                            </span>
-                            <div className="flex gap-1">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="w-8 h-8 p-0"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className="w-8 h-8 p-0"
-                                >
-                                    <ChevronRight className="w-4 h-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                    <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-                        <BarChart3 className="w-4 h-4 text-purple-600" />
-                    </div>
+                <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4 text-purple-600" />
                 </div>
             </div>
             <div>
@@ -988,7 +959,9 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                 <div
                                     className="bg-white rounded-2xl border-2 border-gray-200 p-6 hover:shadow-xl hover:border-purple-300 transition-all duration-300 group cursor-pointer shadow-lg"
                                     role="article"
-                                    aria-label={`Treatment: ${treatment.name || "Treatment"} at ${treatment.clinic?.name || "Clinic"}`}
+                                    aria-label={`Treatment: ${
+                                        treatment.name || "Treatment"
+                                    } at ${treatment.clinic?.name || "Clinic"}`}
                                 >
                                     {/* Enhanced Header with Status and Visual Elements */}
                                     <div className="flex items-center justify-between mb-6">
@@ -997,24 +970,33 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                 <div
                                                     className={cn(
                                                         "w-4 h-4 rounded-full shadow-sm",
-                                                        treatment.status?.toLowerCase() === "completed"
+                                                        treatment.status?.toLowerCase() ===
+                                                            "completed"
                                                             ? "bg-green-500"
-                                                            : treatment.status?.toLowerCase() === "in_progress"
+                                                            : treatment.status?.toLowerCase() ===
+                                                              "in_progress"
                                                             ? "bg-blue-500"
-                                                            : treatment.status?.toLowerCase() === "scheduled"
+                                                            : treatment.status?.toLowerCase() ===
+                                                              "scheduled"
                                                             ? "bg-yellow-500"
                                                             : "bg-red-500"
                                                     )}
                                                 />
                                                 <Badge
                                                     className={cn(
-                                                        getTreatmentStatusColor(treatment.status),
+                                                        getTreatmentStatusColor(
+                                                            treatment.status
+                                                        ),
                                                         "px-3 py-1 text-sm font-semibold"
                                                     )}
                                                     role="status"
-                                                    aria-label={`Treatment status: ${treatment.status || "Unknown"}`}
+                                                    aria-label={`Treatment status: ${
+                                                        treatment.status ||
+                                                        "Unknown"
+                                                    }`}
                                                 >
-                                                    {treatment.status || "Unknown"}
+                                                    {treatment.status ||
+                                                        "Unknown"}
                                                 </Badge>
                                             </div>
                                         </div>
@@ -1029,24 +1011,32 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                             <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-purple-200 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                                                 <img
                                                     src={
-                                                        treatment.clinic?.logo_url ||
+                                                        treatment.clinic
+                                                            ?.logo_url ||
                                                         "/images/clinic-logo.png"
                                                     }
-                                                    alt={`${treatment.clinic?.name || "Clinic"} Logo`}
+                                                    alt={`${
+                                                        treatment.clinic
+                                                            ?.name || "Clinic"
+                                                    } Logo`}
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
-                                                        e.target.src = "/images/clinic-logo.png";
+                                                        e.target.src =
+                                                            "/images/clinic-logo.png";
                                                     }}
                                                 />
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-bold text-gray-900 text-lg mb-1">
-                                                    {treatment.clinic?.name || "Dental Clinic"}
+                                                    {treatment.clinic?.name ||
+                                                        "Dental Clinic"}
                                                 </h4>
                                                 <div className="flex items-center gap-2 text-gray-600">
                                                     <MapPin className="w-3 h-3 text-purple-500" />
                                                     <p className="text-xs line-clamp-1">
-                                                        {treatment.clinic?.street_address || "Address not available"}
+                                                        {treatment.clinic
+                                                            ?.street_address ||
+                                                            "Address not available"}
                                                     </p>
                                                 </div>
                                             </div>
@@ -1062,19 +1052,24 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-gray-900 text-base">
-                                                        {treatment.name || "Dental Treatment"}
+                                                        {treatment.name ||
+                                                            "Dental Treatment"}
                                                     </p>
                                                     <div className="flex items-center gap-2 text-gray-600">
                                                         <FileText className="w-3 h-3 text-violet-500" />
                                                         <span className="text-sm font-medium">
-                                                            {treatment.service?.name || "General Treatment"}
+                                                            {treatment.service
+                                                                ?.name ||
+                                                                "General Treatment"}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-xl font-bold text-violet-600">
-                                                    {treatment.cost ? `₱${treatment.cost.toLocaleString()}` : "N/A"}
+                                                    {treatment.cost
+                                                        ? `₱${treatment.cost.toLocaleString()}`
+                                                        : "N/A"}
                                                 </div>
                                                 <div className="text-xs text-gray-500 uppercase">
                                                     Cost
@@ -1096,7 +1091,12 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                             Dentist
                                                         </p>
                                                         <p className="text-sm font-bold text-gray-900">
-                                                            Dr. {treatment.dentist.name}
+                                                            Dr.{" "}
+                                                            {
+                                                                treatment
+                                                                    .dentist
+                                                                    .name
+                                                            }
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1113,11 +1113,16 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                             Date
                                                         </p>
                                                         <p className="text-sm font-bold text-gray-900">
-                                                            {new Date(treatment.start_date).toLocaleDateString("en-US", {
-                                                                year: "numeric",
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            })}
+                                                            {new Date(
+                                                                treatment.start_date
+                                                            ).toLocaleDateString(
+                                                                "en-US",
+                                                                {
+                                                                    year: "numeric",
+                                                                    month: "short",
+                                                                    day: "numeric",
+                                                                }
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1147,13 +1152,22 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                     {/* Compact Action Buttons */}
                                     <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
                                         <div className="flex items-center gap-2">
-                                            {treatment.id && treatment.id > 0 ? (
-                                                <Link href={route("patient.treatments.show", treatment.id)}>
+                                            {treatment.id &&
+                                            treatment.id > 0 ? (
+                                                <Link
+                                                    href={route(
+                                                        "patient.treatments.show",
+                                                        treatment.id
+                                                    )}
+                                                >
                                                     <Button
                                                         size="sm"
                                                         variant="outline"
                                                         className="flex items-center gap-1 px-4 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-lg text-xs font-semibold"
-                                                        aria-label={`View details for treatment: ${treatment.name || "Treatment"}`}
+                                                        aria-label={`View details for treatment: ${
+                                                            treatment.name ||
+                                                            "Treatment"
+                                                        }`}
                                                     >
                                                         <Eye className="w-3 h-3" />
                                                         View Details
@@ -1190,7 +1204,8 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                             No Treatments Yet
                         </h4>
                         <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-                            Your treatment history will appear here after your first dental visit!
+                            Your treatment history will appear here after your
+                            first dental visit!
                         </p>
                         <Link href="/clinics">
                             <Button className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
@@ -1206,13 +1221,17 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                     <div className="mt-8 pt-6 border-t border-gray-200/50">
                         <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-600">
-                                Showing {startIndex + 1} to {Math.min(endIndex, treatments.length)} of {treatments.length} treatments
+                                Showing {startIndex + 1} to{" "}
+                                {Math.min(endIndex, treatments.length)} of{" "}
+                                {treatments.length} treatments
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    onClick={() =>
+                                        handlePageChange(currentPage - 1)
+                                    }
                                     disabled={currentPage === 1}
                                     className="flex items-center gap-2"
                                 >
@@ -1220,12 +1239,21 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                     Previous
                                 </Button>
                                 <div className="flex items-center gap-1">
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    {Array.from(
+                                        { length: totalPages },
+                                        (_, i) => i + 1
+                                    ).map((page) => (
                                         <Button
                                             key={page}
-                                            variant={page === currentPage ? "default" : "outline"}
+                                            variant={
+                                                page === currentPage
+                                                    ? "default"
+                                                    : "outline"
+                                            }
                                             size="sm"
-                                            onClick={() => handlePageChange(page)}
+                                            onClick={() =>
+                                                handlePageChange(page)
+                                            }
                                             className={`w-8 h-8 p-0 ${
                                                 page === currentPage
                                                     ? "bg-violet-500 text-white"
@@ -1239,7 +1267,9 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    onClick={() =>
+                                        handlePageChange(currentPage + 1)
+                                    }
                                     disabled={currentPage === totalPages}
                                     className="flex items-center gap-2"
                                 >

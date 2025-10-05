@@ -43,6 +43,15 @@ class PatientDashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Debug: Log the data being fetched
+        \Log::info('PatientDashboard Debug', [
+            'user_id' => $user->id,
+            'patients_count' => $patients->count(),
+            'patient_ids' => $patients->pluck('id')->toArray(),
+            'treatments_count' => $treatments->count(),
+            'treatments_data' => $treatments->toArray(),
+        ]);
+
         // Get clinic records for statistics using PatientLinkingService
         $patientLinkingService = new \App\Services\PatientLinkingService();
         $clinicRecords = $patientLinkingService->getPatientClinicRecords($user);
