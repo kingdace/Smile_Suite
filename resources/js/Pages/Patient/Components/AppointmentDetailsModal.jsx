@@ -56,7 +56,7 @@ export default function AppointmentDetailsModal({
     };
 
     return (
-        <div 
+        <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
             role="dialog"
             aria-modal="true"
@@ -73,17 +73,30 @@ export default function AppointmentDetailsModal({
                 </button>
 
                 <div className="text-center mb-6">
-                    <h2 id="appointment-details-title" className="text-2xl font-bold text-gray-900 mb-2">
+                    <h2
+                        id="appointment-details-title"
+                        className="text-2xl font-bold text-gray-900 mb-2"
+                    >
                         Appointment Details
                     </h2>
-                    <p id="appointment-details-description" className="text-gray-600">
+                    <p
+                        id="appointment-details-description"
+                        className="text-gray-600"
+                    >
                         View your appointment information
                     </p>
                 </div>
 
                 {loading ? (
-                    <div className="flex items-center justify-center py-8" role="status" aria-live="polite">
-                        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+                    <div
+                        className="flex items-center justify-center py-8"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <div
+                            className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"
+                            aria-hidden="true"
+                        ></div>
                         <span className="ml-2 text-gray-600">
                             Loading appointment details...
                         </span>
