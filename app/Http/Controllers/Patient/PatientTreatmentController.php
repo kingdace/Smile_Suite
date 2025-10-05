@@ -17,6 +17,14 @@ class PatientTreatmentController extends Controller
     {
         $user = Auth::user();
 
+        // First, let's check if the user has any patient records
+        $patients = \App\Models\Patient::where('user_id', $user->id)->get();
+        \Log::info('PatientTreatmentController::index - User patients', [
+            'user_id' => $user->id,
+            'patients_count' => $patients->count(),
+            'patients_data' => $patients->toArray(),
+        ]);
+
         // Get all treatments for this patient across all clinics
         $treatments = \App\Models\Treatment::whereHas('patient', function ($query) use ($user) {
             $query->where('user_id', $user->id);
@@ -24,6 +32,12 @@ class PatientTreatmentController extends Controller
         ->with(['clinic', 'service', 'dentist', 'appointment'])
         ->orderBy('created_at', 'desc')
         ->paginate(10);
+
+        \Log::info('PatientTreatmentController::index - Treatments found', [
+            'user_id' => $user->id,
+            'treatments_count' => $treatments->count(),
+            'treatments_data' => $treatments->toArray(),
+        ]);
 
         // Get connected clinics for statistics using PatientLinkingService
         $patientLinkingService = new \App\Services\PatientLinkingService();
@@ -50,6 +64,22 @@ class PatientTreatmentController extends Controller
             if ($treatmentId <= 0) {
                 throw new \Exception('Invalid treatment ID');
             }
+
+            // First, let's check if the user has any patient records
+            $patients = \App\Models\Patient::where('user_id', $user->id)->get();
+            \Log::info('PatientTreatmentController::show - User patients', [
+                'user_id' => $user->id,
+                'patients_count' => $patients->count(),
+                'patients_data' => $patients->toArray(),
+            ]);
+
+            // Check if there are any treatments for this user's patients
+            $allTreatments = \App\Models\Treatment::whereIn('patient_id', $patients->pluck('id'))->get();
+            \Log::info('PatientTreatmentController::show - All treatments for user', [
+                'user_id' => $user->id,
+                'treatments_count' => $allTreatments->count(),
+                'treatments_data' => $allTreatments->toArray(),
+            ]);
 
             $treatment = \App\Models\Treatment::whereHas('patient', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
