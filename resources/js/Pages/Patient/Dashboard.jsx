@@ -267,167 +267,174 @@ const AppointmentsSection = ({ appointments = [] }) => {
             <div>
                 {appointments.length > 0 ? (
                     <div className="space-y-4">
-                        {appointments.map((appointment) => (
-                            <div
-                                key={appointment.id}
-                                className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4 hover:shadow-md transition-all duration-300 group"
-                                role="article"
-                                aria-label={`Appointment at ${
-                                    appointment.clinic?.name || "Clinic"
-                                } on ${new Date(
-                                    appointment.scheduled_at
-                                ).toLocaleDateString()}`}
-                            >
-                                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                                    <div className="flex-1">
-                                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                                            <span aria-hidden="true">
-                                                {getStatusIcon(
-                                                    appointment.status?.name
-                                                )}
-                                            </span>
+                        {appointments.map((appointment, index) => (
+                            <SlideIn key={appointment.id} direction="up" delay={index * 100}>
+                                <div
+                                    className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl border border-gray-200/50 p-6 hover:shadow-xl hover:border-blue-300/50 transition-all duration-300 group cursor-pointer"
+                                    role="article"
+                                    aria-label={`Appointment at ${
+                                        appointment.clinic?.name || "Clinic"
+                                    } on ${new Date(
+                                        appointment.scheduled_at
+                                    ).toLocaleDateString()}`}
+                                    onClick={() => handleViewDetails(appointment)}
+                                >
+                                    {/* Header with Status and Service */}
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={cn(
+                                                "w-3 h-3 rounded-full",
+                                                appointment.status?.name?.toLowerCase() === "confirmed" || appointment.status?.name?.toLowerCase() === "pending" ? "bg-blue-500" :
+                                                appointment.status?.name?.toLowerCase() === "completed" ? "bg-green-500" :
+                                                "bg-red-500"
+                                            )} />
                                             <Badge
-                                                className={getStatusColor(
-                                                    appointment.status?.name
-                                                )}
+                                                className={getStatusColor(appointment.status?.name)}
                                                 role="status"
-                                                aria-label={`Appointment status: ${
-                                                    appointment.status?.name ||
-                                                    "Unknown"
-                                                }`}
+                                                aria-label={`Appointment status: ${appointment.status?.name || "Unknown"}`}
                                             >
-                                                {appointment.status?.name ||
-                                                    "Unknown"}
+                                                {appointment.status?.name || "Unknown"}
                                             </Badge>
                                             {/* Show special indicators for patient actions */}
-                                            {appointment.status?.name ===
-                                                "Pending Reschedule" && (
+                                            {appointment.status?.name === "Pending Reschedule" && (
                                                 <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-orange-100 text-orange-700 border-orange-300">
                                                     Awaiting Clinic Response
                                                 </Badge>
                                             )}
-                                            {appointment.status?.name ===
-                                                "Cancelled" &&
-                                                appointment.cancelled_at && (
-                                                    <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-red-100 text-red-700 border-red-300">
-                                                        You Cancelled
-                                                    </Badge>
-                                                )}
+                                            {appointment.status?.name === "Cancelled" && appointment.cancelled_at && (
+                                                <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-red-100 text-red-700 border-red-300">
+                                                    You Cancelled
+                                                </Badge>
+                                            )}
                                         </div>
-                                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
-                                            {appointment.clinic?.name ||
-                                                "Clinic"}
-                                        </h4>
-                                        <time
-                                            className="text-xs sm:text-sm text-gray-600 mb-1 block"
-                                            dateTime={appointment.scheduled_at}
-                                            aria-label={`Scheduled for ${new Date(
-                                                appointment.scheduled_at
-                                            ).toLocaleDateString()} at ${new Date(
-                                                appointment.scheduled_at
-                                            ).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}`}
-                                        >
-                                            {new Date(
-                                                appointment.scheduled_at
-                                            ).toLocaleDateString()}{" "}
-                                            at{" "}
-                                            {new Date(
-                                                appointment.scheduled_at
-                                            ).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </time>
-                                        <p className="text-xs sm:text-sm text-gray-500">
-                                            {appointment.reason ||
-                                                "No reason specified"}
-                                        </p>
-                                        {formatAppointmentNotes(
-                                            appointment.notes
-                                        ) && (
-                                            <div className="mt-2">
-                                                <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 rounded-lg p-2 border border-blue-200/50">
-                                                    <div className="flex items-start gap-2">
-                                                        <FileText className="h-3 w-3 text-blue-500 mt-0.5 shrink-0" />
-                                                        <p className="text-xs text-gray-600 leading-relaxed">
-                                                            {formatAppointmentNotes(
-                                                                appointment.notes
-                                                            )}
-                                                        </p>
-                                                    </div>
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                                        </div>
+                                    </div>
+
+                                    {/* Clinic Information */}
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                                <Building2 className="w-5 h-5 text-white" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 text-lg">
+                                                    {appointment.clinic?.name || "Dental Clinic"}
+                                                </h4>
+                                                <p className="text-gray-600 text-sm">
+                                                    {appointment.clinic?.address || "Clinic Address"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Date and Time Information */}
+                                    <div className="bg-white/60 rounded-xl p-4 mb-4 border border-gray-100/50">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                                <Calendar className="w-4 h-4 text-white" />
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-gray-900">
+                                                    {new Date(appointment.scheduled_at).toLocaleDateString("en-US", {
+                                                        weekday: "long",
+                                                        year: "numeric",
+                                                        month: "long",
+                                                        day: "numeric",
+                                                    })}
+                                                </p>
+                                                <div className="flex items-center gap-2 text-gray-600">
+                                                    <Clock className="w-4 h-4" />
+                                                    <span className="text-sm">
+                                                        {new Date(appointment.scheduled_at).toLocaleTimeString("en-US", {
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                        })}
+                                                    </span>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Additional Information */}
+                                    <div className="space-y-2 mb-4">
+                                        {appointment.dentist && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <User className="w-4 h-4" />
+                                                <span>Dr. {appointment.dentist.name}</span>
+                                            </div>
+                                        )}
+                                        {appointment.reason && (
+                                            <div className="flex items-start gap-2 text-sm text-gray-600">
+                                                <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                <span className="line-clamp-2">{appointment.reason}</span>
+                                            </div>
+                                        )}
+                                        {formatAppointmentNotes(appointment.notes) && (
+                                            <div className="flex items-start gap-2 text-sm text-blue-600 bg-blue-50 rounded-lg p-2">
+                                                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                <span className="font-medium">{formatAppointmentNotes(appointment.notes)}</span>
                                             </div>
                                         )}
                                     </div>
-                                    <div
-                                        className="flex flex-row sm:flex-col gap-2"
-                                        role="group"
-                                        aria-label="Appointment actions"
-                                    >
-                                        {appointment.status?.name?.toLowerCase() ===
-                                            "pending" && (
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="text-red-600 hover:text-red-700 text-xs px-3 py-1"
-                                                onClick={() =>
-                                                    handleCancelAppointment(
-                                                        appointment
-                                                    )
-                                                }
-                                                aria-label={`Cancel appointment at ${
-                                                    appointment.clinic?.name ||
-                                                    "Clinic"
-                                                } on ${new Date(
-                                                    appointment.scheduled_at
-                                                ).toLocaleDateString()}`}
-                                            >
-                                                Cancel
-                                            </Button>
-                                        )}
-                                        {appointment.status?.name?.toLowerCase() ===
-                                            "confirmed" && (
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="text-blue-600 hover:text-blue-700 text-xs px-3 py-1"
-                                                onClick={() =>
-                                                    handleRescheduleAppointment(
-                                                        appointment
-                                                    )
-                                                }
-                                                aria-label={`Reschedule appointment at ${
-                                                    appointment.clinic?.name ||
-                                                    "Clinic"
-                                                } on ${new Date(
-                                                    appointment.scheduled_at
-                                                ).toLocaleDateString()}`}
-                                            >
-                                                Reschedule
-                                            </Button>
-                                        )}
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
+                                        <div className="flex items-center gap-2">
+                                            {appointment.status?.name?.toLowerCase() === "pending" && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="text-xs px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleCancelAppointment(appointment);
+                                                    }}
+                                                    aria-label={`Cancel appointment at ${
+                                                        appointment.clinic?.name || "Clinic"
+                                                    } on ${new Date(appointment.scheduled_at).toLocaleDateString()}`}
+                                                >
+                                                    <XCircle className="w-3 h-3 mr-1" />
+                                                    Cancel
+                                                </Button>
+                                            )}
+                                            {appointment.status?.name?.toLowerCase() === "confirmed" && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="text-xs px-3 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRescheduleAppointment(appointment);
+                                                    }}
+                                                    aria-label={`Reschedule appointment at ${
+                                                        appointment.clinic?.name || "Clinic"
+                                                    } on ${new Date(appointment.scheduled_at).toLocaleDateString()}`}
+                                                >
+                                                    <Clock className="w-3 h-3 mr-1" />
+                                                    Reschedule
+                                                </Button>
+                                            )}
+                                        </div>
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="text-xs px-3 py-1"
-                                            onClick={() =>
-                                                handleViewDetails(appointment)
-                                            }
+                                            className="text-xs px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleViewDetails(appointment);
+                                            }}
                                             aria-label={`View details for appointment at ${
-                                                appointment.clinic?.name ||
-                                                "Clinic"
-                                            } on ${new Date(
-                                                appointment.scheduled_at
-                                            ).toLocaleDateString()}`}
+                                                appointment.clinic?.name || "Clinic"
+                                            } on ${new Date(appointment.scheduled_at).toLocaleDateString()}`}
                                         >
+                                            <Eye className="w-3 h-3 mr-1" />
                                             View Details
                                         </Button>
                                     </div>
                                 </div>
-                            </div>
+                            </SlideIn>
                         ))}
                     </div>
                 ) : (
@@ -868,11 +875,13 @@ export default function PatientDashboard({
     loading = false,
 }) {
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [activeTab, setActiveTab] = useState('overview');
+    const [activeTab, setActiveTab] = useState("overview");
 
     const handleRefresh = () => {
         setIsRefreshing(true);
-        router.reload({ only: ['appointments', 'treatments', 'clinicRecords'] });
+        router.reload({
+            only: ["appointments", "treatments", "clinicRecords"],
+        });
         setTimeout(() => setIsRefreshing(false), 1000);
     };
 
@@ -880,20 +889,42 @@ export default function PatientDashboard({
     const enhancedStats = {
         health: {
             totalTreatments: treatments?.length || 0,
-            completedTreatments: treatments?.filter(t => t.status === 'completed')?.length || 0,
-            upcomingAppointments: appointments?.filter(a => new Date(a.appointment_date) > new Date())?.length || 0,
-            healthScore: treatments?.length > 0 ? Math.round((treatments.filter(t => t.status === 'completed').length / treatments.length) * 100) : 0
+            completedTreatments:
+                treatments?.filter((t) => t.status === "completed")?.length ||
+                0,
+            upcomingAppointments:
+                appointments?.filter(
+                    (a) => new Date(a.appointment_date) > new Date()
+                )?.length || 0,
+            healthScore:
+                treatments?.length > 0
+                    ? Math.round(
+                          (treatments.filter((t) => t.status === "completed")
+                              .length /
+                              treatments.length) *
+                              100
+                      )
+                    : 0,
         },
         appointments: {
             total: appointments?.length || 0,
-            upcoming: appointments?.filter(a => new Date(a.appointment_date) > new Date())?.length || 0,
-            completed: appointments?.filter(a => a.status === 'completed')?.length || 0,
-            cancelled: appointments?.filter(a => a.status === 'cancelled')?.length || 0
+            upcoming:
+                appointments?.filter(
+                    (a) => new Date(a.appointment_date) > new Date()
+                )?.length || 0,
+            completed:
+                appointments?.filter((a) => a.status === "completed")?.length ||
+                0,
+            cancelled:
+                appointments?.filter((a) => a.status === "cancelled")?.length ||
+                0,
         },
         clinics: {
             total: clinicRecords?.length || 0,
-            active: clinicRecords?.filter(c => c.status === 'active')?.length || 0
-        }
+            active:
+                clinicRecords?.filter((c) => c.status === "active")?.length ||
+                0,
+        },
     };
 
     return (
