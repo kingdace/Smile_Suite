@@ -15,55 +15,18 @@ import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
-import InputError from "@/Components/InputError";
-import {
-    FormField,
-    ValidatedInput,
-    ValidatedTextarea,
-    ErrorMessage,
-    SuccessMessage,
-    FormStatus,
-    FormProgress,
-    FormFieldGroup,
-} from "@/Components/ui/form-validation";
-import { usePatientFormValidation } from "@/hooks/useFormValidation";
+import { SuccessMessage } from "@/Components/ui/form-validation";
 import { FadeIn, SlideIn } from "@/Components/ui/loading";
 
 export default function PatientProfileEdit({ user, patients, flash }) {
     const { data, setData, put, processing, errors } = useForm({
         name: user.name || "",
         phone_number: user.phone_number || "",
-        email: user.email || "",
-        date_of_birth: user.date_of_birth || "",
-        address: user.address || "",
-        city: user.city || "",
-        state: user.state || "",
-        zip_code: user.zip_code || "",
-        emergency_contact_name: user.emergency_contact_name || "",
-        emergency_contact_phone: user.emergency_contact_phone || "",
-        medical_history: user.medical_history || "",
-        allergies: user.allergies || "",
-        medications: user.medications || "",
     });
-
-    const {
-        values,
-        errors: validationErrors,
-        touched,
-        isValid,
-        handleChange,
-        handleBlur,
-        handleSubmit: validateAndSubmit,
-        formStats,
-    } = usePatientFormValidation(data);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        validateAndSubmit(async (validatedData) => {
-            put(route("patient.profile.update"), {
-                data: validatedData,
-            });
-        });
+        put(route("patient.profile.update"));
     };
 
     const [showSuccess, setShowSuccess] = useState(false);
@@ -85,17 +48,29 @@ export default function PatientProfileEdit({ user, patients, flash }) {
                     {/* Page Header */}
                     <div className="mb-8">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <h2 className="text-3xl font-bold text-gray-900">
+                            <div className="flex-1">
+                                <Link href={route("patient.profile")}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex items-center gap-2 hover:bg-gray-50"
+                                    >
+                                        <ArrowLeft className="w-4 h-4" />
+                                        Back to Profile
+                                    </Button>
+                                </Link>
+                            </div>
+                            <div className="flex-1 text-center">
+                                <h2 className="text-2xl font-bold text-gray-900">
                                     Edit Profile
                                 </h2>
-                                <p className="text-gray-600 mt-2 text-lg">
+                                <p className="text-gray-600 text-sm">
                                     Update your account information
                                 </p>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-6 py-3 rounded-xl border border-blue-200/50 shadow-lg">
-                                    <span className="text-sm font-bold text-gray-700">
+                            <div className="flex-1 flex justify-end">
+                                <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-blue-200/50 shadow-sm">
+                                    <span className="text-xs font-bold text-gray-700">
                                         {new Date().toLocaleDateString(
                                             "en-US",
                                             {
@@ -107,15 +82,6 @@ export default function PatientProfileEdit({ user, patients, flash }) {
                                         )}
                                     </span>
                                 </div>
-                                <Link href={route("patient.profile")}>
-                                    <Button
-                                        variant="outline"
-                                        className="flex items-center gap-2"
-                                    >
-                                        <ArrowLeft className="w-4 h-4" />
-                                        Back to Profile
-                                    </Button>
-                                </Link>
                             </div>
                         </div>
                     </div>
@@ -125,13 +91,6 @@ export default function PatientProfileEdit({ user, patients, flash }) {
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Left side (Main form) */}
                                 <div className="lg:col-span-2 space-y-8">
-                                    {/* Form Progress */}
-                                    <FormProgress
-                                        current={formStats.completedFields}
-                                        total={formStats.totalFields}
-                                        className="mb-6"
-                                    />
-
                                     {/* Success Message */}
                                     {showSuccess && (
                                         <SuccessMessage
@@ -142,8 +101,8 @@ export default function PatientProfileEdit({ user, patients, flash }) {
 
                                     {/* Personal Information */}
                                     <SlideIn direction="up" delay={100}>
-                                        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl">
-                                            <CardHeader className="bg-gradient-to-r from-blue-50/80 to-cyan-50/80 border-b border-blue-100/50">
+                                        <Card className="bg-white border-0 shadow-lg">
+                                            <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-100">
                                                 <div className="flex items-center justify-between">
                                                     <div>
                                                         <h3 className="text-lg font-bold text-gray-900">
@@ -160,120 +119,88 @@ export default function PatientProfileEdit({ user, patients, flash }) {
                                                 </div>
                                             </CardHeader>
                                             <CardContent className="p-6">
-                                                <FormFieldGroup>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                        <FormField
-                                                            label="Full Name"
-                                                            required
-                                                            error={
-                                                                touched.name
-                                                                    ? validationErrors.name
-                                                                    : null
+                                                <div className="space-y-6">
+                                                    <div>
+                                                        <Label
+                                                            htmlFor="name"
+                                                            className="text-sm font-semibold text-gray-700 mb-2 block"
+                                                        >
+                                                            Full Name *
+                                                        </Label>
+                                                        <Input
+                                                            id="name"
+                                                            type="text"
+                                                            value={data.name}
+                                                            onChange={(e) =>
+                                                                setData(
+                                                                    "name",
+                                                                    e.target
+                                                                        .value
+                                                                )
                                                             }
-                                                        >
-                                                            <ValidatedInput
-                                                                id="name"
-                                                                type="text"
-                                                                value={
-                                                                    values.name
-                                                                }
-                                                                onChange={(
-                                                                    e
-                                                                ) => {
-                                                                    setData(
-                                                                        "name",
-                                                                        e.target
-                                                                            .value
-                                                                    );
-                                                                    handleChange(
-                                                                        "name",
-                                                                        e.target
-                                                                            .value
-                                                                    );
-                                                                }}
-                                                                onBlur={() =>
-                                                                    handleBlur(
-                                                                        "name"
-                                                                    )
-                                                                }
-                                                                placeholder="Enter your full name"
-                                                                error={
-                                                                    touched.name
-                                                                        ? validationErrors.name
-                                                                        : null
-                                                                }
-                                                                success={
-                                                                    touched.name &&
-                                                                    !validationErrors.name &&
-                                                                    values.name
-                                                                }
-                                                            />
-                                                        </FormField>
-
-                                                        <FormField
-                                                            label="Phone Number"
-                                                            required
-                                                            error={
-                                                                touched.phone_number
-                                                                    ? validationErrors.phone_number
-                                                                    : null
-                                                            }
-                                                        >
-                                                            <ValidatedInput
-                                                                id="phone_number"
-                                                                type="tel"
-                                                                value={
-                                                                    values.phone_number
-                                                                }
-                                                                onChange={(
-                                                                    e
-                                                                ) => {
-                                                                    setData(
-                                                                        "phone_number",
-                                                                        e.target
-                                                                            .value
-                                                                    );
-                                                                    handleChange(
-                                                                        "phone_number",
-                                                                        e.target
-                                                                            .value
-                                                                    );
-                                                                }}
-                                                                onBlur={() =>
-                                                                    handleBlur(
-                                                                        "phone_number"
-                                                                    )
-                                                                }
-                                                                placeholder="Enter your phone number"
-                                                                error={
-                                                                    touched.phone_number
-                                                                        ? validationErrors.phone_number
-                                                                        : null
-                                                                }
-                                                                success={
-                                                                    touched.phone_number &&
-                                                                    !validationErrors.phone_number &&
-                                                                    values.phone_number
-                                                                }
-                                                            />
-                                                        </FormField>
-
-                                                        <FormField
-                                                            label="Email Address"
-                                                            description="Email address cannot be changed. Contact support if needed."
-                                                        >
-                                                            <ValidatedInput
-                                                                id="email"
-                                                                type="email"
-                                                                value={
-                                                                    user.email
-                                                                }
-                                                                disabled
-                                                                className="bg-gray-100/50 border-gray-200/50 text-gray-600"
-                                                            />
-                                                        </FormField>
+                                                            placeholder="Enter your full name"
+                                                            className="w-full"
+                                                        />
+                                                        {errors.name && (
+                                                            <p className="text-red-500 text-sm mt-1">
+                                                                {errors.name}
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                </FormFieldGroup>
+
+                                                    <div>
+                                                        <Label
+                                                            htmlFor="phone_number"
+                                                            className="text-sm font-semibold text-gray-700 mb-2 block"
+                                                        >
+                                                            Phone Number *
+                                                        </Label>
+                                                        <Input
+                                                            id="phone_number"
+                                                            type="tel"
+                                                            value={
+                                                                data.phone_number
+                                                            }
+                                                            onChange={(e) =>
+                                                                setData(
+                                                                    "phone_number",
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            placeholder="Enter your phone number"
+                                                            className="w-full"
+                                                        />
+                                                        {errors.phone_number && (
+                                                            <p className="text-red-500 text-sm mt-1">
+                                                                {
+                                                                    errors.phone_number
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    <div>
+                                                        <Label
+                                                            htmlFor="email"
+                                                            className="text-sm font-semibold text-gray-700 mb-2 block"
+                                                        >
+                                                            Email Address
+                                                        </Label>
+                                                        <Input
+                                                            id="email"
+                                                            type="email"
+                                                            value={user.email}
+                                                            disabled
+                                                            className="w-full bg-gray-100 border-gray-200 text-gray-600"
+                                                        />
+                                                        <p className="text-gray-500 text-xs mt-1">
+                                                            Email address cannot
+                                                            be changed. Contact
+                                                            support if needed.
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </CardContent>
                                         </Card>
                                     </SlideIn>

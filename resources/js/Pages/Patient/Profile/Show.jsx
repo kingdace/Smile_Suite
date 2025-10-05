@@ -18,6 +18,7 @@ import {
     UserCheck,
     Award,
     TrendingUp,
+    ArrowLeft,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
 import { Button } from "@/Components/ui/button";
@@ -41,51 +42,36 @@ export default function PatientProfileShow({ user, patients }) {
                     {/* Enhanced Page Header */}
                     <FadeIn>
                         <div className="mb-8">
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                                <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
-                                        <User className="w-8 h-8 text-white" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-4xl font-bold text-gray-900 mb-2">
-                                            My Profile
-                                        </h2>
-                                        <p className="text-gray-600 text-lg">
-                                            Manage your personal information and
-                                            clinic records
-                                        </p>
-                                        <div className="flex items-center gap-4 mt-3">
-                                            <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 px-3 py-1">
-                                                <Shield className="w-3 h-3 mr-1" />
-                                                Verified Account
-                                            </Badge>
-                                            <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-3 py-1">
-                                                <Activity className="w-3 h-3 mr-1" />
-                                                Active Patient
-                                            </Badge>
-                                        </div>
-                                    </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                    <Link href={route("patient.dashboard")}>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="flex items-center gap-2 hover:bg-gray-50"
+                                        >
+                                            <ArrowLeft className="w-4 h-4" />
+                                            Back to Dashboard
+                                        </Button>
+                                    </Link>
                                 </div>
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                    <div className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-6 py-4 rounded-2xl border border-blue-200/50 shadow-lg">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="w-4 h-4 text-blue-600" />
-                                            <span className="text-sm font-bold text-gray-700">
-                                                {new Date().toLocaleDateString(
-                                                    "en-US",
-                                                    {
-                                                        weekday: "long",
-                                                        year: "numeric",
-                                                        month: "long",
-                                                        day: "numeric",
-                                                    }
-                                                )}
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div className="flex-1 text-center">
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        My Profile
+                                    </h2>
+                                    <p className="text-gray-600 text-sm">
+                                        Manage your personal information and
+                                        clinic records
+                                    </p>
+                                </div>
+                                <div className="flex-1 flex justify-end items-center gap-3">
+                                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 px-3 py-1 text-sm font-semibold flex items-center gap-2">
+                                        <Shield className="w-3 h-3" />
+                                        Verified Account
+                                    </Badge>
                                     <Link href={route("patient.profile.edit")}>
-                                        <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                                            <Edit className="w-5 h-5" />
+                                        <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 py-2 text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                                            <Edit className="w-4 h-4" />
                                             Edit Profile
                                         </Button>
                                     </Link>
@@ -97,83 +83,78 @@ export default function PatientProfileShow({ user, patients }) {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                         {/* Main Profile Card */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Enhanced Personal Information */}
+                            {/* Compact Personal Information */}
                             <SlideIn direction="up" delay={0}>
-                                <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl border border-gray-200/50 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                                <User className="w-6 h-6 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-gray-900">
-                                                    Personal Information
-                                                </h3>
-                                                <p className="text-gray-600 text-sm">
-                                                    Your account details and
-                                                    contact information
-                                                </p>
-                                            </div>
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                                            <User className="w-5 h-5 text-white" />
                                         </div>
-                                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                                            <UserCheck className="w-5 h-5 text-blue-600" />
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Personal Information
+                                            </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Your account details and contact
+                                                information
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <div className="bg-gradient-to-r from-white/80 to-blue-50/50 rounded-2xl border border-blue-200/50 p-6 hover:shadow-lg transition-all duration-300 group">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                                    <User className="w-4 h-4 text-white" />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-md flex items-center justify-center">
+                                                    <User className="w-3 h-3 text-white" />
                                                 </div>
-                                                <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">
+                                                <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
                                                     Full Name
                                                 </span>
                                             </div>
-                                            <p className="text-gray-900 font-bold text-xl">
+                                            <p className="text-gray-900 font-bold text-base">
                                                 {user.name}
                                             </p>
                                         </div>
 
-                                        <div className="bg-gradient-to-r from-white/80 to-green-50/50 rounded-2xl border border-green-200/50 p-6 hover:shadow-lg transition-all duration-300 group">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                                                    <Mail className="w-4 h-4 text-white" />
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-green-600 rounded-md flex items-center justify-center">
+                                                    <Mail className="w-3 h-3 text-white" />
                                                 </div>
-                                                <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">
+                                                <span className="text-xs font-semibold text-green-700 uppercase tracking-wide">
                                                     Email Address
                                                 </span>
                                             </div>
-                                            <p className="text-gray-900 font-bold text-lg break-all">
+                                            <p className="text-gray-900 font-bold text-sm break-all">
                                                 {user.email}
                                             </p>
                                         </div>
 
-                                        <div className="bg-gradient-to-r from-white/80 to-purple-50/50 rounded-2xl border border-purple-200/50 p-6 hover:shadow-lg transition-all duration-300 group">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                                    <Phone className="w-4 h-4 text-white" />
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-md flex items-center justify-center">
+                                                    <Phone className="w-3 h-3 text-white" />
                                                 </div>
-                                                <span className="text-sm font-semibold text-purple-700 uppercase tracking-wide">
+                                                <span className="text-xs font-semibold text-purple-700 uppercase tracking-wide">
                                                     Phone Number
                                                 </span>
                                             </div>
-                                            <p className="text-gray-900 font-bold text-lg">
+                                            <p className="text-gray-900 font-bold text-sm">
                                                 {user.phone_number ||
                                                     "Not provided"}
                                             </p>
                                         </div>
 
-                                        <div className="bg-gradient-to-r from-white/80 to-orange-50/50 rounded-2xl border border-orange-200/50 p-6 hover:shadow-lg transition-all duration-300 group">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-                                                    <Award className="w-4 h-4 text-white" />
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-orange-600 rounded-md flex items-center justify-center">
+                                                    <Award className="w-3 h-3 text-white" />
                                                 </div>
-                                                <span className="text-sm font-semibold text-orange-700 uppercase tracking-wide">
+                                                <span className="text-xs font-semibold text-orange-700 uppercase tracking-wide">
                                                     Account Type
                                                 </span>
                                             </div>
-                                            <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-2 text-sm font-semibold">
+                                            <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-3 py-1 text-xs font-semibold">
                                                 <Shield className="w-3 h-3 mr-1" />
                                                 Smile Suite Patient
                                             </Badge>
@@ -182,96 +163,91 @@ export default function PatientProfileShow({ user, patients }) {
                                 </div>
                             </SlideIn>
 
-                            {/* Enhanced Clinic Records */}
+                            {/* Compact Clinic Records */}
                             <SlideIn direction="up" delay={200}>
-                                <div className="bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 rounded-2xl border border-gray-200/50 shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
-                                    <div className="flex items-center justify-between mb-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                                <FileText className="w-6 h-6 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-gray-900">
-                                                    Clinic Records (
-                                                    {patients.length})
-                                                </h3>
-                                                <p className="text-gray-600 text-sm">
-                                                    Your patient records across
-                                                    all connected clinics
-                                                </p>
-                                            </div>
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
+                                            <FileText className="w-5 h-5 text-white" />
                                         </div>
-                                        <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                                            <Building2 className="w-5 h-5 text-green-600" />
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">
+                                                Clinic Records (
+                                                {patients.length})
+                                            </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Your patient records across all
+                                                connected clinics
+                                            </p>
                                         </div>
                                     </div>
                                     {patients.length === 0 ? (
                                         <FadeIn>
-                                            <div className="text-center py-12">
-                                                <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-200 rounded-2xl flex items-center justify-center mx-auto mb-6 group">
-                                                    <FileText className="w-10 h-10 text-green-600 group-hover:scale-110 transition-transform duration-300" />
+                                            <div className="text-center py-8">
+                                                <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                                    <FileText className="w-8 h-8 text-green-600" />
                                                 </div>
-                                                <h4 className="text-xl font-bold text-gray-900 mb-3">
+                                                <h4 className="text-lg font-bold text-gray-900 mb-2">
                                                     No Clinic Records Yet
                                                 </h4>
-                                                <p className="text-gray-600 text-lg max-w-md mx-auto mb-6">
+                                                <p className="text-gray-600 text-sm mb-4 max-w-md mx-auto">
                                                     Your clinic records will
                                                     appear here once you visit
                                                     clinics and book
                                                     appointments.
                                                 </p>
                                                 <Link href="/clinics">
-                                                    <Button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                                                        <Building2 className="w-5 h-5" />
+                                                    <Button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-4 py-2 text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                                                        <Building2 className="w-4 h-4" />
                                                         Find Clinics
                                                     </Button>
                                                 </Link>
                                             </div>
                                         </FadeIn>
                                     ) : (
-                                        <div className="space-y-6">
+                                        <div className="space-y-4">
                                             {patients.map((patient, index) => (
                                                 <SlideIn
                                                     key={patient.id}
                                                     direction="up"
                                                     delay={index * 100}
                                                 >
-                                                    <div className="bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 rounded-2xl border border-gray-200/50 p-8 hover:shadow-xl hover:border-green-300/50 transition-all duration-300 group">
-                                                        <div className="flex items-center justify-between mb-6">
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                                                    <Building2 className="w-6 h-6 text-white" />
+                                                    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg hover:border-green-300 transition-all duration-300 group">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
+                                                                    <Building2 className="w-5 h-5 text-white" />
                                                                 </div>
                                                                 <div>
-                                                                    <h3 className="text-xl font-bold text-gray-900">
+                                                                    <h3 className="text-base font-bold text-gray-900">
                                                                         {
                                                                             patient
                                                                                 .clinic
                                                                                 .name
                                                                         }
                                                                     </h3>
-                                                                    <p className="text-gray-600 text-sm">
+                                                                    <p className="text-gray-600 text-xs">
                                                                         Patient
                                                                         Record
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 px-4 py-2 text-sm font-semibold">
+                                                            <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 px-3 py-1 text-xs font-semibold">
                                                                 <CheckCircle className="w-3 h-3 mr-1" />
                                                                 ID: {patient.id}
                                                             </Badge>
                                                         </div>
 
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                                            <div className="bg-gradient-to-r from-white/80 to-blue-50/50 rounded-xl border border-blue-200/50 p-4">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <User className="w-4 h-4 text-blue-600" />
-                                                                    <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                                                            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <User className="w-3 h-3 text-blue-600" />
+                                                                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
                                                                         Patient
                                                                         Name
                                                                     </span>
                                                                 </div>
-                                                                <p className="text-gray-900 font-bold text-lg">
+                                                                <p className="text-gray-900 font-bold text-sm">
                                                                     {
                                                                         patient.first_name
                                                                     }{" "}
@@ -281,31 +257,31 @@ export default function PatientProfileShow({ user, patients }) {
                                                                 </p>
                                                             </div>
 
-                                                            <div className="bg-gradient-to-r from-white/80 to-green-50/50 rounded-xl border border-green-200/50 p-4">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <Phone className="w-4 h-4 text-green-600" />
-                                                                    <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">
+                                                            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <Phone className="w-3 h-3 text-green-600" />
+                                                                    <span className="text-xs font-semibold text-green-700 uppercase tracking-wide">
                                                                         Phone
                                                                         Number
                                                                     </span>
                                                                 </div>
-                                                                <p className="text-gray-900 font-bold text-lg">
+                                                                <p className="text-gray-900 font-bold text-sm">
                                                                     {
                                                                         patient.phone_number
                                                                     }
                                                                 </p>
                                                             </div>
 
-                                                            <div className="bg-gradient-to-r from-white/80 to-purple-50/50 rounded-xl border border-purple-200/50 p-4">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <Activity className="w-4 h-4 text-purple-600" />
-                                                                    <span className="text-sm font-semibold text-purple-700 uppercase tracking-wide">
+                                                            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <Activity className="w-3 h-3 text-purple-600" />
+                                                                    <span className="text-xs font-semibold text-purple-700 uppercase tracking-wide">
                                                                         Status
                                                                     </span>
                                                                 </div>
                                                                 <Badge
                                                                     className={cn(
-                                                                        "px-3 py-1 text-sm font-semibold",
+                                                                        "px-2 py-1 text-xs font-semibold",
                                                                         patient.status ===
                                                                             "active"
                                                                             ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white"
@@ -318,14 +294,14 @@ export default function PatientProfileShow({ user, patients }) {
                                                                 </Badge>
                                                             </div>
 
-                                                            <div className="bg-gradient-to-r from-white/80 to-orange-50/50 rounded-xl border border-orange-200/50 p-4">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <Award className="w-4 h-4 text-orange-600" />
-                                                                    <span className="text-sm font-semibold text-orange-700 uppercase tracking-wide">
+                                                            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <Award className="w-3 h-3 text-orange-600" />
+                                                                    <span className="text-xs font-semibold text-orange-700 uppercase tracking-wide">
                                                                         Category
                                                                     </span>
                                                                 </div>
-                                                                <p className="text-gray-900 font-bold text-lg">
+                                                                <p className="text-gray-900 font-bold text-sm">
                                                                     {
                                                                         patient.category_display_name
                                                                     }
@@ -403,7 +379,7 @@ export default function PatientProfileShow({ user, patients }) {
                                                                                 Name
                                                                             </span>
                                                                         </div>
-                                                                        <p className="text-gray-900 font-bold text-lg">
+                                                                        <p className="text-gray-900 font-semibold text-sm">
                                                                             {
                                                                                 patient.emergency_contact_name
                                                                             }
@@ -417,7 +393,7 @@ export default function PatientProfileShow({ user, patients }) {
                                                                                 Number
                                                                             </span>
                                                                         </div>
-                                                                        <p className="text-gray-900 font-bold text-lg">
+                                                                        <p className="text-gray-900 font-semibold text-sm">
                                                                             {
                                                                                 patient.emergency_contact_number
                                                                             }
@@ -431,7 +407,7 @@ export default function PatientProfileShow({ user, patients }) {
                                                                                     Relationship
                                                                                 </span>
                                                                             </div>
-                                                                            <p className="text-gray-900 font-bold text-lg">
+                                                                            <p className="text-gray-900 font-semibold text-sm">
                                                                                 {
                                                                                     patient.emergency_contact_relationship
                                                                                 }
@@ -452,53 +428,54 @@ export default function PatientProfileShow({ user, patients }) {
 
                         {/* Enhanced Sidebar */}
                         <div className="space-y-6">
-                            {/* Enhanced Quick Stats */}
+                            {/* Compact Quick Stats */}
                             <SlideIn direction="left" delay={300}>
-                                <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8 hover:shadow-2xl transition-all duration-300">
-                                    <div className="mb-8">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                                                <TrendingUp className="w-5 h-5 text-white" />
-                                            </div>
-                                            <h3 className="text-xl font-bold text-gray-900">
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                                            <TrendingUp className="w-5 h-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">
                                                 Quick Stats
                                             </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Your profile overview and
+                                                activity
+                                            </p>
                                         </div>
-                                        <p className="text-gray-600 text-sm">
-                                            Your profile overview and activity
-                                        </p>
                                     </div>
-                                    <div className="space-y-6">
-                                        <div className="bg-gradient-to-r from-blue-50/80 to-blue-100/80 rounded-2xl p-6 border border-blue-200/50 hover:shadow-lg transition-all duration-300 group">
+                                    <div className="space-y-4">
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Building2 className="w-5 h-5 text-blue-600" />
-                                                    <span className="text-gray-700 font-semibold">
+                                                    <Building2 className="w-4 h-4 text-blue-600" />
+                                                    <span className="text-gray-700 font-semibold text-sm">
                                                         Connected Clinics
                                                     </span>
                                                 </div>
-                                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                                    <Building2 className="w-4 h-4 text-blue-600" />
+                                                <div className="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center">
+                                                    <Building2 className="w-3 h-3 text-blue-600" />
                                                 </div>
                                             </div>
-                                            <span className="text-3xl font-bold text-blue-600">
+                                            <span className="text-2xl font-bold text-blue-600">
                                                 {patients.length}
                                             </span>
                                         </div>
 
-                                        <div className="bg-gradient-to-r from-green-50/80 to-green-100/80 rounded-2xl p-6 border border-green-200/50 hover:shadow-lg transition-all duration-300 group">
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <CheckCircle className="w-5 h-5 text-green-600" />
-                                                    <span className="text-gray-700 font-semibold">
+                                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                                    <span className="text-gray-700 font-semibold text-sm">
                                                         Active Records
                                                     </span>
                                                 </div>
-                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                                    <Activity className="w-4 h-4 text-green-600" />
+                                                <div className="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center">
+                                                    <Activity className="w-3 h-3 text-green-600" />
                                                 </div>
                                             </div>
-                                            <span className="text-3xl font-bold text-green-600">
+                                            <span className="text-2xl font-bold text-green-600">
                                                 {
                                                     patients.filter(
                                                         (p) =>
@@ -509,19 +486,19 @@ export default function PatientProfileShow({ user, patients }) {
                                             </span>
                                         </div>
 
-                                        <div className="bg-gradient-to-r from-purple-50/80 to-purple-100/80 rounded-2xl p-6 border border-purple-200/50 hover:shadow-lg transition-all duration-300 group">
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Star className="w-5 h-5 text-purple-600" />
-                                                    <span className="text-gray-700 font-semibold">
+                                                    <Star className="w-4 h-4 text-purple-600" />
+                                                    <span className="text-gray-700 font-semibold text-sm">
                                                         Profile Complete
                                                     </span>
                                                 </div>
-                                                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                                    <Award className="w-4 h-4 text-purple-600" />
+                                                <div className="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center">
+                                                    <Award className="w-3 h-3 text-purple-600" />
                                                 </div>
                                             </div>
-                                            <span className="text-3xl font-bold text-purple-600">
+                                            <span className="text-2xl font-bold text-purple-600">
                                                 {user.phone_number
                                                     ? "100%"
                                                     : "75%"}
@@ -531,34 +508,34 @@ export default function PatientProfileShow({ user, patients }) {
                                 </div>
                             </SlideIn>
 
-                            {/* Enhanced Quick Actions */}
+                            {/* Compact Quick Actions */}
                             <SlideIn direction="left" delay={400}>
-                                <div className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8 hover:shadow-2xl transition-all duration-300">
-                                    <div className="mb-8">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                                                <Edit className="w-5 h-5 text-white" />
-                                            </div>
-                                            <h3 className="text-xl font-bold text-gray-900">
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+                                        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+                                            <Edit className="w-5 h-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900">
                                                 Quick Actions
                                             </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Navigate to important pages and
+                                                features
+                                            </p>
                                         </div>
-                                        <p className="text-gray-600 text-sm">
-                                            Navigate to important pages and
-                                            features
-                                        </p>
                                     </div>
-                                    <div className="space-y-4">
+                                    <div className="space-y-3">
                                         <Link href={route("patient.dashboard")}>
-                                            <div className="flex items-center gap-4 px-6 py-4 text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-blue-100/80 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent hover:border-blue-200/50">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
-                                                    <Calendar className="w-6 h-6 text-white" />
+                                            <div className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 group border border-transparent hover:border-blue-200">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-all duration-300 shadow-sm">
+                                                    <Calendar className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <span className="font-bold text-lg">
+                                                    <span className="font-bold text-sm">
                                                         View Dashboard
                                                     </span>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-xs text-gray-500">
                                                         Overview and
                                                         appointments
                                                     </p>
@@ -569,15 +546,15 @@ export default function PatientProfileShow({ user, patients }) {
                                         <Link
                                             href={route("patient.profile.edit")}
                                         >
-                                            <div className="flex items-center gap-4 px-6 py-4 text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-purple-100/80 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent hover:border-purple-200/50">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
-                                                    <Edit className="w-6 h-6 text-white" />
+                                            <div className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-300 group border border-transparent hover:border-purple-200">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-all duration-300 shadow-sm">
+                                                    <Edit className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <span className="font-bold text-lg">
+                                                    <span className="font-bold text-sm">
                                                         Edit Profile
                                                     </span>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-xs text-gray-500">
                                                         Update personal
                                                         information
                                                     </p>
@@ -590,15 +567,15 @@ export default function PatientProfileShow({ user, patients }) {
                                                 "patient.treatments.index"
                                             )}
                                         >
-                                            <div className="flex items-center gap-4 px-6 py-4 text-gray-700 hover:text-green-600 hover:bg-gradient-to-r hover:from-green-50/80 hover:to-green-100/80 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent hover:border-green-200/50">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
-                                                    <FileText className="w-6 h-6 text-white" />
+                                            <div className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-300 group border border-transparent hover:border-green-200">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-all duration-300 shadow-sm">
+                                                    <FileText className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <span className="font-bold text-lg">
+                                                    <span className="font-bold text-sm">
                                                         Treatment History
                                                     </span>
-                                                    <p className="text-sm text-gray-500">
+                                                    <p className="text-xs text-gray-500">
                                                         View your dental records
                                                     </p>
                                                 </div>

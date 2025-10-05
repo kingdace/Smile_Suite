@@ -84,7 +84,7 @@ export default function PatientTreatmentShow({
                 {/* Compact Page Header */}
                 <div className="mb-6">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                        <div className="flex-1">
                             <Link href={route("patient.treatments.index")}>
                                 <Button
                                     variant="outline"
@@ -95,18 +95,18 @@ export default function PatientTreatmentShow({
                                     Back to Treatments
                                 </Button>
                             </Link>
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900">
-                                    {treatment?.service?.name ||
-                                        treatment?.name ||
-                                        "Treatment Details"}
-                                </h1>
-                                <p className="text-gray-600 text-sm">
-                                    Treatment ID: #{treatment?.id || "N/A"}
-                                </p>
-                            </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex-1 text-center">
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                {treatment?.service?.name ||
+                                    treatment?.name ||
+                                    "Treatment Details"}
+                            </h1>
+                            <p className="text-gray-600 text-sm">
+                                Treatment ID: #{treatment?.id || "N/A"}
+                            </p>
+                        </div>
+                        <div className="flex-1 flex justify-end items-center gap-3">
                             <Badge
                                 className={cn(
                                     getStatusColor(treatment?.status),

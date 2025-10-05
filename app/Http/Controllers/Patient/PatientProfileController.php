@@ -54,6 +54,9 @@ class PatientProfileController extends Controller
         return Inertia::render('Patient/Profile/Edit', [
             'user' => $user,
             'patients' => $patients,
+            'flash' => [
+                'success' => session('success'),
+            ],
         ]);
     }
 
@@ -83,8 +86,8 @@ class PatientProfileController extends Controller
             'phone_number' => $request->phone_number,
         ]);
 
-        return redirect()->route('patient.profile.show')
-            ->with('success', 'Your account information has been updated successfully. Clinic records are managed by your healthcare providers.');
+        return redirect()->route('patient.profile')
+            ->with('success', 'Your account information has been updated successfully.');
     }
 }
 

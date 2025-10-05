@@ -84,16 +84,7 @@ export default function PatientTreatmentsIndex({
                 {/* Compact Page Header */}
                 <div className="mb-6">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
-                                My Treatments
-                            </h1>
-                            <p className="text-gray-600 text-sm">
-                                Your dental treatment history across all
-                                connected clinics
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex-1">
                             <Link href={route("patient.dashboard")}>
                                 <Button
                                     variant="outline"
@@ -104,6 +95,17 @@ export default function PatientTreatmentsIndex({
                                     Back to Dashboard
                                 </Button>
                             </Link>
+                        </div>
+                        <div className="flex-1 text-center">
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                My Treatments
+                            </h1>
+                            <p className="text-gray-600 text-sm">
+                                Your dental treatment history across all
+                                connected clinics
+                            </p>
+                        </div>
+                        <div className="flex-1 flex justify-end">
                             <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-3 py-1">
                                 {treatments?.data?.length || 0} Total
                             </Badge>
