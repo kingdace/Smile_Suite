@@ -51,7 +51,8 @@ export default function PatientProfileShow({ user, patients }) {
                                             My Profile
                                         </h2>
                                         <p className="text-gray-600 text-lg">
-                                            Manage your personal information and clinic records
+                                            Manage your personal information and
+                                            clinic records
                                         </p>
                                         <div className="flex items-center gap-4 mt-3">
                                             <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 px-3 py-1">
@@ -109,7 +110,8 @@ export default function PatientProfileShow({ user, patients }) {
                                                     Personal Information
                                                 </h3>
                                                 <p className="text-gray-600 text-sm">
-                                                    Your account details and contact information
+                                                    Your account details and
+                                                    contact information
                                                 </p>
                                             </div>
                                         </div>
@@ -117,7 +119,7 @@ export default function PatientProfileShow({ user, patients }) {
                                             <UserCheck className="w-5 h-5 text-blue-600" />
                                         </div>
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                         <div className="bg-gradient-to-r from-white/80 to-blue-50/50 rounded-2xl border border-blue-200/50 p-6 hover:shadow-lg transition-all duration-300 group">
                                             <div className="flex items-center gap-3 mb-3">
@@ -157,7 +159,8 @@ export default function PatientProfileShow({ user, patients }) {
                                                 </span>
                                             </div>
                                             <p className="text-gray-900 font-bold text-lg">
-                                                {user.phone_number || "Not provided"}
+                                                {user.phone_number ||
+                                                    "Not provided"}
                                             </p>
                                         </div>
 
@@ -189,10 +192,12 @@ export default function PatientProfileShow({ user, patients }) {
                                             </div>
                                             <div>
                                                 <h3 className="text-2xl font-bold text-gray-900">
-                                                    Clinic Records ({patients.length})
+                                                    Clinic Records (
+                                                    {patients.length})
                                                 </h3>
                                                 <p className="text-gray-600 text-sm">
-                                                    Your patient records across all connected clinics
+                                                    Your patient records across
+                                                    all connected clinics
                                                 </p>
                                             </div>
                                         </div>
@@ -210,7 +215,10 @@ export default function PatientProfileShow({ user, patients }) {
                                                     No Clinic Records Yet
                                                 </h4>
                                                 <p className="text-gray-600 text-lg max-w-md mx-auto mb-6">
-                                                    Your clinic records will appear here once you visit clinics and book appointments.
+                                                    Your clinic records will
+                                                    appear here once you visit
+                                                    clinics and book
+                                                    appointments.
                                                 </p>
                                                 <Link href="/clinics">
                                                     <Button className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
@@ -236,10 +244,15 @@ export default function PatientProfileShow({ user, patients }) {
                                                                 </div>
                                                                 <div>
                                                                     <h3 className="text-xl font-bold text-gray-900">
-                                                                        {patient.clinic.name}
+                                                                        {
+                                                                            patient
+                                                                                .clinic
+                                                                                .name
+                                                                        }
                                                                     </h3>
                                                                     <p className="text-gray-600 text-sm">
-                                                                        Patient Record
+                                                                        Patient
+                                                                        Record
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -254,11 +267,17 @@ export default function PatientProfileShow({ user, patients }) {
                                                                 <div className="flex items-center gap-2 mb-2">
                                                                     <User className="w-4 h-4 text-blue-600" />
                                                                     <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">
-                                                                        Patient Name
+                                                                        Patient
+                                                                        Name
                                                                     </span>
                                                                 </div>
                                                                 <p className="text-gray-900 font-bold text-lg">
-                                                                    {patient.first_name} {patient.last_name}
+                                                                    {
+                                                                        patient.first_name
+                                                                    }{" "}
+                                                                    {
+                                                                        patient.last_name
+                                                                    }
                                                                 </p>
                                                             </div>
 
@@ -266,11 +285,14 @@ export default function PatientProfileShow({ user, patients }) {
                                                                 <div className="flex items-center gap-2 mb-2">
                                                                     <Phone className="w-4 h-4 text-green-600" />
                                                                     <span className="text-sm font-semibold text-green-700 uppercase tracking-wide">
-                                                                        Phone Number
+                                                                        Phone
+                                                                        Number
                                                                     </span>
                                                                 </div>
                                                                 <p className="text-gray-900 font-bold text-lg">
-                                                                    {patient.phone_number}
+                                                                    {
+                                                                        patient.phone_number
+                                                                    }
                                                                 </p>
                                                             </div>
 
@@ -284,12 +306,15 @@ export default function PatientProfileShow({ user, patients }) {
                                                                 <Badge
                                                                     className={cn(
                                                                         "px-3 py-1 text-sm font-semibold",
-                                                                        patient.status === "active"
+                                                                        patient.status ===
+                                                                            "active"
                                                                             ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white"
                                                                             : "bg-gradient-to-r from-gray-500 to-gray-600 text-white"
                                                                     )}
                                                                 >
-                                                                    {patient.status}
+                                                                    {
+                                                                        patient.status
+                                                                    }
                                                                 </Badge>
                                                             </div>
 
@@ -301,20 +326,24 @@ export default function PatientProfileShow({ user, patients }) {
                                                                     </span>
                                                                 </div>
                                                                 <p className="text-gray-900 font-bold text-lg">
-                                                                    {patient.category_display_name}
+                                                                    {
+                                                                        patient.category_display_name
+                                                                    }
                                                                 </p>
                                                             </div>
                                                         </div>
 
                                                         {/* Enhanced Medical Information */}
-                                                        {(patient.medical_history || patient.allergies) && (
+                                                        {(patient.medical_history ||
+                                                            patient.allergies) && (
                                                             <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-6 border border-red-200/50 mb-6">
                                                                 <div className="flex items-center gap-3 mb-4">
                                                                     <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-600 rounded-lg flex items-center justify-center">
                                                                         <Heart className="w-4 h-4 text-white" />
                                                                     </div>
                                                                     <h4 className="text-lg font-bold text-gray-900">
-                                                                        Medical Information
+                                                                        Medical
+                                                                        Information
                                                                     </h4>
                                                                 </div>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -323,11 +352,14 @@ export default function PatientProfileShow({ user, patients }) {
                                                                             <div className="flex items-center gap-2 mb-2">
                                                                                 <FileText className="w-4 h-4 text-red-600" />
                                                                                 <span className="text-sm font-semibold text-red-700 uppercase tracking-wide">
-                                                                                    Medical History
+                                                                                    Medical
+                                                                                    History
                                                                                 </span>
                                                                             </div>
                                                                             <p className="text-sm text-gray-700">
-                                                                                {patient.medical_history}
+                                                                                {
+                                                                                    patient.medical_history
+                                                                                }
                                                                             </p>
                                                                         </div>
                                                                     )}
@@ -340,7 +372,9 @@ export default function PatientProfileShow({ user, patients }) {
                                                                                 </span>
                                                                             </div>
                                                                             <p className="text-sm text-gray-700">
-                                                                                {patient.allergies}
+                                                                                {
+                                                                                    patient.allergies
+                                                                                }
                                                                             </p>
                                                                         </div>
                                                                     )}
@@ -356,7 +390,8 @@ export default function PatientProfileShow({ user, patients }) {
                                                                         <AlertTriangle className="w-4 h-4 text-white" />
                                                                     </div>
                                                                     <h4 className="text-lg font-bold text-gray-900">
-                                                                        Emergency Contact
+                                                                        Emergency
+                                                                        Contact
                                                                     </h4>
                                                                 </div>
                                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -364,22 +399,28 @@ export default function PatientProfileShow({ user, patients }) {
                                                                         <div className="flex items-center gap-2 mb-2">
                                                                             <User className="w-4 h-4 text-yellow-600" />
                                                                             <span className="text-sm font-semibold text-yellow-700 uppercase tracking-wide">
-                                                                                Contact Name
+                                                                                Contact
+                                                                                Name
                                                                             </span>
                                                                         </div>
                                                                         <p className="text-gray-900 font-bold text-lg">
-                                                                            {patient.emergency_contact_name}
+                                                                            {
+                                                                                patient.emergency_contact_name
+                                                                            }
                                                                         </p>
                                                                     </div>
                                                                     <div className="bg-white/80 rounded-lg p-4 border border-yellow-200/50">
                                                                         <div className="flex items-center gap-2 mb-2">
                                                                             <Phone className="w-4 h-4 text-yellow-600" />
                                                                             <span className="text-sm font-semibold text-yellow-700 uppercase tracking-wide">
-                                                                                Phone Number
+                                                                                Phone
+                                                                                Number
                                                                             </span>
                                                                         </div>
                                                                         <p className="text-gray-900 font-bold text-lg">
-                                                                            {patient.emergency_contact_number}
+                                                                            {
+                                                                                patient.emergency_contact_number
+                                                                            }
                                                                         </p>
                                                                     </div>
                                                                     {patient.emergency_contact_relationship && (
@@ -391,7 +432,9 @@ export default function PatientProfileShow({ user, patients }) {
                                                                                 </span>
                                                                             </div>
                                                                             <p className="text-gray-900 font-bold text-lg">
-                                                                                {patient.emergency_contact_relationship}
+                                                                                {
+                                                                                    patient.emergency_contact_relationship
+                                                                                }
                                                                             </p>
                                                                         </div>
                                                                     )}
@@ -442,7 +485,7 @@ export default function PatientProfileShow({ user, patients }) {
                                                 {patients.length}
                                             </span>
                                         </div>
-                                        
+
                                         <div className="bg-gradient-to-r from-green-50/80 to-green-100/80 rounded-2xl p-6 border border-green-200/50 hover:shadow-lg transition-all duration-300 group">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">
@@ -456,7 +499,13 @@ export default function PatientProfileShow({ user, patients }) {
                                                 </div>
                                             </div>
                                             <span className="text-3xl font-bold text-green-600">
-                                                {patients.filter(p => p.status === "active").length}
+                                                {
+                                                    patients.filter(
+                                                        (p) =>
+                                                            p.status ===
+                                                            "active"
+                                                    ).length
+                                                }
                                             </span>
                                         </div>
 
@@ -473,7 +522,9 @@ export default function PatientProfileShow({ user, patients }) {
                                                 </div>
                                             </div>
                                             <span className="text-3xl font-bold text-purple-600">
-                                                {user.phone_number ? "100%" : "75%"}
+                                                {user.phone_number
+                                                    ? "100%"
+                                                    : "75%"}
                                             </span>
                                         </div>
                                     </div>
@@ -493,7 +544,8 @@ export default function PatientProfileShow({ user, patients }) {
                                             </h3>
                                         </div>
                                         <p className="text-gray-600 text-sm">
-                                            Navigate to important pages and features
+                                            Navigate to important pages and
+                                            features
                                         </p>
                                     </div>
                                     <div className="space-y-4">
@@ -507,13 +559,16 @@ export default function PatientProfileShow({ user, patients }) {
                                                         View Dashboard
                                                     </span>
                                                     <p className="text-sm text-gray-500">
-                                                        Overview and appointments
+                                                        Overview and
+                                                        appointments
                                                     </p>
                                                 </div>
                                             </div>
                                         </Link>
-                                        
-                                        <Link href={route("patient.profile.edit")}>
+
+                                        <Link
+                                            href={route("patient.profile.edit")}
+                                        >
                                             <div className="flex items-center gap-4 px-6 py-4 text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-purple-100/80 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent hover:border-purple-200/50">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
                                                     <Edit className="w-6 h-6 text-white" />
@@ -523,13 +578,18 @@ export default function PatientProfileShow({ user, patients }) {
                                                         Edit Profile
                                                     </span>
                                                     <p className="text-sm text-gray-500">
-                                                        Update personal information
+                                                        Update personal
+                                                        information
                                                     </p>
                                                 </div>
                                             </div>
                                         </Link>
 
-                                        <Link href={route("patient.treatments.index")}>
+                                        <Link
+                                            href={route(
+                                                "patient.treatments.index"
+                                            )}
+                                        >
                                             <div className="flex items-center gap-4 px-6 py-4 text-gray-700 hover:text-green-600 hover:bg-gradient-to-r hover:from-green-50/80 hover:to-green-100/80 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent hover:border-green-200/50">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg">
                                                     <FileText className="w-6 h-6 text-white" />

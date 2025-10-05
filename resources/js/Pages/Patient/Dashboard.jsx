@@ -30,6 +30,10 @@ import {
     AlertCircle,
     BarChart3,
     RefreshCw,
+    AlertTriangle,
+    HelpCircle,
+    ArrowRight,
+    ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -54,13 +58,15 @@ import AppointmentDetailsModal from "./Components/AppointmentDetailsModal";
 import AppointmentCancellationModal from "./Components/AppointmentCancellationModal";
 import AppointmentReschedulingModal from "./Components/AppointmentReschedulingModal";
 
-// Appointments Section Component
+// Enhanced Appointments Section Component
 const AppointmentsSection = ({ appointments = [] }) => {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showRescheduleModal, setShowRescheduleModal] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const appointmentsPerPage = 5;
 
     const formatAppointmentNotes = (notes) => {
         if (!notes) return null;
@@ -244,30 +250,69 @@ const AppointmentsSection = ({ appointments = [] }) => {
         setLoading(false);
     };
 
+    // Pagination logic
+    const totalPages = Math.ceil(appointments.length / appointmentsPerPage);
+    const startIndex = (currentPage - 1) * appointmentsPerPage;
+    const endIndex = startIndex + appointmentsPerPage;
+    const currentAppointments = appointments.slice(startIndex, endIndex);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
-                        <Calendar className="w-5 h-5 text-white" />
+        <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl shadow-xl border border-gray-200/50 p-8 hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Calendar className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-2xl font-bold text-gray-900">
                             My Appointments
                         </h3>
-                        <p className="text-gray-500 text-sm">
-                            Your latest dental appointments
+                        <p className="text-gray-600 text-sm">
+                            Your latest dental appointments ({appointments.length} total)
                         </p>
                     </div>
                 </div>
-                <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center gap-4">
+                    {totalPages > 1 && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <div className="flex gap-1">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="w-8 h-8 p-0"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="w-8 h-8 p-0"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-blue-600" />
+                    </div>
                 </div>
             </div>
             <div>
                 {appointments.length > 0 ? (
-                    <div className="space-y-4">
-                        {appointments.map((appointment, index) => (
+                    <div className="space-y-6">
+                        {currentAppointments.map((appointment, index) => (
                             <SlideIn
                                 key={appointment.id}
                                 direction="up"
@@ -285,60 +330,65 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         handleViewDetails(appointment)
                                     }
                                 >
-                                    {/* Header with Status and Service */}
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className={cn(
-                                                    "w-3 h-3 rounded-full",
-                                                    appointment.status?.name?.toLowerCase() ===
-                                                        "confirmed" ||
+                                    {/* Enhanced Header with Status and Visual Elements */}
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex items-center gap-3">
+                                                <div
+                                                    className={cn(
+                                                        "w-4 h-4 rounded-full shadow-sm",
                                                         appointment.status?.name?.toLowerCase() ===
-                                                            "pending"
-                                                        ? "bg-blue-500"
-                                                        : appointment.status?.name?.toLowerCase() ===
-                                                          "completed"
-                                                        ? "bg-green-500"
-                                                        : "bg-red-500"
-                                                )}
-                                            />
-                                            <Badge
-                                                className={getStatusColor(
-                                                    appointment.status?.name
-                                                )}
-                                                role="status"
-                                                aria-label={`Appointment status: ${
-                                                    appointment.status?.name ||
-                                                    "Unknown"
-                                                }`}
-                                            >
-                                                {appointment.status?.name ||
-                                                    "Unknown"}
-                                            </Badge>
+                                                            "confirmed" ||
+                                                            appointment.status?.name?.toLowerCase() ===
+                                                                "pending"
+                                                            ? "bg-blue-500"
+                                                            : appointment.status?.name?.toLowerCase() ===
+                                                              "completed"
+                                                            ? "bg-green-500"
+                                                            : "bg-red-500"
+                                                    )}
+                                                />
+                                                <Badge
+                                                    className={cn(
+                                                        getStatusColor(
+                                                            appointment.status?.name
+                                                        ),
+                                                        "px-3 py-1 text-sm font-semibold"
+                                                    )}
+                                                    role="status"
+                                                    aria-label={`Appointment status: ${
+                                                        appointment.status?.name ||
+                                                        "Unknown"
+                                                    }`}
+                                                >
+                                                    {appointment.status?.name ||
+                                                        "Unknown"}
+                                                </Badge>
+                                            </div>
                                             {/* Show special indicators for patient actions */}
                                             {appointment.status?.name ===
                                                 "Pending Reschedule" && (
-                                                <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-orange-100 text-orange-700 border-orange-300">
+                                                <Badge className="text-xs font-bold px-3 py-1 rounded-full border bg-orange-100 text-orange-700 border-orange-300 shadow-sm">
                                                     Awaiting Clinic Response
                                                 </Badge>
                                             )}
                                             {appointment.status?.name ===
                                                 "Cancelled" &&
                                                 appointment.cancelled_at && (
-                                                    <Badge className="text-xs font-semibold px-2 py-1 rounded-full border bg-red-100 text-red-700 border-red-300">
+                                                    <Badge className="text-xs font-bold px-3 py-1 rounded-full border bg-red-100 text-red-700 border-red-300 shadow-sm">
                                                         You Cancelled
                                                     </Badge>
                                                 )}
                                         </div>
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                                        <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1">
+                                            <ChevronRight className="w-5 h-5 text-gray-400" />
                                         </div>
                                     </div>
 
-                                    {/* Clinic Information */}
-                                    <div className="mb-4">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-blue-200 hover:shadow-xl transition-all duration-300">
+                                    {/* Enhanced Clinic Information */}
+                                    <div className="mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl border-2 border-blue-200 hover:shadow-2xl transition-all duration-300 group-hover:scale-105">
                                                 <img
                                                     src={
                                                         appointment.clinic
@@ -357,99 +407,136 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-gray-900 text-lg">
+                                                <h4 className="font-bold text-gray-900 text-xl mb-1">
                                                     {appointment.clinic?.name ||
                                                         "Dental Clinic"}
                                                 </h4>
-                                                <p className="text-gray-600 text-sm line-clamp-2">
-                                                    {appointment.clinic
-                                                        ?.street_address ||
-                                                        "Address not available"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Date and Time Information */}
-                                    <div className="bg-white/60 rounded-xl p-4 mb-4 border border-gray-100/50">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                                <Calendar className="w-4 h-4 text-white" />
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-gray-900">
-                                                    {new Date(
-                                                        appointment.scheduled_at
-                                                    ).toLocaleDateString(
-                                                        "en-US",
-                                                        {
-                                                            weekday: "long",
-                                                            year: "numeric",
-                                                            month: "long",
-                                                            day: "numeric",
-                                                        }
-                                                    )}
-                                                </p>
                                                 <div className="flex items-center gap-2 text-gray-600">
-                                                    <Clock className="w-4 h-4" />
-                                                    <span className="text-sm">
-                                                        {new Date(
-                                                            appointment.scheduled_at
-                                                        ).toLocaleTimeString(
-                                                            "en-US",
-                                                            {
-                                                                hour: "2-digit",
-                                                                minute: "2-digit",
-                                                            }
-                                                        )}
-                                                    </span>
+                                                    <MapPin className="w-4 h-4 text-blue-500" />
+                                                    <p className="text-sm line-clamp-1">
+                                                        {appointment.clinic
+                                                            ?.street_address ||
+                                                            "Address not available"}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Additional Information */}
-                                    <div className="space-y-2 mb-4">
+                                    {/* Enhanced Date and Time Information */}
+                                    <div className="bg-gradient-to-r from-white/80 to-blue-50/50 rounded-2xl p-6 mb-6 border border-blue-200/50 shadow-sm">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                                    <Calendar className="w-6 h-6 text-white" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-gray-900 text-lg">
+                                                        {new Date(
+                                                            appointment.scheduled_at
+                                                        ).toLocaleDateString(
+                                                            "en-US",
+                                                            {
+                                                                weekday: "long",
+                                                                year: "numeric",
+                                                                month: "long",
+                                                                day: "numeric",
+                                                            }
+                                                        )}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 text-gray-600">
+                                                        <Clock className="w-4 h-4 text-purple-500" />
+                                                        <span className="text-sm font-medium">
+                                                            {new Date(
+                                                                appointment.scheduled_at
+                                                            ).toLocaleTimeString(
+                                                                "en-US",
+                                                                {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                }
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-2xl font-bold text-purple-600">
+                                                    {new Date(appointment.scheduled_at).getDate()}
+                                                </div>
+                                                <div className="text-xs text-gray-500 uppercase">
+                                                    {new Date(appointment.scheduled_at).toLocaleDateString("en-US", { month: "short" })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Enhanced Additional Information */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                         {appointment.dentist && (
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <User className="w-4 h-4" />
-                                                <span>
-                                                    Dr.{" "}
-                                                    {appointment.dentist.name}
-                                                </span>
+                                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200/50">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                                                        <User className="w-4 h-4 text-white" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
+                                                            Dentist
+                                                        </p>
+                                                        <p className="text-sm font-bold text-gray-900">
+                                                            Dr. {appointment.dentist.name}
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                         {appointment.reason && (
-                                            <div className="flex items-start gap-2 text-sm text-gray-600">
-                                                <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                                <span className="line-clamp-2">
-                                                    {appointment.reason}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {formatAppointmentNotes(
-                                            appointment.notes
-                                        ) && (
-                                            <div className="flex items-start gap-2 text-sm text-blue-600 bg-blue-50 rounded-lg p-2">
-                                                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                                <span className="font-medium">
-                                                    {formatAppointmentNotes(
-                                                        appointment.notes
-                                                    )}
-                                                </span>
+                                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200/50">
+                                                <div className="flex items-start gap-3">
+                                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                                        <FileText className="w-4 h-4 text-white" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
+                                                            Reason
+                                                        </p>
+                                                        <p className="text-sm text-gray-900 line-clamp-2">{appointment.reason}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
-                                        <div className="flex items-center gap-2">
+                                    {/* Enhanced Notes Section */}
+                                    {formatAppointmentNotes(
+                                        appointment.notes
+                                    ) && (
+                                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 mb-6 border border-yellow-200/50">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center">
+                                                    <AlertCircle className="w-4 h-4 text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">
+                                                        Notes
+                                                    </p>
+                                                    <p className="text-sm font-medium text-gray-900">{formatAppointmentNotes(
+                                                        appointment.notes
+                                                    )}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Enhanced Action Buttons */}
+                                    <div className="flex items-center justify-between pt-6 border-t border-gray-200/50">
+                                        <div className="flex items-center gap-3">
                                             {appointment.status?.name?.toLowerCase() ===
                                                 "pending" && (
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="text-xs px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-xl font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleCancelAppointment(
@@ -463,7 +550,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         appointment.scheduled_at
                                                     ).toLocaleDateString()}`}
                                                 >
-                                                    <XCircle className="w-3 h-3 mr-1" />
+                                                    <XCircle className="w-4 h-4" />
                                                     Cancel
                                                 </Button>
                                             )}
@@ -472,7 +559,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="text-xs px-3 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                                                    className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 rounded-xl font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleRescheduleAppointment(
@@ -486,7 +573,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         appointment.scheduled_at
                                                     ).toLocaleDateString()}`}
                                                 >
-                                                    <Clock className="w-3 h-3 mr-1" />
+                                                    <Clock className="w-4 h-4" />
                                                     Reschedule
                                                 </Button>
                                             )}
@@ -494,7 +581,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="text-xs px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                            className="flex items-center gap-2 px-6 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-xl font-semibold"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleViewDetails(appointment);
@@ -506,7 +593,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 appointment.scheduled_at
                                             ).toLocaleDateString()}`}
                                         >
-                                            <Eye className="w-3 h-3 mr-1" />
+                                            <Eye className="w-4 h-4" />
                                             View Details
                                         </Button>
                                     </div>
@@ -515,22 +602,72 @@ const AppointmentsSection = ({ appointments = [] }) => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-8">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <Calendar className="w-8 h-8 text-blue-600" />
+                    <div className="text-center py-12">
+                        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <Calendar className="w-10 h-10 text-blue-600" />
                         </div>
-                        <h4 className="font-semibold text-gray-900 mb-2">
+                        <h4 className="text-xl font-bold text-gray-900 mb-3">
                             No Appointments Yet
                         </h4>
-                        <p className="text-gray-600 text-sm mb-4">
+                        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
                             Book your first appointment today to get started!
                         </p>
                         <Link href="/clinics">
-                            <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
-                                <Plus className="w-4 h-4" />
+                            <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-6 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                <Plus className="w-5 h-5" />
                                 Find Clinics
                             </Button>
                         </Link>
+                    </div>
+                )}
+
+                {/* Pagination Controls */}
+                {appointments.length > appointmentsPerPage && (
+                    <div className="mt-8 pt-6 border-t border-gray-200/50">
+                        <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-600">
+                                Showing {startIndex + 1} to {Math.min(endIndex, appointments.length)} of {appointments.length} appointments
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="flex items-center gap-2"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                    Previous
+                                </Button>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <Button
+                                            key={page}
+                                            variant={page === currentPage ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => handlePageChange(page)}
+                                            className={`w-8 h-8 p-0 ${
+                                                page === currentPage
+                                                    ? "bg-blue-500 text-white"
+                                                    : "text-gray-600 hover:text-gray-900"
+                                            }`}
+                                        >
+                                            {page}
+                                        </Button>
+                                    ))}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="flex items-center gap-2"
+                                >
+                                    Next
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
@@ -562,7 +699,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
     );
 };
 
-// Quick Actions Component
+// Enhanced Quick Actions Component
 const QuickActions = ({ loading = false }) => {
     const actions = [
         {
@@ -573,6 +710,8 @@ const QuickActions = ({ loading = false }) => {
             color: "bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700",
             hoverBg: "hover:from-blue-50/80 hover:to-indigo-100/80",
             hoverBorder: "hover:border-blue-200/50",
+            badge: "Popular",
+            badgeColor: "bg-blue-100 text-blue-700",
         },
         {
             name: "My Profile",
@@ -605,20 +744,21 @@ const QuickActions = ({ loading = false }) => {
 
     if (loading) {
         return (
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6">
-                <div className="mb-4 sm:mb-6">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <Zap
-                            className="w-5 h-5 text-yellow-600"
-                            aria-hidden="true"
-                        />
-                        Quick Actions
-                    </h3>
-                    <p className="text-gray-600 text-sm mt-1">
+            <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sm:p-8">
+                <div className="mb-6 sm:mb-8">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+                            <Zap className="w-5 h-5 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">
+                            Quick Actions
+                        </h3>
+                    </div>
+                    <p className="text-gray-600 text-sm">
                         Access your most important features
                     </p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {Array.from({ length: 4 }).map((_, i) => (
                         <QuickActionSkeleton key={i} />
                     ))}
@@ -628,21 +768,22 @@ const QuickActions = ({ loading = false }) => {
     }
 
     return (
-        <FadeIn className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6">
-            <div className="mb-4 sm:mb-6">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Zap
-                        className="w-5 h-5 text-yellow-600"
-                        aria-hidden="true"
-                    />
-                    Quick Actions
-                </h3>
-                <p className="text-gray-600 text-sm mt-1">
-                    Access your most important features
+        <FadeIn className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sm:p-8 hover:shadow-2xl transition-all duration-300">
+            <div className="mb-6 sm:mb-8">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">
+                        Quick Actions
+                    </h3>
+                </div>
+                <p className="text-gray-600 text-sm">
+                    Access your most important features and services
                 </p>
             </div>
             <nav
-                className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6"
                 role="navigation"
                 aria-label="Quick actions menu"
             >
@@ -656,24 +797,41 @@ const QuickActions = ({ loading = false }) => {
                         >
                             <Link href={action.href}>
                                 <div
-                                    className={`flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-4 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-md border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105`}
+                                    className={`relative flex flex-col items-center gap-4 px-6 py-8 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-xl border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[140px] justify-center`}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`${action.name} - ${action.description}`}
                                 >
+                                    {/* Badge */}
+                                    {action.badge && (
+                                        <div
+                                            className={`absolute -top-2 -right-2 px-3 py-1 text-xs font-bold rounded-full ${action.badgeColor} shadow-lg z-10`}
+                                        >
+                                            {action.badge}
+                                        </div>
+                                    )}
+
+                                    {/* Icon */}
                                     <div
-                                        className={`w-10 h-10 sm:w-12 sm:h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}
+                                        className={`w-16 h-16 ${action.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-xl`}
                                         aria-hidden="true"
                                     >
-                                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                                        <Icon className="w-8 h-8 text-white" />
                                     </div>
-                                    <div className="flex-1 text-center sm:text-left">
-                                        <h4 className="font-semibold text-xs sm:text-sm">
+
+                                    {/* Content */}
+                                    <div className="text-center space-y-2">
+                                        <h4 className="font-bold text-base mb-2">
                                             {action.name}
                                         </h4>
-                                        <p className="text-xs text-gray-500 hidden sm:block">
+                                        <p className="text-sm text-gray-500 leading-relaxed">
                                             {action.description}
                                         </p>
+                                    </div>
+
+                                    {/* Hover indicator */}
+                                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-1">
+                                        <ArrowRight className="w-5 h-5 text-gray-400" />
                                     </div>
                                 </div>
                             </Link>
