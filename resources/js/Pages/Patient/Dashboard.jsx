@@ -262,17 +262,17 @@ const AppointmentsSection = ({ appointments = [] }) => {
     };
 
     return (
-        <div className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-2xl shadow-xl border border-gray-200/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Calendar className="w-6 h-6 text-white" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <Calendar className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-2xl font-bold text-gray-900">
+                        <h3 className="text-lg font-bold text-gray-900">
                             My Appointments
                         </h3>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-500 text-sm">
                             Your latest dental appointments (
                             {appointments.length} total)
                         </p>
@@ -310,8 +310,8 @@ const AppointmentsSection = ({ appointments = [] }) => {
                             </div>
                         </div>
                     )}
-                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <BarChart3 className="w-5 h-5 text-blue-600" />
+                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="w-4 h-4 text-blue-600" />
                     </div>
                 </div>
             </div>
@@ -806,17 +806,17 @@ const QuickActions = ({ loading = false }) => {
     }
 
     return (
-        <FadeIn className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 sm:p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="mb-6 sm:mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <Zap className="w-5 h-5 text-white" />
+        <FadeIn className="bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6 hover:shadow-2xl transition-all duration-300">
+            <div className="mb-4">
+                <div className="flex items-center gap-3 mb-1">
+                    <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                        <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-lg font-bold text-gray-900">
                         Quick Actions
                     </h3>
                 </div>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-xs">
                     Access your most important features and services
                 </p>
             </div>
@@ -835,7 +835,7 @@ const QuickActions = ({ loading = false }) => {
                         >
                             <Link href={action.href}>
                                 <div
-                                    className={`relative flex flex-col items-center gap-2 px-3 py-4 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[80px] justify-center`}
+                                    className={`relative flex flex-col items-center gap-3 px-4 py-5 text-gray-700 hover:text-gray-900 ${action.hoverBg} rounded-xl transition-all duration-300 group shadow-sm hover:shadow-lg border border-transparent ${action.hoverBorder} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 min-h-[100px] justify-center`}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`${action.name} - ${action.description}`}
@@ -851,15 +851,15 @@ const QuickActions = ({ loading = false }) => {
 
                                     {/* Icon */}
                                     <div
-                                        className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-md`}
+                                        className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-lg`}
                                         aria-hidden="true"
                                     >
-                                        <Icon className="w-5 h-5 text-white" />
+                                        <Icon className="w-6 h-6 text-white" />
                                     </div>
 
                                     {/* Content */}
                                     <div className="text-center space-y-1">
-                                        <h4 className="font-bold text-xs mb-1">
+                                        <h4 className="font-bold text-sm mb-1">
                                             {action.name}
                                         </h4>
                                         <p className="text-xs text-gray-500 leading-tight">
@@ -869,7 +869,7 @@ const QuickActions = ({ loading = false }) => {
 
                                     {/* Hover indicator */}
                                     <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-1">
-                                        <ArrowRight className="w-3 h-3 text-gray-400" />
+                                        <ArrowRight className="w-4 h-4 text-gray-400" />
                                     </div>
                                 </div>
                             </Link>
