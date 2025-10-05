@@ -29,6 +29,7 @@ import {
     XCircle,
     AlertCircle,
     BarChart3,
+    RefreshCw,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -866,8 +867,37 @@ export default function PatientDashboard({
     flash,
     loading = false,
 }) {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [activeTab, setActiveTab] = useState('overview');
+
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        router.reload({ only: ['appointments', 'treatments', 'clinicRecords'] });
+        setTimeout(() => setIsRefreshing(false), 1000);
+    };
+
+    // Enhanced stats with better categorization
+    const enhancedStats = {
+        health: {
+            totalTreatments: treatments?.length || 0,
+            completedTreatments: treatments?.filter(t => t.status === 'completed')?.length || 0,
+            upcomingAppointments: appointments?.filter(a => new Date(a.appointment_date) > new Date())?.length || 0,
+            healthScore: treatments?.length > 0 ? Math.round((treatments.filter(t => t.status === 'completed').length / treatments.length) * 100) : 0
+        },
+        appointments: {
+            total: appointments?.length || 0,
+            upcoming: appointments?.filter(a => new Date(a.appointment_date) > new Date())?.length || 0,
+            completed: appointments?.filter(a => a.status === 'completed')?.length || 0,
+            cancelled: appointments?.filter(a => a.status === 'cancelled')?.length || 0
+        },
+        clinics: {
+            total: clinicRecords?.length || 0,
+            active: clinicRecords?.filter(c => c.status === 'active')?.length || 0
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-gray-200">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20">
             <Head title="Patient Dashboard - Smile Suite" />
             <div className="sr-only">
                 <h1>Patient Dashboard</h1>
