@@ -43,8 +43,8 @@ class PatientDashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Debug: Log the data being fetched
-        \Log::info('PatientDashboard Debug', [
+        // Debug: Log the treatments data
+        \Log::info('PatientDashboardController::index - Treatments data', [
             'user_id' => $user->id,
             'patients_count' => $patients->count(),
             'patient_ids' => $patients->pluck('id')->toArray(),

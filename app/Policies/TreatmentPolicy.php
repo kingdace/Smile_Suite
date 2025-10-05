@@ -11,14 +11,34 @@ class TreatmentPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user, Clinic $clinic): bool
+    public function viewAny(User $user, Clinic $clinic = null): bool
     {
-        return (in_array($user->role, ['clinic_admin', 'dentist', 'staff'])) && $user->clinic_id === $clinic->id;
+        // Allow clinic staff to view treatments in their clinic
+        if ($user->isClinicStaff() && $clinic && $user->clinic_id === $clinic->id) {
+            return true;
+        }
+        
+        // Allow patients to view their own treatments (no clinic parameter needed)
+        if ($user->isPatient()) {
+            return true;
+        }
+        
+        return false;
     }
 
     public function view(User $user, Treatment $treatment): bool
     {
-        return $user->clinic->id === $treatment->clinic_id;
+        // Allow clinic staff to view treatments in their clinic
+        if ($user->isClinicStaff() && $user->clinic_id === $treatment->clinic_id) {
+            return true;
+        }
+        
+        // Allow patients to view their own treatments
+        if ($user->isPatient()) {
+            return $treatment->patient->user_id === $user->id;
+        }
+        
+        return false;
     }
 
     public function create(User $user): bool

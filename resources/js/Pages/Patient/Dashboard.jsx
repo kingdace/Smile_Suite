@@ -1156,7 +1156,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                             treatment.id > 0 ? (
                                                 <Link
                                                     href={route(
-                                                        "patient.treatments.show",
+                                                        "treatments.show",
                                                         treatment.id
                                                     )}
                                                 >
