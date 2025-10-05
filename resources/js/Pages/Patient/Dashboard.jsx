@@ -1416,7 +1416,7 @@ export default function PatientDashboard({
     const [activeTab, setActiveTab] = useState("overview");
 
     // Debug: Log the data being received
-    console.log('PatientDashboard Debug:', {
+    console.log("PatientDashboard Debug:", {
         user,
         clinicRecords,
         appointments: appointments?.length || 0,

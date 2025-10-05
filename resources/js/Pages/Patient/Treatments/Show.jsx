@@ -9,6 +9,18 @@ import {
     FileText,
     ArrowLeft,
     DollarSign,
+    MapPin,
+    Phone,
+    Mail,
+    Pill,
+    Heart,
+    Shield,
+    Activity,
+    Image,
+    Star,
+    AlertCircle,
+    CalendarDays,
+    Timer,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -21,6 +33,13 @@ export default function PatientTreatmentShow({
     treatment,
     isPlaceholder = false,
 }) {
+    // Debug: Log the treatment data
+    console.log('PatientTreatmentShow Debug:', {
+        user,
+        treatment,
+        isPlaceholder,
+        treatmentData: treatment,
+    });
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
             case "completed":
@@ -417,7 +436,8 @@ export default function PatientTreatmentShow({
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Service Information */}
                             <div>
                                 <h4 className="font-bold text-gray-900 mb-4 text-lg">
                                     Service Information
@@ -428,7 +448,7 @@ export default function PatientTreatmentShow({
                                             Service
                                         </p>
                                         <p className="font-bold text-gray-900 text-lg">
-                                            {treatment?.service?.name || "N/A"}
+                                            {treatment?.service?.name || treatment?.name || "N/A"}
                                         </p>
                                     </div>
                                     {treatment?.service?.description && (
@@ -452,8 +472,7 @@ export default function PatientTreatmentShow({
                                                         Cost
                                                     </p>
                                                     <p className="font-bold text-green-600 text-lg">
-                                                        ₱
-                                                        {treatment.cost.toLocaleString()}
+                                                        ₱{treatment.cost.toLocaleString()}
                                                     </p>
                                                 </div>
                                             </div>
@@ -462,19 +481,194 @@ export default function PatientTreatmentShow({
                                 </div>
                             </div>
 
-                            {treatment?.notes && (
-                                <div>
-                                    <h4 className="font-bold text-gray-900 mb-4 text-lg">
-                                        Treatment Notes
-                                    </h4>
-                                    <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                            {/* Treatment Timeline */}
+                            <div>
+                                <h4 className="font-bold text-gray-900 mb-4 text-lg">
+                                    Treatment Timeline
+                                </h4>
+                                <div className="space-y-3">
+                                    {treatment?.start_date && (
+                                        <div className="bg-gradient-to-r from-blue-50/50 to-cyan-50/50 rounded-xl border border-blue-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                    <Calendar className="w-4 h-4 text-blue-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Start Date
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {new Date(treatment.start_date).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {treatment?.end_date && (
+                                        <div className="bg-gradient-to-r from-purple-50/50 to-pink-50/50 rounded-xl border border-purple-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                                    <CheckCircle className="w-4 h-4 text-purple-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        End Date
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {new Date(treatment.end_date).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {treatment?.estimated_duration_minutes && (
+                                        <div className="bg-gradient-to-r from-orange-50/50 to-amber-50/50 rounded-xl border border-orange-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                                    <Timer className="w-4 h-4 text-orange-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Duration
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {Math.floor(treatment.estimated_duration_minutes / 60)}h {treatment.estimated_duration_minutes % 60}m
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Medical Information */}
+                            <div>
+                                <h4 className="font-bold text-gray-900 mb-4 text-lg">
+                                    Medical Information
+                                </h4>
+                                <div className="space-y-3">
+                                    {treatment?.diagnosis && (
+                                        <div className="bg-gradient-to-r from-red-50/50 to-rose-50/50 rounded-xl border border-red-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                                                    <Heart className="w-4 h-4 text-red-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Diagnosis
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {treatment.diagnosis}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {treatment?.outcome && (
+                                        <div className="bg-gradient-to-r from-emerald-50/50 to-green-50/50 rounded-xl border border-emerald-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                                    <Activity className="w-4 h-4 text-emerald-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Outcome
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900 capitalize">
+                                                        {treatment.outcome}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {treatment?.next_appointment_date && (
+                                        <div className="bg-gradient-to-r from-indigo-50/50 to-blue-50/50 rounded-xl border border-indigo-100/50 p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                                    <CalendarDays className="w-4 h-4 text-indigo-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Next Appointment
+                                                    </p>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {new Date(treatment.next_appointment_date).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Treatment Notes */}
+                        {treatment?.notes && (
+                            <div className="mt-6">
+                                <h4 className="font-bold text-gray-900 mb-4 text-lg">
+                                    Treatment Notes
+                                </h4>
+                                <div className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4">
+                                    <p className="text-gray-700 whitespace-pre-wrap">
+                                        {treatment.notes}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Recommendations */}
+                        {treatment?.recommendations && (
+                            <div className="mt-6">
+                                <h4 className="font-bold text-gray-900 mb-4 text-lg">
+                                    Recommendations
+                                </h4>
+                                <div className="bg-gradient-to-r from-yellow-50/50 to-amber-50/50 rounded-xl border border-yellow-100/50 p-4">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                            <Star className="w-4 h-4 text-yellow-600" />
+                                        </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">
-                                            {treatment.notes}
+                                            {treatment.recommendations}
                                         </p>
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+
+                        {/* Prescriptions */}
+                        {treatment?.prescriptions && Array.isArray(treatment.prescriptions) && treatment.prescriptions.length > 0 && (
+                            <div className="mt-6">
+                                <h4 className="font-bold text-gray-900 mb-4 text-lg">
+                                    Prescriptions
+                                </h4>
+                                <div className="space-y-3">
+                                    {treatment.prescriptions.map((prescription, index) => (
+                                        <div key={index} className="bg-gradient-to-r from-green-50/50 to-emerald-50/50 rounded-xl border border-green-100/50 p-4">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                    <Pill className="w-4 h-4 text-green-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-gray-900">
+                                                        {prescription.medication || prescription.name || `Prescription ${index + 1}`}
+                                                    </p>
+                                                    {prescription.dosage && (
+                                                        <p className="text-sm text-gray-600">
+                                                            Dosage: {prescription.dosage}
+                                                        </p>
+                                                    )}
+                                                    {prescription.instructions && (
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            Instructions: {prescription.instructions}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </main>
