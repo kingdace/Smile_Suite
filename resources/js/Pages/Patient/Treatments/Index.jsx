@@ -113,16 +113,16 @@ export default function PatientTreatmentsIndex({
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                         <Building2 className="w-6 h-6 text-white" />
-                                </div>
+                                    </div>
                                     <div className="text-right">
                                         <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">
                                             Clinics
                                         </p>
                                         <p className="text-2xl font-bold text-gray-900">
-                                        {clinicRecords?.length || 0}
-                                    </p>
+                                            {clinicRecords?.length || 0}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <TrendingUp className="w-4 h-4 text-green-500" />
                                     <span>Connected</span>
@@ -143,10 +143,10 @@ export default function PatientTreatmentsIndex({
                                             Treatments
                                         </p>
                                         <p className="text-2xl font-bold text-gray-900">
-                                        {treatments?.data?.length || 0}
-                                    </p>
+                                            {treatments?.data?.length || 0}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Activity className="w-4 h-4 text-blue-500" />
                                     <span>Total Sessions</span>
@@ -164,17 +164,17 @@ export default function PatientTreatmentsIndex({
                                     </div>
                                     <div className="text-right">
                                         <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide">
-                                        Completed
-                                    </p>
+                                            Completed
+                                        </p>
                                         <p className="text-2xl font-bold text-gray-900">
-                                        {treatments?.data?.filter(
-                                            (t) =>
-                                                t.status?.toLowerCase() ===
-                                                "completed"
-                                        ).length || 0}
-                                    </p>
+                                            {treatments?.data?.filter(
+                                                (t) =>
+                                                    t.status?.toLowerCase() ===
+                                                    "completed"
+                                            ).length || 0}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Heart className="w-4 h-4 text-red-500" />
                                     <span>Success Rate</span>
@@ -203,8 +203,8 @@ export default function PatientTreatmentsIndex({
                                     <Shield className="w-4 h-4 text-purple-500" />
                                     <span>Avg Rating</span>
                                 </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
                     </SlideIn>
                 </div>
 
@@ -239,24 +239,35 @@ export default function PatientTreatmentsIndex({
                                             <div className="flex items-start justify-between mb-6">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                                        {getStatusIcon(treatment.status)}
-                                                </div>
+                                                        {getStatusIcon(
+                                                            treatment.status
+                                                        )}
+                                                    </div>
                                                     <div>
                                                         <Badge
                                                             className={cn(
-                                                                getStatusColor(treatment.status),
+                                                                getStatusColor(
+                                                                    treatment.status
+                                                                ),
                                                                 "text-sm font-semibold px-3 py-1 rounded-full"
                                                             )}
                                                         >
-                                                            {treatment.status || "Unknown"}
+                                                            {treatment.status ||
+                                                                "Unknown"}
                                                         </Badge>
                                                         <p className="text-sm text-gray-500 mt-1">
-                                                            {new Date(treatment.created_at).toLocaleDateString("en-US", {
-                                                                weekday: "long",
-                                                                year: "numeric",
-                                                                month: "long",
-                                                                day: "numeric",
-                                                            })}
+                                                            {new Date(
+                                                                treatment.created_at
+                                                            ).toLocaleDateString(
+                                                                "en-US",
+                                                                {
+                                                                    weekday:
+                                                                        "long",
+                                                                    year: "numeric",
+                                                                    month: "long",
+                                                                    day: "numeric",
+                                                                }
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -270,9 +281,11 @@ export default function PatientTreatmentsIndex({
                                                 {/* Service Details */}
                                                 <div className="lg:col-span-2">
                                                     <h4 className="text-xl font-bold text-gray-900 mb-4">
-                                                        {treatment.service?.name || "Dental Treatment"}
+                                                        {treatment.service
+                                                            ?.name ||
+                                                            "Dental Treatment"}
                                                     </h4>
-                                                    
+
                                                     {/* Clinic and Dentist Info */}
                                                     <div className="space-y-3 mb-4">
                                                         <div className="flex items-center gap-3 p-3 bg-white/60 rounded-xl border border-white/50">
@@ -281,10 +294,16 @@ export default function PatientTreatmentsIndex({
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-medium text-gray-900">
-                                                                    {treatment.clinic?.name || "Clinic"}
+                                                                    {treatment
+                                                                        .clinic
+                                                                        ?.name ||
+                                                                        "Clinic"}
                                                                 </p>
                                                                 <p className="text-xs text-gray-600">
-                                                                    {treatment.clinic?.street_address || "Address not available"}
+                                                                    {treatment
+                                                                        .clinic
+                                                                        ?.street_address ||
+                                                                        "Address not available"}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -296,7 +315,12 @@ export default function PatientTreatmentsIndex({
                                                                 </div>
                                                                 <div>
                                                                     <p className="text-sm font-medium text-gray-900">
-                                                                        Dr. {treatment.dentist.name}
+                                                                        Dr.{" "}
+                                                                        {
+                                                                            treatment
+                                                                                .dentist
+                                                                                .name
+                                                                        }
                                                                     </p>
                                                                     <p className="text-xs text-gray-600">
                                                                         Dentist
@@ -312,18 +336,29 @@ export default function PatientTreatmentsIndex({
                                                                 </div>
                                                                 <div>
                                                                     <p className="text-sm font-medium text-gray-900">
-                                                                        {new Date(treatment.appointment.scheduled_at).toLocaleDateString("en-US", {
-                                                                            weekday: "long",
-                                                                            year: "numeric",
-                                                                            month: "long",
-                                                                            day: "numeric",
-                                                                        })}
+                                                                        {new Date(
+                                                                            treatment.appointment.scheduled_at
+                                                                        ).toLocaleDateString(
+                                                                            "en-US",
+                                                                            {
+                                                                                weekday:
+                                                                                    "long",
+                                                                                year: "numeric",
+                                                                                month: "long",
+                                                                                day: "numeric",
+                                                                            }
+                                                                        )}
                                                                     </p>
                                                                     <p className="text-xs text-gray-600">
-                                                                        {new Date(treatment.appointment.scheduled_at).toLocaleTimeString("en-US", {
-                                                                            hour: "2-digit",
-                                                                            minute: "2-digit",
-                                                                        })}
+                                                                        {new Date(
+                                                                            treatment.appointment.scheduled_at
+                                                                        ).toLocaleTimeString(
+                                                                            "en-US",
+                                                                            {
+                                                                                hour: "2-digit",
+                                                                                minute: "2-digit",
+                                                                            }
+                                                                        )}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -338,11 +373,13 @@ export default function PatientTreatmentsIndex({
                                                             <div className="flex items-center gap-2 mb-2">
                                                                 <DollarSign className="w-5 h-5 text-green-600" />
                                                                 <span className="text-sm font-semibold text-green-700">
-                                                                    Treatment Cost
+                                                                    Treatment
+                                                                    Cost
                                                                 </span>
                                                             </div>
                                                             <p className="text-2xl font-bold text-green-800">
-                                                                ₱{treatment.cost.toLocaleString()}
+                                                                ₱
+                                                                {treatment.cost.toLocaleString()}
                                                             </p>
                                                         </div>
                                                     )}
@@ -352,11 +389,14 @@ export default function PatientTreatmentsIndex({
                                                             <div className="flex items-center gap-2 mb-2">
                                                                 <FileText className="w-5 h-5 text-blue-600" />
                                                                 <span className="text-sm font-semibold text-blue-700">
-                                                                    Treatment Notes
+                                                                    Treatment
+                                                                    Notes
                                                                 </span>
                                                             </div>
                                                             <p className="text-sm text-gray-700 line-clamp-3">
-                                                                {treatment.notes}
+                                                                {
+                                                                    treatment.notes
+                                                                }
                                                             </p>
                                                         </div>
                                                     )}
@@ -365,7 +405,8 @@ export default function PatientTreatmentsIndex({
 
                                             {/* Action Button */}
                                             <div className="flex justify-end pt-4 border-t border-gray-200/50">
-                                                {treatment.id && treatment.id > 0 ? (
+                                                {treatment.id &&
+                                                treatment.id > 0 ? (
                                                     <Link
                                                         href={route(
                                                             "patient.treatments.show",
@@ -405,9 +446,10 @@ export default function PatientTreatmentsIndex({
                                         No Treatments Yet
                                     </h3>
                                     <p className="text-gray-600 mb-8 max-w-lg mx-auto text-lg leading-relaxed">
-                                        You haven't received any dental treatments yet. 
-                                        Book an appointment with one of our partner clinics 
-                                        to start your dental care journey!
+                                        You haven't received any dental
+                                        treatments yet. Book an appointment with
+                                        one of our partner clinics to start your
+                                        dental care journey!
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                         <Link href="/clinics">
@@ -417,8 +459,8 @@ export default function PatientTreatmentsIndex({
                                             </Button>
                                         </Link>
                                         <Link href="/appointments">
-                                            <Button 
-                                                variant="outline" 
+                                            <Button
+                                                variant="outline"
                                                 className="flex items-center gap-2 border-2 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 px-8 py-4 text-lg font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300"
                                             >
                                                 <Calendar className="w-5 h-5" />
