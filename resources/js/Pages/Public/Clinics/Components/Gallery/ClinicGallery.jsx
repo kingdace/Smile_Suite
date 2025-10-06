@@ -15,7 +15,7 @@ export default function ClinicGallery({ galleryImages }) {
             setCurrentImageIndex((prev) =>
                 prev === galleryImages.length - 1 ? 0 : prev + 1
             );
-        }, 5000); // Change image every 5 seconds
+        }, 10000); // Change image every 10 seconds
 
         return () => clearInterval(interval);
     }, [isPlaying, galleryImages.length]);

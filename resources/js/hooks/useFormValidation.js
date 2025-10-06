@@ -169,6 +169,26 @@ export const validators = {
         return null;
     },
 
+    coordinate: (value) => {
+        if (!value) return null;
+        const num = parseFloat(value);
+        return isNaN(num) || num < -90 || num > 90
+            ? "Invalid coordinate value"
+            : null;
+    },
+
+    phone: (value) => {
+        if (!value) return null;
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        return !phoneRegex.test(value.replace(/[\s\-\(\)]/g, ""))
+            ? "Please enter a valid phone number"
+            : null;
+    },
+
+    match: (matchValue) => (value) => {
+        return value !== matchValue ? "Values do not match" : null;
+    },
+
     custom: (validator) => validator,
 };
 

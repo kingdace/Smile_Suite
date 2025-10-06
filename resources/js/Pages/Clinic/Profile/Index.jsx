@@ -23,7 +23,6 @@ import UserInfoSection from "@/Components/Clinic/Profile/UserInfoSection";
 import HolidayManagementSection from "@/Components/Clinic/Profile/HolidayManagementSection";
 
 // Import custom hooks
-import { useFormValidation } from "@/hooks/useFormValidation";
 import { useRealTimeValidation } from "@/hooks/useRealTimeValidation";
 
 // Import UI components
@@ -76,17 +75,10 @@ export default function Index({
         active_tab: activeTab,
     });
 
-    // Custom hooks
-    const {
-        validateClinicForm,
-        validateClinicSettingsForm,
-        validateLocationForm,
-        validateUserForm,
-        errors: validationErrors,
-        isSubmitting,
-        submitProgress,
-        submitWithProgress,
-    } = useFormValidation();
+    // Custom hooks - removed complex validation, using simple validation instead
+    const [validationErrors, setValidationErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitProgress, setSubmitProgress] = useState(0);
 
     // Real-time validation
     const {
@@ -109,66 +101,61 @@ export default function Index({
         validateField(fieldName, value, { ...data, [fieldName]: value });
     };
 
-    // Handle form submission
-    const handleSubmit = async (e) => {
+    // Handle form submission - simplified like the original
+    const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validate form based on active tab
-        let isValid = false;
+        // Basic validation for clinic settings
         if (activeTab === "clinic") {
-            // Only validate clinic settings fields (name, email, phone, description)
-            isValid = validateClinicSettingsForm(data);
-        } else if (activeTab === "user") {
-            // Validate user account fields
-            isValid = validateUserForm(data);
-        } else if (activeTab === "location") {
-            // Only validate location fields (latitude, longitude)
-            isValid = validateLocationForm(data);
-        } else if (activeTab === "hours") {
-            // Operating hours validation - always valid for now
-            isValid = true;
-        } else {
-            // For other tabs (gallery, holidays), always valid
-            isValid = true;
+            if (!data.clinic_name || data.clinic_name.trim() === "") {
+                showError("Validation Error", "Clinic name is required.");
+                return;
+            }
+            if (!data.clinic_email || data.clinic_email.trim() === "") {
+                showError("Validation Error", "Clinic email is required.");
+                return;
+            }
         }
 
-        if (!isValid) {
-            showError(
-                "Validation Error",
-                "Please fix the errors before submitting."
-            );
-            return;
-        }
+        // Set submitting state
+        setIsSubmitting(true);
+        setSubmitProgress(0);
 
-        try {
-            await submitWithProgress(async () => {
-                return new Promise((resolve, reject) => {
-                    post(route("clinic.profile.update"), {
-                        ...data,
-                        active_tab: activeTab,
-                        onSuccess: () => {
-                            showSuccess(
-                                "Success",
-                                "Profile updated successfully!"
-                            );
-                            // Use Inertia reload to preserve current tab state
-                            router.reload();
-                            resolve();
-                        },
-                        onError: (errors) => {
-                            console.log("Backend validation errors:", errors);
-                            showError(
-                                "Update Failed",
-                                "Please check the errors and try again."
-                            );
-                            reject(errors);
-                        },
-                    });
-                });
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+            setSubmitProgress((prev) => {
+                if (prev >= 90) {
+                    clearInterval(progressInterval);
+                    return prev;
+                }
+                return prev + 10;
             });
-        } catch (error) {
-            console.error("Form submission error:", error);
-        }
+        }, 100);
+
+        // Submit the form
+        post(route("clinic.profile.update"), {
+            ...data,
+            active_tab: activeTab,
+            forceFormData: true,
+            onSuccess: () => {
+                clearInterval(progressInterval);
+                setSubmitProgress(100);
+                showSuccess("Success", "Profile updated successfully!");
+                setTimeout(() => {
+                    setIsSubmitting(false);
+                    router.reload();
+                }, 500);
+            },
+            onError: (errors) => {
+                clearInterval(progressInterval);
+                setIsSubmitting(false);
+                console.log("Backend validation errors:", errors);
+                showError(
+                    "Update Failed",
+                    "Please check the errors and try again."
+                );
+            },
+        });
     };
 
     // Tab configuration
@@ -375,10 +362,7 @@ export default function Index({
                                             <ClinicInfoSection
                                                 data={data}
                                                 setData={setData}
-                                                errors={{
-                                                    ...errors,
-                                                    ...validationErrors,
-                                                }}
+                                                errors={errors}
                                                 isAdmin={isAdmin}
                                                 validateField={validateField}
                                                 getFieldError={getFieldError}
@@ -402,10 +386,7 @@ export default function Index({
                                             <UserInfoSection
                                                 data={data}
                                                 setData={setData}
-                                                errors={{
-                                                    ...errors,
-                                                    ...validationErrors,
-                                                }}
+                                                errors={errors}
                                                 isAdmin={isAdmin}
                                             />
                                         </div>
@@ -420,10 +401,7 @@ export default function Index({
                                                 initialOperatingHours={
                                                     data.operating_hours
                                                 }
-                                                errors={{
-                                                    ...errors,
-                                                    ...validationErrors,
-                                                }}
+                                                errors={errors}
                                                 onOperatingHoursChange={
                                                     handleOperatingHoursChange
                                                 }
@@ -439,10 +417,7 @@ export default function Index({
                                             <LocationSection
                                                 data={data}
                                                 setData={setData}
-                                                errors={{
-                                                    ...errors,
-                                                    ...validationErrors,
-                                                }}
+                                                errors={errors}
                                             />
                                         </div>
                                     </div>
@@ -456,10 +431,7 @@ export default function Index({
                                                 initialGalleryImages={
                                                     clinic?.gallery_images || []
                                                 }
-                                                errors={{
-                                                    ...errors,
-                                                    ...validationErrors,
-                                                }}
+                                                errors={errors}
                                                 onGalleryChange={
                                                     handleGalleryChange
                                                 }
@@ -477,10 +449,7 @@ export default function Index({
                                                 initialHolidays={
                                                     clinic?.holidays || []
                                                 }
-                                                errors={{
-                                                    ...errors,
-                                                    ...validationErrors,
-                                                }}
+                                                errors={errors}
                                                 showSuccess={showSuccess}
                                                 showError={showError}
                                             />
