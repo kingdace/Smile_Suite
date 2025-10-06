@@ -67,7 +67,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const appointmentsPerPage = 5;
+    const appointmentsPerPage = 3;
 
     const formatAppointmentNotes = (notes) => {
         if (!notes) return null;
@@ -278,11 +278,11 @@ const AppointmentsSection = ({ appointments = [] }) => {
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     {totalPages > 1 && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">
-                                Page {currentPage} of {totalPages}
+                        <div className="flex items-center gap-1">
+                            <span className="text-xs text-gray-500">
+                                {currentPage}/{totalPages}
                             </span>
                             <div className="flex gap-1">
                                 <Button
@@ -292,9 +292,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         handlePageChange(currentPage - 1)
                                     }
                                     disabled={currentPage === 1}
-                                    className="w-8 h-8 p-0"
+                                    className="w-6 h-6 p-0"
                                 >
-                                    <ChevronLeft className="w-4 h-4" />
+                                    <ChevronLeft className="w-3 h-3" />
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -303,9 +303,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         handlePageChange(currentPage + 1)
                                     }
                                     disabled={currentPage === totalPages}
-                                    className="w-8 h-8 p-0"
+                                    className="w-6 h-6 p-0"
                                 >
-                                    <ChevronRight className="w-4 h-4" />
+                                    <ChevronRight className="w-3 h-3" />
                                 </Button>
                             </div>
                         </div>
@@ -644,16 +644,14 @@ const AppointmentsSection = ({ appointments = [] }) => {
                     </div>
                 )}
 
-                {/* Pagination Controls */}
+                {/* Compact Pagination Controls */}
                 {appointments.length > appointmentsPerPage && (
-                    <div className="mt-8 pt-6 border-t border-gray-200/50">
+                    <div className="mt-4 pt-4 border-t border-gray-200/50">
                         <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-600">
-                                Showing {startIndex + 1} to{" "}
-                                {Math.min(endIndex, appointments.length)} of{" "}
-                                {appointments.length} appointments
+                            <div className="text-xs text-gray-500">
+                                Page {currentPage} of {totalPages}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -661,10 +659,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         handlePageChange(currentPage - 1)
                                     }
                                     disabled={currentPage === 1}
-                                    className="flex items-center gap-2"
+                                    className="h-7 px-2 text-xs"
                                 >
-                                    <ChevronLeft className="w-4 h-4" />
-                                    Previous
+                                    <ChevronLeft className="w-3 h-3" />
                                 </Button>
                                 <div className="flex items-center gap-1">
                                     {Array.from(
@@ -682,7 +679,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             onClick={() =>
                                                 handlePageChange(page)
                                             }
-                                            className={`w-8 h-8 p-0 ${
+                                            className={`w-6 h-6 p-0 text-xs ${
                                                 page === currentPage
                                                     ? "bg-blue-500 text-white"
                                                     : "text-gray-600 hover:text-gray-900"
@@ -699,10 +696,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         handlePageChange(currentPage + 1)
                                     }
                                     disabled={currentPage === totalPages}
-                                    className="flex items-center gap-2"
+                                    className="h-7 px-2 text-xs"
                                 >
-                                    Next
-                                    <ChevronRight className="w-4 h-4" />
+                                    <ChevronRight className="w-3 h-3" />
                                 </Button>
                             </div>
                         </div>
@@ -796,8 +792,8 @@ const QuickActions = ({ loading = false }) => {
                         </p>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                    {Array.from({ length: 4 }).map((_, i) => (
+                <div className="grid grid-cols-3 gap-4 sm:gap-6">
+                    {Array.from({ length: 3 }).map((_, i) => (
                         <QuickActionSkeleton key={i} />
                     ))}
                 </div>
@@ -823,7 +819,7 @@ const QuickActions = ({ loading = false }) => {
                 </div>
             </div>
             <nav
-                className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6"
+                className="grid grid-cols-3 gap-4 sm:gap-6"
                 role="navigation"
                 aria-label="Quick actions menu"
             >
@@ -944,8 +940,41 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                         </p>
                     </div>
                 </div>
-                <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-purple-600" />
+                <div className="flex items-center gap-2">
+                    {totalPages > 1 && (
+                        <div className="flex items-center gap-1">
+                            <span className="text-xs text-gray-500">
+                                {currentPage}/{totalPages}
+                            </span>
+                            <div className="flex gap-1">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        handlePageChange(currentPage - 1)
+                                    }
+                                    disabled={currentPage === 1}
+                                    className="w-6 h-6 p-0"
+                                >
+                                    <ChevronLeft className="w-3 h-3" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        handlePageChange(currentPage + 1)
+                                    }
+                                    disabled={currentPage === totalPages}
+                                    className="w-6 h-6 p-0"
+                                >
+                                    <ChevronRight className="w-3 h-3" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                    <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+                        <BarChart3 className="w-4 h-4 text-purple-600" />
+                    </div>
                 </div>
             </div>
             <div>
@@ -1217,16 +1246,14 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                     </div>
                 )}
 
-                {/* Pagination Controls */}
+                {/* Compact Pagination Controls */}
                 {(treatments?.length || 0) > treatmentsPerPage && (
-                    <div className="mt-8 pt-6 border-t border-gray-200/50">
+                    <div className="mt-4 pt-4 border-t border-gray-200/50">
                         <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-600">
-                                Showing {startIndex + 1} to{" "}
-                                {Math.min(endIndex, treatments?.length || 0)} of{" "}
-                                {treatments?.length || 0} treatments
+                            <div className="text-xs text-gray-500">
+                                Page {currentPage} of {totalPages}
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -1234,10 +1261,9 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                         handlePageChange(currentPage - 1)
                                     }
                                     disabled={currentPage === 1}
-                                    className="flex items-center gap-2"
+                                    className="h-7 px-2 text-xs"
                                 >
-                                    <ChevronLeft className="w-4 h-4" />
-                                    Previous
+                                    <ChevronLeft className="w-3 h-3" />
                                 </Button>
                                 <div className="flex items-center gap-1">
                                     {Array.from(
@@ -1255,7 +1281,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                             onClick={() =>
                                                 handlePageChange(page)
                                             }
-                                            className={`w-8 h-8 p-0 ${
+                                            className={`w-6 h-6 p-0 text-xs ${
                                                 page === currentPage
                                                     ? "bg-violet-500 text-white"
                                                     : "text-gray-600 hover:text-gray-900"
@@ -1272,10 +1298,9 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                         handlePageChange(currentPage + 1)
                                     }
                                     disabled={currentPage === totalPages}
-                                    className="flex items-center gap-2"
+                                    className="h-7 px-2 text-xs"
                                 >
-                                    Next
-                                    <ChevronRight className="w-4 h-4" />
+                                    <ChevronRight className="w-3 h-3" />
                                 </Button>
                             </div>
                         </div>
@@ -1287,16 +1312,18 @@ const TreatmentsOverview = ({ treatments = [] }) => {
 };
 
 // Statistics Component
-const StatisticsSection = ({ clinicRecords = [], loading = false }) => {
+const StatisticsSection = ({
+    appointments = [],
+    treatments = [],
+    clinicRecords = [],
+    loading = false,
+}) => {
+    // Calculate actual statistics from real data
     const totalClinics = clinicRecords.length;
-    const totalAppointments = clinicRecords.reduce(
-        (sum, record) => sum + (record.appointments_count || 0),
-        0
-    );
-    const upcomingAppointments = clinicRecords.reduce(
-        (sum, record) => sum + (record.upcoming_appointments || 0),
-        0
-    );
+    const totalAppointments = appointments.length;
+    const upcomingAppointments = appointments.filter(
+        (appointment) => new Date(appointment.scheduled_at) > new Date()
+    ).length;
 
     const stats = [
         {
@@ -1488,7 +1515,7 @@ export default function PatientDashboard({
 
             {/* Success Message */}
             {flash?.success && (
-                <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 pt-4">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
                     <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-sm">
                         <div className="flex items-center">
                             <CheckCircle className="w-5 h-5 mr-2" />
@@ -1499,63 +1526,100 @@ export default function PatientDashboard({
             )}
 
             {/* Main Container */}
-            <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-4 sm:py-6 lg:py-8">
-                <div className="bg-gradient-to-br from-blue-50 via-blue-80 to-cyan-80 rounded-2xl shadow-2xl border border-blue-200/50 overflow-hidden">
+            <div
+                className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
+                style={{ width: "95%", maxWidth: "1350px" }}
+            >
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
                     {/* Enhanced Header Section */}
-                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                    <div className="relative overflow-hidden bg-gradient-to-br from-teal-500 via-sky-600 to-blue-400 px-6 py-6">
+                        {/* Background Visual Elements */}
                         <div className="absolute inset-0 bg-black/5"></div>
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
-                        <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-10 -translate-x-10"></div>
-                        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white/3 rounded-full -translate-y-8 -translate-x-8"></div>
+
+                        {/* Floating Geometric Shapes */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/8 rounded-full translate-y-12 -translate-x-12"></div>
+                        <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white/6 rounded-full -translate-y-8 -translate-x-8"></div>
+                        <div className="absolute top-1/4 right-1/4 w-12 h-12 bg-white/8 rounded-full -translate-y-6 translate-x-6"></div>
+
+                        {/* Subtle Grid Pattern */}
+                        <div className="absolute inset-0 opacity-10">
+                            <div
+                                className="w-full h-full"
+                                style={{
+                                    backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                                    backgroundSize: "30px 30px",
+                                }}
+                            ></div>
+                        </div>
+
+                        {/* Decorative Lines */}
+                        <div className="absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+                        <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
 
                         <div className="relative">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div className="flex items-center gap-3 sm:gap-4">
+                            {/* Header Single Row */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
                                     <div
                                         className="relative"
                                         role="img"
                                         aria-label="Dashboard icon"
                                     >
-                                        <div className="p-2 sm:p-3 bg-white/25 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30 shadow-lg">
                                             <LayoutDashboard
-                                                className="h-5 w-5 sm:h-6 sm:w-6 text-white"
+                                                className="h-6 w-6 text-white"
                                                 aria-hidden="true"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">
+                                        <h1 className="text-2xl font-bold text-white mb-1">
                                             Patient Dashboard
                                         </h1>
-                                        <p className="text-blue-100 text-xs sm:text-sm font-medium">
+                                        <p className="text-blue-100 text-sm font-medium">
                                             Welcome back,{" "}
                                             <span className="font-semibold">
                                                 {user?.name || auth?.user?.name}
                                             </span>
                                             !
-                                            <span className="hidden sm:inline">
-                                                {" "}
-                                                Here's your dental health
-                                                overview
-                                            </span>
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* Navigation Actions and Date in Same Row */}
                                 <div className="flex items-center gap-3">
+                                    <Link href={route("patient.profile")}>
+                                        <div className="flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20 hover:border-white/30 transition-all duration-300 cursor-pointer group">
+                                            <User className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                                            <span className="text-sm font-medium text-white">
+                                                My Profile
+                                            </span>
+                                        </div>
+                                    </Link>
+                                    <Link
+                                        href={route("patient.treatments.index")}
+                                    >
+                                        <div className="flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20 hover:border-white/30 transition-all duration-300 cursor-pointer group">
+                                            <Stethoscope className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
+                                            <span className="text-sm font-medium text-white">
+                                                My Treatments
+                                            </span>
+                                        </div>
+                                    </Link>
                                     <div
-                                        className="bg-gradient-to-r from-blue-100/80 to-cyan-100/80 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-xl border border-blue-200/50 shadow-lg"
+                                        className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/30 shadow-sm"
                                         role="img"
                                         aria-label="Current date"
                                     >
                                         <time
-                                            className="text-xs sm:text-sm font-bold text-gray-700"
+                                            className="text-sm font-medium text-white"
                                             dateTime={new Date().toISOString()}
                                         >
                                             {new Date().toLocaleDateString(
                                                 "en-US",
                                                 {
-                                                    weekday: "short",
-                                                    year: "numeric",
+                                                    weekday: "long",
                                                     month: "short",
                                                     day: "numeric",
                                                 }
@@ -1568,19 +1632,18 @@ export default function PatientDashboard({
                     </div>
 
                     {/* Main Content */}
-                    <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+                    <div className="px-6 py-6">
                         {/* Statistics */}
-                        <div className="mb-8">
-                            <StatisticsSection clinicRecords={clinicRecords} />
-                        </div>
-
-                        {/* Quick Actions Section */}
-                        <div className="mb-8">
-                            <QuickActions />
+                        <div className="mb-6">
+                            <StatisticsSection
+                                appointments={appointments}
+                                treatments={treatments}
+                                clinicRecords={clinicRecords}
+                            />
                         </div>
 
                         {/* Main Content Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Appointments Section */}
                             <div>
                                 <AppointmentsSection
@@ -1593,86 +1656,6 @@ export default function PatientDashboard({
                                 <TreatmentsOverview treatments={treatments} />
                             </div>
                         </div>
-
-                        {/* Connected Clinics Section - Full Width */}
-                        {clinicRecords && clinicRecords.length > 0 && (
-                            <div className="mt-8">
-                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-sm">
-                                                <Building2 className="w-5 h-5 text-white" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-lg font-bold text-gray-900">
-                                                    Connected Clinics
-                                                </h3>
-                                                <p className="text-gray-500 text-sm">
-                                                    Your trusted dental partners
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-                                            <BarChart3 className="w-4 h-4 text-green-600" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {clinicRecords
-                                            .slice(0, 6)
-                                            .map((record) => (
-                                                <div
-                                                    key={record.id}
-                                                    className="bg-gradient-to-r from-gray-50/50 to-white/50 rounded-xl border border-gray-100/50 p-4 hover:shadow-md transition-all duration-300 group"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center shadow-sm">
-                                                            <Building2 className="w-6 h-6 text-emerald-600" />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <h4 className="font-semibold text-gray-900">
-                                                                {
-                                                                    record
-                                                                        .clinic
-                                                                        ?.name
-                                                                }
-                                                            </h4>
-                                                            <p className="text-sm text-gray-500">
-                                                                {
-                                                                    record
-                                                                        .clinic
-                                                                        ?.address
-                                                                }
-                                                            </p>
-                                                            <div className="flex justify-between text-sm text-gray-600 mt-1">
-                                                                <span>
-                                                                    Appointments:
-                                                                </span>
-                                                                <span className="font-medium">
-                                                                    {record.appointments_count ||
-                                                                        0}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        {clinicRecords.length > 6 && (
-                                            <div className="col-span-full text-center pt-2">
-                                                <Link href="/clinics">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 text-emerald-700 hover:from-emerald-100 hover:to-teal-100"
-                                                    >
-                                                        View All Clinics
-                                                    </Button>
-                                                </Link>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

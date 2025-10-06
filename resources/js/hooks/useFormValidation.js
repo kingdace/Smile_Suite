@@ -243,9 +243,12 @@ export const useFormValidation = (initialValues = {}, validationRules = {}) => {
     );
 
     // Set multiple field values
-    const setMultipleValues = useCallback((newValues) => {
-        setValues((prev) => ({ ...prev, ...newValues }));
-    }, [setValues]);
+    const setMultipleValues = useCallback(
+        (newValues) => {
+            setValues((prev) => ({ ...prev, ...newValues }));
+        },
+        [setValues]
+    );
 
     // Handle field blur
     const handleBlur = useCallback(

@@ -27,15 +27,36 @@ import {
     Star,
     TrendingUp,
     DollarSign,
+    Settings,
+    Download,
+    FileText,
+    History,
+    Bell,
+    Globe,
+    Lock,
+    RefreshCw,
+    Plus,
+    Minus,
+    ChevronRight,
+    Sparkles,
+    Target,
+    Award,
+    BarChart3,
+    Activity,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInDays, differenceInHours, addDays } from "date-fns";
+import { useState } from "react";
 
 export default function SubscriptionIndex({ auth, clinic }) {
+    const [selectedDuration, setSelectedDuration] = useState(1);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const [showRenewalModal, setShowRenewalModal] = useState(false);
+
     const getPlanInfo = (plan) => {
         const plans = {
             basic: {
                 name: "Basic Plan",
-                price: "₱999",
+                price: 999,
                 period: "month",
                 features: [
                     "Patient Management (up to 500 patients)",
@@ -47,12 +68,13 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     "Email Notifications",
                     "14-day Free Trial",
                 ],
-                color: "bg-blue-500",
+                color: "from-blue-500 to-blue-600",
                 icon: <Package className="w-6 h-6" />,
+                popular: false,
             },
             premium: {
                 name: "Premium Plan",
-                price: "₱1,999",
+                price: 1999,
                 period: "month",
                 features: [
                     "Everything in Basic",
@@ -64,12 +86,13 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     "Bulk Operations",
                     "Priority Support",
                 ],
-                color: "bg-purple-500",
+                color: "from-purple-500 to-purple-600",
                 icon: <Star className="w-6 h-6" />,
+                popular: true,
             },
             enterprise: {
                 name: "Enterprise Plan",
-                price: "₱2,999",
+                price: 2999,
                 period: "month",
                 features: [
                     "Everything in Premium",
@@ -81,11 +104,76 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     "24/7 Priority Support",
                     "Training & Onboarding",
                 ],
-                color: "bg-gradient-to-r from-purple-500 to-pink-500",
+                color: "from-purple-500 to-pink-500",
                 icon: <Crown className="w-6 h-6" />,
+                popular: false,
             },
         };
         return plans[plan] || plans.basic;
+    };
+
+    // Calculate actual usage statistics
+    const calculateUsageStats = () => {
+        const currentPlan = getPlanInfo(clinic.subscription_plan);
+
+        // Mock data - in real implementation, these would come from the backend
+        const stats = {
+            patients: {
+                current: clinic.patients?.length || 0,
+                limit:
+                    currentPlan.name === "Basic Plan"
+                        ? 500
+                        : currentPlan.name === "Premium Plan"
+                        ? 1000
+                        : 9999,
+                percentage: 0,
+            },
+            staff: {
+                current: clinic.users?.length || 0,
+                limit:
+                    currentPlan.name === "Basic Plan"
+                        ? 2
+                        : currentPlan.name === "Premium Plan"
+                        ? 5
+                        : 9999,
+                percentage: 0,
+            },
+            storage: {
+                current: 2.3, // GB
+                limit:
+                    currentPlan.name === "Basic Plan"
+                        ? 10
+                        : currentPlan.name === "Premium Plan"
+                        ? 50
+                        : 999,
+                percentage: 0,
+            },
+            appointments: {
+                current: clinic.appointments?.length || 0,
+                limit: 9999,
+                percentage: 0,
+            },
+        };
+
+        // Calculate percentages
+        stats.patients.percentage = Math.min(
+            (stats.patients.current / stats.patients.limit) * 100,
+            100
+        );
+        stats.staff.percentage = Math.min(
+            (stats.staff.current / stats.staff.limit) * 100,
+            100
+        );
+        stats.storage.percentage = Math.min(
+            (stats.storage.current / stats.storage.limit) * 100,
+            100
+        );
+        stats.appointments.percentage = Math.min(
+            (stats.appointments.current / stats.appointments.limit) * 100,
+            100
+        );
+
+        return stats;
     };
 
     const getStatusInfo = () => {
@@ -96,13 +184,8 @@ export default function SubscriptionIndex({ auth, clinic }) {
             case "active":
                 if (clinic.subscription_end_date) {
                     const endDate = new Date(clinic.subscription_end_date);
-                    const timeLeft = endDate - now;
-                    const daysLeft = Math.floor(
-                        timeLeft / (1000 * 60 * 60 * 24)
-                    );
-                    const hoursLeft = Math.floor(
-                        (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-                    );
+                    const daysLeft = differenceInDays(endDate, now);
+                    const hoursLeft = differenceInHours(endDate, now) % 24;
 
                     return {
                         icon: <CheckCircle className="w-5 h-5" />,
@@ -110,6 +193,12 @@ export default function SubscriptionIndex({ auth, clinic }) {
                         bgColor: "bg-green-50",
                         borderColor: "border-green-200",
                         text: `Active • ${daysLeft} days, ${hoursLeft} hours remaining`,
+                        urgency:
+                            daysLeft > 7
+                                ? "low"
+                                : daysLeft > 3
+                                ? "medium"
+                                : "high",
                     };
                 }
                 return {
@@ -118,18 +207,14 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     bgColor: "bg-green-50",
                     borderColor: "border-green-200",
                     text: "Active",
+                    urgency: "low",
                 };
 
             case "trial":
                 if (clinic.trial_ends_at) {
                     const trialEnd = new Date(clinic.trial_ends_at);
-                    const timeLeft = trialEnd - now;
-                    const daysLeft = Math.floor(
-                        timeLeft / (1000 * 60 * 60 * 24)
-                    );
-                    const hoursLeft = Math.floor(
-                        (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-                    );
+                    const daysLeft = differenceInDays(trialEnd, now);
+                    const hoursLeft = differenceInHours(trialEnd, now) % 24;
 
                     return {
                         icon: <Clock className="w-5 h-5" />,
@@ -137,6 +222,12 @@ export default function SubscriptionIndex({ auth, clinic }) {
                         bgColor: "bg-blue-50",
                         borderColor: "border-blue-200",
                         text: `Trial • ${daysLeft} days, ${hoursLeft} hours remaining`,
+                        urgency:
+                            daysLeft > 7
+                                ? "low"
+                                : daysLeft > 3
+                                ? "medium"
+                                : "high",
                     };
                 }
                 return {
@@ -145,6 +236,7 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     bgColor: "bg-blue-50",
                     borderColor: "border-blue-200",
                     text: "Trial",
+                    urgency: "medium",
                 };
 
             case "grace_period":
@@ -154,6 +246,7 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     bgColor: "bg-orange-50",
                     borderColor: "border-orange-200",
                     text: "Grace Period",
+                    urgency: "high",
                 };
 
             case "suspended":
@@ -163,6 +256,7 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     bgColor: "bg-red-50",
                     borderColor: "border-red-200",
                     text: "Suspended",
+                    urgency: "critical",
                 };
 
             default:
@@ -172,330 +266,640 @@ export default function SubscriptionIndex({ auth, clinic }) {
                     bgColor: "bg-gray-50",
                     borderColor: "border-gray-200",
                     text: "Unknown",
+                    urgency: "medium",
                 };
         }
     };
 
+    const handleUpgrade = (newPlan) => {
+        router.post(
+            route("clinic.subscription.upgrade"),
+            {
+                new_plan: newPlan,
+                duration_months: selectedDuration,
+                message: `Upgrade request from ${clinic.subscription_plan} to ${newPlan} for ${selectedDuration} month(s)`,
+            },
+            {
+                onSuccess: (page) => {
+                    if (page.props.flash?.success) {
+                        alert(page.props.flash.success);
+                    } else if (page.props.flash?.error) {
+                        alert("Error: " + page.props.flash.error);
+                    }
+                },
+                onError: (errors) => {
+                    console.error("Upgrade request failed:", errors);
+                    alert(
+                        "Upgrade request failed. Please try again or contact support."
+                    );
+                },
+            }
+        );
+    };
+
+    const handleRenewal = () => {
+        router.post(
+            route("clinic.subscription.renewal"),
+            {
+                duration_months: selectedDuration,
+                message: `Renewal request for ${selectedDuration} month(s)`,
+            },
+            {
+                onSuccess: (page) => {
+                    if (page.props.flash?.success) {
+                        alert(page.props.flash.success);
+                    } else if (page.props.flash?.error) {
+                        alert("Error: " + page.props.flash.error);
+                    }
+                },
+                onError: (errors) => {
+                    console.error("Renewal request failed:", errors);
+                    alert(
+                        "Renewal request failed. Please try again or contact support."
+                    );
+                },
+            }
+        );
+    };
+
     const planInfo = getPlanInfo(clinic.subscription_plan);
     const statusInfo = getStatusInfo();
+    const usageStats = calculateUsageStats();
 
     return (
         <AuthenticatedLayout auth={auth}>
             <Head title="Subscription Management" />
 
-            <div className="max-w-7xl mx-auto px-6 py-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Subscription Management
-                            </h1>
-                            <p className="text-gray-600">
-                                Manage your Smile Suite subscription and billing
-                            </p>
+            <div className="max-w-7xl mx-auto px-6 py-6">
+                {/* Header Section */}
+                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-xl shadow-xl mb-6">
+                    <div className="absolute inset-0 bg-black/5"></div>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
+                    <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-10 -translate-x-10"></div>
+
+                    <div className="relative px-6 py-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/25 rounded-xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                    <Crown className="h-6 w-6 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-white mb-1">
+                                        Subscription Management
+                                    </h1>
+                                    <p className="text-blue-100 text-sm">
+                                        Manage your Smile Suite subscription and
+                                        billing
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div
+                                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border backdrop-blur-sm ${statusInfo.bgColor} ${statusInfo.borderColor}`}
+                                >
+                                    {statusInfo.icon}
+                                    <span
+                                        className={`font-medium text-sm ${statusInfo.color}`}
+                                    >
+                                        {statusInfo.text}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <SubscriptionStatusIndicator clinic={clinic} />
                     </div>
                 </div>
 
                 {/* Warning Banner */}
                 <SubscriptionWarningBanner clinic={clinic} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Current Plan */}
-                    <div className="lg:col-span-2">
-                        <Card className="shadow-lg">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-3">
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    {/* Left Column - Current Plan & Usage */}
+                    <div className="xl:col-span-2 space-y-6">
+                        {/* Current Plan Card */}
+                        <Card className="shadow-xl rounded-xl border-0 bg-white/95 backdrop-blur-sm overflow-hidden">
+                            <CardHeader className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 py-4">
+                                <CardTitle className="flex items-center gap-3 text-lg text-white">
                                     <div
-                                        className={`p-2 rounded-lg ${planInfo.color} text-white`}
+                                        className={`p-2 rounded-lg bg-gradient-to-r ${planInfo.color} text-white shadow-lg`}
                                     >
                                         {planInfo.icon}
                                     </div>
                                     Current Plan
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-6">
                                 <div className="space-y-6">
+                                    {/* Plan Overview */}
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="text-xl font-semibold text-gray-900">
+                                            <h3 className="text-xl font-bold text-gray-900 mb-1">
                                                 {planInfo.name}
                                             </h3>
                                             <p className="text-gray-600">
                                                 {clinic.subscription_plan ===
                                                 "trial"
                                                     ? "Free trial period"
-                                                    : `${planInfo.price}/${planInfo.period}`}
+                                                    : `₱${planInfo.price.toLocaleString()}/${
+                                                          planInfo.period
+                                                      }`}
                                             </p>
                                         </div>
-                                        <div
-                                            className={`px-4 py-2 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}
-                                        >
-                                            <div
-                                                className={`flex items-center gap-2 ${statusInfo.color}`}
-                                            >
-                                                {statusInfo.icon}
-                                                <span className="text-sm font-medium">
-                                                    {statusInfo.text}
-                                                </span>
+                                        <div className="text-right">
+                                            <div className="text-xs text-gray-500 mb-1">
+                                                Next Payment
+                                            </div>
+                                            <div className="text-sm font-semibold text-gray-900">
+                                                {clinic.next_payment_at
+                                                    ? format(
+                                                          new Date(
+                                                              clinic.next_payment_at
+                                                          ),
+                                                          "MMM d, yyyy"
+                                                      )
+                                                    : "N/A"}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="border-t pt-6">
+                                    {/* Plan Features */}
+                                    <div className="border-t pt-4">
                                         <h4 className="font-semibold text-gray-900 mb-3">
                                             Plan Features
                                         </h4>
-                                        <ul className="space-y-2">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                             {planInfo.features.map(
                                                 (feature, index) => (
-                                                    <li
+                                                    <div
                                                         key={index}
-                                                        className="flex items-center gap-3"
+                                                        className="flex items-center gap-2"
                                                     >
                                                         <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                                        <span className="text-gray-700">
+                                                        <span className="text-sm text-gray-700">
                                                             {feature}
                                                         </span>
-                                                    </li>
+                                                    </div>
                                                 )
                                             )}
-                                        </ul>
+                                        </div>
                                     </div>
 
-                                    {clinic.subscription_end_date && (
-                                        <div className="border-t pt-6">
+                                    {/* Subscription Details */}
+                                    {clinic.subscription_start_date && (
+                                        <div className="border-t pt-4">
                                             <h4 className="font-semibold text-gray-900 mb-3">
                                                 Subscription Details
                                             </h4>
-                                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                                <div>
-                                                    <p className="text-gray-600">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div className="bg-gray-50 p-3 rounded-lg">
+                                                    <div className="text-xs text-gray-600 mb-1">
                                                         Start Date
-                                                    </p>
-                                                    <p className="font-medium">
-                                                        {clinic.subscription_start_date
+                                                    </div>
+                                                    <div className="font-semibold text-sm text-gray-900">
+                                                        {format(
+                                                            new Date(
+                                                                clinic.subscription_start_date
+                                                            ),
+                                                            "MMM d, yyyy"
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="bg-gray-50 p-3 rounded-lg">
+                                                    <div className="text-xs text-gray-600 mb-1">
+                                                        End Date
+                                                    </div>
+                                                    <div className="font-semibold text-sm text-gray-900">
+                                                        {clinic.subscription_end_date
                                                             ? format(
                                                                   new Date(
-                                                                      clinic.subscription_start_date
+                                                                      clinic.subscription_end_date
                                                                   ),
                                                                   "MMM d, yyyy"
                                                               )
                                                             : "N/A"}
-                                                    </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-gray-600">
-                                                        End Date
-                                                    </p>
-                                                    <p className="font-medium">
-                                                        {format(
-                                                            new Date(
-                                                                clinic.subscription_end_date
-                                                            ),
-                                                            "MMM d, yyyy"
-                                                        )}
-                                                    </p>
+                                                <div className="bg-gray-50 p-3 rounded-lg">
+                                                    <div className="text-xs text-gray-600 mb-1">
+                                                        Last Payment
+                                                    </div>
+                                                    <div className="font-semibold text-sm text-gray-900">
+                                                        {clinic.last_payment_at
+                                                            ? format(
+                                                                  new Date(
+                                                                      clinic.last_payment_at
+                                                                  ),
+                                                                  "MMM d, yyyy"
+                                                              )
+                                                            : "N/A"}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
+                                    {/* Action Buttons */}
                                     <div className="flex gap-3 pt-4">
-                                        <Button
-                                            className="flex-1"
-                                            onClick={() => {
-                                                router.post(
-                                                    route(
-                                                        "clinic.subscription.upgrade"
-                                                    ),
-                                                    {
-                                                        new_plan: "premium", // Default to premium for upgrade
-                                                        duration_months: 1,
-                                                        message:
-                                                            "Requested via subscription page Upgrade button",
-                                                    },
-                                                    {
-                                                        onSuccess: (page) => {
-                                                            if (
-                                                                page.props.flash
-                                                                    ?.success
-                                                            ) {
-                                                                alert(
-                                                                    page.props
-                                                                        .flash
-                                                                        .success
-                                                                );
-                                                            } else if (
-                                                                page.props.flash
-                                                                    ?.error
-                                                            ) {
-                                                                alert(
-                                                                    "Error: " +
-                                                                        page
-                                                                            .props
-                                                                            .flash
-                                                                            .error
-                                                                );
-                                                            }
-                                                        },
-                                                        onError: (errors) => {
-                                                            console.error(
-                                                                "Upgrade request failed:",
-                                                                errors
-                                                            );
-                                                            alert(
-                                                                "Upgrade request failed. Please try again or contact support."
-                                                            );
-                                                        },
+                                        {clinic.subscription_plan ===
+                                        "trial" ? (
+                                            <Button
+                                                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                                                onClick={() =>
+                                                    handleUpgrade("premium")
+                                                }
+                                            >
+                                                <Crown className="w-4 h-4 mr-2" />
+                                                Upgrade to Premium
+                                            </Button>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                                                    onClick={() =>
+                                                        setShowRenewalModal(
+                                                            true
+                                                        )
                                                     }
-                                                );
-                                            }}
-                                        >
-                                            <CreditCard className="w-4 h-4 mr-2" />
-                                            {clinic.subscription_plan ===
-                                            "trial"
-                                                ? "Upgrade Now"
-                                                : "Manage Billing"}
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1"
-                                        >
-                                            <Mail className="w-4 h-4 mr-2" />
-                                            Contact Support
-                                        </Button>
+                                                >
+                                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                                    Renew Subscription
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    className="flex-1 border-2 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+                                                    onClick={() =>
+                                                        setShowUpgradeModal(
+                                                            true
+                                                        )
+                                                    }
+                                                >
+                                                    <TrendingUp className="w-4 h-4 mr-2" />
+                                                    Upgrade Plan
+                                                </Button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Usage Statistics */}
+                        <Card className="shadow-xl rounded-xl border-0 bg-white/95 backdrop-blur-sm overflow-hidden">
+                            <CardHeader className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 py-4">
+                                <CardTitle className="flex items-center gap-3 text-lg text-white">
+                                    <div className="p-2 rounded-lg bg-white/25 backdrop-blur-sm border border-white/40 shadow-lg">
+                                        <BarChart3 className="h-5 w-5 text-white" />
+                                    </div>
+                                    Usage Statistics
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {/* Patients */}
+                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 bg-blue-500 rounded-lg">
+                                                <Users className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-bold text-blue-900">
+                                                    {
+                                                        usageStats.patients
+                                                            .current
+                                                    }
+                                                </div>
+                                                <div className="text-xs text-blue-600">
+                                                    /{" "}
+                                                    {usageStats.patients.limit}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-blue-700">
+                                                    Patients
+                                                </span>
+                                                <span className="font-semibold text-blue-900">
+                                                    {Math.round(
+                                                        usageStats.patients
+                                                            .percentage
+                                                    )}
+                                                    %
+                                                </span>
+                                            </div>
+                                            <Progress
+                                                value={
+                                                    usageStats.patients
+                                                        .percentage
+                                                }
+                                                className="h-1.5 bg-blue-200"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Staff */}
+                                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 bg-purple-500 rounded-lg">
+                                                <Building2 className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-bold text-purple-900">
+                                                    {usageStats.staff.current}
+                                                </div>
+                                                <div className="text-xs text-purple-600">
+                                                    / {usageStats.staff.limit}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-purple-700">
+                                                    Staff
+                                                </span>
+                                                <span className="font-semibold text-purple-900">
+                                                    {Math.round(
+                                                        usageStats.staff
+                                                            .percentage
+                                                    )}
+                                                    %
+                                                </span>
+                                            </div>
+                                            <Progress
+                                                value={
+                                                    usageStats.staff.percentage
+                                                }
+                                                className="h-1.5 bg-purple-200"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Storage */}
+                                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 bg-orange-500 rounded-lg">
+                                                <Package className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-bold text-orange-900">
+                                                    {usageStats.storage.current}
+                                                    GB
+                                                </div>
+                                                <div className="text-xs text-orange-600">
+                                                    / {usageStats.storage.limit}
+                                                    GB
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-orange-700">
+                                                    Storage
+                                                </span>
+                                                <span className="font-semibold text-orange-900">
+                                                    {Math.round(
+                                                        usageStats.storage
+                                                            .percentage
+                                                    )}
+                                                    %
+                                                </span>
+                                            </div>
+                                            <Progress
+                                                value={
+                                                    usageStats.storage
+                                                        .percentage
+                                                }
+                                                className="h-1.5 bg-orange-200"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Appointments */}
+                                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 bg-green-500 rounded-lg">
+                                                <Calendar className="h-5 w-5 text-white" />
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xl font-bold text-green-900">
+                                                    {
+                                                        usageStats.appointments
+                                                            .current
+                                                    }
+                                                </div>
+                                                <div className="text-xs text-green-600">
+                                                    Total
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-green-700">
+                                                    Appointments
+                                                </span>
+                                                <span className="font-semibold text-green-900">
+                                                    This Month
+                                                </span>
+                                            </div>
+                                            <Progress
+                                                value={
+                                                    usageStats.appointments
+                                                        .percentage
+                                                }
+                                                className="h-1.5 bg-green-200"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Quick Actions & Support */}
-                    <div className="space-y-6">
+                    {/* Right Sidebar */}
+                    <div className="xl:col-span-1 space-y-4">
                         {/* Quick Actions */}
-                        <Card className="shadow-lg">
-                            <CardHeader>
-                                <CardTitle>Quick Actions</CardTitle>
+                        <Card className="shadow-xl rounded-xl border-0 bg-white/95 backdrop-blur-sm overflow-hidden">
+                            <CardHeader className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 py-3">
+                                <CardTitle className="flex items-center gap-2 text-base text-white">
+                                    <div className="p-1.5 rounded-lg bg-white/25 backdrop-blur-sm border border-white/40">
+                                        <Zap className="h-4 w-4 text-white" />
+                                    </div>
+                                    Quick Actions
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3">
+                            <CardContent className="p-4 space-y-3">
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start"
+                                    className="w-full justify-start h-10 border-2 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
                                 >
-                                    <CreditCard className="w-4 h-4 mr-2" />
-                                    Update Payment Method
+                                    <CreditCard className="w-4 h-4 mr-2 text-blue-600" />
+                                    <div className="text-left">
+                                        <div className="font-medium text-sm">
+                                            Update Payment
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            Change payment method
+                                        </div>
+                                    </div>
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start"
+                                    className="w-full justify-start h-10 border-2 hover:border-green-500 hover:bg-green-50 transition-all duration-200"
                                 >
-                                    <Calendar className="w-4 h-4 mr-2" />
-                                    View Billing History
+                                    <History className="w-4 h-4 mr-2 text-green-600" />
+                                    <div className="text-left">
+                                        <div className="font-medium text-sm">
+                                            Billing History
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            View past invoices
+                                        </div>
+                                    </div>
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start"
+                                    className="w-full justify-start h-10 border-2 hover:border-purple-500 hover:bg-purple-50 transition-all duration-200"
                                 >
-                                    <Shield className="w-4 h-4 mr-2" />
-                                    Security Settings
+                                    <Download className="w-4 h-4 mr-2 text-purple-600" />
+                                    <div className="text-left">
+                                        <div className="font-medium text-sm">
+                                            Export Data
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            Download reports
+                                        </div>
+                                    </div>
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    className="w-full justify-start"
+                                    className="w-full justify-start h-10 border-2 hover:border-orange-500 hover:bg-orange-50 transition-all duration-200"
                                 >
-                                    <Users className="w-4 h-4 mr-2" />
-                                    Team Management
+                                    <Settings className="w-4 h-4 mr-2 text-orange-600" />
+                                    <div className="text-left">
+                                        <div className="font-medium text-sm">
+                                            Settings
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            Manage preferences
+                                        </div>
+                                    </div>
                                 </Button>
                             </CardContent>
                         </Card>
 
                         {/* Support */}
-                        <Card className="shadow-lg">
-                            <CardHeader>
-                                <CardTitle>Need Help?</CardTitle>
+                        <Card className="shadow-xl rounded-xl border-0 bg-white/95 backdrop-blur-sm overflow-hidden">
+                            <CardHeader className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 py-3">
+                                <CardTitle className="flex items-center gap-2 text-base text-white">
+                                    <div className="p-1.5 rounded-lg bg-white/25 backdrop-blur-sm border border-white/40">
+                                        <Bell className="h-4 w-4 text-white" />
+                                    </div>
+                                    Need Help?
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-3">
+                            <CardContent className="p-4 space-y-3">
+                                <div className="space-y-2">
                                     <a
                                         href="mailto:support@smilesuite.com"
-                                        className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                                        className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group"
                                     >
-                                        <Mail className="w-5 h-5 text-blue-600" />
-                                        <div>
-                                            <p className="font-medium">
+                                        <div className="p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                                            <Mail className="w-4 h-4 text-blue-600" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-medium text-sm text-gray-900">
                                                 Email Support
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-xs text-gray-600">
                                                 support@smilesuite.com
                                             </p>
                                         </div>
-                                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+                                        <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                     </a>
 
                                     <a
                                         href="tel:+631234567890"
-                                        className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                                        className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all duration-200 group"
                                     >
-                                        <Phone className="w-5 h-5 text-green-600" />
-                                        <div>
-                                            <p className="font-medium">
+                                        <div className="p-1.5 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                                            <Phone className="w-4 h-4 text-green-600" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-medium text-sm text-gray-900">
                                                 Phone Support
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-xs text-gray-600">
                                                 +63 123 456 7890
                                             </p>
                                         </div>
-                                        <ExternalLink className="w-4 h-4 text-gray-400 ml-auto" />
+                                        <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-green-600 transition-colors" />
                                     </a>
                                 </div>
 
-                                <div className="p-3 bg-blue-50 rounded-lg">
-                                    <p className="text-sm text-blue-800">
-                                        <strong>Support Hours:</strong>{" "}
+                                <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Clock className="w-3 h-3 text-blue-600" />
+                                        <span className="font-medium text-sm text-blue-900">
+                                            Support Hours
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-blue-800">
                                         Monday-Friday, 8 AM - 6 PM (PHT)
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* Usage Stats */}
-                        <Card className="shadow-lg">
-                            <CardHeader>
-                                <CardTitle>Usage Statistics</CardTitle>
+                        {/* Available Plans */}
+                        <Card className="shadow-xl rounded-xl border-0 bg-white/95 backdrop-blur-sm overflow-hidden">
+                            <CardHeader className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-800 py-3">
+                                <CardTitle className="flex items-center gap-2 text-base text-white">
+                                    <div className="p-1.5 rounded-lg bg-white/25 backdrop-blur-sm border border-white/40">
+                                        <Target className="h-4 w-4 text-white" />
+                                    </div>
+                                    Available Plans
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-gray-600">
-                                        Patients
-                                    </span>
-                                    <span className="font-medium">
-                                        247 / 500
-                                    </span>
-                                </div>
-                                <Progress value={49} className="w-full" />
-
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-gray-600">
-                                        Storage
-                                    </span>
-                                    <span className="font-medium">
-                                        2.3 GB / 10 GB
-                                    </span>
-                                </div>
-                                <Progress value={23} className="w-full" />
-
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-gray-600">
-                                        API Calls
-                                    </span>
-                                    <span className="font-medium">
-                                        1,234 / 5,000
-                                    </span>
-                                </div>
-                                <Progress value={25} className="w-full" />
+                            <CardContent className="p-4 space-y-3">
+                                {Object.entries({
+                                    basic: getPlanInfo("basic"),
+                                    premium: getPlanInfo("premium"),
+                                    enterprise: getPlanInfo("enterprise"),
+                                }).map(([key, plan]) => (
+                                    <div
+                                        key={key}
+                                        className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                                            clinic.subscription_plan === key
+                                                ? "border-blue-500 bg-blue-50"
+                                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                        }`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div
+                                                    className={`p-1.5 rounded-lg bg-gradient-to-r ${plan.color} text-white`}
+                                                >
+                                                    {plan.icon}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-medium text-sm text-gray-900">
+                                                        {plan.name}
+                                                    </h4>
+                                                    <p className="text-xs text-gray-600">
+                                                        ₱
+                                                        {plan.price.toLocaleString()}
+                                                        /month
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {plan.popular && (
+                                                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs">
+                                                    Popular
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
                     </div>

@@ -55,6 +55,32 @@ return [
             ],
         ],
 
+        'gmail' => [
+            'transport' => 'smtp',
+            'host' => 'smtp.gmail.com',
+            'port' => 587,
+            'encryption' => 'tls',
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => 60,
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true,
+        ],
+
+        'gmail_ssl' => [
+            'transport' => 'smtp',
+            'host' => 'smtp.gmail.com',
+            'port' => 465,
+            'encryption' => 'ssl',
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => 60,
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true,
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

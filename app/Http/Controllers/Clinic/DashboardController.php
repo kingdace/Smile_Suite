@@ -14,6 +14,7 @@ use App\Traits\SubscriptionAccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -35,7 +36,7 @@ class DashboardController extends Controller
         $this->checkSubscriptionAccess();
 
         $user = Auth::user();
-        
+
         // Get time range from request, default to 'week'
         $timeRange = $request->get('range', 'week');
         $validRanges = ['today', 'week', 'month', 'quarter', 'year'];
@@ -78,6 +79,11 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // For Today's Schedule: If no appointments today, show upcoming appointments
+        $todayScheduleData = $todayAppointments->count() > 0
+            ? $todayAppointments
+            : $upcomingAppointments;
+
         // Get recent patients
         $recentPatients = Patient::where('clinic_id', $clinic->id)
             ->latest()
@@ -118,9 +124,18 @@ class DashboardController extends Controller
         $advancedMetrics = $this->dashboardMetricsService->getAllMetrics($clinic, $timeRange);
 
         // Calculate statistics (keeping existing for backward compatibility)
+        $totalPatients = Patient::where('clinic_id', $clinic->id)->count();
+
+        // Get previous period patient count for comparison
+        $previousRange = $this->getPreviousDateRange($timeRange);
+        $previousPatients = Patient::where('clinic_id', $clinic->id)
+            ->whereBetween('created_at', [$previousRange['start'], $previousRange['end']])
+            ->count();
+
         $stats = [
-            'total_patients' => Patient::where('clinic_id', $clinic->id)->count(),
-            'today_appointments' => $todayAppointments->count(),
+            'total_patients' => $totalPatients,
+            'previous_patients' => $previousPatients,
+            'today_appointments' => $todayAppointments->count(), // Keep original count for stats
             'upcoming_appointments' => $upcomingAppointments->count(),
             'today_treatments' => $todayTreatments->count(),
             'low_stock_items' => $lowStockItems->count(),
@@ -140,7 +155,7 @@ class DashboardController extends Controller
 
         return Inertia::render('Clinic/Dashboard', [
             'clinic' => $enhancedClinic,
-            'today_appointments' => $todayAppointments,
+            'today_appointments' => $todayScheduleData, // Use the smart data that shows today's or upcoming
             'upcoming_appointments' => $upcomingAppointments,
             'recent_patients' => $recentPatients,
             'lowStockItems' => $lowStockItems,
@@ -156,8 +171,51 @@ class DashboardController extends Controller
             'revenue_metrics' => $advancedMetrics['revenue'],
             'appointment_metrics' => $advancedMetrics['appointments'],
             'satisfaction_metrics' => $advancedMetrics['satisfaction'],
+            'staff_performance_metrics' => $advancedMetrics['staff_performance'],
             'chart_data' => $advancedMetrics['charts'],
+            'patient_demographics' => $advancedMetrics['patient_demographics'],
+            'treatment_success' => $advancedMetrics['treatment_success'],
+            'peak_hours' => $advancedMetrics['peak_hours'],
         ]);
+    }
+
+    /**
+     * Get previous date range for comparison
+     */
+    private function getPreviousDateRange(string $timeRange): array
+    {
+        $end = Carbon::now();
+
+        switch ($timeRange) {
+            case 'today':
+                $start = Carbon::yesterday();
+                $end = Carbon::yesterday()->endOfDay();
+                break;
+            case 'week':
+                $start = Carbon::now()->subWeek()->startOfWeek();
+                $end = Carbon::now()->subWeek()->endOfWeek();
+                break;
+            case 'month':
+                $start = Carbon::now()->subMonth()->startOfMonth();
+                $end = Carbon::now()->subMonth()->endOfMonth();
+                break;
+            case 'quarter':
+                $start = Carbon::now()->subQuarter()->startOfQuarter();
+                $end = Carbon::now()->subQuarter()->endOfQuarter();
+                break;
+            case 'year':
+                $start = Carbon::now()->subYear()->startOfYear();
+                $end = Carbon::now()->subYear()->endOfYear();
+                break;
+            default:
+                $start = Carbon::now()->subWeek()->startOfWeek();
+                $end = Carbon::now()->subWeek()->endOfWeek();
+        }
+
+        return [
+            'start' => $start,
+            'end' => $end
+        ];
     }
 
 

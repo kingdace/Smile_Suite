@@ -56,12 +56,39 @@ class ClinicDirectoryController extends Controller
         }, 'users' => function($query) {
             $query->whereIn('role', ['dentist', 'staff'])->orderBy('name');
         }, 'reviews' => function($query) {
-            $query->with(['patient.user'])->approved()->orderBy('created_at', 'desc')->limit(5);
+            $query->with(['patient.user', 'staff'])->approved()->orderBy('created_at', 'desc')->limit(10);
         }]);
 
-        // Get review statistics
-        $averageRating = Review::getAverageRating($clinic->id);
-        $reviewCount = Review::getReviewCount($clinic->id);
+        // Get review statistics (clinic reviews only, not doctor reviews)
+        $averageRating = Review::where('clinic_id', $clinic->id)
+            ->clinicOnly()
+            ->approved()
+            ->avg('rating');
+        $reviewCount = Review::where('clinic_id', $clinic->id)
+            ->clinicOnly()
+            ->approved()
+            ->count();
+
+        // Get doctor performance data
+        $doctors = \App\Models\User::where('clinic_id', $clinic->id)
+            ->where('role', 'dentist')
+            ->get()
+            ->map(function ($doctor) {
+                $averageRating = Review::getDoctorAverageRating($doctor->id);
+                $reviewCount = Review::getDoctorReviewCount($doctor->id);
+                $categoryRatings = Review::getDoctorCategoryRatings($doctor->id);
+
+                return [
+                    'id' => $doctor->id,
+                    'name' => $doctor->name,
+                    'specialties' => $doctor->specialties,
+                    'years_experience' => $doctor->years_experience,
+                    'profile_photo' => $doctor->profile_photo,
+                    'average_rating' => round($averageRating, 1),
+                    'review_count' => $reviewCount,
+                    'category_ratings' => $categoryRatings,
+                ];
+            });
 
         return Inertia::render('Public/Clinics/Profile', [
             'clinic' => array_merge($clinic->toArray(), [
@@ -69,6 +96,7 @@ class ClinicDirectoryController extends Controller
                 'services' => $clinic->services ? $clinic->services->values()->toArray() : [],
                 'staff' => $clinic->users ? $clinic->users->values()->toArray() : [],
                 'reviews' => $clinic->reviews ? $clinic->reviews->values()->toArray() : [],
+                'doctors' => $doctors->toArray(),
                 'review_stats' => [
                     'average_rating' => round($averageRating, 1),
                     'review_count' => $reviewCount,

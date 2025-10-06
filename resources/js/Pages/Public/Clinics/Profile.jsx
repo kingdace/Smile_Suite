@@ -170,6 +170,7 @@ export default function ClinicProfile({ clinic, auth }) {
                             clinic={clinic}
                             auth={auth}
                             reviews={clinic.reviews}
+                            doctors={clinic.doctors}
                         />
                     </div>
                 </section>

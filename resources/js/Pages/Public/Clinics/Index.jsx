@@ -497,7 +497,7 @@ export default function ClinicDirectory({ clinics }) {
                             {sortedClinics.map((clinic) => (
                                 <div
                                     key={clinic.id}
-                                    className={`group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 flex flex-col h-full ${
+                                    className={`group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] flex flex-col h-full ${
                                         viewMode === "list" ? "flex-row" : ""
                                     }`}
                                 >
@@ -658,13 +658,13 @@ export default function ClinicDirectory({ clinics }) {
                                                         slug: clinic.slug,
                                                     }
                                                 )}
-                                                className="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm group-hover:scale-105 shadow-lg"
+                                                className="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm group-hover:scale-[1.02] shadow-lg"
                                             >
                                                 <Eye className="w-4 h-4 mr-2" />
                                                 View Details
                                             </Link>
                                             <button
-                                                className="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 text-sm group-hover:scale-105 shadow-lg"
+                                                className="w-full inline-flex items-center justify-center px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-200 text-sm group-hover:scale-[1.02] shadow-lg"
                                                 onClick={() => {
                                                     window.open(
                                                         route(

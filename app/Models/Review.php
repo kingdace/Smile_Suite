@@ -10,13 +10,53 @@ class Review extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Pre-defined review categories and their values
+     */
+    const REVIEW_CATEGORIES = [
+        'professionalism' => [
+            5 => 'Excellent',
+            4 => 'Good',
+            3 => 'Average',
+            2 => 'Poor',
+            1 => 'Very Poor'
+        ],
+        'communication' => [
+            5 => 'Excellent',
+            4 => 'Good',
+            3 => 'Average',
+            2 => 'Poor',
+            1 => 'Very Poor'
+        ],
+        'treatment_quality' => [
+            5 => 'Excellent',
+            4 => 'Good',
+            3 => 'Average',
+            2 => 'Poor',
+            1 => 'Very Poor'
+        ],
+        'bedside_manner' => [
+            5 => 'Excellent',
+            4 => 'Good',
+            3 => 'Average',
+            2 => 'Poor',
+            1 => 'Very Poor'
+        ]
+    ];
+
     protected $fillable = [
         'clinic_id',
         'patient_id',
         'appointment_id',
+        'staff_id',
         'title',
         'content',
         'rating',
+        'professionalism_rating',
+        'communication_rating',
+        'treatment_quality_rating',
+        'bedside_manner_rating',
+        'comment',
         'source',
         'external_review_id',
         'status',
@@ -28,6 +68,10 @@ class Review extends Model
 
     protected $casts = [
         'rating' => 'integer',
+        'professionalism_rating' => 'integer',
+        'communication_rating' => 'integer',
+        'treatment_quality_rating' => 'integer',
+        'bedside_manner_rating' => 'integer',
         'is_verified' => 'boolean',
         'helpful_count' => 'integer',
         'reported_count' => 'integer',
@@ -59,6 +103,15 @@ class Review extends Model
     }
 
     /**
+     * Get the staff member (doctor) being reviewed.
+     */
+    public function staff()
+    {
+        return $this->belongsTo(User::class, 'staff_id')
+                    ->where('role', 'dentist');
+    }
+
+    /**
      * Scope to get only approved reviews.
      */
     public function scopeApproved($query)
@@ -80,6 +133,30 @@ class Review extends Model
     public function scopeVerified($query)
     {
         return $query->where('is_verified', true);
+    }
+
+    /**
+     * Scope to get reviews for a specific doctor.
+     */
+    public function scopeForDoctor($query, $doctorId)
+    {
+        return $query->where('staff_id', $doctorId);
+    }
+
+    /**
+     * Scope to get clinic-only reviews (no staff_id).
+     */
+    public function scopeClinicOnly($query)
+    {
+        return $query->whereNull('staff_id');
+    }
+
+    /**
+     * Scope to get doctor reviews only.
+     */
+    public function scopeDoctorReviews($query)
+    {
+        return $query->whereNotNull('staff_id');
     }
 
     /**
@@ -123,6 +200,53 @@ class Review extends Model
         return self::where('clinic_id', $clinicId)
             ->where('patient_id', $patientId)
             ->exists();
+    }
+
+    /**
+     * Check if a patient has already reviewed a specific doctor.
+     */
+    public static function hasPatientReviewedDoctor($clinicId, $patientId, $doctorId)
+    {
+        return self::where('clinic_id', $clinicId)
+            ->where('patient_id', $patientId)
+            ->where('staff_id', $doctorId)
+            ->exists();
+    }
+
+    /**
+     * Get the average rating for a specific doctor.
+     */
+    public static function getDoctorAverageRating($doctorId)
+    {
+        return self::where('staff_id', $doctorId)
+            ->approved()
+            ->avg('rating');
+    }
+
+    /**
+     * Get the total review count for a specific doctor.
+     */
+    public static function getDoctorReviewCount($doctorId)
+    {
+        return self::where('staff_id', $doctorId)
+            ->approved()
+            ->count();
+    }
+
+    /**
+     * Get category-specific average ratings for a doctor.
+     */
+    public static function getDoctorCategoryRatings($doctorId)
+    {
+        return self::where('staff_id', $doctorId)
+            ->approved()
+            ->selectRaw('
+                AVG(professionalism_rating) as avg_professionalism,
+                AVG(communication_rating) as avg_communication,
+                AVG(treatment_quality_rating) as avg_treatment_quality,
+                AVG(bedside_manner_rating) as avg_bedside_manner
+            ')
+            ->first();
     }
 
     /**

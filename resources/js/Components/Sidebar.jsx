@@ -148,13 +148,6 @@ const getNavigation = (clinicId) => [
                 description: "Manage stock items",
             },
             {
-                name: "Purchase Orders",
-                href: route("clinic.purchase-orders.index", [clinicId]),
-                routeName: "clinic.purchase-orders.*",
-                icon: ShoppingCart,
-                description: "Manage purchase orders",
-            },
-            {
                 name: "Suppliers",
                 href: route("clinic.suppliers.index", [clinicId]),
                 routeName: "clinic.suppliers.*",
@@ -197,7 +190,10 @@ export default function Sidebar({ className, auth }) {
         }
 
         // Appointments dropdown
-        if (route().current("clinic.appointments.*")) {
+        if (
+            route().current("clinic.appointments.*") ||
+            route().current("clinic.waitlist.*")
+        ) {
             expanded.add("Appointments");
         }
 
@@ -260,7 +256,10 @@ export default function Sidebar({ className, auth }) {
     };
 
     const isAppointmentsActive = () => {
-        return route().current("clinic.appointments.*");
+        return (
+            route().current("clinic.appointments.*") ||
+            route().current("clinic.waitlist.*")
+        );
     };
 
     return (

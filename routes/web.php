@@ -43,6 +43,8 @@ Route::post('/clinics/{clinic}/book-appointment', [\App\Http\Controllers\Public\
 // Review Routes
 Route::get('/clinics/{clinic}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'index'])->name('public.clinics.reviews.index');
 Route::post('/clinics/{clinic}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'store'])->name('public.clinics.reviews.store');
+Route::get('/clinics/{clinic}/doctors', [\App\Http\Controllers\Public\ReviewController::class, 'getClinicDoctors'])->name('public.clinics.doctors');
+Route::get('/clinics/{clinic}/doctors/{doctor}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'getDoctorReviews'])->name('public.clinics.doctors.reviews');
 Route::get('/clinics/{clinic}/check-appointment', [\App\Http\Controllers\Public\ReviewController::class, 'checkAppointment'])->name('public.clinics.check-appointment');
 Route::post('/reviews/{review}/helpful', [\App\Http\Controllers\Public\ReviewController::class, 'markHelpful'])->name('public.reviews.helpful');
 Route::post('/reviews/{review}/report', [\App\Http\Controllers\Public\ReviewController::class, 'report'])->name('public.reviews.report');
