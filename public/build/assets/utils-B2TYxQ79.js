@@ -1,0 +1,1 @@
+function o(t){if(!t)return"?";const r=t.trim().split(" ");return r.length>=2?(r[0][0]+r[1][0]).toUpperCase():t[0].toUpperCase()}function g(t){const r=["bg-blue-500","bg-purple-500","bg-green-500","bg-orange-50","bg-pink-500","bg-indigo-500","bg-red-500","bg-teal-50"];if(!t)return r[0];const e=t.charCodeAt(0)+(t.charCodeAt(1)||0);return r[e%r.length]}export{g as a,o as g};
