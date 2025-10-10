@@ -15,6 +15,3 @@ cmds = [
     "php artisan route:cache",
     "php artisan view:cache"
 ]
-
-[start]
-cmd = "chmod +x start.sh && ./start.sh"

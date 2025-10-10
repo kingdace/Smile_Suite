@@ -628,9 +628,5 @@ Route::get('/test-email', function () {
     }
 });
 
-// Health check endpoint for Railway
-Route::get('/health', function () {
-    return 'OK';
-});
 
 require __DIR__.'/auth.php';
