@@ -19,5 +19,6 @@ cmds = [
     "mkdir -p storage/app/public/clinic-logos",
     "mkdir -p storage/app/public/clinics",
     "mkdir -p storage/app/public/clinics/treatments",
-    "mkdir -p storage/app/public/user-avatars"
+    "mkdir -p storage/app/public/user-avatars",
+    "chmod +x start.sh"
 ]

@@ -4,6 +4,6 @@
         "builder": "NIXPACKS"
     },
     "deploy": {
-        "startCommand": "./start.sh"
+        "startCommand": "mkdir -p storage/app/public/clinic-gallery storage/app/public/clinic-logos storage/app/public/clinics storage/app/public/clinics/treatments storage/app/public/user-avatars && rm -rf public/storage && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT"
     }
 }
