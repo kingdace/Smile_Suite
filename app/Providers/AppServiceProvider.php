@@ -26,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         Vite::prefetch(concurrency: 3);
 
+        // Force HTTPS in production
+        if (app()->environment('production')) {
+            \URL::forceScheme('https');
+        }
+
         // Share flash success message with all Inertia responses
         Inertia::share([
             'success' => function () {
