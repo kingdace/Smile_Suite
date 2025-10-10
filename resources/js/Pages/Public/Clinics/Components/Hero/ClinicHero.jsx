@@ -204,12 +204,7 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                                         {clinic.description}
                                     </p>
                                 )}
-                            {/* Tagline / Slogan */}
-                            <div className="text-gray-700 text-sm sm:text-base">
-                                {clinic.tagline ||
-                                    clinic.slogan ||
-                                    "Compassionate dental care for every smile."}
-                            </div>
+
                             {/* Badges & Social Proof */}
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-medium">
