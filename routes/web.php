@@ -629,4 +629,25 @@ Route::get('/test-email', function () {
 });
 
 
+// Health check endpoint for Railway
+Route::get('/health', function () {
+    return 'OK';
+});
+
+// Storage test endpoint
+Route::get('/storage-test', function () {
+    $storageExists = file_exists(public_path('storage'));
+    $storageLink = is_link(public_path('storage'));
+    $storageDir = storage_path('app/public');
+    $storageDirExists = is_dir($storageDir);
+    
+    return response()->json([
+        'storage_exists' => $storageExists,
+        'storage_is_link' => $storageLink,
+        'storage_dir_exists' => $storageDirExists,
+        'storage_path' => $storageDir,
+        'public_storage_path' => public_path('storage'),
+    ]);
+});
+
 require __DIR__.'/auth.php';
