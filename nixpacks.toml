@@ -18,6 +18,8 @@ cmds = [
     "mkdir -p storage/app/public/clinic-gallery",
     "mkdir -p storage/app/public/clinic-logos",
     "mkdir -p storage/app/public/clinics",
+    "mkdir -p storage/app/public/clinics/treatments",
+    "mkdir -p storage/app/public/user-avatars",
     "rm -f public/storage",
     "php artisan storage:link",
     "ls -la public/ | grep storage"

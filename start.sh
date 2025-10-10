@@ -8,6 +8,8 @@ echo "Creating storage directories..."
 mkdir -p storage/app/public/clinic-gallery
 mkdir -p storage/app/public/clinic-logos
 mkdir -p storage/app/public/clinics
+mkdir -p storage/app/public/clinics/treatments
+mkdir -p storage/app/public/user-avatars
 
 # Remove existing storage symlink if it exists
 if [ -L "public/storage" ]; then

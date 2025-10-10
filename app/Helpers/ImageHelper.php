@@ -23,7 +23,7 @@ class ImageHelper
             if (file_exists($publicPath)) {
                 return $imageUrl;
             }
-            
+
             // If public path doesn't exist, check if file exists in storage and try to get URL
             $storagePath = str_replace('/storage/', '', $imageUrl);
             if (Storage::disk('public')->exists($storagePath)) {
