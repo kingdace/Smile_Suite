@@ -11,10 +11,10 @@ mkdir -p storage/app/public/clinics
 mkdir -p storage/app/public/clinics/treatments
 mkdir -p storage/app/public/user-avatars
 
-# Remove existing storage symlink if it exists
-if [ -L "public/storage" ]; then
-    echo "Removing existing storage symlink..."
-    rm -f public/storage
+# Remove existing storage symlink or directory if it exists
+if [ -L "public/storage" ] || [ -d "public/storage" ]; then
+    echo "Removing existing storage symlink or directory..."
+    rm -rf public/storage
 fi
 
 # Create storage symlink

@@ -20,7 +20,7 @@ cmds = [
     "mkdir -p storage/app/public/clinics",
     "mkdir -p storage/app/public/clinics/treatments",
     "mkdir -p storage/app/public/user-avatars",
-    "rm -f public/storage",
+    "rm -rf public/storage",
     "php artisan storage:link",
     "ls -la public/ | grep storage"
 ]
