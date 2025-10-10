@@ -7,6 +7,7 @@
 3. **If no dump.sql is found**, it will run Laravel migrations instead
 
 ## File Structure
+
 ```
 database/
 ├── README.md          # This file
@@ -15,10 +16,12 @@ database/
 ```
 
 ## Supported Formats
-- `.sql` files (MySQL dump)
-- Any MySQL-compatible SQL file
+
+-   `.sql` files (MySQL dump)
+-   Any MySQL-compatible SQL file
 
 ## Notes
-- The import script will wait for the database to be ready
-- It will automatically create the database if it doesn't exist
-- All existing data will be preserved
+
+-   The import script will wait for the database to be ready
+-   It will automatically create the database if it doesn't exist
+-   All existing data will be preserved
