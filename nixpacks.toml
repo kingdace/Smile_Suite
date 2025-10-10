@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["php82", "nodejs", "npm", "mysql"]
+nixPkgs = ["php82", "nodejs", "npm", "mariadb"]
 
 [phases.install]
 cmds = [
