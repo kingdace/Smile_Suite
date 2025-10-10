@@ -13,6 +13,7 @@ import LocationMap from "./Components/Sidebar/LocationMap";
 import Footer from "./Components/Shared/Footer";
 import BookingModal from "./Components/Modals/BookingModal";
 import ReviewModal from "./Components/Modals/ReviewModal";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 import { getInitials, getAvatarColor } from "./Components/Shared/utils";
 
 export default function ClinicProfile({ clinic, auth }) {
@@ -199,6 +200,9 @@ export default function ClinicProfile({ clinic, auth }) {
                 onClose={handleCloseReviewModal}
                 clinic={clinic}
             />
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy />
         </GuestLayout>
     );
 }

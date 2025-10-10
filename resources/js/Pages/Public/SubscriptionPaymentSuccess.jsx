@@ -4,6 +4,7 @@ import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import { Separator } from "@/Components/ui/separator";
 import { CheckCircle, Building2, Crown, Zap, Clock, Mail } from "lucide-react";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 export default function SubscriptionPaymentSuccess({ request }) {
     const getPlanIcon = (plan) => {
@@ -238,7 +239,9 @@ export default function SubscriptionPaymentSuccess({ request }) {
                     </div>
                 </div>
             </div>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy />
         </>
     );
 }
-

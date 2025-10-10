@@ -23,6 +23,7 @@ import {
     Sparkles,
 } from "lucide-react";
 import axios from "axios";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 const PaymentForm = ({ request, token, paymentMethods }) => {
     const [loading, setLoading] = useState(false);
@@ -749,6 +750,9 @@ export default function Payment({ request, token, paymentMethods }) {
                     </div>
                 </div>
             </div>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy />
         </GuestLayout>
     );
 }

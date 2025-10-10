@@ -14,6 +14,7 @@ import {
     Crown,
     Zap,
 } from "lucide-react";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 export default function SubscriptionPayment({
     request,
@@ -526,6 +527,9 @@ export default function SubscriptionPayment({
                     </Card>
                 </div>
             </div>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy />
         </>
     );
 }

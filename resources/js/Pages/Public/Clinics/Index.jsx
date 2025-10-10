@@ -27,6 +27,7 @@ import {
     Instagram,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 export default function ClinicDirectory({ clinics }) {
     const [searchTerm, setSearchTerm] = useState("");
@@ -835,6 +836,9 @@ export default function ClinicDirectory({ clinics }) {
                     </div>
                 </div>
             </footer>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy />
         </div>
     );
 }

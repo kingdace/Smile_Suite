@@ -18,3 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// SmileyDy Chatbot API route
+Route::post('/chatbot', [App\Http\Controllers\Api\ChatbotController::class, 'chat'])->name('chatbot.chat');
+

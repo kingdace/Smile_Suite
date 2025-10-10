@@ -23,6 +23,7 @@ import {
     Play,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 // NOTE: For best results, add this to your <head> in public/index.html or your Blade layout:
 // <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700&display=swap" rel="stylesheet">
@@ -1030,6 +1031,9 @@ export default function Landing() {
                     </div>
                 </div>
             </footer>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy />
         </div>
     );
 }

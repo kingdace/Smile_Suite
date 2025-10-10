@@ -40,6 +40,7 @@ Route::get('/clinics', [ClinicDirectoryController::class, 'index'])->name('publi
 Route::get('/clinics/{slug}', [ClinicDirectoryController::class, 'profile'])->name('public.clinics.profile');
 Route::post('/clinics/{clinic}/book-appointment', [\App\Http\Controllers\Public\ClinicDirectoryController::class, 'bookAppointment'])->name('public.clinics.book-appointment');
 
+
 // Review Routes
 Route::get('/clinics/{clinic}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'index'])->name('public.clinics.reviews.index');
 Route::post('/clinics/{clinic}/reviews', [\App\Http\Controllers\Public\ReviewController::class, 'store'])->name('public.clinics.reviews.store');
