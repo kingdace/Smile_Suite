@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Storage;
+
 class ImageHelper
 {
     /**
@@ -16,9 +18,20 @@ class ImageHelper
 
         // If it's a storage path, check if file exists
         if (str_starts_with($imageUrl, '/storage/')) {
-            $filePath = public_path($imageUrl);
-            if (file_exists($filePath)) {
+            // First check if the symlink exists and file is accessible via public path
+            $publicPath = public_path($imageUrl);
+            if (file_exists($publicPath)) {
                 return $imageUrl;
+            }
+            
+            // If public path doesn't exist, check if file exists in storage and try to get URL
+            $storagePath = str_replace('/storage/', '', $imageUrl);
+            if (Storage::disk('public')->exists($storagePath)) {
+                // Try to get the storage URL
+                $storageUrl = Storage::disk('public')->url($storagePath);
+                if ($storageUrl) {
+                    return $storageUrl;
+                }
             }
         }
 
