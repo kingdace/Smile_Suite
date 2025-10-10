@@ -26,13 +26,16 @@ if [ -L "public/storage" ]; then
     echo "✅ Storage symlink created successfully"
     ls -la public/ | grep storage
 else
-    echo "❌ Failed to create storage symlink"
+    echo "❌ Failed to create storage symlink with artisan command"
     echo "Creating manual symlink..."
     ln -sf ../storage/app/public public/storage
     if [ -L "public/storage" ]; then
         echo "✅ Manual storage symlink created"
+        ls -la public/ | grep storage
     else
         echo "❌ Manual symlink creation failed"
+        echo "Storage symlink status:"
+        ls -la public/ | grep storage || echo "No storage found in public/"
     fi
 fi
 
