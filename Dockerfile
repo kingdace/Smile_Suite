@@ -1,5 +1,5 @@
-# Use PHP 8.2 with Apache
-FROM php:8.2-apache
+# Use PHP 8.2 CLI
+FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -40,22 +40,15 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Configure Apache
-RUN a2enmod rewrite
-
-# Create startup script that handles Railway's PORT
+# Create startup script
 RUN echo '#!/bin/bash\n\
 PORT=${PORT:-8080}\n\
 echo "Starting Smile Suite on port $PORT"\n\
-sed -i "s/8080/$PORT/g" /etc/apache2/sites-available/000-default.conf\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
 php artisan view:cache\n\
-apache2-foreground' > /usr/local/bin/start.sh \
+php artisan serve --host=0.0.0.0 --port=$PORT' > /usr/local/bin/start.sh \
     && chmod +x /usr/local/bin/start.sh
-
-# Copy Apache config
-COPY .docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Expose port (Railway will override this)
 EXPOSE 8080
