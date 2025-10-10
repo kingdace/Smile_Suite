@@ -628,4 +628,22 @@ Route::get('/test-email', function () {
     }
 });
 
+// Health check endpoint for Railway
+Route::get('/health', function () {
+    try {
+        // Simple health check without database dependency
+        return response()->json([
+            'status' => 'ok',
+            'timestamp' => date('Y-m-d H:i:s'),
+            'service' => 'Smile Suite',
+            'php_version' => PHP_VERSION
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 require __DIR__.'/auth.php';
