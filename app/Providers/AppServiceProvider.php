@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Force HTTPS in production
         if (app()->environment('production')) {
-            \URL::forceScheme('https');
+            URL::forceScheme('https');
         }
 
         // Share flash success message with all Inertia responses
