@@ -640,7 +640,7 @@ Route::get('/storage-test', function () {
     $storageLink = is_link(public_path('storage'));
     $storageDir = storage_path('app/public');
     $storageDirExists = is_dir($storageDir);
-    
+
     return response()->json([
         'storage_exists' => $storageExists,
         'storage_is_link' => $storageLink,
