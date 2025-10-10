@@ -630,11 +630,7 @@ Route::get('/test-email', function () {
 
 // Health check endpoint for Railway
 Route::get('/health', function () {
-    // Ultra simple health check - no dependencies
-    return response()->json([
-        'status' => 'ok',
-        'service' => 'Smile Suite'
-    ]);
+    return 'OK';
 });
 
 require __DIR__.'/auth.php';
