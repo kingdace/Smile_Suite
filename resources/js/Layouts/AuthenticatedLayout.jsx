@@ -4,6 +4,7 @@ import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link } from "@inertiajs/react";
+import { ImageHelper } from "@/Helpers/ImageHelper.js";
 import Sidebar from "@/Components/Sidebar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -504,9 +505,16 @@ const Header = ({
                                     <div className="w-11 h-11 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/60 overflow-hidden">
                                         {auth?.clinic?.logo_url ? (
                                             <img
-                                                src={auth.clinic.logo_url}
+                                                src={ImageHelper.getImageUrl(
+                                                    auth.clinic.logo_url,
+                                                    "/images/clinic-logo.png"
+                                                )}
                                                 alt={`${auth.clinic.name} Logo`}
                                                 className="w-9 h-9 object-contain"
+                                                onError={(e) => {
+                                                    e.target.src =
+                                                        "/images/clinic-logo.png";
+                                                }}
                                             />
                                         ) : (
                                             <img
