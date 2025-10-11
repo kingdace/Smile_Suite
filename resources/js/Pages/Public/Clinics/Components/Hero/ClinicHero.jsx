@@ -14,6 +14,7 @@ import {
     Navigation,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { ImageHelper } from "@/Helpers/ImageHelper.js";
 
 export default function ClinicHero({ clinic, onBookAppointment }) {
     const rating = clinic?.review_stats?.average_rating || 0;
@@ -97,7 +98,7 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
             <div className="relative h-[12rem] sm:h-[16rem] md:h-[18rem] w-full overflow-hidden">
                 {clinic.banner_url && typeof clinic.banner_url === "string" ? (
                     <img
-                        src={clinic.banner_url}
+                        src={ImageHelper.getImageUrl(clinic.banner_url)}
                         alt={`${clinic.name || "Clinic"} banner`}
                         className="w-full h-full object-cover blur-[1px]"
                     />
@@ -168,7 +169,9 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                                 {clinic.logo_url &&
                                 typeof clinic.logo_url === "string" ? (
                                     <img
-                                        src={clinic.logo_url}
+                                        src={ImageHelper.getImageUrl(
+                                            clinic.logo_url
+                                        )}
                                         alt={`${clinic.name || "Clinic"} logo`}
                                         className="w-full h-full object-cover"
                                     />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ImageHelper } from "@/Helpers/ImageHelper.js";
 
 export default function ClinicGallery({ galleryImages }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -87,11 +88,11 @@ export default function ClinicGallery({ galleryImages }) {
                     {/* Main Carousel Image */}
                     <div className="relative h-48 sm:h-80 lg:h-96 w-full overflow-hidden rounded-xl lg:rounded-2xl shadow-xl bg-gray-100">
                         <img
-                            src={
+                            src={ImageHelper.getClinicGalleryImage(
                                 galleryImages[currentImageIndex]?.image_url ||
-                                galleryImages[currentImageIndex]?.url ||
-                                galleryImages[currentImageIndex]
-                            }
+                                    galleryImages[currentImageIndex]?.url ||
+                                    galleryImages[currentImageIndex]
+                            )}
                             alt={`Clinic gallery image ${
                                 currentImageIndex + 1
                             }`}
@@ -264,11 +265,11 @@ export default function ClinicGallery({ galleryImages }) {
 
                         {/* Main Image */}
                         <img
-                            src={
+                            src={ImageHelper.getClinicGalleryImage(
                                 lightboxImg.image_url ||
-                                lightboxImg.url ||
-                                lightboxImg
-                            }
+                                    lightboxImg.url ||
+                                    lightboxImg
+                            )}
                             alt="Gallery image"
                             className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
                         />
