@@ -18,67 +18,85 @@ import {
     HelpCircle,
 } from "lucide-react";
 
-// Custom SmileyDy Video Component
+// Custom SmileyDy Icon Component - Video for floating button, static image for chat
 const SmileyDyIcon = ({ className = "w-6 h-6", isOpen = false }) => {
     const videoRef = useRef(null);
 
     useEffect(() => {
-        const video = videoRef.current;
-        if (video) {
-            // Ensure video plays and loops infinitely
-            const playVideo = () => {
-                video.play().catch((e) => console.log("Video play failed:", e));
-            };
+        // Only run video logic if not in chat (isOpen is false)
+        if (!isOpen) {
+            const video = videoRef.current;
+            if (video) {
+                // Ensure video plays and loops infinitely
+                const playVideo = () => {
+                    video
+                        .play()
+                        .catch((e) => console.log("Video play failed:", e));
+                };
 
-            // Play immediately when loaded
-            playVideo();
-
-            // Handle any interruptions
-            const handleEnded = () => {
-                video.currentTime = 0;
+                // Play immediately when loaded
                 playVideo();
-            };
 
-            const handlePause = () => {
-                playVideo();
-            };
+                // Handle any interruptions
+                const handleEnded = () => {
+                    video.currentTime = 0;
+                    playVideo();
+                };
 
-            video.addEventListener("ended", handleEnded);
-            video.addEventListener("pause", handlePause);
+                const handlePause = () => {
+                    playVideo();
+                };
 
-            return () => {
-                video.removeEventListener("ended", handleEnded);
-                video.removeEventListener("pause", handlePause);
-            };
+                video.addEventListener("ended", handleEnded);
+                video.addEventListener("pause", handlePause);
+
+                return () => {
+                    video.removeEventListener("ended", handleEnded);
+                    video.removeEventListener("pause", handlePause);
+                };
+            }
         }
-    }, []);
+    }, [isOpen]);
 
     return (
-        <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-blue-700">
-            <video
-                ref={videoRef}
-                className="w-full h-full object-contain"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                onLoadedData={(e) => e.target.play()}
-                onEnded={(e) => {
-                    e.target.currentTime = 0;
-                    e.target.play();
-                }}
-                onError={(e) => console.log("Video error:", e)}
-                onCanPlay={(e) => e.target.play()}
-                style={{
-                    imageRendering: "crisp-edges",
-                    WebkitImageRendering: "crisp-edges",
-                    imageRendering: "pixelated",
-                }}
-            >
-                <source src="/icons/smiley-video.mp4" type="video/mp4" />
-                <source src="/icons/smiley-video.webm" type="video/webm" />
-                {/* Fallback image if video fails to load */}
+        <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-300 via-blue-900 to-indigo-900">
+            {!isOpen ? (
+                // Video for floating button (when chat is closed)
+                <video
+                    ref={videoRef}
+                    className="w-full h-full object-contain"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    onLoadedData={(e) => e.target.play()}
+                    onEnded={(e) => {
+                        e.target.currentTime = 0;
+                        e.target.play();
+                    }}
+                    onError={(e) => console.log("Video error:", e)}
+                    onCanPlay={(e) => e.target.play()}
+                    style={{
+                        imageRendering: "crisp-edges",
+                        WebkitImageRendering: "crisp-edges",
+                    }}
+                >
+                    <source src="/icons/smiley-video.mp4" type="video/mp4" />
+                    <source src="/icons/smiley-video.webm" type="video/webm" />
+                    {/* Fallback image if video fails to load */}
+                    <img
+                        src="/icons/smiley.png"
+                        alt="SmileyDy - Dental AI Assistant"
+                        className="w-full h-full object-contain"
+                        style={{
+                            imageRendering: "crisp-edges",
+                            WebkitImageRendering: "crisp-edges",
+                        }}
+                    />
+                </video>
+            ) : (
+                // Static image for chat window (when chat is open)
                 <img
                     src="/icons/smiley.png"
                     alt="SmileyDy - Dental AI Assistant"
@@ -88,7 +106,7 @@ const SmileyDyIcon = ({ className = "w-6 h-6", isOpen = false }) => {
                         WebkitImageRendering: "crisp-edges",
                     }}
                 />
-            </video>
+            )}
         </div>
     );
 };
@@ -262,24 +280,6 @@ const SmileyDy = ({ position = "left" }) => {
                 )}
             </button>
 
-            {/* Floating Interactive Text - Hidden on mobile */}
-            {!isOpen && (
-                <div
-                    className={`hidden sm:flex fixed bottom-20 z-40 items-center ${
-                        position === "right" ? "right-2" : "left-2"
-                    }`}
-                >
-                    <div className="bg-white/95 backdrop-blur-sm rounded-md px-2 py-1.5 shadow-lg border border-cyan-100">
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse"></div>
-                            <p className="text-xs font-medium text-gray-700">
-                                Need help? 😊
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* Chat Window - Mobile Optimized */}
             {isOpen && (
                 <div
@@ -293,7 +293,10 @@ const SmileyDy = ({ position = "left" }) => {
                     <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-blue-700 p-1.5 sm:p-2 text-white">
                         <div className="flex items-center gap-1.5 sm:gap-2">
                             <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                                <SmileyDyIcon className="w-4 h-4 sm:w-6 sm:h-6" />
+                                <SmileyDyIcon
+                                    className="w-4 h-4 sm:w-6 sm:h-6"
+                                    isOpen={true}
+                                />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <h3 className="font-bold text-xs sm:text-sm truncate">
@@ -330,7 +333,10 @@ const SmileyDy = ({ position = "left" }) => {
                                     <div className="flex items-start gap-2">
                                         {message.type === "bot" && (
                                             <div className="w-6 h-6 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                <SmileyDyIcon className="w-4 h-4" />
+                                                <SmileyDyIcon
+                                                    className="w-4 h-4"
+                                                    isOpen={true}
+                                                />
                                             </div>
                                         )}
                                         {message.type === "user" && (
@@ -351,7 +357,10 @@ const SmileyDy = ({ position = "left" }) => {
                                 <div className="bg-white p-3 rounded-2xl rounded-bl-md shadow-sm border border-gray-100">
                                     <div className="flex items-center gap-2">
                                         <div className="w-6 h-6 bg-cyan-100 rounded-full flex items-center justify-center">
-                                            <SmileyDyIcon className="w-4 h-4" />
+                                            <SmileyDyIcon
+                                                className="w-4 h-4"
+                                                isOpen={true}
+                                            />
                                         </div>
                                         <Loader2 className="w-4 h-4 animate-spin text-cyan-500" />
                                         <span className="text-sm text-gray-600">

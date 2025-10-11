@@ -107,160 +107,74 @@ export default function ClinicRegister() {
         <>
             <Head title="Register Clinic" />
             <SiteHeader />
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-                {/* Enhanced background decorative elements */}
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-50 flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                {/* Simplified background decorative elements */}
                 <div className="absolute top-0 left-0 w-full h-full">
-                    {/* Main gradient circles */}
-                    <div
-                        className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full opacity-40 mix-blend-multiply transform rotate-45 animate-pulse shadow-lg"
-                        style={{
-                            animationDuration: "3s",
-                            animationDelay: "0s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full opacity-40 mix-blend-multiply transform -rotate-30 animate-bounce shadow-xl"
-                        style={{
-                            animationDuration: "2.5s",
-                            animationDelay: "0.5s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-500 rounded-full opacity-30 mix-blend-multiply animate-pulse shadow-2xl"
-                        style={{
-                            animationDuration: "4s",
-                            animationDelay: "1s",
-                        }}
-                    ></div>
-
-                    {/* Colorful accent circles */}
-                    <div
-                        className="absolute top-20 right-20 w-24 h-24 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-full opacity-50 mix-blend-multiply animate-bounce shadow-lg"
-                        style={{
-                            animationDuration: "2s",
-                            animationDelay: "0.3s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute bottom-20 left-20 w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full opacity-50 mix-blend-multiply animate-pulse shadow-lg"
-                        style={{
-                            animationDuration: "3.5s",
-                            animationDelay: "0.8s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute top-1/3 right-1/3 w-16 h-16 bg-gradient-to-br from-blue-700 to-indigo-800 rounded-full opacity-40 mix-blend-multiply animate-ping shadow-md"
-                        style={{
-                            animationDuration: "1.5s",
-                            animationDelay: "0.2s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute top-1/4 left-1/4 w-20 h-20 bg-gradient-to-br from-cyan-400 to-teal-500 rounded-full opacity-35 mix-blend-multiply animate-bounce shadow-lg"
-                        style={{
-                            animationDuration: "2.8s",
-                            animationDelay: "0.6s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute bottom-1/4 right-1/4 w-28 h-28 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 rounded-full opacity-45 mix-blend-multiply animate-pulse shadow-xl"
-                        style={{
-                            animationDuration: "3.2s",
-                            animationDelay: "0.4s",
-                        }}
-                    ></div>
-
-                    {/* Additional colorful elements */}
-                    <div
-                        className="absolute top-1/6 left-1/6 w-12 h-12 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full opacity-30 mix-blend-multiply animate-ping shadow-md"
-                        style={{
-                            animationDuration: "1.8s",
-                            animationDelay: "0.7s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute bottom-1/6 left-1/3 w-16 h-16 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-35 mix-blend-multiply animate-bounce shadow-lg"
-                        style={{
-                            animationDuration: "2.2s",
-                            animationDelay: "0.9s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute top-2/3 right-1/6 w-14 h-14 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full opacity-40 mix-blend-multiply animate-pulse shadow-md"
-                        style={{
-                            animationDuration: "2.7s",
-                            animationDelay: "0.1s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute top-3/4 left-2/3 w-18 h-18 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full opacity-30 mix-blend-multiply animate-bounce shadow-lg"
-                        style={{
-                            animationDuration: "2.4s",
-                            animationDelay: "0.3s",
-                        }}
-                    ></div>
-
-                    {/* Larger, more pleasant floating elements */}
-                    <div
-                        className="absolute top-1/5 right-1/4 w-14 h-14 bg-gradient-to-br from-indigo-300 to-purple-400 rounded-full opacity-35 mix-blend-multiply animate-bounce shadow-md"
-                        style={{
-                            animationDuration: "2.5s",
-                            animationDelay: "0.2s",
-                        }}
-                    ></div>
-                    <div
-                        className="absolute bottom-1/5 right-1/5 w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full opacity-30 mix-blend-multiply animate-pulse shadow-lg"
-                        style={{
-                            animationDuration: "3.2s",
-                            animationDelay: "0.8s",
-                        }}
-                    ></div>
-
-                    {/* Special accent elements */}
-                    <div className="absolute top-1/8 right-1/8 w-18 h-18 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full opacity-30 mix-blend-multiply shadow-lg"></div>
+                    {/* Main subtle gradient circles - hidden on mobile */}
+                    <div className="hidden md:block absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-full mix-blend-multiply transform rotate-45"></div>
+                    <div className="hidden md:block absolute bottom-10 right-10 w-40 h-40 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-full mix-blend-multiply transform -rotate-30"></div>
+                    <div className="hidden md:block absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-blue-400/15 via-indigo-500/15 to-purple-500/15 rounded-full mix-blend-multiply"></div>
                 </div>
 
-                <div className="max-w-4xl w-full space-y-5 relative z-10">
-                    <div className="text-center mb-5">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100/80 backdrop-blur-sm rounded-full border border-blue-200/50 mb-5 shadow-lg">
-                            <Building2 className="w-3 h-3 text-blue-600" />
-                            <span className="text-xs text-blue-700 font-semibold tracking-wide">
-                                Clinic Registration
-                            </span>
-                        </div>
-                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
-                            Register Your{" "}
-                            <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-700 bg-clip-text text-transparent">
-                                Dental Clinic
+                <div className="max-w-4xl w-full space-y-4 sm:space-y-5 relative z-10">
+                    {/* Mobile-optimized header */}
+                    <div className="text-center mb-4 sm:mb-5">
+                        {/* Mobile: Simplified header, Desktop: Full header */}
+
+                        {/* Mobile: Direct title, Desktop: Full title */}
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2 sm:mb-3">
+                            <span className="hidden sm:inline">
+                                Register Your{" "}
+                                <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-700 bg-clip-text text-transparent">
+                                    Dental Clinic
+                                </span>
                             </span>
                         </h2>
-                        <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                            Join hundreds of dental practices that have
-                            transformed their operations with Smile Suite.
-                            Request to join our platform and streamline your
-                            dental practice.
+
+                        {/* Mobile: Short description, Desktop: Full description */}
+                        <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                            <span className="sm:hidden">
+                                Join our platform and streamline your dental
+                                practice.
+                            </span>
+                            <span className="hidden sm:inline">
+                                Join hundreds of dental practices that have
+                                transformed their operations with Smile Suite.
+                                Request to join our platform and streamline your
+                                dental practice.
+                            </span>
                         </p>
                     </div>
-                    <Card className="shadow-2xl rounded-3xl border border-blue-200/20 bg-white backdrop-blur-sm relative overflow-hidden">
-                        {/* Card decorative elements */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full -translate-y-16 translate-x-16"></div>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full -translate-y-12 -translate-x-12"></div>
-                        <div className="absolute top-1/2 left-0 w-16 h-16 bg-gradient-to-br from-blue-400/8 to-cyan-400/8 rounded-full -translate-y-8 -translate-x-8"></div>
+                    <Card className="shadow-xl sm:shadow-2xl rounded-2xl sm:rounded-3xl border border-blue-200/20 bg-white backdrop-blur-sm relative overflow-hidden">
+                        {/* Simplified card decorative elements - hidden on mobile */}
+                        <div className="hidden sm:block absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/5 to-cyan-400/5 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div className="hidden sm:block absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-cyan-400/5 to-blue-400/5 rounded-full -translate-y-12 -translate-x-12"></div>
                         {/* Glow effect */}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 rounded-3xl"></div>
-                        <CardHeader className="pb-5 relative z-10">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
-                                    <ShieldCheck className="w-5 h-5 text-white" />
+                        <CardHeader className="pb-4 sm:pb-5 relative z-10">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg mx-auto sm:mx-0">
+                                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                                 </div>
-                                <div>
-                                    <CardTitle className="text-xl font-bold text-gray-900 mb-1">
-                                        Clinic Registration Request
+                                <div className="text-center sm:text-left">
+                                    <CardTitle className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+                                        <span className="sm:hidden">
+                                            Registration Form
+                                        </span>
+                                        <span className="hidden sm:inline">
+                                            Clinic Registration Request
+                                        </span>
                                     </CardTitle>
-                                    <CardDescription className="text-sm text-gray-600 leading-relaxed">
-                                        Fill out the form below and we'll get
-                                        back to you within 24-48 hours to set up
-                                        your clinic account.
+                                    <CardDescription className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                                        <span className="sm:hidden">
+                                            Fill out the form below to get
+                                            started.
+                                        </span>
+                                        <span className="hidden sm:inline">
+                                            Fill out the form below and we'll
+                                            get back to you within 24-48 hours
+                                            to set up your clinic account.
+                                        </span>
                                     </CardDescription>
                                 </div>
                             </div>
@@ -468,7 +382,7 @@ export default function ClinicRegister() {
                                         Subscription Plan{" "}
                                         <span className="text-red-500">*</span>
                                     </Label>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                                         {subscriptionPlans.map((plan) => {
                                             const PlanIcon =
                                                 plan.id === "basic"
@@ -485,11 +399,11 @@ export default function ClinicRegister() {
                                             return (
                                                 <div
                                                     key={plan.id}
-                                                    className={`relative border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 group ${
+                                                    className={`relative border-2 rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer transition-all duration-300 group ${
                                                         data.subscription_plan ===
                                                         plan.id
-                                                            ? "border-blue-500 bg-blue-50 shadow-xl scale-105"
-                                                            : "border-gray-200 hover:border-blue-300 bg-white hover:shadow-lg"
+                                                            ? "border-blue-500 bg-blue-50 shadow-lg sm:shadow-xl scale-105"
+                                                            : "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md sm:hover:shadow-lg"
                                                     }`}
                                                     onClick={() =>
                                                         setData(
@@ -498,31 +412,31 @@ export default function ClinicRegister() {
                                                         )
                                                     }
                                                 >
-                                                    <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center justify-between mb-2 sm:mb-3">
                                                         <div className="flex items-center gap-2">
                                                             <PlanIcon
-                                                                className={`w-6 h-6 ${planColor}`}
+                                                                className={`w-5 h-5 sm:w-6 sm:h-6 ${planColor}`}
                                                             />
-                                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                                                                 {plan.name}
                                                             </h3>
                                                         </div>
                                                         {data.subscription_plan ===
                                                             plan.id && (
-                                                            <CheckCircle className="h-5 w-5 text-blue-500 animate-bounce" />
+                                                            <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 animate-bounce" />
                                                         )}
                                                     </div>
-                                                    <div className="text-2xl font-bold text-gray-900 mb-3">
+                                                    <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
                                                         {plan.hasTrial ? (
                                                             <>
                                                                 <span className="text-green-600">
                                                                     FREE
                                                                 </span>
-                                                                <span className="text-sm font-normal text-gray-500">
+                                                                <span className="text-xs sm:text-sm font-normal text-gray-500">
                                                                     /14 days
                                                                     trial
                                                                 </span>
-                                                                <div className="text-sm text-gray-500 line-through mt-1">
+                                                                <div className="text-xs sm:text-sm text-gray-500 line-through mt-1">
                                                                     Then ₱
                                                                     {plan.price}
                                                                     /month
@@ -531,13 +445,13 @@ export default function ClinicRegister() {
                                                         ) : (
                                                             <>
                                                                 ₱{plan.price}
-                                                                <span className="text-sm font-normal text-gray-500">
+                                                                <span className="text-xs sm:text-sm font-normal text-gray-500">
                                                                     /month
                                                                 </span>
                                                             </>
                                                         )}
                                                     </div>
-                                                    <ul className="space-y-2">
+                                                    <ul className="space-y-1 sm:space-y-2">
                                                         {plan.features.map(
                                                             (
                                                                 feature,
@@ -545,10 +459,14 @@ export default function ClinicRegister() {
                                                             ) => (
                                                                 <li
                                                                     key={index}
-                                                                    className="flex items-center text-sm text-gray-600"
+                                                                    className="flex items-center text-xs sm:text-sm text-gray-600"
                                                                 >
-                                                                    <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                                                                    {feature}
+                                                                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 flex-shrink-0" />
+                                                                    <span className="leading-tight">
+                                                                        {
+                                                                            feature
+                                                                        }
+                                                                    </span>
                                                                 </li>
                                                             )
                                                         )}
@@ -564,28 +482,33 @@ export default function ClinicRegister() {
                                     )}
                                 </div>
                                 {selectedPlan && (
-                                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3 mt-2 shadow-lg">
+                                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-3 sm:p-4 flex items-center gap-3 mt-2 shadow-lg">
                                         <div
-                                            className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-lg ${
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shadow-lg ${
                                                 selectedPlan.hasTrial
                                                     ? "bg-gradient-to-br from-green-400 to-emerald-500"
                                                     : "bg-gradient-to-br from-yellow-400 to-orange-500"
                                             }`}
                                         >
                                             {selectedPlan.hasTrial ? (
-                                                <CheckCircle className="w-5 h-5 text-white fill-current" />
+                                                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-current" />
                                             ) : (
-                                                <Star className="w-5 h-5 text-white fill-current" />
+                                                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-current" />
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <h4 className="text-base font-bold text-blue-900 mb-1">
-                                                Selected Plan:{" "}
+                                            <h4 className="text-sm sm:text-base font-bold text-blue-900 mb-1">
+                                                <span className="sm:hidden">
+                                                    Selected:{" "}
+                                                </span>
+                                                <span className="hidden sm:inline">
+                                                    Selected Plan:{" "}
+                                                </span>
                                                 {selectedPlan.name}
                                             </h4>
                                             {selectedPlan.hasTrial ? (
                                                 <div>
-                                                    <p className="text-sm text-green-700 font-medium">
+                                                    <p className="text-xs sm:text-sm text-green-700 font-medium">
                                                         14-day FREE trial
                                                     </p>
                                                     <p className="text-xs text-gray-600">
@@ -595,7 +518,7 @@ export default function ClinicRegister() {
                                                     </p>
                                                 </div>
                                             ) : (
-                                                <p className="text-sm text-blue-700 font-medium">
+                                                <p className="text-xs sm:text-sm text-blue-700 font-medium">
                                                     ₱{selectedPlan.price}/month
                                                 </p>
                                             )}

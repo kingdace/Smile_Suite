@@ -202,7 +202,7 @@ export default function ClinicProfile({ clinic, auth }) {
             />
 
             {/* SmileyDy Chatbot */}
-            <SmileyDy />
+            <SmileyDy position="right" />
         </GuestLayout>
     );
 }

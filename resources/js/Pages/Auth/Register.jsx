@@ -428,7 +428,7 @@ export default function Register() {
                     {/* Right side - Enhanced Registration Form */}
                     <div className="w-full md:w-1/2 flex items-center justify-center p-8">
                         <div className="w-full max-w-sm">
-                            <div className="text-left mb-8">
+                            <div className="text-center mb-8">
                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100/80 rounded-full border border-blue-200/50 mb-4">
                                     <User className="w-3 h-3 text-blue-600" />
                                     <span className="text-xs text-blue-700 font-semibold tracking-wide">
