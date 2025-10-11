@@ -653,24 +653,24 @@ Route::get('/storage-test', function () {
 // Temporary log viewer for debugging (REMOVE AFTER FIXING)
 Route::get('/view-logs-temp', function () {
     $logFile = storage_path('logs/laravel.log');
-    
+
     if (!file_exists($logFile)) {
         return response()->json(['error' => 'Log file not found']);
     }
-    
+
     // Get last 100 lines
     $lines = [];
     $file = new \SplFileObject($logFile, 'r');
     $file->seek(PHP_INT_MAX);
     $lastLine = $file->key();
     $startLine = max(0, $lastLine - 100);
-    
+
     $file->seek($startLine);
     while (!$file->eof()) {
         $lines[] = $file->current();
         $file->next();
     }
-    
+
     return response('<pre>' . implode('', $lines) . '</pre>')
         ->header('Content-Type', 'text/html');
 })->middleware('web');

@@ -21,23 +21,38 @@ class StorageHelper
     {
         try {
             $disk = self::getDisk();
-            \Log::info('StorageHelper: Uploading file', ['disk' => $disk, 'path' => $path]);
-
+            \Log::info('StorageHelper: Uploading file', [
+                'disk' => $disk, 
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName()
+            ]);
+            
             if ($disk === 's3') {
-                // Ensure public object when on S3
-                $storedPath = $file->storePublicly($path, $disk);
+                // Store with public visibility
+                $storedPath = $file->store($path, ['disk' => $disk, 'visibility' => 'public']);
             } else {
                 $storedPath = $file->store($path, $disk);
             }
-
+            
+            // Check if upload succeeded
+            if (!$storedPath) {
+                throw new \Exception('File upload failed - store() returned false');
+            }
+            
+            \Log::info('StorageHelper: File stored', ['stored_path' => $storedPath]);
+            
             /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
             $storage = Storage::disk($disk);
             $url = $storage->url($storedPath);
-
-            \Log::info('StorageHelper: File uploaded successfully', ['url' => $url, 'stored_path' => $storedPath]);
+            
+            \Log::info('StorageHelper: File uploaded successfully', ['url' => $url]);
             return $url;
         } catch (\Exception $e) {
-            \Log::error('StorageHelper: Upload failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            \Log::error('StorageHelper: Upload failed', [
+                'error' => $e->getMessage(), 
+                'file' => $file->getClientOriginalName(),
+                'trace' => $e->getTraceAsString()
+            ]);
             throw $e;
         }
     }
