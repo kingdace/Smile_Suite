@@ -117,9 +117,18 @@ export function useGalleryManagement(initialGalleryImages = []) {
 
                 if (!res.ok) {
                     success = false;
-                    setGalleryError(
-                        "One or more uploads failed. Please check file type/size."
-                    );
+                    // Try to get error message from response
+                    let errorMsg = "One or more uploads failed. Please check file type/size.";
+                    try {
+                        const errorData = await res.json();
+                        if (errorData.message) {
+                            errorMsg = errorData.message;
+                        }
+                    } catch (e) {
+                        // If can't parse JSON, use default message
+                    }
+                    setGalleryError(errorMsg);
+                    console.error('Upload failed:', res.status, errorMsg);
                 }
             } catch (error) {
                 success = false;
