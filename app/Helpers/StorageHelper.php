@@ -20,8 +20,15 @@ class StorageHelper
     public static function storeAndGetUrl($file, string $path): string
     {
         $disk = self::getDisk();
-        $storedPath = $file->store($path, $disk);
-        return Storage::disk($disk)->url($storedPath);
+        if ($disk === 's3') {
+            // Ensure public object when on S3
+            $storedPath = $file->storePublicly($path, $disk);
+        } else {
+            $storedPath = $file->store($path, $disk);
+        }
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk($disk);
+        return $storage->url($storedPath);
     }
 
     /**
@@ -30,8 +37,16 @@ class StorageHelper
     public static function storeAsAndGetUrl($file, string $path, string $name): string
     {
         $disk = self::getDisk();
-        $storedPath = $file->storeAs($path, $name, $disk);
-        return Storage::disk($disk)->url($storedPath);
+        if ($disk === 's3') {
+            // Ensure public object when on S3
+            $storedPath = $file->storeAs($path, $name, $disk);
+            Storage::disk($disk)->setVisibility($storedPath, 'public');
+        } else {
+            $storedPath = $file->storeAs($path, $name, $disk);
+        }
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk($disk);
+        return $storage->url($storedPath);
     }
 
     /**
