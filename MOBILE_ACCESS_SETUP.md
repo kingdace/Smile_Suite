@@ -6,9 +6,9 @@ This guide will help you configure your Smile Suite project to be accessible fro
 
 ## ðŸ” **Current Network Configuration**
 
--   **Your Computer IP**: `10.36.17.70`
--   **Network**: `10.36.17.70/24`
--   **Default Gateway**: `10.36.17.70`
+-   **Your Computer IP**: `10.247.194.70`
+-   **Network**: `10.247.194.70/24`
+-   **Default Gateway**: `10.247.194.70`
 
 ## ðŸš€ **Quick Start (Choose One Method)**
 
@@ -48,7 +48,7 @@ serve-network.bat
 
 ```bash
 # Terminal 1: Laravel server
-php artisan serve --host=10.36.17.70 --port=8000
+php artisan serve --host=10.247.194.70 --port=8000
 
 # Terminal 2: Vite dev server
 npm run dev
@@ -64,8 +64,8 @@ Once running, your app will be accessible at:
     -   Vite Dev: `http://localhost:5173`
 
 -   **Network (Mobile/Other Devices)**:
-    -   Laravel: `http://10.36.17.70:8000`
-    -   Vite Dev: `http://10.36.17.70:5173`
+    -   Laravel: `http://10.247.194.70:8000`
+    -   Vite Dev: `http://10.247.194.70:5173`
 
 ## âš ï¸ **Important Security Notes**
 
@@ -88,9 +88,9 @@ Once running, your app will be accessible at:
 ```php
 'allowed_origins' => [
     'http://localhost:5173',
-    'http://10.36.17.70:5173',
-    'http://10.36.17.70:5173',    // âœ… Added
-    'http://10.36.17.70:8000'     // âœ… Added
+    'http://10.247.194.70:5173',
+    'http://10.247.194.70:5173',    // âœ… Added
+    'http://10.247.194.70:8000'     // âœ… Added
 ],
 ```
 
@@ -98,10 +98,10 @@ Once running, your app will be accessible at:
 
 ```javascript
 server: {
-    host: "10.36.17.70",           // âœ… Already configured
+    host: "10.247.194.70",           // âœ… Already configured
     port: 5173,
     hmr: {
-        host: "10.36.17.70", // âœ… Updated for network
+        host: "10.247.194.70", // âœ… Updated for network
     },
 },
 ```
@@ -110,8 +110,8 @@ server: {
 
 ```json
 "scripts": {
-    "serve:network": "php artisan serve --host=10.36.17.70 --port=8000",
-    "dev:network": "vite --host 10.36.17.70"
+    "serve:network": "php artisan serve --host=10.247.194.70 --port=8000",
+    "dev:network": "vite --host 10.247.194.70"
 }
 ```
 
@@ -135,12 +135,12 @@ npm run dev:network
 ### **Step 3: Test on Mobile Device**
 
 -   Connect your mobile device to the same WiFi network
--   Open browser and navigate to: `http://10.36.17.70:8000`
+-   Open browser and navigate to: `http://10.247.194.70:8000`
 -   The app should load and be fully functional
 
 ### **Step 4: Test Vite Dev Server**
 
--   On mobile: `http://10.36.17.70:5173`
+-   On mobile: `http://10.247.194.70:5173`
 -   Hot Module Replacement (HMR) should work for development
 
 ## ðŸš¨ **Troubleshooting**
@@ -167,7 +167,7 @@ If your network IP address changes (common when reconnecting to WiFi):
 1. **Check Server Status**
 
     ```bash
-    # Verify Laravel is running on 10.36.17.70
+    # Verify Laravel is running on 10.247.194.70
     netstat -an | findstr :8000
     ```
 
@@ -183,7 +183,7 @@ If your network IP address changes (common when reconnecting to WiFi):
     ipconfig
 
     # Test connectivity from mobile
-    ping 10.36.17.70
+    ping 10.247.194.70
     ```
 
 ### **CORS Errors on Mobile**
@@ -232,14 +232,14 @@ netstat -an | findstr :8000
 ipconfig
 
 # Test mobile access
-curl http://10.36.17.70:8000
+curl http://10.247.194.70:8000
 ```
 
 ## ðŸŽ‰ **Success Indicators**
 
-âœ… **Laravel server shows**: `Server running on [http://10.36.17.70:8000]`  
-âœ… **Vite shows**: `Local: http://localhost:5173/` and `Network: http://10.36.17.70:5173/`  
-âœ… **Mobile device can access**: `http://10.36.17.70:8000`  
+âœ… **Laravel server shows**: `Server running on [http://10.247.194.70:8000]`  
+âœ… **Vite shows**: `Local: http://localhost:5173/` and `Network: http://10.247.194.70:5173/`  
+âœ… **Mobile device can access**: `http://10.247.194.70:8000`  
 âœ… **No CORS errors** in mobile browser console  
 âœ… **App loads and functions** normally on mobile
 
@@ -256,6 +256,7 @@ If you encounter issues:
 ---
 
 **Happy Mobile Development! ðŸš€ðŸ“±**
+
 
 
 

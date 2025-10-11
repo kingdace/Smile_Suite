@@ -92,9 +92,9 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
     }
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full z-10 mt-12 mb-12 sm:mt-0 sm:mb-0">
             {/* Banner Image */}
-            <div className="relative h-[14rem] sm:h-[16rem] md:h-[18rem] w-full overflow-hidden">
+            <div className="relative h-[12rem] sm:h-[16rem] md:h-[18rem] w-full overflow-hidden">
                 {clinic.banner_url && typeof clinic.banner_url === "string" ? (
                     <img
                         src={clinic.banner_url}
@@ -105,8 +105,6 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                     <div className="w-full h-full bg-gradient-to-br from-teal-200 via-sky-200 to-blue-100"></div>
                 )}
 
-                {/* Decorative Visual Elements */}
-                {/* Floating geometric shapes */}
                 {/* Decorative Visual Elements */}
                 {/* Floating geometric shapes */}
                 <div className="absolute top-8 left-8 w-16 h-16 border-2 border-teal-400/100 rounded-full"></div>
@@ -154,19 +152,19 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
             </div>
 
             {/* Main Content Card - IMPROVED Glassmorphism */}
-            <div className="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8 absolute inset-0 flex items-center justify-center z-10">
+            <div className="w-full max-w-none mx-auto px-2 sm:px-6 lg:px-8 absolute inset-0 flex items-center justify-center z-10 pointer-events-none py-4 sm:py-0">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="w-full max-w-7xl flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between bg-white/60 backdrop-blur-xl rounded-lg lg:rounded-xl shadow-2xl p-2 sm:p-3 lg:p-4 border border-white/60 gap-2 sm:gap-3 lg:gap-4 my-2 sm:my-0"
+                    className="w-full max-w-7xl flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between bg-white/60 backdrop-blur-xl rounded-lg lg:rounded-xl shadow-2xl p-3 sm:p-3 lg:p-4 border border-white/60 gap-3 sm:gap-3 lg:gap-4 my-1 sm:my-0 pointer-events-auto"
                 >
                     {/* Left Side: Logo + Name + Verified Badge + Status */}
-                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 lg:gap-8 text-center lg:text-left ml-2">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 lg:gap-8 text-center lg:text-left">
                         {/* Logo */}
                         <div className="relative">
                             {/* Decorative corner elements */}
-                            <div className="w-18 h-18 sm:w-20 sm:h-20 bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden ring-2 sm:ring-4 ring-cyan-500/30">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-xl sm:rounded-2xl shadow-xl overflow-hidden ring-2 sm:ring-4 ring-cyan-500/30">
                                 {clinic.logo_url &&
                                 typeof clinic.logo_url === "string" ? (
                                     <img
@@ -186,11 +184,11 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                         <div className="flex flex-col gap-2 sm:gap-3">
                             {/* Name and Verified Badge Row */}
                             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
                                     {clinic.name || "Clinic Name"}
                                 </h1>
                                 {/* Verified Badge */}
-                                <div className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-100 text-emerald-700 rounded-full shadow-md border border-emerald-200">
+                                <div className="flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-100 text-emerald-700 rounded-full shadow-md border border-emerald-200">
                                     <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                                     <span className="font-semibold text-xs sm:text-sm">
                                         Verified
@@ -200,23 +198,23 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                             {/* Clinic Description */}
                             {clinic.description &&
                                 typeof clinic.description === "string" && (
-                                    <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl">
+                                    <p className="text-xs sm:text-base lg:text-lg text-gray-600 max-w-2xl">
                                         {clinic.description}
                                     </p>
                                 )}
 
                             {/* Badges & Social Proof */}
-                            <div className="flex flex-wrap items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-medium">
-                                    <Award className="w-3.5 h-3.5" /> Top Rated
-                                    Clinic
+                                    <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5" />{" "}
+                                    Top Rated Clinic
                                 </span>
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 text-xs font-medium">
-                                    <ShieldCheck className="w-3.5 h-3.5" />{" "}
+                                    <ShieldCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5" />{" "}
                                     Clean & Safe Facility
                                 </span>
                                 {reviewCount > 0 && (
-                                    <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
+                                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium">
                                         {renderStars(rating)}
                                         <span className="ml-1">
                                             {rating.toFixed(1)} ({reviewCount}{" "}
@@ -265,12 +263,12 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                     </div>
 
                     {/* Right Side: Contact Info + Book Button */}
-                    <div className="flex flex-col items-center lg:items-end gap-3 w-full lg:w-auto relative">
+                    <div className="flex flex-col items-center lg:items-end gap-2 sm:gap-3 w-full lg:w-auto relative">
                         {/* Combined Contact Badge */}
-                        <div className="w-full sm:w-64 flex flex-col gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-white/70 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-gray-200 text-gray-800 shadow-lg text-center mr-4 relative">
+                        <div className="w-full sm:w-64 flex flex-col gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-white/70 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-gray-200 text-gray-800 shadow-lg text-center mr-2 sm:mr-4 relative">
                             {/* Email */}
                             {clinic.email && (
-                                <div className="flex items-center justify-center gap-2">
+                                <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                                     <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
                                     <span className="font-medium text-xs sm:text-sm">
                                         {clinic.email}
@@ -279,7 +277,7 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                             )}
                             {/* Phone */}
                             {clinic.contact_number && (
-                                <div className="flex items-center justify-center gap-2">
+                                <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                                     <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
                                     <span className="font-medium text-xs sm:text-sm">
                                         {clinic.contact_number}
@@ -287,9 +285,9 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                                 </div>
                             )}
                             {/* Location */}
-                            <div className="flex items-center justify-center gap-2">
+                            <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                                 <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="text-gray-700 font-medium text-xs sm:text-sm truncate max-w-[220px]">
+                                <span className="text-gray-700 font-medium text-xs sm:text-sm truncate max-w-[200px] sm:max-w-[220px]">
                                     {clinic.street_address ||
                                         clinic.city_municipality_code ||
                                         clinic.region_code ||
@@ -303,21 +301,21 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={onBookAppointment}
-                            className="w-full sm:w-60 px-3 sm:px-3 py-2 sm:py-2.5 bg-gradient-to-r from-teal-700 to-sky-700 text-white font-semibold text-sm sm:text-sm rounded-lg sm:rounded-xl shadow-xl hover:from-teal-750 hover:to-sky-700 transition-all duration-300 flex items-center justify-center gap-2 border border-white/30 mr-6 relative"
+                            className="w-full sm:w-60 px-3 sm:px-3 py-2 sm:py-2.5 bg-gradient-to-r from-teal-700 to-sky-700 text-white font-semibold text-sm sm:text-sm rounded-lg sm:rounded-xl shadow-xl hover:from-teal-750 hover:to-sky-700 transition-all duration-300 flex items-center justify-center gap-2 border border-white/30 mr-2 sm:mr-6 relative"
                         >
                             <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                             Book Appointment
                         </motion.button>
 
                         {/* Quick Actions */}
-                        <div className="flex items-center gap-2 mr-1.5 relative">
+                        <div className="flex items-center gap-1.5 sm:gap-2 mr-1 sm:mr-1.5 relative">
                             {clinic.contact_number && (
                                 <a
                                     href={`tel:${clinic.contact_number}`}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-white text-gray-700 text-xs border border-gray-200 hover:bg-gray-50 transition relative"
+                                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-md bg-white text-gray-700 text-xs border border-gray-200 hover:bg-gray-50 transition relative"
                                 >
                                     <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-400/10 to-teal-500/5 rounded-md blur-sm opacity-0 hover:opacity-100 transition-opacity"></div>
-                                    <Phone className="w-3.5 h-3.5 relative z-10" />
+                                    <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 relative z-10" />
                                     <span className="relative z-10">
                                         Call Now
                                     </span>
@@ -328,10 +326,10 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                                     href={mapUrl}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-white text-gray-700 text-xs border border-gray-200 hover:bg-gray-50 transition relative"
+                                    className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-md bg-white text-gray-700 text-xs border border-gray-200 hover:bg-gray-50 transition relative"
                                 >
                                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400/10 to-cyan-500/5 rounded-md blur-sm opacity-0 hover:opacity-100 transition-opacity"></div>
-                                    <Navigation className="w-3.5 h-3.5 relative z-10" />
+                                    <Navigation className="w-3 h-3 sm:w-3.5 sm:h-3.5 relative z-10" />
                                     <span className="relative z-10">
                                         Directions
                                     </span>
@@ -340,10 +338,10 @@ export default function ClinicHero({ clinic, onBookAppointment }) {
                             <button
                                 type="button"
                                 onClick={handleShare}
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-white text-gray-700 text-xs border border-gray-200 hover:bg-gray-50 transition relative"
+                                className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-md bg-white text-gray-700 text-xs border border-gray-200 hover:bg-gray-50 transition relative"
                             >
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-400/10 to-pink-500/5 rounded-md blur-sm opacity-0 hover:opacity-100 transition-opacity"></div>
-                                <Share2 className="w-3.5 h-3.5 relative z-10" />
+                                <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 relative z-10" />
                                 <span className="relative z-10">Share</span>
                             </button>
                         </div>

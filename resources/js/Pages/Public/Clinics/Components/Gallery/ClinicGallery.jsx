@@ -81,11 +81,11 @@ export default function ClinicGallery({ galleryImages }) {
     return (
         <div className="relative">
             {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 lg:gap-12 items-center">
                 {/* Left Column - Image Carousel */}
                 <div className="relative">
                     {/* Main Carousel Image */}
-                    <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden rounded-xl lg:rounded-2xl shadow-xl bg-gray-100">
+                    <div className="relative h-48 sm:h-80 lg:h-96 w-full overflow-hidden rounded-xl lg:rounded-2xl shadow-xl bg-gray-100">
                         <img
                             src={
                                 galleryImages[currentImageIndex]?.image_url ||
@@ -151,11 +151,11 @@ export default function ClinicGallery({ galleryImages }) {
                 </div>
 
                 {/* Right Column - Text Content */}
-                <div className="flex flex-col justify-center items-center text-center h-full space-y-4 sm:space-y-6">
+                <div className="flex flex-col justify-center items-center text-center h-full space-y-3 sm:space-y-6">
                     {/* Gallery Badge */}
-                    <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm">
+                    <div className="inline-flex items-center gap-1.5 sm:gap-3 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm">
                         <svg
-                            className="w-4 h-4 text-blue-600"
+                            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -172,27 +172,27 @@ export default function ClinicGallery({ galleryImages }) {
                         </span>
                     </div>
 
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900">
+                    <h2 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900">
                         See our{" "}
                         <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                             clinic in action
                         </span>
                     </h2>
 
-                    <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-md px-4">
+                    <p className="text-sm sm:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-md px-4">
                         Take a virtual tour of our modern facilities and see why
                         patients choose us for their dental care. Our
                         state-of-the-art equipment and comfortable environment
                         ensure the best experience for every patient.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
-                        <span className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-4 text-xs sm:text-sm text-gray-500">
+                        <span className="flex items-center gap-1.5 sm:gap-2">
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full"></div>
                             Professional Environment
                         </span>
-                        <span className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                        <span className="flex items-center gap-1.5 sm:gap-2">
+                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-cyan-500 rounded-full"></div>
                             Modern Equipment
                         </span>
                     </div>

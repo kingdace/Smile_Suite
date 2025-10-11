@@ -139,38 +139,38 @@ export default function AccessibilityTrust({ clinic }) {
     const trustBadges = getTrustBadges();
 
     return (
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
             {/* Accessibility Features */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-                <div className="px-5 py-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <Zap className="w-5 h-5 text-blue-600" />
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div className="px-3 sm:px-5 py-3 sm:py-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-gray-100">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                         Accessibility Features
                     </h3>
                 </div>
-                <div className="p-5">
-                    <div className="space-y-3">
+                <div className="p-3 sm:p-5">
+                    <div className="space-y-2 sm:space-y-3">
                         {accessibilityFeatures.map((feature, index) => {
                             const IconComponent = feature.icon;
                             return (
                                 <div
                                     key={index}
-                                    className={`flex items-start gap-3 p-3 rounded-xl border ${feature.borderColor} ${feature.bgColor} hover:shadow-md transition-all duration-300`}
+                                    className={`flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg sm:rounded-xl border ${feature.borderColor} ${feature.bgColor} hover:shadow-md transition-all duration-300`}
                                 >
                                     <div
-                                        className={`w-12 h-12 ${feature.bgColor} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}
+                                        className={`w-10 h-10 sm:w-12 sm:h-12 ${feature.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}
                                     >
                                         <IconComponent
-                                            className={`w-6 h-6 ${feature.color}`}
+                                            className={`w-5 h-5 sm:w-6 sm:h-6 ${feature.color}`}
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4
-                                            className={`font-bold ${feature.color} mb-1 text-lg`}
+                                            className={`font-bold ${feature.color} mb-1 text-base sm:text-lg`}
                                         >
                                             {feature.label}
                                         </h4>
-                                        <p className="text-sm text-gray-600 leading-relaxed">
+                                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                                             {feature.description}
                                         </p>
                                     </div>
@@ -182,21 +182,21 @@ export default function AccessibilityTrust({ clinic }) {
             </div>
 
             {/* Trust & Verification */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-                <div className="px-5 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-green-600" />
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div className="px-3 sm:px-5 py-3 sm:py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                         Trust & Verification
                     </h3>
                 </div>
-                <div className="p-5">
-                    <div className="space-y-3">
+                <div className="p-3 sm:p-5">
+                    <div className="space-y-2 sm:space-y-3">
                         {trustBadges.map((badge, index) => {
                             const IconComponent = badge.icon;
                             return (
                                 <div
                                     key={index}
-                                    className={`flex items-start gap-3 p-3 rounded-xl border ${
+                                    className={`flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg sm:rounded-xl border ${
                                         badge.borderColor
                                     } ${
                                         badge.bgColor
@@ -207,26 +207,26 @@ export default function AccessibilityTrust({ clinic }) {
                                     }`}
                                 >
                                     <div
-                                        className={`w-12 h-12 ${badge.bgColor} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}
+                                        className={`w-10 h-10 sm:w-12 sm:h-12 ${badge.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}
                                     >
                                         <IconComponent
-                                            className={`w-6 h-6 ${badge.color}`}
+                                            className={`w-5 h-5 sm:w-6 sm:h-6 ${badge.color}`}
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             <h4
-                                                className={`font-bold ${badge.color} text-lg`}
+                                                className={`font-bold ${badge.color} text-base sm:text-lg`}
                                             >
                                                 {badge.label}
                                             </h4>
                                             {badge.highlight && (
-                                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
                                                     Verified
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-sm text-gray-600 leading-relaxed">
+                                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                                             {badge.description}
                                         </p>
                                     </div>

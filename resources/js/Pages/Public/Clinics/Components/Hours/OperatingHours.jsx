@@ -119,46 +119,46 @@ export default function OperatingHours({ clinic }) {
     return (
         <div className="relative">
             {/* Section Header */}
-            <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm mb-6">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-semibold text-blue-700 tracking-wide">
+            <div className="text-center mb-6 sm:mb-12">
+                <div className="inline-flex items-center gap-1.5 sm:gap-3 px-2.5 sm:px-5 py-1.5 sm:py-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 shadow-sm mb-3 sm:mb-6">
+                    <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-blue-600" />
+                    <span className="text-xs sm:text-sm font-semibold text-blue-700 tracking-wide">
                         Operating Hours
                     </span>
                 </div>
-                <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
+                <h2 className="text-xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 mb-3 sm:mb-6">
                     When we're{" "}
                     <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                         available
                     </span>
                 </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-sm sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                     Plan your visit with our convenient operating hours. We're
                     here to serve you with flexible scheduling options.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 items-start">
                 {/* Left Column: Current Status & Hours */}
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                     {/* Current Status Card */}
                     <div
-                        className={`${currentStatus.bgColor} ${currentStatus.borderColor} border-2 rounded-2xl p-5 shadow-lg`}
+                        className={`${currentStatus.bgColor} ${currentStatus.borderColor} border-2 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-lg`}
                     >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4">
                             <div
-                                className={`w-14 h-14 ${currentStatus.bgColor} rounded-2xl flex items-center justify-center shadow-sm`}
+                                className={`w-12 h-12 sm:w-14 sm:h-14 ${currentStatus.bgColor} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm`}
                             >
                                 <StatusIcon
-                                    className={`w-7 h-7 ${currentStatus.color}`}
+                                    className={`w-6 h-6 sm:w-7 sm:h-7 ${currentStatus.color}`}
                                 />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">
                                     Current Status
                                 </h3>
                                 <p
-                                    className={`text-xl font-semibold ${currentStatus.color}`}
+                                    className={`text-lg sm:text-xl font-semibold ${currentStatus.color}`}
                                 >
                                     {currentStatus.text}
                                 </p>
@@ -167,9 +167,9 @@ export default function OperatingHours({ clinic }) {
                     </div>
 
                     {/* Operating Hours Table */}
-                    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                        <div className="px-5 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900">
+                    <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                        <div className="px-3 sm:px-5 py-3 sm:py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900">
                                 Weekly Schedule
                             </h3>
                         </div>
@@ -208,15 +208,15 @@ export default function OperatingHours({ clinic }) {
                                 return (
                                     <div
                                         key={day}
-                                        className={`px-5 py-3 flex items-center justify-between transition-colors duration-200 hover:bg-gray-50 ${
+                                        className={`px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between transition-colors duration-200 hover:bg-gray-50 ${
                                             isToday
                                                 ? "bg-blue-50 border-l-4 border-blue-500"
                                                 : ""
                                         }`}
                                     >
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2 sm:gap-3">
                                             <span
-                                                className={`font-semibold ${
+                                                className={`font-semibold text-sm sm:text-base ${
                                                     isToday
                                                         ? "text-blue-900"
                                                         : "text-gray-900"
@@ -225,18 +225,18 @@ export default function OperatingHours({ clinic }) {
                                                 {dayNames[day]}
                                             </span>
                                             {isToday && (
-                                                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                                                     Today
                                                 </span>
                                             )}
                                         </div>
                                         <div className="text-right">
                                             {isClosed ? (
-                                                <span className="text-red-600 font-semibold">
+                                                <span className="text-red-600 font-semibold text-sm sm:text-base">
                                                     Closed
                                                 </span>
                                             ) : (
-                                                <span className="text-gray-700 font-semibold">
+                                                <span className="text-gray-700 font-semibold text-sm sm:text-base">
                                                     {openTime} - {closeTime}
                                                 </span>
                                             )}

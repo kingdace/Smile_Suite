@@ -89,9 +89,9 @@ export default function ClinicProfile({ clinic, auth }) {
             <Head title={`${clinic.name} - Dental Clinic Profile`} />
 
             {/* Main Content Wrapper */}
-            <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-cyan-50">
+            <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-cyan-50 relative">
                 {/* Hero Section */}
-                <section className="relative pt-32 sm:pt-0 pb-16 sm:pb-0">
+                <section className="relative pt-20 sm:pt-28 md:pt-0 pb-8 sm:pb-12 md:pb-0">
                     <ClinicHero
                         clinic={clinic}
                         onBookAppointment={handleBookAppointment}
@@ -121,14 +121,14 @@ export default function ClinicProfile({ clinic, auth }) {
                 )}
 
                 {/* Gallery Section */}
-                <section className="pt-12 sm:pt-8 lg:pt-10 pb-6 sm:pb-8 lg:pb-10 bg-white">
+                <section className="pt-16 sm:pt-8 lg:pt-10 pb-4 sm:pb-8 lg:pb-10 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <ClinicGallery galleryImages={clinic.gallery_images} />
                     </div>
                 </section>
 
                 {/* Services Section */}
-                <section className="pt-6 sm:pt-8 lg:pt-10 pb-6 sm:pt-8 lg:pt-10 bg-gradient-to-br from-blue-50 to-cyan-50">
+                <section className="pt-8 sm:pt-8 lg:pt-10 pb-4 sm:pt-8 lg:pt-10 bg-gradient-to-br from-blue-50 to-cyan-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <ServicesSection
                             clinic={clinic}
@@ -138,14 +138,14 @@ export default function ClinicProfile({ clinic, auth }) {
                 </section>
 
                 {/* Operating Hours Section */}
-                <section className="py-6 sm:py-8 lg:py-10 bg-white">
+                <section className="py-4 sm:py-8 lg:py-10 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <OperatingHours clinic={clinic} />
                     </div>
                 </section>
 
                 {/* Staff Section */}
-                <section className="py-6 sm:pt-8 lg:pt-10 bg-gradient-to-r from-blue-50 to-white">
+                <section className="py-6 sm:py-8 lg:py-10 bg-gradient-to-r from-blue-50 to-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <StaffSection
                             clinic={clinic}
@@ -155,9 +155,9 @@ export default function ClinicProfile({ clinic, auth }) {
                 </section>
 
                 {/* Sidebar Content Section */}
-                <section className="py-12 sm:py-14 lg:py-16 bg-white">
+                <section className="py-6 sm:py-8 lg:py-10 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                             <AccessibilityTrust clinic={clinic} />
                             <LocationMap clinic={clinic} />
                         </div>
@@ -165,7 +165,7 @@ export default function ClinicProfile({ clinic, auth }) {
                 </section>
 
                 {/* Reviews Section */}
-                <section className="py-12 sm:py-14 lg:py-16 bg-gradient-to-br from-cyan-50 via-white to-blue-50">
+                <section className="py-6 sm:py-8 lg:py-10 bg-gradient-to-br from-cyan-50 via-white to-blue-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <ReviewsSection
                             clinic={clinic}

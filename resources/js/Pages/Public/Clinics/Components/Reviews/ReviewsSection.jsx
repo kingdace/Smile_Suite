@@ -267,31 +267,31 @@ export default function ReviewsSection({
     return (
         <div className="relative">
             {/* Section Header */}
-            <div className="text-center mb-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-lg border border-blue-200/50 shadow-sm mb-4">
-                    <MessageCircle className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-semibold text-blue-700 tracking-wide">
+            <div className="text-center mb-4 sm:mb-6">
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-lg border border-blue-200/50 shadow-sm mb-3 sm:mb-4">
+                    <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+                    <span className="text-xs sm:text-sm font-semibold text-blue-700 tracking-wide">
                         Reviews & Ratings
                     </span>
                 </div>
-                <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-3">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-gray-900 mb-2 sm:mb-3">
                     What our{" "}
                     <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                         patients say
                     </span>
                 </h2>
-                <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+                <p className="text-xs sm:text-sm text-gray-600 max-w-2xl mx-auto">
                     Read authentic reviews from our patients and discover why
                     they choose us.
                 </p>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex items-center justify-center mb-6">
+            <div className="flex items-center justify-center mb-4 sm:mb-6">
                 <div className="bg-gray-100 rounded-lg p-1 flex">
                     <button
                         onClick={() => setActiveTab("clinic")}
-                        className={`px-4 py-2 rounded-md font-medium text-sm transition-all duration-200 flex items-center space-x-2 ${
+                        className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all duration-200 flex items-center space-x-1.5 sm:space-x-2 ${
                             activeTab === "clinic"
                                 ? "bg-white text-blue-600 shadow-sm"
                                 : "text-gray-600 hover:text-gray-900"
@@ -299,13 +299,13 @@ export default function ReviewsSection({
                     >
                         <Building2 className="w-3 h-3" />
                         <span>Clinic</span>
-                        <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full text-xs">
+                        <span className="bg-blue-100 text-blue-600 px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                             {clinicReviews.length}
                         </span>
                     </button>
                     <button
                         onClick={() => setActiveTab("doctors")}
-                        className={`px-4 py-2 rounded-md font-medium text-sm transition-all duration-200 flex items-center space-x-2 ${
+                        className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md font-medium text-xs sm:text-sm transition-all duration-200 flex items-center space-x-1.5 sm:space-x-2 ${
                             activeTab === "doctors"
                                 ? "bg-white text-blue-600 shadow-sm"
                                 : "text-gray-600 hover:text-gray-900"
@@ -313,7 +313,7 @@ export default function ReviewsSection({
                     >
                         <Stethoscope className="w-3 h-3" />
                         <span>Doctors</span>
-                        <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full text-xs">
+                        <span className="bg-blue-100 text-blue-600 px-1 sm:px-1.5 py-0.5 rounded-full text-xs">
                             {doctors.length}
                         </span>
                     </button>
