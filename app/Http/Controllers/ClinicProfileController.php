@@ -127,7 +127,17 @@ class ClinicProfileController extends Controller
                 $clinic->operating_hours = null;
             }
             if ($request->hasFile('logo')) {
-                $clinic->logo_url = StorageHelper::storeAndGetUrl($request->file('logo'), 'clinic-logos');
+                try {
+                    Log::info('Attempting to upload logo', ['file_name' => $request->file('logo')->getClientOriginalName()]);
+                    $clinic->logo_url = StorageHelper::storeAndGetUrl($request->file('logo'), 'clinic-logos');
+                    Log::info('Logo uploaded successfully', ['url' => $clinic->logo_url]);
+                } catch (\Exception $e) {
+                    Log::error('Logo upload failed', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    throw $e; // Re-throw to show error to user
+                }
             }
             $clinic->save();
 
