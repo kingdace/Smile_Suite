@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\StorageHelper;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -245,15 +246,12 @@ class TreatmentController extends Controller
             foreach ($request->file('imageFiles') as $file) {
                 if ($file && $file->isValid()) {
                     $filename = time() . '_' . $file->getClientOriginalName();
-                    $path = $file->storeAs(
+                    $imageUrl = StorageHelper::storeAsAndGetUrl(
+                        $file,
                         "clinics/{$clinicId}/treatments/{$treatmentId}",
-                        $filename,
-                        'public'
+                        $filename
                     );
-
-                    if ($path) {
-                        $uploadedImages[] = Storage::url($path);
-                    }
+                    $uploadedImages[] = $imageUrl;
                 }
             }
 

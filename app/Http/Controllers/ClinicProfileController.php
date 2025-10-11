@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use App\Models\ClinicGalleryImage;
 use Illuminate\Support\Facades\Artisan;
+use App\Helpers\StorageHelper;
 
 class ClinicProfileController extends Controller
 {
@@ -126,8 +127,7 @@ class ClinicProfileController extends Controller
                 $clinic->operating_hours = null;
             }
             if ($request->hasFile('logo')) {
-                $path = $request->file('logo')->store('clinic-logos', 'public');
-                $clinic->logo_url = '/storage/' . $path;
+                $clinic->logo_url = StorageHelper::storeAndGetUrl($request->file('logo'), 'clinic-logos');
             }
             $clinic->save();
 
@@ -200,11 +200,10 @@ class ClinicProfileController extends Controller
             \Artisan::call('storage:link');
         }
 
-        $path = $request->file('image')->store('clinic-gallery', 'public');
-        $imageUrl = '/storage/' . $path;
+        $imageUrl = StorageHelper::storeAndGetUrl($request->file('image'), 'clinic-gallery');
 
-        // Double-check file exists
-        if (!file_exists(public_path($imageUrl))) {
+        // Double-check file exists (only for local development)
+        if (!StorageHelper::fileExists($imageUrl)) {
             return response()->json(['error' => 'File not saved!'], 500);
         }
 
@@ -228,9 +227,8 @@ class ClinicProfileController extends Controller
         }
         $image = ClinicGalleryImage::where('id', $id)->where('clinic_id', $clinic->id)->firstOrFail();
         // Delete the file from storage
-        if ($image->image_url && str_starts_with($image->image_url, '/storage/')) {
-            $filePath = str_replace('/storage/', '', $image->image_url);
-            Storage::disk('public')->delete($filePath);
+        if ($image->image_url) {
+            StorageHelper::deleteFile($image->image_url);
         }
         $image->delete();
         return response()->json(['success' => true]);
