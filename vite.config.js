@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+﻿import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import react from "@vitejs/plugin-react";
 
@@ -20,10 +20,10 @@ export default defineConfig({
         }
     },
     server: {
-        host: "0.0.0.0",
+        host: "10.188.96.70",
         port: 5173,
         hmr: {
-            host: "localhost", // Default to localhost for normal dev
+            host: "10.188.96.70", // Default to localhost for normal dev
         },
         cors: true,
         strictPort: true,
@@ -32,3 +32,4 @@ export default defineConfig({
         },
     },
 });
+

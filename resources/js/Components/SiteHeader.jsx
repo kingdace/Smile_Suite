@@ -371,28 +371,34 @@ export default function SiteHeader() {
                 <div
                     className={`md:hidden transition-all duration-300 ease-in-out ${
                         mobileMenuOpen
-                            ? "max-h-96 opacity-100 visible"
+                            ? "max-h-screen opacity-100 visible"
                             : "max-h-0 opacity-0 invisible"
                     } overflow-hidden`}
                 >
-                    <div className="px-4 py-6 space-y-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-md">
+                    <div className="px-4 py-4 space-y-3 border-t border-slate-200/60 bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/40 backdrop-blur-md shadow-lg">
                         {/* Mobile Navigation Links */}
-                        <Link
-                            href="/#pricing"
-                            className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
-                            style={{ fontFamily: "Inter, sans-serif" }}
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Pricing
-                        </Link>
-                        <Link
-                            href={route("public.clinics.index") || "/clinics"}
-                            className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
-                            style={{ fontFamily: "Inter, sans-serif" }}
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Find Clinics
-                        </Link>
+                        <div className="space-y-2">
+                            <Link
+                                href="/#pricing"
+                                className="flex items-center justify-between w-full text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-blue-200/50 group"
+                                style={{ fontFamily: "Inter, sans-serif" }}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                <span>Pricing</span>
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </Link>
+                            <Link
+                                href={
+                                    route("public.clinics.index") || "/clinics"
+                                }
+                                className="flex items-center justify-between w-full text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-blue-200/50 group"
+                                style={{ fontFamily: "Inter, sans-serif" }}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                <span>Find Clinics</span>
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </Link>
+                        </div>
                         {/* <Link
                             href="/#testimonials"
                             className="block text-slate-700 hover:text-blue-700 px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 hover:bg-blue-50/80"
@@ -403,34 +409,38 @@ export default function SiteHeader() {
                         </Link> */}
 
                         {/* Mobile Register Options */}
-                        <div className="pt-2 border-t border-slate-200/60">
-                            <div className="text-sm font-semibold text-slate-500 px-4 py-2 mb-2">
+                        <div className="pt-3 border-t border-slate-200/60">
+                            <div className="text-xs font-bold text-slate-600 px-2 py-2 mb-2 bg-slate-50/80 rounded-lg border border-slate-200/50">
                                 Register
                             </div>
-                            <Link
-                                href={route("register")}
-                                className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200"
-                                style={{ fontFamily: "Inter, sans-serif" }}
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                Create Smile Suite Account
-                            </Link>
-                            <Link
-                                href={route("register.clinic")}
-                                className="block px-4 py-3 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-base transition-all duration-200"
-                                style={{ fontFamily: "Inter, sans-serif" }}
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                Register Clinic
-                            </Link>
+                            <div className="space-y-2">
+                                <Link
+                                    href={route("register")}
+                                    className="flex items-center justify-between w-full px-4 py-3 text-slate-700 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-blue-200/50 group"
+                                    style={{ fontFamily: "Inter, sans-serif" }}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    <span>Create Smile Suite Account</span>
+                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </Link>
+                                <Link
+                                    href={route("register.clinic")}
+                                    className="flex items-center justify-between w-full px-4 py-3 text-slate-700 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-blue-200/50 group"
+                                    style={{ fontFamily: "Inter, sans-serif" }}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    <span>Register Clinic</span>
+                                    <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Mobile Auth Buttons */}
                         {!isLoggedIn && (
-                            <div className="pt-2 border-t border-slate-200/60">
+                            <div className="pt-3 border-t border-slate-200/60">
                                 <Link
                                     href={route("login")}
-                                    className="block w-full text-center bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-base font-bold shadow-lg transition-all duration-300"
+                                    className="block w-full text-center bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white px-6 py-3 rounded-xl text-base font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-blue-500/20"
                                     style={{ fontFamily: "Inter, sans-serif" }}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
@@ -441,12 +451,73 @@ export default function SiteHeader() {
 
                         {/* Mobile Profile (if logged in) */}
                         {isLoggedIn && (
-                            <div className="pt-2 border-t border-slate-200/60">
-                                {userRole === "patient" ? (
-                                    <>
+                            <div className="pt-3 border-t border-slate-200/60">
+                                <div className="text-xs font-bold text-slate-600 px-2 py-2 mb-2 bg-slate-50/80 rounded-lg border border-slate-200/50">
+                                    Account
+                                </div>
+                                <div className="space-y-2">
+                                    {userRole === "patient" ? (
+                                        <>
+                                            <Link
+                                                href={route(
+                                                    "patient.dashboard"
+                                                )}
+                                                className="flex items-center justify-between w-full px-4 py-3 text-slate-700 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-blue-200/50 group"
+                                                style={{
+                                                    fontFamily:
+                                                        "Inter, sans-serif",
+                                                }}
+                                                onClick={() =>
+                                                    setMobileMenuOpen(false)
+                                                }
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                                    <span>Dashboard</span>
+                                                </div>
+                                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            </Link>
+                                            <Link
+                                                href={route("patient.profile")}
+                                                className="flex items-center justify-between w-full px-4 py-3 text-slate-700 hover:text-green-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-green-200/50 group"
+                                                style={{
+                                                    fontFamily:
+                                                        "Inter, sans-serif",
+                                                }}
+                                                onClick={() =>
+                                                    setMobileMenuOpen(false)
+                                                }
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <UserIcon className="w-4 h-4 text-green-500" />
+                                                    <span>My Profile</span>
+                                                </div>
+                                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            </Link>
+                                            <Link
+                                                href={route(
+                                                    "patient.treatments.index"
+                                                )}
+                                                className="flex items-center justify-between w-full px-4 py-3 text-slate-700 hover:text-purple-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-purple-200/50 group"
+                                                style={{
+                                                    fontFamily:
+                                                        "Inter, sans-serif",
+                                                }}
+                                                onClick={() =>
+                                                    setMobileMenuOpen(false)
+                                                }
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Stethoscope className="w-4 h-4 text-purple-500" />
+                                                    <span>My Treatments</span>
+                                                </div>
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            </Link>
+                                        </>
+                                    ) : (
                                         <Link
-                                            href={route("patient.dashboard")}
-                                            className="block px-3 py-2 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-sm transition-all duration-200 flex items-center gap-2.5"
+                                            href={dashboardRoute}
+                                            className="flex items-center justify-between w-full px-4 py-3 text-slate-700 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:bg-white/80 hover:shadow-sm border border-transparent hover:border-blue-200/50 group"
                                             style={{
                                                 fontFamily: "Inter, sans-serif",
                                             }}
@@ -454,65 +525,35 @@ export default function SiteHeader() {
                                                 setMobileMenuOpen(false)
                                             }
                                         >
-                                            <LayoutGrid className="w-3.5 h-3.5 text-blue-500" />
-                                            Dashboard
+                                            <div className="flex items-center gap-2">
+                                                <LayoutGrid className="w-4 h-4 text-blue-500" />
+                                                <span>
+                                                    {userRole === "admin"
+                                                        ? "Admin Dashboard"
+                                                        : "Dashboard"}
+                                                </span>
+                                            </div>
+                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                         </Link>
-                                        <Link
-                                            href={route("patient.profile")}
-                                            className="block px-3 py-2 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-sm transition-all duration-200 flex items-center gap-2.5"
-                                            style={{
-                                                fontFamily: "Inter, sans-serif",
-                                            }}
-                                            onClick={() =>
-                                                setMobileMenuOpen(false)
-                                            }
-                                        >
-                                            <UserIcon className="w-3.5 h-3.5 text-green-500" />
-                                            My Profile
-                                        </Link>
-                                        <Link
-                                            href={route(
-                                                "patient.treatments.index"
-                                            )}
-                                            className="block px-3 py-2 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-sm transition-all duration-200 flex items-center gap-2.5"
-                                            style={{
-                                                fontFamily: "Inter, sans-serif",
-                                            }}
-                                            onClick={() =>
-                                                setMobileMenuOpen(false)
-                                            }
-                                        >
-                                            <Stethoscope className="w-3.5 h-3.5 text-purple-500" />
-                                            My Treatments
-                                        </Link>
-                                    </>
-                                ) : (
-                                    <Link
-                                        href={dashboardRoute}
-                                        className="block px-3 py-2 text-slate-700 hover:bg-blue-50/80 hover:text-blue-700 rounded-xl text-sm transition-all duration-200 flex items-center gap-2.5"
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            router.post(route("logout"));
+                                            setMobileMenuOpen(false);
+                                        }}
+                                        className="flex items-center justify-between w-full px-4 py-3 text-red-600 hover:bg-red-50/80 hover:text-red-700 rounded-xl text-sm font-semibold transition-all duration-300 hover:shadow-sm border border-transparent hover:border-red-200/50 group"
                                         style={{
                                             fontFamily: "Inter, sans-serif",
                                         }}
-                                        onClick={() => setMobileMenuOpen(false)}
                                     >
-                                        <LayoutGrid className="w-3.5 h-3.5 text-blue-500" />
-                                        {userRole === "admin"
-                                            ? "Admin Dashboard"
-                                            : "Dashboard"}
-                                    </Link>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        router.post(route("logout"));
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    className="w-full text-center px-3 py-2 text-red-600 hover:bg-red-50/80 hover:text-red-700 flex items-center gap-2.5 text-sm transition-all duration-200 font-medium rounded-xl"
-                                    style={{ fontFamily: "Inter, sans-serif" }}
-                                >
-                                    <LogOut className="w-3.5 h-3.5" />
-                                    Log Out
-                                </button>
+                                        <div className="flex items-center gap-2">
+                                            <LogOut className="w-4 h-4" />
+                                            <span>Log Out</span>
+                                        </div>
+                                        <div className="w-1.5 h-1.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

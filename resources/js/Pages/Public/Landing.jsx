@@ -101,10 +101,117 @@ export default function Landing() {
             {/* Hero Section: slightly more pronounced gradient */}
             <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-blue-50 to-cyan-100 pb-0 z-10">
                 <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-stretch min-h-[28rem] sm:min-h-[32rem] md:min-h-[38rem] lg:min-h-[44rem]">
-                    {/* Left: Headline and content */}
-                    <div className="flex-1 flex flex-col justify-center px-4 sm:px-8 lg:px-16 py-8 sm:py-12 md:py-0 md:pr-0 z-10">
-                        {/* Enhanced tagline with better styling */}
-                        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 mb-6 sm:mb-8 text-center sm:text-left">
+                    {/* Mobile Layout: Title → Image → Description → Buttons → Trust Badge */}
+                    <div className="flex flex-col md:hidden px-4 py-8">
+                        {/* 1. Title */}
+                        <h1
+                            className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight mb-6 text-center animate-fade-in"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                        >
+                            <span className="block">
+                                The Future of{" "}
+                                <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-700 bg-clip-text text-transparent relative inline-block">
+                                    Dental Practice
+                                    <div className="absolute left-0 bottom-0 w-full h-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full -z-10 opacity-60"></div>
+                                </span>
+                            </span>
+                            <span className="block text-gray-800">
+                                Management
+                            </span>
+                        </h1>
+
+                        {/* 2. Image */}
+                        <div className="relative z-20 w-full flex justify-center mb-6">
+                            <div className="relative w-full max-w-sm">
+                                <img
+                                    src="/images/dental-image.png"
+                                    alt="Modern dental clinic management platform"
+                                    className="w-full h-64 object-cover rounded-2xl shadow-xl border-2 border-white ring-2 ring-blue-100/50"
+                                    style={{
+                                        boxShadow:
+                                            "0 20px 60px 0 rgba(16, 112, 202, 0.25)",
+                                    }}
+                                    loading="lazy"
+                                />
+                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-white/60 via-blue-100/20 to-transparent pointer-events-none" />
+                            </div>
+                        </div>
+
+                        {/* 3. Description */}
+                        <p
+                            className="text-base sm:text-lg text-gray-600 max-w-2xl font-medium animate-fade-in leading-relaxed text-center mb-8"
+                            style={{
+                                fontFamily: "Inter, sans-serif",
+                                letterSpacing: "0.01em",
+                            }}
+                        >
+                            Transform your dental practice with our
+                            comprehensive SaaS platform. Manage patients,
+                            appointments, treatments, and billing with{" "}
+                            <span className="text-blue-600 font-semibold bg-blue-50 px-1 rounded">
+                                enterprise-grade security
+                            </span>
+                            . Built for dental professionals who prioritize{" "}
+                            <span className="text-cyan-600 font-semibold bg-cyan-50 px-1 rounded">
+                                patient care
+                            </span>
+                            , not administrative tasks.
+                        </p>
+
+                        {/* 4. Buttons */}
+                        <div className="flex flex-col sm:flex-row sm:justify-center gap-3 sm:gap-4 animate-fade-in mb-8">
+                            <Link
+                                href={route("public.clinics.index")}
+                                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-base sm:text-lg font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 hover:from-blue-700 hover:via-blue-800 hover:to-cyan-700 shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:ring-offset-2 group transform hover:scale-105"
+                                style={{ fontFamily: "Inter, sans-serif" }}
+                            >
+                                Get Started
+                                <ArrowRight className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                            </Link>
+                            <Link
+                                href="#features"
+                                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 border-2 border-blue-600 text-base sm:text-lg font-bold rounded-xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:ring-offset-2 group transform hover:scale-105"
+                                style={{ fontFamily: "Inter, sans-serif" }}
+                            >
+                                Explore Features
+                                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                            </Link>
+                        </div>
+
+                        {/* 5. Trust Badge */}
+                        <div className="flex items-center justify-center gap-3 animate-fade-in">
+                            <div className="flex -space-x-2">
+                                <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
+                                    <span className="text-blue-600 text-xs font-bold">
+                                        D
+                                    </span>
+                                </div>
+                                <div className="w-7 h-7 rounded-full bg-cyan-100 border-2 border-white flex items-center justify-center">
+                                    <span className="text-cyan-600 text-xs font-bold">
+                                        C
+                                    </span>
+                                </div>
+                                <div className="w-7 h-7 rounded-full bg-green-100 border-2 border-white flex items-center justify-center">
+                                    <span className="text-blue-600 text-xs font-bold">
+                                        P
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-sm font-semibold text-gray-900">
+                                    500+ Clinics
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    Trust Smile Suite
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Desktop Layout: Content on left, Image on right */}
+                    <div className="hidden md:flex flex-1 flex-col justify-center px-4 sm:px-8 lg:px-16 py-4 sm:py-8 md:py-0 md:pr-0 z-10">
+                        {/* Enhanced tagline with better styling - Hidden on mobile for cleaner view */}
+                        <div className="hidden md:flex flex-col sm:flex-row items-center sm:items-center gap-3 mb-6 sm:mb-8 text-center sm:text-left">
                             <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-100/80 backdrop-blur-sm rounded-full border border-blue-200/50">
                                 <Sparkles className="w-4 h-4 text-blue-600" />
                                 <span className="text-xs sm:text-sm text-blue-700 font-semibold tracking-wide">
@@ -174,9 +281,39 @@ export default function Landing() {
                                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300" />
                             </Link>
                         </div>
-                        {/* Enhanced trust badges */}
-                        <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 animate-fade-in text-center sm:text-left">
-                            <div className="flex items-center gap-3">
+                        {/* Enhanced trust badges - Simplified on mobile */}
+                        <div className="mt-6 sm:mt-8 md:mt-12 flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 md:gap-6 animate-fade-in text-center sm:text-left">
+                            {/* Mobile: Show only main trust badge */}
+                            <div className="flex items-center gap-3 md:hidden">
+                                <div className="flex -space-x-2">
+                                    <div className="w-7 h-7 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-blue-600 text-xs font-bold">
+                                            D
+                                        </span>
+                                    </div>
+                                    <div className="w-7 h-7 rounded-full bg-cyan-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-cyan-600 text-xs font-bold">
+                                            C
+                                        </span>
+                                    </div>
+                                    <div className="w-7 h-7 rounded-full bg-green-100 border-2 border-white flex items-center justify-center">
+                                        <span className="text-blue-600 text-xs font-bold">
+                                            P
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-semibold text-gray-900">
+                                        500+ Clinics
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                        Trust Smile Suite
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Desktop: Show all trust badges */}
+                            <div className="hidden md:flex items-center gap-3">
                                 <div className="flex -space-x-2">
                                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center">
                                         <span className="text-blue-600 text-xs font-bold">
@@ -203,7 +340,7 @@ export default function Landing() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="hidden md:flex items-center gap-3">
                                 <CheckCircle className="w-5 h-5 text-green-500" />
                                 <div>
                                     <div className="text-sm font-semibold text-gray-900">
@@ -214,7 +351,7 @@ export default function Landing() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="hidden md:flex items-center gap-3">
                                 <ShieldCheck className="w-5 h-5 text-blue-500" />
                                 <div>
                                     <div className="text-sm font-semibold text-gray-900">
@@ -227,8 +364,9 @@ export default function Landing() {
                             </div>
                         </div>
                     </div>
-                    {/* Right: Enhanced hero image with floating elements */}
-                    <div className="flex-1 relative flex items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20">
+
+                    {/* Right: Enhanced hero image with floating elements - Hidden on mobile */}
+                    <div className="hidden md:flex flex-1 relative items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20">
                         {/* Enhanced decorative elements - Hidden on mobile */}
                         <div className="absolute -top-16 -right-16 w-32 h-32 sm:w-48 sm:h-48 bg-gradient-to-br from-blue-200/30 to-cyan-200/20 rounded-full blur-3xl z-10 animate-pulse hidden sm:block" />
                         <div className="absolute -bottom-8 -left-8 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-tr from-cyan-200/20 to-blue-200/30 rounded-full blur-2xl z-10 hidden sm:block" />

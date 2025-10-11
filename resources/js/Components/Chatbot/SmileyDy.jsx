@@ -262,10 +262,10 @@ const SmileyDy = ({ position = "left" }) => {
                 )}
             </button>
 
-            {/* Floating Interactive Text - Centered with Chatbot */}
+            {/* Floating Interactive Text - Hidden on mobile */}
             {!isOpen && (
                 <div
-                    className={`fixed bottom-20 z-40 flex items-center hidden sm:flex ${
+                    className={`hidden sm:flex fixed bottom-20 z-40 items-center ${
                         position === "right" ? "right-2" : "left-2"
                     }`}
                 >
