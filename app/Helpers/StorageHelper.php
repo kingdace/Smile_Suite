@@ -19,16 +19,27 @@ class StorageHelper
      */
     public static function storeAndGetUrl($file, string $path): string
     {
-        $disk = self::getDisk();
-        if ($disk === 's3') {
-            // Ensure public object when on S3
-            $storedPath = $file->storePublicly($path, $disk);
-        } else {
-            $storedPath = $file->store($path, $disk);
+        try {
+            $disk = self::getDisk();
+            \Log::info('StorageHelper: Uploading file', ['disk' => $disk, 'path' => $path]);
+
+            if ($disk === 's3') {
+                // Ensure public object when on S3
+                $storedPath = $file->storePublicly($path, $disk);
+            } else {
+                $storedPath = $file->store($path, $disk);
+            }
+
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+            $storage = Storage::disk($disk);
+            $url = $storage->url($storedPath);
+
+            \Log::info('StorageHelper: File uploaded successfully', ['url' => $url, 'stored_path' => $storedPath]);
+            return $url;
+        } catch (\Exception $e) {
+            \Log::error('StorageHelper: Upload failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            throw $e;
         }
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
-        $storage = Storage::disk($disk);
-        return $storage->url($storedPath);
     }
 
     /**

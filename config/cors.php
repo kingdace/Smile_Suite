@@ -5,12 +5,8 @@ return [
     'allowed_methods' => ['*'],
     'allowed_origins' => [
         'http://localhost:5173',
-        'http://',
+        'http://127.0.0.1:8000',
         'http://localhost:8000',
-        'http://',
-        // Network access for mobile devices (updated by update-ip script)
-        'http://',
-        'http://'
     ],
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
@@ -18,10 +14,3 @@ return [
     'max_age' => 0,
     'supports_credentials' => true,
 ];
-
-
-
-
-
-
-

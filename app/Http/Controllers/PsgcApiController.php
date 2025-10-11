@@ -12,10 +12,8 @@ class PsgcApiController extends Controller
 
     public function __construct()
     {
-        // Add CORS headers
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        // CORS headers are handled by Laravel's CORS middleware
+        // No need to set headers manually here
     }
 
     public function getRegions()
