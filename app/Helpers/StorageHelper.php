@@ -27,20 +27,30 @@ class StorageHelper
                 'original_name' => $file->getClientOriginalName()
             ]);
 
-            if ($disk === 's3') {
-                // Store with public visibility on S3
-                $storedPath = $file->store($path, $disk);
-                // Set visibility to public after upload
-                if ($storedPath) {
-                    Storage::disk($disk)->setVisibility($storedPath, 'public');
+            try {
+                if ($disk === 's3') {
+                    // Store with public visibility on S3
+                    $storedPath = $file->store($path, $disk);
+                    // Set visibility to public after upload
+                    if ($storedPath) {
+                        Storage::disk($disk)->setVisibility($storedPath, 'public');
+                    }
+                } else {
+                    $storedPath = $file->store($path, $disk);
                 }
-            } else {
-                $storedPath = $file->store($path, $disk);
-            }
 
-            // Check if upload succeeded
-            if (!$storedPath) {
-                throw new \Exception('File upload failed - store() returned false');
+                // Check if upload succeeded
+                if (!$storedPath) {
+                    throw new \Exception('File upload failed - store() returned false');
+                }
+            } catch (\Exception $uploadException) {
+                \Log::error('StorageHelper: S3 store() failed with exception', [
+                    'error' => $uploadException->getMessage(),
+                    'disk' => $disk,
+                    'path' => $path,
+                    'trace' => $uploadException->getTraceAsString()
+                ]);
+                throw new \Exception('S3 Upload Error: ' . $uploadException->getMessage());
             }
 
             \Log::info('StorageHelper: File stored', ['stored_path' => $storedPath]);
@@ -66,17 +76,59 @@ class StorageHelper
      */
     public static function storeAsAndGetUrl($file, string $path, string $name): string
     {
-        $disk = self::getDisk();
-        if ($disk === 's3') {
-            // Ensure public object when on S3
-            $storedPath = $file->storeAs($path, $name, $disk);
-            Storage::disk($disk)->setVisibility($storedPath, 'public');
-        } else {
-            $storedPath = $file->storeAs($path, $name, $disk);
+        try {
+            $disk = self::getDisk();
+            \Log::info('StorageHelper: Uploading file with custom name', [
+                'disk' => $disk,
+                'path' => $path,
+                'name' => $name,
+                'original_name' => $file->getClientOriginalName()
+            ]);
+
+            try {
+                if ($disk === 's3') {
+                    // Store with public visibility on S3
+                    $storedPath = $file->storeAs($path, $name, $disk);
+                    // Set visibility to public after upload
+                    if ($storedPath) {
+                        Storage::disk($disk)->setVisibility($storedPath, 'public');
+                    }
+                } else {
+                    $storedPath = $file->storeAs($path, $name, $disk);
+                }
+
+                // Check if upload succeeded
+                if (!$storedPath) {
+                    throw new \Exception('File upload failed - storeAs() returned false');
+                }
+            } catch (\Exception $uploadException) {
+                \Log::error('StorageHelper: S3 storeAs() failed with exception', [
+                    'error' => $uploadException->getMessage(),
+                    'disk' => $disk,
+                    'path' => $path,
+                    'name' => $name,
+                    'trace' => $uploadException->getTraceAsString()
+                ]);
+                throw new \Exception('S3 Upload Error: ' . $uploadException->getMessage());
+            }
+
+            \Log::info('StorageHelper: File stored with custom name', ['stored_path' => $storedPath]);
+
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+            $storage = Storage::disk($disk);
+            $url = $storage->url($storedPath);
+
+            \Log::info('StorageHelper: File uploaded successfully with custom name', ['url' => $url]);
+            return $url;
+        } catch (\Exception $e) {
+            \Log::error('StorageHelper: Upload with custom name failed', [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName(),
+                'name' => $name,
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
         }
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
-        $storage = Storage::disk($disk);
-        return $storage->url($storedPath);
     }
 
     /**
