@@ -28,8 +28,12 @@ class StorageHelper
             ]);
 
             if ($disk === 's3') {
-                // Store with public visibility
-                $storedPath = $file->store($path, ['disk' => $disk, 'visibility' => 'public']);
+                // Store with public visibility on S3
+                $storedPath = $file->store($path, $disk);
+                // Set visibility to public after upload
+                if ($storedPath) {
+                    Storage::disk($disk)->setVisibility($storedPath, 'public');
+                }
             } else {
                 $storedPath = $file->store($path, $disk);
             }
