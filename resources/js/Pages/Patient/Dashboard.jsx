@@ -1,5 +1,6 @@
 import { Head, usePage, Link, router } from "@inertiajs/react";
 import { useState, useEffect } from "react";
+import { ImageHelper } from "@/Helpers/ImageHelper.js";
 import {
     Calendar,
     User,
@@ -397,11 +398,11 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         <div className="flex items-center gap-3">
                                             <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-blue-200 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                                                 <img
-                                                    src={
+                                                    src={ImageHelper.getImageUrl(
                                                         appointment.clinic
-                                                            ?.logo_url ||
+                                                            ?.logo_url,
                                                         "/images/clinic-logo.png"
-                                                    }
+                                                    )}
                                                     alt={`${
                                                         appointment.clinic
                                                             ?.name || "Clinic"
@@ -1040,11 +1041,11 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                         <div className="flex items-center gap-3">
                                             <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg border-2 border-purple-200 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                                                 <img
-                                                    src={
+                                                    src={ImageHelper.getImageUrl(
                                                         treatment.clinic
-                                                            ?.logo_url ||
+                                                            ?.logo_url,
                                                         "/images/clinic-logo.png"
-                                                    }
+                                                    )}
                                                     alt={`${
                                                         treatment.clinic
                                                             ?.name || "Clinic"

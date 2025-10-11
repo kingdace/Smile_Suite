@@ -1,6 +1,7 @@
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Link } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
+import { ImageHelper } from "@/Helpers/ImageHelper.js";
 import {
     MapPin,
     Phone,
@@ -521,10 +522,10 @@ export default function ClinicDirectory({ clinics }) {
                                             <div className="relative">
                                                 <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-0.5">
                                                     <img
-                                                        src={
-                                                            clinic.logo_url ||
+                                                        src={ImageHelper.getImageUrl(
+                                                            clinic.logo_url,
                                                             "/images/clinic-logo.png"
-                                                        }
+                                                        )}
                                                         alt={clinic.name}
                                                         className="w-full h-full rounded-lg sm:rounded-xl object-cover"
                                                         onError={(e) => {
