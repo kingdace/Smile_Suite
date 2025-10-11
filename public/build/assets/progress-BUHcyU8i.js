@@ -1,1 +1,0 @@
-import{r as o,j as s}from"./app-DzAKanfO.js";const t=o.forwardRef(({className:l,value:r=0,...e},a)=>s.jsx("div",{ref:a,className:`relative h-2 w-full overflow-hidden rounded-full bg-gray-200 ${l||""}`,...e,children:s.jsx("div",{className:"h-full w-full flex-1 bg-blue-600 transition-all",style:{width:`${r}%`}})}));t.displayName="Progress";export{t as P};

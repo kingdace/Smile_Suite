@@ -322,112 +322,88 @@ export default function Landing() {
                         </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105 h-full">
                             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                 <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </div>
                             <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
                                 Patient Management
                             </h3>
-                            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                            <p className="text-gray-600 text-sm sm:text-base leading-relaxed flex-grow">
                                 Complete patient lifecycle management with
                                 digital records, medical history, and
                                 personalized treatment plans.
                             </p>
-                            <div className="mt-4 sm:mt-6 flex items-center gap-2 text-blue-600 font-semibold text-sm sm:text-base">
-                                <span>Learn more</span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105 h-full">
                             <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                 <Calendar className="w-8 h-8 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Smart Scheduling
                             </h3>
-                            <p className="text-gray-600 text-base leading-relaxed">
+                            <p className="text-gray-600 text-base leading-relaxed flex-grow">
                                 AI-powered appointment scheduling with automated
                                 reminders, conflict detection, and calendar
                                 optimization.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-cyan-600 font-semibold">
-                                <span>Learn more</span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105 h-full">
                             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                 <FileText className="w-8 h-8 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Treatment Records
                             </h3>
-                            <p className="text-gray-600 text-base leading-relaxed">
+                            <p className="text-gray-600 text-base leading-relaxed flex-grow">
                                 Comprehensive treatment documentation with
                                 progress tracking, outcome monitoring, and
                                 clinical decision support.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-blue-600 font-semibold">
-                                <span>Learn more</span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105 h-full">
                             <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                 <CreditCard className="w-8 h-8 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Payment Processing
                             </h3>
-                            <p className="text-gray-600 text-base leading-relaxed">
+                            <p className="text-gray-600 text-base leading-relaxed flex-grow">
                                 Secure payment processing with multiple payment
                                 methods, automated billing, and comprehensive
                                 financial reporting.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-cyan-600 font-semibold">
-                                <span>Learn more</span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-blue-200 hover:scale-105 h-full">
                             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                 <ShieldCheck className="w-8 h-8 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Enterprise Security
                             </h3>
-                            <p className="text-gray-600 text-base leading-relaxed">
+                            <p className="text-gray-600 text-base leading-relaxed flex-grow">
                                 HIPAA-compliant security with end-to-end
                                 encryption, multi-factor authentication, and
                                 regular security audits.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-blue-600 font-semibold">
-                                <span>Learn more</span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105">
+                        <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center group animate-fade-in border border-gray-100 hover:border-cyan-200 hover:scale-105 h-full">
                             <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                                 <Globe className="w-8 h-8 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">
                                 Cloud-First Platform
                             </h3>
-                            <p className="text-gray-600 text-base leading-relaxed">
+                            <p className="text-gray-600 text-base leading-relaxed flex-grow">
                                 Access your practice from anywhere with
                                 real-time sync, automatic backups, and seamless
                                 multi-device experience.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-cyan-600 font-semibold">
-                                <span>Learn more</span>
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1032,8 +1008,8 @@ export default function Landing() {
                 </div>
             </footer>
 
-            {/* SmileyDy Chatbot */}
-            <SmileyDy />
+            {/* SmileyDy Chatbot - Fixed position in bottom right corner */}
+            <SmileyDy position="right" />
         </div>
     );
 }

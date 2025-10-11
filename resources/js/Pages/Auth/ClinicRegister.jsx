@@ -25,6 +25,7 @@ import {
     Users,
     CheckCircle,
 } from "lucide-react";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 export default function ClinicRegister() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -689,6 +690,9 @@ export default function ClinicRegister() {
                     </Card>
                 </div>
             </div>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy position="right" />
         </>
     );
 }

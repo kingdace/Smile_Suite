@@ -18,21 +18,93 @@ import {
     HelpCircle,
 } from "lucide-react";
 
-// Custom SmileyDy Image Component
-const SmileyDyIcon = ({ className = "w-6 h-6" }) => (
-    <img
-        src="/icons/smiley.png"
-        alt="SmileyDy - Dental AI Assistant"
-        className={className}
-        style={{
-            objectFit: "contain",
-            width: "100%",
-            height: "100%",
-        }}
-    />
+// Custom SmileyDy Video Component
+const SmileyDyIcon = ({ className = "w-6 h-6", isOpen = false }) => {
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (video) {
+            // Ensure video plays and loops infinitely
+            const playVideo = () => {
+                video.play().catch((e) => console.log("Video play failed:", e));
+            };
+
+            // Play immediately when loaded
+            playVideo();
+
+            // Handle any interruptions
+            const handleEnded = () => {
+                video.currentTime = 0;
+                playVideo();
+            };
+
+            const handlePause = () => {
+                playVideo();
+            };
+
+            video.addEventListener("ended", handleEnded);
+            video.addEventListener("pause", handlePause);
+
+            return () => {
+                video.removeEventListener("ended", handleEnded);
+                video.removeEventListener("pause", handlePause);
+            };
+        }
+    }, []);
+
+    return (
+        <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-blue-700">
+            <video
+                ref={videoRef}
+                className="w-full h-full object-contain"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                onLoadedData={(e) => e.target.play()}
+                onEnded={(e) => {
+                    e.target.currentTime = 0;
+                    e.target.play();
+                }}
+                onError={(e) => console.log("Video error:", e)}
+                onCanPlay={(e) => e.target.play()}
+                style={{
+                    imageRendering: "crisp-edges",
+                    WebkitImageRendering: "crisp-edges",
+                    imageRendering: "pixelated",
+                }}
+            >
+                <source src="/icons/smiley-video.mp4" type="video/mp4" />
+                <source src="/icons/smiley-video.webm" type="video/webm" />
+                {/* Fallback image if video fails to load */}
+                <img
+                    src="/icons/smiley.png"
+                    alt="SmileyDy - Dental AI Assistant"
+                    className="w-full h-full object-contain"
+                    style={{
+                        imageRendering: "crisp-edges",
+                        WebkitImageRendering: "crisp-edges",
+                    }}
+                />
+            </video>
+        </div>
+    );
+};
+
+// Alternative: Animated GIF Component (if you prefer GIF)
+const SmileyDyGifIcon = ({ className = "w-6 h-6" }) => (
+    <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-blue-700">
+        <img
+            src="/icons/smiley-animated.gif"
+            alt="SmileyDy - Dental AI Assistant"
+            className="w-full h-full object-contain"
+        />
+    </div>
 );
 
-const SmileyDy = () => {
+const SmileyDy = ({ position = "left" }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [messages, setMessages] = useState([
@@ -165,23 +237,38 @@ const SmileyDy = () => {
             {/* Floating Chat Button - Mobile Optimized */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`fixed bottom-4 left-4 sm:bottom-6 sm:left-6 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-cyan-600 via-blue-600 to-blue-700 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 z-50 group transform hover:scale-105 active:scale-95 ${
-                    isOpen ? "rotate-90" : ""
-                }`}
+                className={`fixed bottom-4 sm:bottom-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 z-50 group transform hover:scale-105 active:scale-95 flex items-center justify-center ${
+                    position === "right"
+                        ? "right-4 sm:right-6"
+                        : "left-4 sm:left-6"
+                } ${isOpen ? "rotate-90" : ""}`}
                 style={{
                     boxShadow: "0 8px 32px rgba(6, 182, 212, 0.4)",
+                    borderRadius: "50%",
+                    aspectRatio: "1/1",
+                    imageRendering: "crisp-edges",
+                    WebkitImageRendering: "crisp-edges",
                 }}
             >
                 {isOpen ? (
-                    <X className="w-5 h-5 sm:w-6 sm:h-6 text-white mx-auto" />
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg animate-pulse">
+                        <X className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-lg group-hover:rotate-90 transition-transform duration-300" />
+                    </div>
                 ) : (
-                    <SmileyDyIcon className="w-6 h-6 sm:w-7 sm:h-7 mx-auto group-hover:scale-110 transition-transform duration-300" />
+                    <SmileyDyIcon
+                        className="w-8 h-8 sm:w-10 sm:h-10 mx-auto group-hover:scale-110 transition-transform duration-300"
+                        isOpen={isOpen}
+                    />
                 )}
             </button>
 
             {/* Floating Interactive Text - Centered with Chatbot */}
             {!isOpen && (
-                <div className="fixed bottom-20 left-2 z-40 flex items-center hidden sm:flex">
+                <div
+                    className={`fixed bottom-20 z-40 flex items-center hidden sm:flex ${
+                        position === "right" ? "right-2" : "left-2"
+                    }`}
+                >
                     <div className="bg-white/95 backdrop-blur-sm rounded-md px-2 py-1.5 shadow-lg border border-cyan-100">
                         <div className="flex items-center gap-1.5">
                             <div className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse"></div>
@@ -195,12 +282,18 @@ const SmileyDy = () => {
 
             {/* Chat Window - Mobile Optimized */}
             {isOpen && (
-                <div className="fixed bottom-20 left-2 right-2 sm:bottom-24 sm:left-6 sm:right-auto w-auto sm:w-80 h-[24rem] sm:h-[28rem] bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 z-40 flex flex-col overflow-hidden backdrop-blur-sm">
+                <div
+                    className={`fixed bottom-20 sm:bottom-24 w-auto sm:w-80 h-[24rem] sm:h-[28rem] bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 z-40 flex flex-col overflow-hidden backdrop-blur-sm ${
+                        position === "right"
+                            ? "right-2 sm:right-6 sm:left-auto"
+                            : "left-2 right-2 sm:left-6 sm:right-auto"
+                    }`}
+                >
                     {/* Header - Ultra Compact */}
                     <div className="bg-gradient-to-r from-cyan-600 via-blue-600 to-blue-700 p-1.5 sm:p-2 text-white">
                         <div className="flex items-center gap-1.5 sm:gap-2">
-                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-md flex items-center justify-center backdrop-blur-sm">
-                                <SmileyDyIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                                <SmileyDyIcon className="w-4 h-4 sm:w-6 sm:h-6" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <h3 className="font-bold text-xs sm:text-sm truncate">

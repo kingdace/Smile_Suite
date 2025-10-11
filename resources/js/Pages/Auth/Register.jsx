@@ -16,6 +16,7 @@ import {
     ArrowLeft,
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
@@ -851,6 +852,9 @@ export default function Register() {
                     </div>
                 </div>
             </div>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy position="right" />
         </div>
     );
 }

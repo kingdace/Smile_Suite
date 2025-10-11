@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import SiteHeader from "@/Components/SiteHeader";
+import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
 export default function Login({ status, canResetPassword, flash }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -355,6 +356,9 @@ export default function Login({ status, canResetPassword, flash }) {
                     </div>
                 </div>
             </div>
+
+            {/* SmileyDy Chatbot */}
+            <SmileyDy position="right" />
         </div>
     );
 }

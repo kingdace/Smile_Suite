@@ -529,7 +529,7 @@ export default function SubscriptionPayment({
             </div>
 
             {/* SmileyDy Chatbot */}
-            <SmileyDy />
+            <SmileyDy position="right" />
         </>
     );
 }

@@ -241,7 +241,7 @@ export default function SubscriptionPaymentSuccess({ request }) {
             </div>
 
             {/* SmileyDy Chatbot */}
-            <SmileyDy />
+            <SmileyDy position="right" />
         </>
     );
 }

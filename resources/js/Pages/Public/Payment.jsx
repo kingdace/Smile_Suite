@@ -752,7 +752,7 @@ export default function Payment({ request, token, paymentMethods }) {
             </div>
 
             {/* SmileyDy Chatbot */}
-            <SmileyDy />
+            <SmileyDy position="right" />
         </GuestLayout>
     );
 }
