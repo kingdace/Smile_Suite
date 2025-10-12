@@ -1,1 +1,0 @@
-import{r as a}from"./app-X78Y7oGJ.js";import{b as t,c as o}from"./ExportButton-Bf30NTS3.js";var i=["axis"],s=a.forwardRef((r,e)=>a.createElement(t,{chartName:"LineChart",defaultTooltipEventType:"axis",validateTooltipEventTypes:i,tooltipPayloadSearcher:o,categoricalChartProps:r,ref:e}));export{s as L};
