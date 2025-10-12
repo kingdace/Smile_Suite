@@ -26,15 +26,22 @@ class ClinicDirectoryController extends Controller
 
     public function index()
     {
+        // Optimized query with proper eager loading and indexed columns
         $clinics = Clinic::select(
-            'id', 'name', 'slug', 'street_address', 'barangay_code', 'city_municipality_code',
-            'province_code', 'region_code', 'address_details', 'logo_url', 'description',
-            'contact_number', 'email'
+            'clinics.id', 'clinics.name', 'clinics.slug', 'clinics.street_address', 
+            'clinics.barangay_code', 'clinics.city_municipality_code',
+            'clinics.province_code', 'clinics.region_code', 'clinics.address_details', 
+            'clinics.logo_url', 'clinics.description',
+            'clinics.contact_number', 'clinics.email'
         )
-            ->where('is_active', true)
-            ->whereHas('users', function($query) {
-                $query->where('role', 'clinic_admin');
-            })
+            ->where('clinics.is_active', true)
+            // Use join instead of whereHas for better performance
+            ->join('users', 'users.clinic_id', '=', 'clinics.id')
+            ->where('users.role', 'clinic_admin')
+            // Remove duplicate clinics if they have multiple admins
+            ->distinct()
+            // Order by most recently updated or by name for consistency
+            ->orderBy('clinics.name', 'asc')
             ->paginate(12);
 
         return Inertia::render('Public/Clinics/Index', [
