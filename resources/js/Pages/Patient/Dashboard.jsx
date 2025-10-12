@@ -263,17 +263,17 @@ const AppointmentsSection = ({ appointments = [] }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl sm:rounded-xl shadow-lg border border-gray-100 p-4 sm:p-4 md:p-6">
-            <div className="flex items-center justify-between mb-6 sm:mb-4 md:mb-6">
-                <div className="flex items-center gap-4 sm:gap-3">
-                    <div className="w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg">
-                        <Calendar className="w-6 h-6 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-100 p-3 sm:p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-4 md:mb-6">
+                <div className="flex items-center gap-3 sm:gap-3">
+                    <div className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
+                        <Calendar className="w-5 h-5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-lg sm:text-base md:text-lg font-semibold text-gray-700">
+                        <h3 className="text-base sm:text-base md:text-lg font-semibold text-gray-700">
                             My Appointments
                         </h3>
-                        <p className="text-gray-400 text-base sm:text-sm">
+                        <p className="text-gray-400 text-sm sm:text-sm">
                             Your latest dental appointments (
                             {appointments.length} total)
                         </p>
@@ -318,7 +318,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
             </div>
             <div>
                 {appointments.length > 0 ? (
-                    <div className="space-y-4 sm:space-y-3 md:space-y-4">
+                    <div className="space-y-3 sm:space-y-3 md:space-y-4">
                         {currentAppointments.map((appointment, index) => (
                             <SlideIn
                                 key={appointment.id}
@@ -326,7 +326,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 delay={index * 100}
                             >
                                 <div
-                                    className="bg-white rounded-xl sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-4 sm:p-4 md:p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
+                                    className="bg-white rounded-lg sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-3 sm:p-4 md:p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
                                     role="article"
                                     aria-label={`Appointment at ${
                                         appointment.clinic?.name || "Clinic"
@@ -338,12 +338,12 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     }
                                 >
                                     {/* Enhanced Header with Status and Visual Elements */}
-                                    <div className="flex items-center justify-between mb-6 sm:mb-4 md:mb-6">
-                                        <div className="flex items-center gap-3 sm:gap-2 md:gap-4">
-                                            <div className="flex items-center gap-3 sm:gap-2 md:gap-3">
+                                    <div className="flex items-center justify-between mb-4 sm:mb-4 md:mb-6">
+                                        <div className="flex items-center gap-2 sm:gap-2 md:gap-4">
+                                            <div className="flex items-center gap-2 sm:gap-2 md:gap-3">
                                                 <div
                                                     className={cn(
-                                                        "w-4 h-4 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-full shadow-sm",
+                                                        "w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-full shadow-sm",
                                                         appointment.status?.name?.toLowerCase() ===
                                                             "confirmed" ||
                                                             appointment.status?.name?.toLowerCase() ===
@@ -361,7 +361,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                             appointment.status
                                                                 ?.name
                                                         ),
-                                                        "px-3 sm:px-2 md:px-3 py-1.5 sm:py-1 text-base sm:text-sm font-semibold"
+                                                        "px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold"
                                                     )}
                                                     role="status"
                                                     aria-label={`Appointment status: ${
@@ -376,14 +376,14 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             {/* Show special indicators for patient actions */}
                                             {appointment.status?.name ===
                                                 "Pending Reschedule" && (
-                                                <Badge className="text-xs font-bold px-3 py-1 rounded-full border bg-orange-100 text-orange-700 border-orange-300 shadow-sm">
+                                                <Badge className="text-xs font-bold px-2 py-0.5 rounded-full border bg-orange-100 text-orange-700 border-orange-300 shadow-sm">
                                                     Awaiting Clinic Response
                                                 </Badge>
                                             )}
                                             {appointment.status?.name ===
                                                 "Cancelled" &&
                                                 appointment.cancelled_at && (
-                                                    <Badge className="text-xs font-bold px-3 py-1 rounded-full border bg-red-100 text-red-700 border-red-300 shadow-sm">
+                                                    <Badge className="text-xs font-bold px-2 py-0.5 rounded-full border bg-red-100 text-red-700 border-red-300 shadow-sm">
                                                         You Cancelled
                                                     </Badge>
                                                 )}
@@ -394,9 +394,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     </div>
 
                                     {/* Compact Clinic Information */}
-                                    <div className="mb-4 sm:mb-3 md:mb-4">
-                                        <div className="flex items-center gap-4 sm:gap-2 md:gap-3">
-                                            <div className="w-16 h-16 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl sm:rounded-xl overflow-hidden shadow-lg sm:shadow-lg border border-blue-200 sm:border-2 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                                    <div className="mb-3 sm:mb-3 md:mb-4">
+                                        <div className="flex items-center gap-3 sm:gap-2 md:gap-3">
+                                            <div className="w-12 h-12 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl overflow-hidden shadow-lg sm:shadow-lg border border-blue-200 sm:border-2 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                                                 <img
                                                     src={ImageHelper.getImageUrl(
                                                         appointment.clinic
@@ -415,13 +415,13 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-semibold text-gray-700 text-lg sm:text-base md:text-lg mb-2 sm:mb-1">
+                                                <h4 className="font-semibold text-gray-700 text-base sm:text-base md:text-lg mb-1 sm:mb-1">
                                                     {appointment.clinic?.name ||
                                                         "Dental Clinic"}
                                                 </h4>
-                                                <div className="flex items-center gap-2 sm:gap-2 text-gray-500">
-                                                    <MapPin className="w-4 h-4 sm:w-3 sm:h-3 text-blue-500" />
-                                                    <p className="text-base sm:text-sm line-clamp-1">
+                                                <div className="flex items-center gap-1 sm:gap-2 text-gray-500">
+                                                    <MapPin className="w-3 h-3 sm:w-3 sm:h-3 text-blue-500" />
+                                                    <p className="text-sm sm:text-sm line-clamp-1">
                                                         {appointment.clinic
                                                             ?.street_address ||
                                                             "Address not available"}
@@ -432,14 +432,14 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     </div>
 
                                     {/* Compact Date and Time Information */}
-                                    <div className="bg-white rounded-xl sm:rounded-xl p-3 sm:p-3 md:p-4 mb-4 sm:mb-3 md:mb-4 border border-gray-200 shadow-lg">
+                                    <div className="bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 mb-3 sm:mb-3 md:mb-4 border border-gray-200 shadow-lg">
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-4 sm:gap-2 md:gap-3">
-                                                <div className="w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg sm:shadow-md">
-                                                    <Calendar className="w-6 h-6 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
+                                            <div className="flex items-center gap-3 sm:gap-2 md:gap-3">
+                                                <div className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg sm:shadow-md">
+                                                    <Calendar className="w-5 h-5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-gray-700 text-base sm:text-sm md:text-base">
+                                                    <p className="font-semibold text-gray-700 text-sm sm:text-sm md:text-base">
                                                         {new Date(
                                                             appointment.scheduled_at
                                                         ).toLocaleDateString(
@@ -452,9 +452,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                             }
                                                         )}
                                                     </p>
-                                                    <div className="flex items-center gap-2 text-gray-500">
+                                                    <div className="flex items-center gap-1 text-gray-500">
                                                         <Clock className="w-3 h-3 text-purple-500" />
-                                                        <span className="text-sm font-normal">
+                                                        <span className="text-xs font-normal">
                                                             {new Date(
                                                                 appointment.scheduled_at
                                                             ).toLocaleTimeString(
@@ -487,18 +487,18 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     </div>
 
                                     {/* Compact Additional Information */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-2 md:gap-3 mb-4 sm:mb-3 md:mb-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-2 md:gap-3 mb-3 sm:mb-3 md:mb-4">
                                         {appointment.dentist && (
-                                            <div className="bg-white rounded-lg sm:rounded-lg p-3 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
-                                                <div className="flex items-center gap-3 sm:gap-2">
-                                                    <div className="w-8 h-8 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg sm:rounded-md flex items-center justify-center">
-                                                        <User className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+                                            <div className="bg-white rounded-lg sm:rounded-lg p-2 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
+                                                <div className="flex items-center gap-2 sm:gap-2">
+                                                    <div className="w-6 h-6 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-md sm:rounded-md flex items-center justify-center">
+                                                        <User className="w-3 h-3 sm:w-3 sm:h-3 text-white" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-semibold text-green-700 uppercase tracking-wide">
+                                                        <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
                                                             Dentist
                                                         </p>
-                                                        <p className="text-base font-semibold text-gray-700">
+                                                        <p className="text-sm font-semibold text-gray-700">
                                                             Dr.{" "}
                                                             {
                                                                 appointment
@@ -511,16 +511,16 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             </div>
                                         )}
                                         {appointment.reason && (
-                                            <div className="bg-white rounded-lg sm:rounded-lg p-3 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
-                                                <div className="flex items-start gap-3 sm:gap-2">
-                                                    <div className="w-8 h-8 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg sm:rounded-md flex items-center justify-center">
-                                                        <FileText className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+                                            <div className="bg-white rounded-lg sm:rounded-lg p-2 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
+                                                <div className="flex items-start gap-2 sm:gap-2">
+                                                    <div className="w-6 h-6 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-md sm:rounded-md flex items-center justify-center">
+                                                        <FileText className="w-3 h-3 sm:w-3 sm:h-3 text-white" />
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="text-sm font-semibold text-blue-700 uppercase tracking-wide mb-2">
+                                                        <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
                                                             Reason
                                                         </p>
-                                                        <p className="text-base text-gray-700 line-clamp-2">
+                                                        <p className="text-sm text-gray-700 line-clamp-2">
                                                             {appointment.reason}
                                                         </p>
                                                     </div>
@@ -533,16 +533,16 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     {formatAppointmentNotes(
                                         appointment.notes
                                     ) && (
-                                        <div className="bg-white rounded-lg sm:rounded-lg p-3 sm:p-2 md:p-3 mb-4 sm:mb-3 md:mb-4 border border-yellow-200 shadow-lg">
-                                            <div className="flex items-start gap-3 sm:gap-2">
-                                                <div className="w-8 h-8 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg sm:rounded-md flex items-center justify-center">
-                                                    <AlertCircle className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
+                                        <div className="bg-white rounded-lg sm:rounded-lg p-2 sm:p-2 md:p-3 mb-3 sm:mb-3 md:mb-4 border border-yellow-200 shadow-lg">
+                                            <div className="flex items-start gap-2 sm:gap-2">
+                                                <div className="w-6 h-6 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-md sm:rounded-md flex items-center justify-center">
+                                                    <AlertCircle className="w-3 h-3 sm:w-3 sm:h-3 text-white" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-semibold text-yellow-700 uppercase tracking-wide mb-2">
+                                                    <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">
                                                         Notes
                                                     </p>
-                                                    <p className="text-base font-normal text-gray-700">
+                                                    <p className="text-sm font-normal text-gray-700">
                                                         {formatAppointmentNotes(
                                                             appointment.notes
                                                         )}
@@ -553,14 +553,14 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     )}
 
                                     {/* Compact Action Buttons */}
-                                    <div className="flex items-center justify-between pt-4 sm:pt-3 md:pt-4 border-t border-gray-200/50">
-                                        <div className="flex items-center gap-3 sm:gap-2">
+                                    <div className="flex items-center justify-between pt-3 sm:pt-3 md:pt-4 border-t border-gray-200/50">
+                                        <div className="flex items-center gap-2 sm:gap-2">
                                             {appointment.status?.name?.toLowerCase() ===
                                                 "pending" && (
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="flex items-center gap-1 px-3 sm:px-2 md:px-3 py-1.5 sm:py-1 md:py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg sm:rounded-lg text-base font-semibold"
+                                                    className="flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 rounded-lg sm:rounded-lg text-xs font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleCancelAppointment(
@@ -583,7 +583,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="flex items-center gap-1 px-3 sm:px-2 md:px-3 py-1.5 sm:py-1 md:py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 rounded-lg sm:rounded-lg text-base font-semibold"
+                                                    className="flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 rounded-lg sm:rounded-lg text-xs font-semibold"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleRescheduleAppointment(
@@ -605,7 +605,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="flex items-center gap-1 px-4 sm:px-3 md:px-4 py-1.5 sm:py-1 md:py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-lg sm:rounded-lg text-base font-semibold"
+                                            className="flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-lg sm:rounded-lg text-xs font-semibold"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleViewDetails(appointment);
@@ -925,17 +925,17 @@ const TreatmentsOverview = ({ treatments = [] }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl sm:rounded-xl shadow-lg border border-gray-100 p-4 sm:p-4 md:p-6">
-            <div className="flex items-center justify-between mb-6 sm:mb-4 md:mb-6">
-                <div className="flex items-center gap-4 sm:gap-3">
-                    <div className="w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg">
-                        <Stethoscope className="w-6 h-6 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-100 p-3 sm:p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-4 md:mb-6">
+                <div className="flex items-center gap-3 sm:gap-3">
+                    <div className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
+                        <Stethoscope className="w-5 h-5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-lg sm:text-base md:text-lg font-semibold text-gray-700">
+                        <h3 className="text-base sm:text-base md:text-lg font-semibold text-gray-700">
                             Treatment History
                         </h3>
-                        <p className="text-gray-400 text-base sm:text-sm">
+                        <p className="text-gray-400 text-sm sm:text-sm">
                             Your dental treatment records (
                             {treatments?.length || 0} total)
                         </p>
@@ -980,7 +980,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
             </div>
             <div>
                 {(treatments?.length || 0) > 0 ? (
-                    <div className="space-y-4 sm:space-y-3 md:space-y-4">
+                    <div className="space-y-3 sm:space-y-3 md:space-y-4">
                         {currentTreatments.map((treatment, index) => (
                             <SlideIn
                                 key={treatment.id}
@@ -988,7 +988,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                 delay={index * 100}
                             >
                                 <div
-                                    className="bg-white rounded-xl sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-4 sm:p-4 md:p-6 hover:shadow-xl hover:border-purple-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
+                                    className="bg-white rounded-lg sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-3 sm:p-4 md:p-6 hover:shadow-xl hover:border-purple-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
                                     role="article"
                                     aria-label={`Treatment: ${
                                         treatment.name || "Treatment"
@@ -1018,7 +1018,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                         getTreatmentStatusColor(
                                                             treatment.status
                                                         ),
-                                                        "px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold"
+                                                        "px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold"
                                                     )}
                                                     role="status"
                                                     aria-label={`Treatment status: ${
@@ -1182,6 +1182,11 @@ const TreatmentsOverview = ({ treatments = [] }) => {
 
                                     {/* Compact Action Buttons */}
                                     <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-200/50">
+                                        <div className="text-left">
+                                            <div className="text-xs text-gray-400">
+                                                #{treatment.id}
+                                            </div>
+                                        </div>
                                         <div className="flex items-center gap-1 sm:gap-2">
                                             {treatment.id &&
                                             treatment.id > 0 ? (
@@ -1194,7 +1199,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                     <Button
                                                         size="sm"
                                                         variant="outline"
-                                                        className="flex items-center gap-1 px-3 sm:px-4 py-1 sm:py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-lg text-xs font-semibold"
+                                                        className="flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-50 border-gray-200 rounded-lg text-xs font-semibold"
                                                         aria-label={`View details for treatment: ${
                                                             treatment.name ||
                                                             "Treatment"
@@ -1208,18 +1213,13 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="flex items-center gap-1 px-3 sm:px-4 py-1 sm:py-1.5 opacity-50 cursor-not-allowed text-xs font-semibold"
+                                                    className="flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-1.5 opacity-50 cursor-not-allowed text-xs font-semibold"
                                                     disabled
                                                 >
                                                     <Eye className="w-3 h-3" />
                                                     View Details
                                                 </Button>
                                             )}
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-xs text-gray-400">
-                                                #{treatment.id}
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1325,6 +1325,10 @@ const StatisticsSection = ({
     const upcomingAppointments = appointments.filter(
         (appointment) => new Date(appointment.scheduled_at) > new Date()
     ).length;
+    const totalTreatments = treatments.length;
+    const completedTreatments = treatments.filter(
+        (treatment) => treatment.status?.toLowerCase() === "completed"
+    ).length;
 
     const stats = [
         {
@@ -1363,11 +1367,23 @@ const StatisticsSection = ({
             trendText: "Soon",
             trendColor: "text-rose-600",
         },
+        {
+            name: "Total Treatments",
+            value: totalTreatments,
+            icon: Stethoscope,
+            gradient: "from-violet-50/90 via-white/80 to-purple-100/60",
+            border: "border-violet-200/50",
+            iconBg: "from-violet-500 to-purple-600",
+            iconGlow: "from-violet-400/30 to-purple-500/30",
+            trend: `${completedTreatments}`,
+            trendText: "Completed",
+            trendColor: "text-violet-600",
+        },
     ];
 
     return (
         <div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-3 md:gap-6"
+            className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3 md:gap-6"
             role="region"
             aria-label="Statistics overview"
         >
@@ -1376,19 +1392,19 @@ const StatisticsSection = ({
                 return (
                     <div
                         key={stat.name}
-                        className={`bg-gradient-to-br ${stat.gradient} backdrop-blur-sm rounded-xl sm:rounded-xl shadow-lg sm:shadow-lg border ${stat.border} p-4 sm:p-4 hover:shadow-xl transition-all duration-300 group hover:scale-102`}
+                        className={`bg-gradient-to-br ${stat.gradient} backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg sm:shadow-lg border ${stat.border} p-2 sm:p-4 hover:shadow-xl transition-all duration-300 group hover:scale-102`}
                         role="article"
                         aria-label={`${stat.name} statistic`}
                     >
-                        <div className="flex items-center justify-between mb-4 sm:mb-3">
+                        <div className="flex items-center justify-between mb-1 sm:mb-3">
                             <div className="relative">
                                 <div
-                                    className={`w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br ${stat.iconBg} rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg sm:shadow-lg group-hover:scale-105 transition-all duration-300`}
+                                    className={`w-8 h-8 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br ${stat.iconBg} rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg sm:shadow-lg group-hover:scale-105 transition-all duration-300`}
                                     role="img"
                                     aria-label={`${stat.name} icon`}
                                 >
                                     <Icon
-                                        className="w-6 h-6 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white"
+                                        className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white"
                                         aria-hidden="true"
                                     />
                                 </div>
@@ -1411,18 +1427,20 @@ const StatisticsSection = ({
                                 </div>
                             </div>
                         </div>
-                        <h3 className="text-base sm:text-sm md:text-base font-semibold text-gray-700 mb-2 sm:mb-1">
+                        <h3 className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 mb-0.5 sm:mb-1">
                             {stat.name}
                         </h3>
-                        <p className="text-2xl sm:text-xl md:text-2xl lg:text-3xl font-semibold text-gray-700 mb-2 sm:mb-1">
+                        <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-gray-700 mb-0.5 sm:mb-1">
                             {stat.value}
                         </p>
-                        <p className="text-sm sm:text-sm text-gray-400 font-normal">
+                        <p className="text-xs sm:text-sm text-gray-400 font-normal">
                             {stat.trendText === "New"
                                 ? "Connected clinics"
                                 : stat.trendText === "Active"
                                 ? "All-time appointments"
-                                : "Scheduled visits"}
+                                : stat.trendText === "Soon"
+                                ? "Scheduled visits"
+                                : "Completed treatments"}
                         </p>
                     </div>
                 );
@@ -1529,7 +1547,7 @@ export default function PatientDashboard({
             {/* Main Container */}
             <div
                 className="mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
-                style={{ width: "95%", maxWidth: "1350px" }}
+                style={{ width: "100%", maxWidth: "1350px" }}
             >
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
                     {/* Enhanced Header Section */}
@@ -1559,11 +1577,72 @@ export default function PatientDashboard({
                         <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
 
                         <div className="relative">
-                            {/* Header Single Row */}
-                            <div className="flex items-center justify-between">
+                            {/* Mobile Layout: Stacked */}
+                            <div className="flex flex-col sm:hidden gap-3">
+                                {/* Top Row: Centered Title + Subtitle */}
+                                <div className="flex items-center justify-center">
+                                    <div className="text-center">
+                                        <h1 className="text-lg font-bold text-white leading-tight">
+                                            Patient Dashboard
+                                        </h1>
+                                        <p className="text-blue-100 text-xs font-medium leading-tight mt-0.5">
+                                            Welcome back,{" "}
+                                            <span className="font-semibold">
+                                                {user?.name || auth?.user?.name}
+                                            </span>
+                                            !
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Bottom Row: Centered Navigation + Date */}
+                                <div className="flex items-center justify-center gap-2">
+                                    <Link href={route("patient.profile")}>
+                                        <div className="flex items-center gap-1 bg-white/15 hover:bg-white/25 backdrop-blur-sm px-2 py-1.5 rounded-md border border-white/20 hover:border-white/30 transition-all duration-300 cursor-pointer group">
+                                            <User className="h-3 w-3 text-white group-hover:scale-110 transition-transform" />
+                                            <span className="text-xs font-medium text-white whitespace-nowrap">
+                                                Profile
+                                            </span>
+                                        </div>
+                                    </Link>
+                                    <Link
+                                        href={route("patient.treatments.index")}
+                                    >
+                                        <div className="flex items-center gap-1 bg-white/15 hover:bg-white/25 backdrop-blur-sm px-2 py-1.5 rounded-md border border-white/20 hover:border-white/30 transition-all duration-300 cursor-pointer group">
+                                            <Stethoscope className="h-3 w-3 text-white group-hover:scale-110 transition-transform" />
+                                            <span className="text-xs font-medium text-white whitespace-nowrap">
+                                                Treatments
+                                            </span>
+                                        </div>
+                                    </Link>
+                                    <div
+                                        className="bg-white/20 backdrop-blur-sm px-2 py-1.5 rounded-md border border-white/30 shadow-sm flex-shrink-0 flex items-center"
+                                        role="img"
+                                        aria-label="Current date"
+                                    >
+                                        <time
+                                            className="text-xs font-medium text-white whitespace-nowrap"
+                                            dateTime={new Date().toISOString()}
+                                        >
+                                            {new Date().toLocaleDateString(
+                                                "en-US",
+                                                {
+                                                    weekday: "short",
+                                                    month: "short",
+                                                    day: "numeric",
+                                                }
+                                            )}
+                                        </time>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Desktop Layout: Single Row */}
+                            <div className="hidden sm:flex items-center justify-between">
+                                {/* Left Section: Icon + Title */}
                                 <div className="flex items-center gap-4">
                                     <div
-                                        className="relative"
+                                        className="relative flex-shrink-0"
                                         role="img"
                                         aria-label="Dashboard icon"
                                     >
@@ -1574,11 +1653,11 @@ export default function PatientDashboard({
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <h1 className="text-2xl font-bold text-white mb-1">
+                                    <div className="flex-shrink-0">
+                                        <h1 className="text-2xl font-bold text-white leading-tight">
                                             Patient Dashboard
                                         </h1>
-                                        <p className="text-blue-100 text-sm font-medium">
+                                        <p className="text-blue-100 text-sm font-medium leading-tight mt-0.5">
                                             Welcome back,{" "}
                                             <span className="font-semibold">
                                                 {user?.name || auth?.user?.name}
@@ -1588,13 +1667,13 @@ export default function PatientDashboard({
                                     </div>
                                 </div>
 
-                                {/* Navigation Actions and Date in Same Row */}
-                                <div className="flex items-center gap-3">
+                                {/* Right Section: Navigation + Date */}
+                                <div className="flex items-center gap-3 flex-shrink-0">
                                     <Link href={route("patient.profile")}>
                                         <div className="flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20 hover:border-white/30 transition-all duration-300 cursor-pointer group">
                                             <User className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
-                                            <span className="text-sm font-medium text-white">
-                                                My Profile
+                                            <span className="text-sm font-medium text-white whitespace-nowrap">
+                                                Profile
                                             </span>
                                         </div>
                                     </Link>
@@ -1603,24 +1682,24 @@ export default function PatientDashboard({
                                     >
                                         <div className="flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20 hover:border-white/30 transition-all duration-300 cursor-pointer group">
                                             <Stethoscope className="h-4 w-4 text-white group-hover:scale-110 transition-transform" />
-                                            <span className="text-sm font-medium text-white">
-                                                My Treatments
+                                            <span className="text-sm font-medium text-white whitespace-nowrap">
+                                                Treatments
                                             </span>
                                         </div>
                                     </Link>
                                     <div
-                                        className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/30 shadow-sm"
+                                        className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/30 shadow-sm flex-shrink-0 flex items-center"
                                         role="img"
                                         aria-label="Current date"
                                     >
                                         <time
-                                            className="text-sm font-medium text-white"
+                                            className="text-sm font-medium text-white whitespace-nowrap"
                                             dateTime={new Date().toISOString()}
                                         >
                                             {new Date().toLocaleDateString(
                                                 "en-US",
                                                 {
-                                                    weekday: "long",
+                                                    weekday: "short",
                                                     month: "short",
                                                     day: "numeric",
                                                 }
@@ -1633,9 +1712,9 @@ export default function PatientDashboard({
                     </div>
 
                     {/* Main Content */}
-                    <div className="px-0 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6">
+                    <div className="px-0 sm:px-4 md:px-6 py-2 sm:py-4 md:py-6">
                         {/* Mobile Layout: Full-width cards */}
-                        <div className="flex flex-col md:hidden space-y-3">
+                        <div className="flex flex-col md:hidden space-y-2">
                             {/* Statistics */}
                             <div className="px-2">
                                 <StatisticsSection

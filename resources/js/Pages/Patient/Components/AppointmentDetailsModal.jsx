@@ -65,35 +65,35 @@ export default function AppointmentDetailsModal({
             aria-describedby="appointment-details-description"
         >
             <div
-                className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto"
+                className="bg-white rounded-lg sm:rounded-xl shadow-2xl border border-gray-200 p-3 sm:p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto"
                 style={{
                     scrollbarWidth: "thin",
                     scrollbarColor: "#d1d5db #f3f4f6",
                 }}
             >
                 <button
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-2 hover:bg-gray-100"
+                    className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-1.5 sm:p-2 hover:bg-gray-100"
                     onClick={onClose}
                     aria-label="Close appointment details modal"
                 >
-                    <X className="w-5 h-5" aria-hidden="true" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                 </button>
 
                 {/* Compact Header */}
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                        <Calendar className="w-5 h-5 text-white" />
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
                     <div>
                         <h2
                             id="appointment-details-title"
-                            className="text-xl font-bold text-gray-900"
+                            className="text-lg sm:text-xl font-bold text-gray-900"
                         >
                             Appointment Details
                         </h2>
                         <p
                             id="appointment-details-description"
-                            className="text-gray-500 text-sm"
+                            className="text-gray-500 text-xs sm:text-sm"
                         >
                             Complete information about your appointment
                         </p>
@@ -102,25 +102,25 @@ export default function AppointmentDetailsModal({
 
                 {loading ? (
                     <div
-                        className="flex items-center justify-center py-8"
+                        className="flex items-center justify-center py-6 sm:py-8"
                         role="status"
                         aria-live="polite"
                     >
                         <div
-                            className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"
+                            className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"
                             aria-hidden="true"
                         ></div>
-                        <span className="ml-2 text-gray-600">
+                        <span className="ml-2 text-gray-600 text-xs sm:text-sm">
                             Loading appointment details...
                         </span>
                     </div>
                 ) : (
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                         {/* Compact Status and Basic Info */}
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                        <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                                         {getStatusIcon(
                                             appointment.status?.name
                                         )}
@@ -131,13 +131,13 @@ export default function AppointmentDetailsModal({
                                                 getStatusColor(
                                                     appointment.status?.name
                                                 ),
-                                                "text-xs font-semibold px-3 py-1"
+                                                "text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1"
                                             )}
                                         >
                                             {appointment.status?.name ||
                                                 "Unknown"}
                                         </Badge>
-                                        <p className="text-xs text-gray-500 mt-1">
+                                        <p className="text-xs text-gray-500 mt-0.5 sm:mt-1">
                                             Status
                                         </p>
                                     </div>
@@ -146,32 +146,32 @@ export default function AppointmentDetailsModal({
                                     <div className="text-xs text-gray-500">
                                         ID
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900">
+                                    <div className="text-xs sm:text-sm font-bold text-gray-900">
                                         #{appointment.id}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="text-center mb-4">
-                                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                            <div className="text-center mb-3 sm:mb-4">
+                                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-0.5 sm:mb-1">
                                     {appointment.clinic?.name ||
                                         "Dental Clinic"}
                                 </h3>
-                                <p className="text-gray-600 text-sm">
+                                <p className="text-gray-600 text-xs sm:text-sm">
                                     {appointment.service?.name ||
                                         "General Checkup"}
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white rounded-lg p-3 border border-gray-200">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Calendar className="w-4 h-4 text-purple-600" />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                                         <span className="text-xs font-semibold text-gray-700">
                                             Date
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-900">
+                                    <p className="text-xs sm:text-sm text-gray-900">
                                         {new Date(
                                             appointment.scheduled_at
                                         ).toLocaleDateString("en-US", {
@@ -182,14 +182,14 @@ export default function AppointmentDetailsModal({
                                         })}
                                     </p>
                                 </div>
-                                <div className="bg-white rounded-lg p-3 border border-gray-200">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Clock className="w-4 h-4 text-green-600" />
+                                <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                                        <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                                         <span className="text-xs font-semibold text-gray-700">
                                             Time
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-900">
+                                    <p className="text-xs sm:text-sm text-gray-900">
                                         {new Date(
                                             appointment.scheduled_at
                                         ).toLocaleTimeString("en-US", {
@@ -202,45 +202,45 @@ export default function AppointmentDetailsModal({
                         </div>
 
                         {/* Compact Clinic Information */}
-                        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                    <Building2 className="w-4 h-4 text-white" />
+                        <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+                            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <Building2 className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-bold text-gray-900">
+                                    <h4 className="text-base sm:text-lg font-bold text-gray-900">
                                         Clinic Information
                                     </h4>
-                                    <p className="text-gray-500 text-sm">
+                                    <p className="text-gray-500 text-xs sm:text-sm">
                                         Complete clinic details
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-3">
-                                    <div className="bg-white rounded-lg p-3 border border-gray-200">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <Building2 className="w-4 h-4 text-blue-600" />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                <div className="space-y-2 sm:space-y-3">
+                                    <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                                        <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                                            <Building2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                                             <span className="text-xs font-semibold text-gray-700">
                                                 Clinic Name
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-900 font-medium">
+                                        <p className="text-xs sm:text-sm text-gray-900 font-medium">
                                             {appointment.clinic?.name ||
                                                 "Clinic Name"}
                                         </p>
                                     </div>
 
                                     {appointment.clinic?.contact_number && (
-                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Phone className="w-4 h-4 text-green-600" />
+                                        <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                                            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                                                <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                                                 <span className="text-xs font-semibold text-gray-700">
                                                     Phone
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-gray-900">
+                                            <p className="text-xs sm:text-sm text-gray-900">
                                                 {
                                                     appointment.clinic
                                                         .contact_number
@@ -250,29 +250,29 @@ export default function AppointmentDetailsModal({
                                     )}
                                 </div>
 
-                                <div className="space-y-3">
+                                <div className="space-y-2 sm:space-y-3">
                                     {appointment.clinic?.email && (
-                                        <div className="bg-white rounded-lg p-3 border border-gray-200">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Mail className="w-4 h-4 text-purple-600" />
+                                        <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                                            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                                                <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600" />
                                                 <span className="text-xs font-semibold text-gray-700">
                                                     Email
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-gray-900">
+                                            <p className="text-xs sm:text-sm text-gray-900">
                                                 {appointment.clinic.email}
                                             </p>
                                         </div>
                                     )}
 
-                                    <div className="bg-white rounded-lg p-3 border border-gray-200">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <MapPin className="w-4 h-4 text-orange-600" />
+                                    <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                                        <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-orange-600" />
                                             <span className="text-xs font-semibold text-gray-700">
                                                 Address
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-900">
+                                        <p className="text-xs sm:text-sm text-gray-900">
                                             {appointment.clinic
                                                 ?.street_address ||
                                                 "Address not available"}
@@ -283,17 +283,17 @@ export default function AppointmentDetailsModal({
                         </div>
 
                         {/* Appointment Details */}
-                        <div className="bg-white border border-gray-200 rounded-xl p-6">
-                            <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-blue-600" />
+                        <div className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-6">
+                            <h4 className="font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+                                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                                 Appointment Details
                             </h4>
-                            <div className="space-y-3">
+                            <div className="space-y-2 sm:space-y-3">
                                 <div>
-                                    <label className="text-sm font-medium text-gray-500">
+                                    <label className="text-xs sm:text-sm font-medium text-gray-500">
                                         Reason for Visit
                                     </label>
-                                    <p className="text-sm text-gray-900">
+                                    <p className="text-xs sm:text-sm text-gray-900">
                                         {appointment.reason ||
                                             "No reason specified"}
                                     </p>
@@ -301,10 +301,10 @@ export default function AppointmentDetailsModal({
 
                                 {appointment.service && (
                                     <div>
-                                        <label className="text-sm font-medium text-gray-500">
+                                        <label className="text-xs sm:text-sm font-medium text-gray-500">
                                             Service
                                         </label>
-                                        <p className="text-sm text-gray-900">
+                                        <p className="text-xs sm:text-sm text-gray-900">
                                             {appointment.service.name}
                                             {appointment.service.price && (
                                                 <span className="ml-2 text-green-600 font-medium">
@@ -318,11 +318,11 @@ export default function AppointmentDetailsModal({
 
                                 {appointment.assignedDentist && (
                                     <div>
-                                        <label className="text-sm font-medium text-gray-500">
+                                        <label className="text-xs sm:text-sm font-medium text-gray-500">
                                             Assigned Dentist
                                         </label>
-                                        <p className="text-sm text-gray-900 flex items-center gap-2">
-                                            <User className="w-4 h-4" />
+                                        <p className="text-xs sm:text-sm text-gray-900 flex items-center gap-1.5 sm:gap-2">
+                                            <User className="w-3 h-3 sm:w-4 sm:h-4" />
                                             {appointment.assignedDentist.name}
                                         </p>
                                     </div>
@@ -330,10 +330,10 @@ export default function AppointmentDetailsModal({
 
                                 {appointment.type && (
                                     <div>
-                                        <label className="text-sm font-medium text-gray-500">
+                                        <label className="text-xs sm:text-sm font-medium text-gray-500">
                                             Appointment Type
                                         </label>
-                                        <p className="text-sm text-gray-900">
+                                        <p className="text-xs sm:text-sm text-gray-900">
                                             {appointment.type.name}
                                         </p>
                                     </div>
@@ -341,10 +341,10 @@ export default function AppointmentDetailsModal({
 
                                 {appointment.notes && (
                                     <div>
-                                        <label className="text-sm font-medium text-gray-500">
+                                        <label className="text-xs sm:text-sm font-medium text-gray-500">
                                             Notes
                                         </label>
-                                        <p className="text-sm text-gray-900">
+                                        <p className="text-xs sm:text-sm text-gray-900">
                                             {appointment.notes}
                                         </p>
                                     </div>
@@ -353,12 +353,12 @@ export default function AppointmentDetailsModal({
                         </div>
 
                         {/* Important Information */}
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                            <h4 className="font-medium text-amber-900 mb-2 flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                            <h4 className="font-medium text-amber-900 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+                                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                                 Important Information
                             </h4>
-                            <ul className="text-sm text-amber-800 space-y-1">
+                            <ul className="text-xs sm:text-sm text-amber-800 space-y-0.5 sm:space-y-1">
                                 <li>
                                     • Please arrive 10 minutes before your
                                     scheduled time
@@ -377,11 +377,12 @@ export default function AppointmentDetailsModal({
                     </div>
                 )}
 
-                <div className="flex justify-end gap-3 mt-6">
+                <div className="flex justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
                     <Button
                         variant="outline"
                         onClick={onClose}
                         disabled={loading}
+                        className="px-4 sm:px-6 py-1.5 sm:py-2 text-xs sm:text-sm"
                     >
                         Close
                     </Button>
