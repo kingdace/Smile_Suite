@@ -29,12 +29,8 @@ class StorageHelper
 
             try {
                 if ($disk === 's3') {
-                    // Store with public visibility on S3
+                    // Store on S3 (bucket must be configured for public read via bucket policy)
                     $storedPath = $file->store($path, $disk);
-                    // Set visibility to public after upload
-                    if ($storedPath) {
-                        Storage::disk($disk)->setVisibility($storedPath, 'public');
-                    }
                 } else {
                     $storedPath = $file->store($path, $disk);
                 }
@@ -87,12 +83,8 @@ class StorageHelper
 
             try {
                 if ($disk === 's3') {
-                    // Store with public visibility on S3
+                    // Store on S3 (bucket must be configured for public read via bucket policy)
                     $storedPath = $file->storeAs($path, $name, $disk);
-                    // Set visibility to public after upload
-                    if ($storedPath) {
-                        Storage::disk($disk)->setVisibility($storedPath, 'public');
-                    }
                 } else {
                     $storedPath = $file->storeAs($path, $name, $disk);
                 }

@@ -54,8 +54,7 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'visibility' => 'public',
-            'throw' => true, // Enable exceptions so we can see what's wrong
+            'throw' => true, // Enable exceptions so we can debug issues
         ],
 
     ],
