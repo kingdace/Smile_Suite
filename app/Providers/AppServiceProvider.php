@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Resend;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,13 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
+
+        // Register Resend mail transport
+        Mail::extend('resend', function () {
+            return new \Resend\Laravel\Mail\Transport(
+                Resend::client(config('services.resend.key'))
+            );
+        });
 
         // Share flash success message with all Inertia responses
         Inertia::share([

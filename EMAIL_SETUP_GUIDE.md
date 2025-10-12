@@ -3,18 +3,20 @@
 ## Problem: Gmail SMTP Issues on Railway/cPanel
 
 Gmail SMTP often fails in production environments due to:
-- IP reputation issues
-- Rate limiting
-- SSL certificate verification problems
-- Network firewall restrictions
+
+-   IP reputation issues
+-   Rate limiting
+-   SSL certificate verification problems
+-   Network firewall restrictions
 
 ## ✅ Solution: Use Resend (Recommended)
 
 **Resend** is a modern transactional email service that's:
-- ✅ **Free**: 3,000 emails/month (100/day)
-- ✅ **Reliable**: Better deliverability than Gmail
-- ✅ **Fast**: No SMTP connection delays
-- ✅ **Easy**: 5-minute setup
+
+-   ✅ **Free**: 3,000 emails/month (100/day)
+-   ✅ **Reliable**: Better deliverability than Gmail
+-   ✅ **Fast**: No SMTP connection delays
+-   ✅ **Easy**: 5-minute setup
 
 ---
 
@@ -43,8 +45,9 @@ Gmail SMTP often fails in production environments due to:
 5. Wait for verification (usually 5-15 minutes)
 
 **OR** use Resend's default domain (works immediately but less professional):
-- From: `noreply@resend.dev`
-- To: Any email address
+
+-   From: `noreply@resend.dev`
+-   To: Any email address
 
 ### Step 4: Configure Railway
 
@@ -73,6 +76,7 @@ MAIL_FROM_NAME=Smile Suite
 ## 🔧 Configuration Options
 
 ### For Production (Railway):
+
 ```env
 MAIL_MAILER=resend
 RESEND_API_KEY=re_your_actual_key
@@ -81,7 +85,9 @@ MAIL_FROM_NAME=Smile Suite
 ```
 
 ### For Local Development:
+
 Keep using Gmail SMTP (it works fine locally):
+
 ```env
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
@@ -98,20 +104,27 @@ MAIL_FROM_NAME=Smile Suite
 ## 🆘 Troubleshooting
 
 ### "Domain not verified" Error
+
 **Solution**: Use Resend's default sending domain initially:
+
 ```env
 MAIL_FROM_ADDRESS=noreply@resend.dev
 ```
+
 Then verify your custom domain later.
 
 ### Emails Going to Spam
-**Solution**: 
+
+**Solution**:
+
 1. Verify your domain in Resend (adds SPF/DKIM records)
 2. Warm up your sending reputation (start with low volume)
 3. Use a professional "from" address (not noreply@)
 
 ### "API Key Invalid" Error
-**Solution**: 
+
+**Solution**:
+
 1. Make sure API key starts with `re_`
 2. Check for spaces before/after the key
 3. Regenerate the API key in Resend if needed
@@ -121,6 +134,7 @@ Then verify your custom domain later.
 ## 📊 Monitoring
 
 **Check email delivery in Resend:**
+
 1. Go to Resend Dashboard → **"Logs"**
 2. See all sent emails, delivery status, and errors
 3. Much better than Gmail's lack of visibility!
@@ -132,16 +146,19 @@ Then verify your custom domain later.
 If Resend doesn't work for you, alternative options:
 
 ### Option 1: Mailtrap (For Testing)
-- Free tier: 1,000 emails/month
-- https://mailtrap.io
+
+-   Free tier: 1,000 emails/month
+-   https://mailtrap.io
 
 ### Option 2: SendGrid
-- Free tier: 100 emails/day
-- https://sendgrid.com
+
+-   Free tier: 100 emails/day
+-   https://sendgrid.com
 
 ### Option 3: Mailgun
-- Free tier: 1,000 emails/month (first 3 months)
-- https://mailgun.com
+
+-   Free tier: 1,000 emails/month (first 3 months)
+-   https://mailgun.com
 
 All work similarly to Resend with Laravel.
 
@@ -149,14 +166,14 @@ All work similarly to Resend with Laravel.
 
 ## ✨ Benefits of Resend Over Gmail
 
-| Feature | Gmail SMTP | Resend |
-|---------|-----------|---------|
-| **Reliability in Production** | ❌ Often blocked | ✅ Always works |
-| **Deliverability** | ⚠️ Often goes to spam | ✅ High deliverability |
-| **Speed** | ⚠️ Slow SMTP connection | ✅ Instant API |
-| **Monitoring** | ❌ No visibility | ✅ Full logs & analytics |
-| **Cost** | ✅ Free | ✅ Free (3K/month) |
-| **Setup Difficulty** | ⚠️ App passwords, 2FA | ✅ Just API key |
+| Feature                       | Gmail SMTP              | Resend                   |
+| ----------------------------- | ----------------------- | ------------------------ |
+| **Reliability in Production** | ❌ Often blocked        | ✅ Always works          |
+| **Deliverability**            | ⚠️ Often goes to spam   | ✅ High deliverability   |
+| **Speed**                     | ⚠️ Slow SMTP connection | ✅ Instant API           |
+| **Monitoring**                | ❌ No visibility        | ✅ Full logs & analytics |
+| **Cost**                      | ✅ Free                 | ✅ Free (3K/month)       |
+| **Setup Difficulty**          | ⚠️ App passwords, 2FA   | ✅ Just API key          |
 
 ---
 
@@ -165,11 +182,10 @@ All work similarly to Resend with Laravel.
 1. **Sign up** at https://resend.com (free)
 2. **Get API key** from Resend dashboard
 3. **Add to Railway**:
-   ```
-   MAIL_MAILER=resend
-   RESEND_API_KEY=re_your_key
-   ```
+    ```
+    MAIL_MAILER=resend
+    RESEND_API_KEY=re_your_key
+    ```
 4. **Redeploy** and test!
 
 That's it! Your emails will now be reliable and fast! 🚀
-
