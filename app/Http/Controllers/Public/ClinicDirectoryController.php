@@ -28,9 +28,9 @@ class ClinicDirectoryController extends Controller
     {
         // Optimized query with proper eager loading and indexed columns
         $clinics = Clinic::select(
-            'clinics.id', 'clinics.name', 'clinics.slug', 'clinics.street_address', 
+            'clinics.id', 'clinics.name', 'clinics.slug', 'clinics.street_address',
             'clinics.barangay_code', 'clinics.city_municipality_code',
-            'clinics.province_code', 'clinics.region_code', 'clinics.address_details', 
+            'clinics.province_code', 'clinics.region_code', 'clinics.address_details',
             'clinics.logo_url', 'clinics.description',
             'clinics.contact_number', 'clinics.email'
         )
