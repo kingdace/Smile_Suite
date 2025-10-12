@@ -420,7 +420,7 @@ export default function Register() {
                         <div className="absolute bottom-0 left-0 p-6 z-10 w-full text-center">
                             <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 inline-block border border-white/20">
                                 <p className="text-sm text-white font-medium">
-                                    🌐 www.smilesuite.dental
+                                    🌐 smilesuite.site
                                 </p>
                             </div>
                         </div>

@@ -81,6 +81,10 @@ return [
             'allow_self_signed' => true,
         ],
 
+        'resend' => [
+            'transport' => 'resend',
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],
