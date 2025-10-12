@@ -263,7 +263,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl sm:rounded-xl shadow-lg border border-gray-100 p-6 sm:p-4 md:p-6">
+        <div className="bg-white rounded-xl sm:rounded-xl shadow-lg border border-gray-100 p-4 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-6 sm:mb-4 md:mb-6">
                 <div className="flex items-center gap-4 sm:gap-3">
                     <div className="w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg">
@@ -326,7 +326,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                 delay={index * 100}
                             >
                                 <div
-                                    className="bg-white rounded-xl sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-6 sm:p-4 md:p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
+                                    className="bg-white rounded-xl sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-4 sm:p-4 md:p-6 hover:shadow-xl hover:border-blue-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
                                     role="article"
                                     aria-label={`Appointment at ${
                                         appointment.clinic?.name || "Clinic"
@@ -432,7 +432,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     </div>
 
                                     {/* Compact Date and Time Information */}
-                                    <div className="bg-white rounded-xl sm:rounded-xl p-4 sm:p-3 md:p-4 mb-4 sm:mb-3 md:mb-4 border border-gray-200 shadow-lg">
+                                    <div className="bg-white rounded-xl sm:rounded-xl p-3 sm:p-3 md:p-4 mb-4 sm:mb-3 md:mb-4 border border-gray-200 shadow-lg">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4 sm:gap-2 md:gap-3">
                                                 <div className="w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg sm:shadow-md">
@@ -489,7 +489,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     {/* Compact Additional Information */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-2 md:gap-3 mb-4 sm:mb-3 md:mb-4">
                                         {appointment.dentist && (
-                                            <div className="bg-white rounded-lg sm:rounded-lg p-4 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
+                                            <div className="bg-white rounded-lg sm:rounded-lg p-3 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
                                                 <div className="flex items-center gap-3 sm:gap-2">
                                                     <div className="w-8 h-8 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg sm:rounded-md flex items-center justify-center">
                                                         <User className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
@@ -511,7 +511,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                             </div>
                                         )}
                                         {appointment.reason && (
-                                            <div className="bg-white rounded-lg sm:rounded-lg p-4 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
+                                            <div className="bg-white rounded-lg sm:rounded-lg p-3 sm:p-2 md:p-3 border border-gray-200 shadow-lg">
                                                 <div className="flex items-start gap-3 sm:gap-2">
                                                     <div className="w-8 h-8 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg sm:rounded-md flex items-center justify-center">
                                                         <FileText className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
@@ -533,7 +533,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                     {formatAppointmentNotes(
                                         appointment.notes
                                     ) && (
-                                        <div className="bg-white rounded-lg sm:rounded-lg p-4 sm:p-2 md:p-3 mb-4 sm:mb-3 md:mb-4 border border-yellow-200 shadow-lg">
+                                        <div className="bg-white rounded-lg sm:rounded-lg p-3 sm:p-2 md:p-3 mb-4 sm:mb-3 md:mb-4 border border-yellow-200 shadow-lg">
                                             <div className="flex items-start gap-3 sm:gap-2">
                                                 <div className="w-8 h-8 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg sm:rounded-md flex items-center justify-center">
                                                     <AlertCircle className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
@@ -925,7 +925,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl sm:rounded-xl shadow-lg border border-gray-100 p-6 sm:p-4 md:p-6">
+        <div className="bg-white rounded-xl sm:rounded-xl shadow-lg border border-gray-100 p-4 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-6 sm:mb-4 md:mb-6">
                 <div className="flex items-center gap-4 sm:gap-3">
                     <div className="w-12 h-12 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl sm:rounded-xl flex items-center justify-center shadow-lg">
@@ -988,7 +988,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                 delay={index * 100}
                             >
                                 <div
-                                    className="bg-white rounded-xl sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-6 sm:p-4 md:p-6 hover:shadow-xl hover:border-purple-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
+                                    className="bg-white rounded-xl sm:rounded-xl md:rounded-2xl border border-gray-200 sm:border-2 p-4 sm:p-4 md:p-6 hover:shadow-xl hover:border-purple-300 transition-all duration-300 group cursor-pointer shadow-lg sm:shadow-lg"
                                     role="article"
                                     aria-label={`Treatment: ${
                                         treatment.name || "Treatment"
@@ -1376,7 +1376,7 @@ const StatisticsSection = ({
                 return (
                     <div
                         key={stat.name}
-                        className={`bg-gradient-to-br ${stat.gradient} backdrop-blur-sm rounded-xl sm:rounded-xl shadow-lg sm:shadow-lg border ${stat.border} p-6 sm:p-4 hover:shadow-xl transition-all duration-300 group hover:scale-102`}
+                        className={`bg-gradient-to-br ${stat.gradient} backdrop-blur-sm rounded-xl sm:rounded-xl shadow-lg sm:shadow-lg border ${stat.border} p-4 sm:p-4 hover:shadow-xl transition-all duration-300 group hover:scale-102`}
                         role="article"
                         aria-label={`${stat.name} statistic`}
                     >
@@ -1635,9 +1635,9 @@ export default function PatientDashboard({
                     {/* Main Content */}
                     <div className="px-0 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6">
                         {/* Mobile Layout: Full-width cards */}
-                        <div className="flex flex-col md:hidden">
+                        <div className="flex flex-col md:hidden space-y-3">
                             {/* Statistics */}
-                            <div className="mb-4 px-4">
+                            <div className="px-2">
                                 <StatisticsSection
                                     appointments={appointments}
                                     treatments={treatments}
@@ -1646,14 +1646,14 @@ export default function PatientDashboard({
                             </div>
 
                             {/* Appointments Section */}
-                            <div className="mb-4 px-4">
+                            <div className="px-2">
                                 <AppointmentsSection
                                     appointments={appointments}
                                 />
                             </div>
 
                             {/* Treatments Overview Section */}
-                            <div className="px-4">
+                            <div className="px-2">
                                 <TreatmentsOverview treatments={treatments} />
                             </div>
                         </div>
