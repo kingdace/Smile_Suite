@@ -270,10 +270,10 @@ const AppointmentsSection = ({ appointments = [] }) => {
                         <Calendar className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-lg font-semibold text-gray-700">
                             My Appointments
                         </h3>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-gray-400 text-sm">
                             Your latest dental appointments (
                             {appointments.length} total)
                         </p>
@@ -415,11 +415,11 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-gray-900 text-lg mb-1">
+                                                <h4 className="font-semibold text-gray-700 text-lg mb-1">
                                                     {appointment.clinic?.name ||
                                                         "Dental Clinic"}
                                                 </h4>
-                                                <div className="flex items-center gap-2 text-gray-600">
+                                                <div className="flex items-center gap-2 text-gray-500">
                                                     <MapPin className="w-3 h-3 text-blue-500" />
                                                     <p className="text-xs line-clamp-1">
                                                         {appointment.clinic
@@ -439,7 +439,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     <Calendar className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 text-base">
+                                                    <p className="font-semibold text-gray-700 text-base">
                                                         {new Date(
                                                             appointment.scheduled_at
                                                         ).toLocaleDateString(
@@ -452,9 +452,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                             }
                                                         )}
                                                     </p>
-                                                    <div className="flex items-center gap-2 text-gray-600">
+                                                    <div className="flex items-center gap-2 text-gray-500">
                                                         <Clock className="w-3 h-3 text-purple-500" />
-                                                        <span className="text-sm font-medium">
+                                                        <span className="text-sm font-normal">
                                                             {new Date(
                                                                 appointment.scheduled_at
                                                             ).toLocaleTimeString(
@@ -469,7 +469,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-xl font-bold text-purple-600">
+                                                <div className="text-xl font-semibold text-purple-600">
                                                     {new Date(
                                                         appointment.scheduled_at
                                                     ).getDate()}
@@ -498,7 +498,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
                                                             Dentist
                                                         </p>
-                                                        <p className="text-sm font-bold text-gray-900">
+                                                        <p className="text-sm font-semibold text-gray-700">
                                                             Dr.{" "}
                                                             {
                                                                 appointment
@@ -520,7 +520,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                         <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
                                                             Reason
                                                         </p>
-                                                        <p className="text-sm text-gray-900 line-clamp-2">
+                                                        <p className="text-sm text-gray-700 line-clamp-2">
                                                             {appointment.reason}
                                                         </p>
                                                     </div>
@@ -542,7 +542,7 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                     <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">
                                                         Notes
                                                     </p>
-                                                    <p className="text-sm font-medium text-gray-900">
+                                                    <p className="text-sm font-normal text-gray-700">
                                                         {formatAppointmentNotes(
                                                             appointment.notes
                                                         )}
@@ -932,10 +932,10 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                         <Stethoscope className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-lg font-semibold text-gray-700">
                             Treatment History
                         </h3>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-gray-400 text-sm">
                             Your dental treatment records (
                             {treatments?.length || 0} total)
                         </p>
@@ -1058,11 +1058,11 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-gray-900 text-lg mb-1">
+                                                <h4 className="font-semibold text-gray-700 text-lg mb-1">
                                                     {treatment.clinic?.name ||
                                                         "Dental Clinic"}
                                                 </h4>
-                                                <div className="flex items-center gap-2 text-gray-600">
+                                                <div className="flex items-center gap-2 text-gray-500">
                                                     <MapPin className="w-3 h-3 text-purple-500" />
                                                     <p className="text-xs line-clamp-1">
                                                         {treatment.clinic
@@ -1082,13 +1082,13 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                     <Stethoscope className="w-5 h-5 text-white" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 text-base">
+                                                    <p className="font-semibold text-gray-700 text-base">
                                                         {treatment.name ||
                                                             "Dental Treatment"}
                                                     </p>
-                                                    <div className="flex items-center gap-2 text-gray-600">
+                                                    <div className="flex items-center gap-2 text-gray-500">
                                                         <FileText className="w-3 h-3 text-violet-500" />
-                                                        <span className="text-sm font-medium">
+                                                        <span className="text-sm font-normal">
                                                             {treatment.service
                                                                 ?.name ||
                                                                 "General Treatment"}
@@ -1097,7 +1097,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="text-xl font-bold text-violet-600">
+                                                <div className="text-xl font-semibold text-violet-600">
                                                     {treatment.cost
                                                         ? `₱${treatment.cost.toLocaleString()}`
                                                         : "N/A"}
@@ -1121,7 +1121,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                         <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">
                                                             Dentist
                                                         </p>
-                                                        <p className="text-sm font-bold text-gray-900">
+                                                        <p className="text-sm font-semibold text-gray-700">
                                                             Dr.{" "}
                                                             {
                                                                 treatment
@@ -1143,7 +1143,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                         <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
                                                             Date
                                                         </p>
-                                                        <p className="text-sm font-bold text-gray-900">
+                                                        <p className="text-sm font-semibold text-gray-700">
                                                             {new Date(
                                                                 treatment.start_date
                                                             ).toLocaleDateString(
@@ -1172,7 +1172,7 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                     <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide mb-1">
                                                         Notes
                                                     </p>
-                                                    <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                                                    <p className="text-sm font-normal text-gray-700 line-clamp-2">
                                                         {treatment.notes}
                                                     </p>
                                                 </div>
