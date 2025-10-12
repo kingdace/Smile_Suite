@@ -149,67 +149,86 @@ class ClinicRegistrationController extends Controller
             'address_details' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($registrationRequest, $validated) {
-            // Generate a unique slug from the clinic name
-            $baseSlug = Str::slug($registrationRequest->clinic_name);
-            $slug = $baseSlug;
-            $counter = 1;
+        try {
+            DB::transaction(function () use ($registrationRequest, $validated) {
+                // Check if this setup was already completed
+                if ($registrationRequest->status === 'completed' && $registrationRequest->clinic_id) {
+                    throw new \Exception('This clinic setup has already been completed. Please login to access your clinic dashboard.');
+                }
 
-            // Ensure slug uniqueness
-            while (Clinic::where('slug', $slug)->exists()) {
-                $slug = $baseSlug . '-' . $counter;
-                $counter++;
+                // Generate a unique slug from the clinic name
+                $baseSlug = Str::slug($registrationRequest->clinic_name);
+                $slug = $baseSlug;
+                $counter = 1;
+
+                // Ensure slug uniqueness
+                while (Clinic::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
+
+                // Determine subscription details based on plan
+                $subscriptionStatus = $registrationRequest->subscription_plan === 'basic' ? 'trial' : 'active';
+                $subscriptionEndDate = $registrationRequest->subscription_plan === 'basic'
+                    ? now()->addDays(14) // 14-day trial for Basic
+                    : now()->addDays(30); // 30-day billing cycle for others
+
+                // Create the clinic
+                $clinic = Clinic::create([
+                    'name' => $registrationRequest->clinic_name,
+                    'street_address' => $validated['street_address'] ?? null,
+                    'contact_number' => $registrationRequest->phone,
+                    'email' => $validated['email'], // Use the email from setup form, not registration request
+                    'license_number' => $registrationRequest->license_number,
+                    'description' => $registrationRequest->description,
+                    'slug' => $slug,
+                    'logo_url' => '/images/clinic-logo.png',
+                    'subscription_plan' => $registrationRequest->subscription_plan,
+                    'subscription_status' => $subscriptionStatus,
+                    'subscription_start_date' => now(),
+                    'subscription_end_date' => $subscriptionEndDate,
+                    'trial_ends_at' => $registrationRequest->subscription_plan === 'basic' ? now()->addDays(14) : null,
+                    'is_active' => true,
+                    'region_code' => $validated['region_code'] ?? null,
+                    'province_code' => $validated['province_code'] ?? null,
+                    'city_municipality_code' => $validated['city_municipality_code'] ?? null,
+                    'barangay_code' => $validated['barangay_code'] ?? null,
+                    'postal_code' => $validated['postal_code'] ?? null,
+                    'address_details' => $validated['address_details'] ?? null,
+                ]);
+
+                // Create the admin user for the clinic
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'role' => 'clinic_admin',
+                    'user_type' => User::getUserTypeFromRole('clinic_admin'),
+                    'clinic_id' => $clinic->id,
+                    'email_verified_at' => now(), // Auto-verify since they came from approved request
+                ]);
+
+                // Mark the registration request as completed and link to clinic
+                $registrationRequest->update([
+                    'status' => 'completed',
+                    'clinic_id' => $clinic->id,
+                ]);
+            });
+
+            // Redirect to the dedicated success page
+            return redirect()->route('clinic.setup.success');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle duplicate entry errors gracefully
+            if ($e->getCode() == 23000) { // Integrity constraint violation
+                return redirect()->back()
+                    ->withErrors(['email' => 'This email address is already in use. If you already completed the setup, please login instead.'])
+                    ->withInput();
             }
-
-            // Determine subscription details based on plan
-            $subscriptionStatus = $registrationRequest->subscription_plan === 'basic' ? 'trial' : 'active';
-            $subscriptionEndDate = $registrationRequest->subscription_plan === 'basic'
-                ? now()->addDays(14) // 14-day trial for Basic
-                : now()->addDays(30); // 30-day billing cycle for others
-
-            // Create the clinic
-            $clinic = Clinic::create([
-                'name' => $registrationRequest->clinic_name,
-                'street_address' => $validated['street_address'] ?? null,
-                'contact_number' => $registrationRequest->phone,
-                'email' => $validated['email'], // Use the email from setup form, not registration request
-                'license_number' => $registrationRequest->license_number,
-                'description' => $registrationRequest->description,
-                'slug' => $slug,
-                'logo_url' => '/images/clinic-logo.png',
-                'subscription_plan' => $registrationRequest->subscription_plan,
-                'subscription_status' => $subscriptionStatus,
-                'subscription_start_date' => now(),
-                'subscription_end_date' => $subscriptionEndDate,
-                'trial_ends_at' => $registrationRequest->subscription_plan === 'basic' ? now()->addDays(14) : null,
-                'is_active' => true,
-                'region_code' => $validated['region_code'] ?? null,
-                'province_code' => $validated['province_code'] ?? null,
-                'city_municipality_code' => $validated['city_municipality_code'] ?? null,
-                'barangay_code' => $validated['barangay_code'] ?? null,
-                'postal_code' => $validated['postal_code'] ?? null,
-                'address_details' => $validated['address_details'] ?? null,
-            ]);
-
-            // Create the admin user for the clinic
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role' => 'clinic_admin',
-                'user_type' => User::getUserTypeFromRole('clinic_admin'),
-                'clinic_id' => $clinic->id,
-                'email_verified_at' => now(), // Auto-verify since they came from approved request
-            ]);
-
-            // Mark the registration request as completed and link to clinic
-            $registrationRequest->update([
-                'status' => 'completed',
-                'clinic_id' => $clinic->id,
-            ]);
-        });
-
-        // Redirect to the dedicated success page
-        return redirect()->route('clinic.setup.success');
+            throw $e;
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => $e->getMessage()])
+                ->withInput();
+        }
     }
 }
