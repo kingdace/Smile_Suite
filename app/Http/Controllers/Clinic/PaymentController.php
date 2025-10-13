@@ -97,6 +97,7 @@ class PaymentController extends Controller
 
         // Fetch patients and treatments for the modal dropdowns
         $patients = $clinic->patients()
+            ->withConfirmedAppointments()
             ->select('id', 'first_name', 'last_name')
             ->get()
             ->map(function ($p) {
@@ -132,6 +133,7 @@ class PaymentController extends Controller
     public function create(Clinic $clinic)
     {
         $patients = $clinic->patients()
+            ->withConfirmedAppointments()
             ->select('id', 'first_name', 'last_name')
             ->get()
             ->map(function ($p) {
@@ -256,6 +258,7 @@ class PaymentController extends Controller
     {
         $this->authorize('update', $payment);
         $patients = $clinic->patients()
+            ->withConfirmedAppointments()
             ->select('id', 'first_name', 'last_name')
             ->get()
             ->map(function ($p) {

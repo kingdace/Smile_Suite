@@ -292,6 +292,19 @@ class Patient extends Model
     }
 
     /**
+     * Scope for patients with confirmed appointments
+     * Only shows patients who have at least one confirmed appointment
+     */
+    public function scopeWithConfirmedAppointments($query)
+    {
+        return $query->whereHas('appointments', function($q) {
+            $q->whereHas('status', function($statusQuery) {
+                $statusQuery->where('name', 'Confirmed');
+            });
+        });
+    }
+
+    /**
      * Check if patient has a linked user account
      */
     public function hasUserAccount(): bool

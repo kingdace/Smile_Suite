@@ -37,6 +37,7 @@ class PatientController extends Controller
         $this->checkSubscriptionAccess();
 
         $query = Auth::user()->clinic->patients()
+            ->withConfirmedAppointments()
             ->with(['appointments', 'treatments', 'payments']);
 
         if ($request->search) {
@@ -97,17 +98,18 @@ class PatientController extends Controller
             ];
         });
 
-        // Calculate statistics using model scopes
+        // Calculate statistics using model scopes (only confirmed patients)
         $clinicId = Auth::user()->clinic_id;
-        $totalPatients = Patient::where('clinic_id', $clinicId)->count();
+        $totalPatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->count();
         $newThisMonth = Patient::where('clinic_id', $clinicId)
+            ->withConfirmedAppointments()
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
-        $recentVisits = Patient::where('clinic_id', $clinicId)->active()->count();
-        $activePatients = Patient::where('clinic_id', $clinicId)->active()->count();
-        $newPatients = Patient::where('clinic_id', $clinicId)->new()->count();
-        $inactivePatients = Patient::where('clinic_id', $clinicId)->inactive()->count();
+        $recentVisits = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->active()->count();
+        $activePatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->active()->count();
+        $newPatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->new()->count();
+        $inactivePatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->inactive()->count();
 
         // Debug logging
         Log::info('Patient statistics debug', [
@@ -339,6 +341,7 @@ class PatientController extends Controller
         $search = $request->input('search');
 
         $patients = $clinic->patients()
+            ->withConfirmedAppointments()
             ->where(function ($query) use ($search) {
                 $query->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
@@ -420,6 +423,7 @@ class PatientController extends Controller
         $clinic = Auth::user()->clinic;
 
         $query = $clinic->patients()
+            ->withConfirmedAppointments()
             ->withCount(['appointments', 'treatments'])
             ->withSum('payments', 'amount')
             ->withAvg('reviews', 'rating');

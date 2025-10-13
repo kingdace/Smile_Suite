@@ -187,6 +187,7 @@ class ReportController extends Controller
         $clinic = Auth::user()->clinic;
 
         $query = $clinic->patients()
+            ->withConfirmedAppointments()
             ->withCount(['appointments', 'treatments', 'payments'])
             ->withSum('payments', 'amount')
             ->withAvg('reviews', 'rating')
@@ -237,24 +238,24 @@ class ReportController extends Controller
 
         $patients = $query->latest()->paginate(15);
 
-        // Enhanced patient statistics
+        // Enhanced patient statistics (only confirmed patients)
         $patientStats = [
-            'total_patients' => $clinic->patients()->count(),
-            'new_patients' => $clinic->patients()->new()->count(),
-            'active_patients' => $clinic->patients()->active()->count(),
-            'inactive_patients' => $clinic->patients()->inactive()->count(),
-            'new_this_month' => $clinic->patients()->whereMonth('created_at', now()->month)->count(),
-            'total_revenue' => $clinic->patients()->withSum('payments', 'amount')->get()->sum('payments_sum_amount'),
-            'avg_age' => $clinic->patients()->whereNotNull('date_of_birth')->get()->avg(function($patient) {
+            'total_patients' => $clinic->patients()->withConfirmedAppointments()->count(),
+            'new_patients' => $clinic->patients()->withConfirmedAppointments()->new()->count(),
+            'active_patients' => $clinic->patients()->withConfirmedAppointments()->active()->count(),
+            'inactive_patients' => $clinic->patients()->withConfirmedAppointments()->inactive()->count(),
+            'new_this_month' => $clinic->patients()->withConfirmedAppointments()->whereMonth('created_at', now()->month)->count(),
+            'total_revenue' => $clinic->patients()->withConfirmedAppointments()->withSum('payments', 'amount')->get()->sum('payments_sum_amount'),
+            'avg_age' => $clinic->patients()->withConfirmedAppointments()->whereNotNull('date_of_birth')->get()->avg(function($patient) {
                 return $patient->date_of_birth ? $patient->date_of_birth->age : 0;
             }),
-            'verified_emails' => $clinic->patients()->where('email_verified', true)->count(),
-            'with_insurance' => $clinic->patients()->whereNotNull('insurance_provider')->count(),
+            'verified_emails' => $clinic->patients()->withConfirmedAppointments()->where('email_verified', true)->count(),
+            'with_insurance' => $clinic->patients()->withConfirmedAppointments()->whereNotNull('insurance_provider')->count(),
         ];
 
-        // Demographics data
+        // Demographics data (only confirmed patients)
         $demographics = [
-            'age_groups' => $clinic->patients()->whereNotNull('date_of_birth')->get()->groupBy(function($patient) {
+            'age_groups' => $clinic->patients()->withConfirmedAppointments()->whereNotNull('date_of_birth')->get()->groupBy(function($patient) {
                 $age = $patient->date_of_birth->age;
                 if ($age < 18) return '0-17';
                 if ($age < 30) return '18-29';
@@ -264,10 +265,10 @@ class ReportController extends Controller
             })->map(function($group) {
                 return $group->count();
             }),
-            'gender_distribution' => $clinic->patients()->whereNotNull('gender')->get()->groupBy('gender')->map(function($group) {
+            'gender_distribution' => $clinic->patients()->withConfirmedAppointments()->whereNotNull('gender')->get()->groupBy('gender')->map(function($group) {
                 return $group->count();
             }),
-            'categories' => $clinic->patients()->whereNotNull('category')->get()->groupBy('category')->map(function($group) {
+            'categories' => $clinic->patients()->withConfirmedAppointments()->whereNotNull('category')->get()->groupBy('category')->map(function($group) {
                 return $group->count();
             }),
         ];

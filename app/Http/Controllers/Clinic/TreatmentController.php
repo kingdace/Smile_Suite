@@ -112,7 +112,7 @@ class TreatmentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Clinic not found.');
         }
 
-        $patients = $clinic->patients()->with('user')->get();
+        $patients = $clinic->patients()->withConfirmedAppointments()->with('user')->get();
         $dentists = $clinic->users()->where('role', 'dentist')->get();
         $services = $clinic->services()
                           ->where('is_active', true)
@@ -326,7 +326,7 @@ class TreatmentController extends Controller
 
         $clinic = Auth::user()->clinic;
 
-        $patients = $clinic->patients()->with('user')->get();
+        $patients = $clinic->patients()->withConfirmedAppointments()->with('user')->get();
         $dentists = $clinic->users()->where('role', 'dentist')->get();
         $services = $clinic->services()
                           ->where('is_active', true)
