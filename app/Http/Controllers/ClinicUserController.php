@@ -107,6 +107,7 @@ class ClinicUserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|in:dentist,staff,clinic_admin',
             'is_active' => 'boolean',
         ]);
@@ -118,6 +119,11 @@ class ClinicUserController extends Controller
             'user_type' => User::getUserTypeFromRole($validated['role']),
             'is_active' => $validated['is_active'] ?? $user->is_active,
         ];
+
+        // Only update password if provided
+        if (!empty($validated['password'])) {
+            $userData['password'] = Hash::make($validated['password']);
+        }
 
         $user->update($userData);
 

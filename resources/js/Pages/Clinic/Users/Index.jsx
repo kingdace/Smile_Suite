@@ -239,42 +239,61 @@ export default function Index({
         <AuthenticatedLayout auth={auth}>
             <Head title="User Management" />
 
-            {/* Compact Background */}
-            <div className="min-h-screen bg-gray-50">
-                <div className="max-w-7xl mx-auto px-4 py-6">
-                    {/* Compact Header Section */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-                        <div className="px-6 py-4">
+            {/* Enhanced Background */}
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50">
+                <div className="max-w-7xl mx-auto px-6 py-8">
+                    {/* Enhanced Header Section */}
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-2xl shadow-2xl mb-8">
+                        <div className="absolute inset-0 bg-black/5"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+
+                        <div className="relative px-8 py-8">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-2 bg-blue-100 rounded-lg">
-                                        <Users className="h-6 w-6 text-blue-600" />
+                                <div className="flex items-center gap-6">
+                                    <div className="relative">
+                                        <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30 shadow-lg">
+                                            <Users className="h-8 w-8 text-white" />
+                                        </div>
+                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
                                     </div>
                                     <div>
-                                        <h1 className="text-xl font-bold text-gray-900">
+                                        <h1 className="text-3xl font-bold text-white mb-2">
                                             User Management
                                         </h1>
-                                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                                            <span>Plan: {plan}</span>
-                                            <span>
-                                                {userList.length}/{limit} Users
-                                            </span>
-                                            <span>
-                                                {
-                                                    filteredUsers.filter(
-                                                        (u) => u.is_active
-                                                    ).length
-                                                }{" "}
-                                                Active
-                                            </span>
+                                        <div className="flex items-center gap-6 text-blue-100">
+                                            <div className="flex items-center gap-2">
+                                                <Crown className="h-4 w-4" />
+                                                <span className="text-sm font-medium">
+                                                    Plan: {plan}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Users className="h-4 w-4" />
+                                                <span className="text-sm font-medium">
+                                                    {userList.length}/{limit}{" "}
+                                                    Users
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Activity className="h-4 w-4" />
+                                                <span className="text-sm font-medium">
+                                                    {
+                                                        filteredUsers.filter(
+                                                            (u) => u.is_active
+                                                        ).length
+                                                    }{" "}
+                                                    Active
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3">
                                     <Button
-                                        variant="outline"
+                                        variant="secondary"
                                         size="sm"
-                                        className="gap-2"
+                                        className="gap-2 bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm"
                                     >
                                         <Download className="h-4 w-4" />
                                         Export
@@ -282,7 +301,7 @@ export default function Index({
                                     <Button
                                         onClick={openCreateModal}
                                         disabled={!canAdd}
-                                        className="gap-2"
+                                        className="gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold shadow-lg"
                                     >
                                         <UserPlus className="h-4 w-4" />
                                         Add User
@@ -292,15 +311,15 @@ export default function Index({
                         </div>
                     </div>
 
-                    {/* Combined Search, Filters and Users Table */}
-                    <Card className="border border-gray-200 shadow-sm">
-                        <CardHeader className="pb-4">
+                    {/* Enhanced Filters and Search */}
+                    <Card className="mb-6 border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                        <CardContent className="p-6">
                             <div className="flex flex-col lg:flex-row gap-4 items-center">
                                 <div className="relative flex-1">
                                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                     <Input
                                         type="text"
-                                        className="pl-10"
+                                        className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                                         placeholder="Search users by name, email, or role..."
                                         value={search}
                                         onChange={(e) =>
@@ -351,12 +370,16 @@ export default function Index({
                                     </Badge>
                                 </div>
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-0">
+                        </CardContent>
+                    </Card>
+
+                    {/* Enhanced Users Grid */}
+                    <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                        <CardContent className="p-6">
                             {filteredUsers.length === 0 ? (
                                 <div className="text-center py-16">
-                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Users className="h-8 w-8 text-gray-400" />
+                                    <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Users className="h-12 w-12 text-blue-400" />
                                     </div>
                                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                                         No users found
@@ -381,186 +404,176 @@ export default function Index({
                                         )}
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead className="bg-gray-50 border-b border-gray-200">
-                                            <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    User
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Role
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Status
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Joined
-                                                </th>
-                                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Actions
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                            {filteredUsers.map((user) => (
-                                                <tr
-                                                    key={user.id}
-                                                    className="hover:bg-gray-50"
-                                                >
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="flex items-center">
-                                                            <div className="relative">
-                                                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                                    <span className="text-sm font-bold text-blue-600">
-                                                                        {getInitials(
-                                                                            user.name
-                                                                        )}
-                                                                    </span>
-                                                                </div>
-                                                                <div
-                                                                    className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                                                                        user.is_active
-                                                                            ? "bg-green-500"
-                                                                            : "bg-gray-400"
-                                                                    }`}
-                                                                ></div>
-                                                            </div>
-                                                            <div className="ml-4">
-                                                                <div className="text-sm font-medium text-gray-900">
-                                                                    {getDentistDisplayName(
-                                                                        user
-                                                                    )}
-                                                                </div>
-                                                                <div className="text-sm text-gray-500 flex items-center gap-1">
-                                                                    <Mail className="h-3 w-3" />
-                                                                    {user.email}
-                                                                </div>
-                                                                {user.phone_number && (
-                                                                    <div className="text-xs text-gray-500 flex items-center gap-1">
-                                                                        <Phone className="h-3 w-3" />
-                                                                        {
-                                                                            user.phone_number
-                                                                        }
-                                                                    </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {filteredUsers.map((user, index) => (
+                                        <div
+                                            key={user.id}
+                                            className="group relative bg-gradient-to-br from-white to-blue-50/30 rounded-xl border border-blue-100/50 hover:border-blue-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                                        >
+                                            {/* Status indicator */}
+                                            <div
+                                                className={`absolute top-0 right-0 w-4 h-4 rounded-bl-lg ${
+                                                    user.is_active
+                                                        ? "bg-green-400"
+                                                        : "bg-red-400"
+                                                }`}
+                                            ></div>
+
+                                            <div className="p-6">
+                                                {/* User Avatar and Info */}
+                                                <div className="flex items-center gap-4 mb-4">
+                                                    <div className="relative">
+                                                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                                                            <span className="text-lg font-bold text-white">
+                                                                {getInitials(
+                                                                    user.name
                                                                 )}
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <Badge
-                                                            className={`${
-                                                                roleColors[
-                                                                    user.role
-                                                                ] ||
-                                                                "bg-gray-100 text-gray-700 border-gray-200"
-                                                            } text-xs font-semibold px-2 py-1`}
-                                                        >
-                                                            {user.role ===
-                                                                "clinic_admin" && (
-                                                                <Shield className="w-3 h-3 mr-1" />
-                                                            )}
-                                                            {user.role ===
-                                                                "dentist" && (
-                                                                <Stethoscope className="w-3 h-3 mr-1" />
-                                                            )}
-                                                            {user.role ===
-                                                                "staff" && (
-                                                                <UserCog className="w-3 h-3 mr-1" />
-                                                            )}
-                                                            {user.role
-                                                                .replace(
-                                                                    "_",
-                                                                    " "
-                                                                )
-                                                                .toUpperCase()}
-                                                        </Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="flex items-center gap-2">
-                                                            {user.is_active ? (
-                                                                <CheckCircle className="h-4 w-4 text-green-500" />
-                                                            ) : (
-                                                                <XCircle className="h-4 w-4 text-red-500" />
-                                                            )}
-                                                            <span className="text-sm text-gray-900">
-                                                                {user.is_active
-                                                                    ? "Active"
-                                                                    : "Inactive"}
                                                             </span>
                                                         </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {new Date(
-                                                            user.created_at
-                                                        ).toLocaleDateString()}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    openViewModal(
-                                                                        user
-                                                                    )
-                                                                }
-                                                                className="gap-1 text-xs"
-                                                            >
-                                                                <Eye className="h-3 w-3" />
-                                                                View
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    openEditModal(
-                                                                        user
-                                                                    )
-                                                                }
-                                                                className="gap-1 text-xs"
-                                                            >
-                                                                <Edit className="h-3 w-3" />
-                                                                Edit
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    toggleUserStatus(
-                                                                        user
-                                                                    )
-                                                                }
-                                                                className={`gap-1 text-xs ${
-                                                                    user.is_active
-                                                                        ? "text-red-600 hover:bg-red-50"
-                                                                        : "text-green-600 hover:bg-green-50"
-                                                                }`}
-                                                            >
-                                                                {user.is_active ? (
-                                                                    <XCircle className="h-3 w-3" />
-                                                                ) : (
-                                                                    <CheckCircle className="h-3 w-3" />
-                                                                )}
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    handleDelete(
-                                                                        user
-                                                                    )
-                                                                }
-                                                                className="gap-1 text-xs text-red-600 hover:bg-red-50"
-                                                            >
-                                                                <Trash2 className="h-3 w-3" />
-                                                            </Button>
+                                                        <div
+                                                            className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                                                                user.is_active
+                                                                    ? "bg-green-500"
+                                                                    : "bg-gray-400"
+                                                            }`}
+                                                        ></div>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="font-semibold text-gray-900 truncate">
+                                                            {getDentistDisplayName(
+                                                                user
+                                                            )}
+                                                        </h3>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <Mail className="h-3 w-3 text-gray-400" />
+                                                            <p className="text-sm text-gray-600 truncate">
+                                                                {user.email}
+                                                            </p>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                                    </div>
+                                                </div>
+
+                                                {/* Role Badge */}
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <Badge
+                                                        className={`${
+                                                            roleColors[
+                                                                user.role
+                                                            ] ||
+                                                            "bg-gray-100 text-gray-700 border-gray-200"
+                                                        } text-xs font-semibold px-3 py-1`}
+                                                    >
+                                                        {user.role ===
+                                                            "clinic_admin" && (
+                                                            <Shield className="w-3 h-3 mr-1" />
+                                                        )}
+                                                        {user.role ===
+                                                            "dentist" && (
+                                                            <Stethoscope className="w-3 h-3 mr-1" />
+                                                        )}
+                                                        {user.role ===
+                                                            "staff" && (
+                                                            <UserCog className="w-3 h-3 mr-1" />
+                                                        )}
+                                                        {user.role
+                                                            .replace("_", " ")
+                                                            .toUpperCase()}
+                                                    </Badge>
+                                                    <div className="flex items-center gap-1">
+                                                        {user.is_active ? (
+                                                            <CheckCircle className="h-4 w-4 text-green-500" />
+                                                        ) : (
+                                                            <XCircle className="h-4 w-4 text-red-500" />
+                                                        )}
+                                                        <span className="text-xs text-gray-500">
+                                                            {user.is_active
+                                                                ? "Active"
+                                                                : "Inactive"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Additional Info */}
+                                                <div className="space-y-2 mb-4">
+                                                    {user.phone_number && (
+                                                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                                                            <Phone className="h-3 w-3" />
+                                                            <span>
+                                                                {
+                                                                    user.phone_number
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                                                        <Calendar className="h-3 w-3" />
+                                                        <span>
+                                                            Joined{" "}
+                                                            {new Date(
+                                                                user.created_at
+                                                            ).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Buttons */}
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            openViewModal(user)
+                                                        }
+                                                        className="flex-1 gap-1 text-xs border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                    >
+                                                        <Eye className="h-3 w-3" />
+                                                        View
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            openEditModal(user)
+                                                        }
+                                                        className="flex-1 gap-1 text-xs border-green-200 text-green-600 hover:bg-green-50"
+                                                    >
+                                                        <Edit className="h-3 w-3" />
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            toggleUserStatus(
+                                                                user
+                                                            )
+                                                        }
+                                                        className={`gap-1 text-xs px-2 ${
+                                                            user.is_active
+                                                                ? "border-red-200 text-red-600 hover:bg-red-50"
+                                                                : "border-green-200 text-green-600 hover:bg-green-50"
+                                                        }`}
+                                                    >
+                                                        {user.is_active ? (
+                                                            <XCircle className="h-3 w-3" />
+                                                        ) : (
+                                                            <CheckCircle className="h-3 w-3" />
+                                                        )}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            handleDelete(user)
+                                                        }
+                                                        className="gap-1 text-xs px-2 border-red-200 text-red-600 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </CardContent>
@@ -816,6 +829,48 @@ export default function Index({
                                 required
                             />
                         </div>
+
+                        <div>
+                            <Label htmlFor="edit_password">
+                                Password (Optional)
+                            </Label>
+                            <Input
+                                id="edit_password"
+                                type="password"
+                                value={formData.password}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        password: e.target.value,
+                                    })
+                                }
+                                placeholder="Leave blank to keep current password"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Leave blank to keep the current password
+                            </p>
+                        </div>
+
+                        {formData.password && (
+                            <div>
+                                <Label htmlFor="edit_password_confirmation">
+                                    Confirm Password
+                                </Label>
+                                <Input
+                                    id="edit_password_confirmation"
+                                    type="password"
+                                    value={formData.password_confirmation}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            password_confirmation:
+                                                e.target.value,
+                                        })
+                                    }
+                                    placeholder="Confirm new password"
+                                />
+                            </div>
+                        )}
 
                         <div>
                             <Label>Role</Label>
