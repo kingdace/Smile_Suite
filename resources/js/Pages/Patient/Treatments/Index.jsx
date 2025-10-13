@@ -80,10 +80,39 @@ export default function PatientTreatmentsIndex({
             <SiteHeader />
 
             {/* Main Content */}
-            <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <main className="max-w-6xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
                 {/* Compact Page Header */}
-                <div className="mb-6">
-                    <div className="flex items-center justify-between">
+                <div className="mb-4 sm:mb-6">
+                    {/* Mobile Layout */}
+                    <div className="flex flex-col sm:hidden gap-3">
+                        <div className="flex items-center justify-between">
+                            <Link href={route("patient.dashboard")}>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex items-center gap-1 px-2 py-1 text-xs"
+                                >
+                                    <ArrowLeft className="w-3 h-3" />
+                                    Back
+                                </Button>
+                            </Link>
+                            <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-2 py-1 text-xs">
+                                {treatments?.data?.length || 0} Total
+                            </Badge>
+                        </div>
+                        <div className="text-center">
+                            <h1 className="text-lg font-bold text-gray-900">
+                                My Treatments
+                            </h1>
+                            <p className="text-gray-600 text-xs">
+                                Your dental treatment history across all
+                                connected clinics
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Desktop Layout */}
+                    <div className="hidden sm:flex items-center justify-between">
                         <div className="flex-1">
                             <Link href={route("patient.dashboard")}>
                                 <Button
@@ -114,19 +143,19 @@ export default function PatientTreatmentsIndex({
                 </div>
 
                 {/* Enhanced Statistics Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                     <SlideIn direction="up" delay={0}>
                         <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                            <CardContent className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <Building2 className="w-5 h-5 text-blue-600" />
+                            <CardContent className="p-2 sm:p-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-600">
                                             Clinics
                                         </p>
-                                        <p className="text-lg font-bold text-gray-900">
+                                        <p className="text-sm sm:text-lg font-bold text-gray-900">
                                             {clinicRecords?.length || 0}
                                         </p>
                                     </div>
@@ -137,16 +166,16 @@ export default function PatientTreatmentsIndex({
 
                     <SlideIn direction="up" delay={100}>
                         <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                            <CardContent className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <Stethoscope className="w-5 h-5 text-green-600" />
+                            <CardContent className="p-2 sm:p-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-600">
                                             Treatments
                                         </p>
-                                        <p className="text-lg font-bold text-gray-900">
+                                        <p className="text-sm sm:text-lg font-bold text-gray-900">
                                             {treatments?.data?.length || 0}
                                         </p>
                                     </div>
@@ -157,16 +186,16 @@ export default function PatientTreatmentsIndex({
 
                     <SlideIn direction="up" delay={200}>
                         <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                            <CardContent className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-emerald-600" />
+                            <CardContent className="p-2 sm:p-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-600">
                                             Completed
                                         </p>
-                                        <p className="text-lg font-bold text-gray-900">
+                                        <p className="text-sm sm:text-lg font-bold text-gray-900">
                                             {treatments?.data?.filter(
                                                 (t) =>
                                                     t.status?.toLowerCase() ===
@@ -181,16 +210,16 @@ export default function PatientTreatmentsIndex({
 
                     <SlideIn direction="up" delay={300}>
                         <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                            <CardContent className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                        <Star className="w-5 h-5 text-purple-600" />
+                            <CardContent className="p-2 sm:p-4">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <Star className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-600">
                                             Quality
                                         </p>
-                                        <p className="text-lg font-bold text-gray-900">
+                                        <p className="text-sm sm:text-lg font-bold text-gray-900">
                                             4.8
                                         </p>
                                     </div>
@@ -202,42 +231,42 @@ export default function PatientTreatmentsIndex({
 
                 {/* Treatments List */}
                 <Card className="bg-white border-0 shadow-lg">
-                    <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-100">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-100 p-3 sm:p-4 md:p-6">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <Stethoscope className="w-5 h-5 text-blue-600" />
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-gray-900">
+                                    <h3 className="text-base sm:text-lg font-bold text-gray-900">
                                         Treatment History
                                     </h3>
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-gray-600 text-xs sm:text-sm">
                                         Your complete dental treatment records
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-6">
+                    <CardContent className="p-3 sm:p-4 md:p-6">
                         {treatments?.data && treatments.data.length > 0 ? (
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 {treatments.data.map((treatment, index) => (
                                     <SlideIn
                                         key={treatment.id || Math.random()}
                                         direction="up"
                                         delay={index * 100}
                                     >
-                                        <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300 group">
+                                        <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 md:p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300 group">
                                             {/* Header with Status and Date */}
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-3">
+                                            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                                <div className="flex items-center gap-2 sm:gap-3">
                                                     <Badge
                                                         className={cn(
                                                             getStatusColor(
                                                                 treatment.status
                                                             ),
-                                                            "px-3 py-1 text-sm font-semibold flex items-center gap-2"
+                                                            "px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold flex items-center gap-1 sm:gap-2"
                                                         )}
                                                     >
                                                         {getStatusIcon(
@@ -246,23 +275,23 @@ export default function PatientTreatmentsIndex({
                                                         {treatment.status ||
                                                             "Unknown"}
                                                     </Badge>
-                                                    <div className="text-sm text-gray-600">
+                                                    <div className="text-xs sm:text-sm text-gray-600">
                                                         {new Date(
                                                             treatment.created_at
                                                         ).toLocaleDateString()}
                                                     </div>
                                                 </div>
                                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                                                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                                                 </div>
                                             </div>
 
                                             {/* Treatment Information Grid */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
+                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-3 sm:mb-4">
                                                 {/* Service and Clinic Info */}
-                                                <div className="lg:col-span-2 space-y-4">
+                                                <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                                                     <div>
-                                                        <h4 className="text-lg font-bold text-gray-900 mb-2">
+                                                        <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">
                                                             {treatment.service
                                                                 ?.name ||
                                                                 treatment.name ||
@@ -270,7 +299,7 @@ export default function PatientTreatmentsIndex({
                                                         </h4>
                                                         {treatment.service
                                                             ?.description && (
-                                                            <p className="text-gray-600 text-sm">
+                                                            <p className="text-gray-600 text-xs sm:text-sm">
                                                                 {
                                                                     treatment
                                                                         .service
@@ -281,9 +310,9 @@ export default function PatientTreatmentsIndex({
                                                     </div>
 
                                                     {/* Clinic and Dentist Info */}
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+                                                        <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden border border-gray-200">
                                                                 <img
                                                                     src={
                                                                         treatment
@@ -307,7 +336,7 @@ export default function PatientTreatmentsIndex({
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <p className="font-semibold text-gray-900 text-sm">
+                                                                <p className="font-semibold text-gray-900 text-xs sm:text-sm">
                                                                     {treatment
                                                                         .clinic
                                                                         ?.name ||
@@ -323,12 +352,12 @@ export default function PatientTreatmentsIndex({
                                                         </div>
 
                                                         {treatment.dentist && (
-                                                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                                                    <User className="w-5 h-5 text-green-600" />
+                                                            <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                                                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="font-semibold text-gray-900 text-sm">
+                                                                    <p className="font-semibold text-gray-900 text-xs sm:text-sm">
                                                                         Dr.{" "}
                                                                         {
                                                                             treatment
@@ -346,21 +375,20 @@ export default function PatientTreatmentsIndex({
 
                                                     {/* Appointment Info */}
                                                     {treatment.appointment && (
-                                                        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                                                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                                <Calendar className="w-4 h-4 text-blue-600" />
+                                                        <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-blue-50 rounded-lg">
+                                                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                                                             </div>
                                                             <div>
-                                                                <p className="font-semibold text-gray-900 text-sm">
+                                                                <p className="font-semibold text-gray-900 text-xs sm:text-sm">
                                                                     {new Date(
                                                                         treatment.appointment.scheduled_at
                                                                     ).toLocaleDateString(
                                                                         "en-US",
                                                                         {
                                                                             weekday:
-                                                                                "long",
-                                                                            year: "numeric",
-                                                                            month: "long",
+                                                                                "short",
+                                                                            month: "short",
                                                                             day: "numeric",
                                                                         }
                                                                     )}
@@ -382,17 +410,17 @@ export default function PatientTreatmentsIndex({
                                                 </div>
 
                                                 {/* Cost and Additional Info */}
-                                                <div className="space-y-4">
+                                                <div className="space-y-3 sm:space-y-4">
                                                     {treatment.cost && (
-                                                        <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <DollarSign className="w-4 h-4 text-green-600" />
-                                                                <span className="text-sm font-semibold text-green-700">
+                                                        <div className="bg-green-50 rounded-lg p-3 sm:p-4 border border-green-200">
+                                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                                                                <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                                                                <span className="text-xs sm:text-sm font-semibold text-green-700">
                                                                     Treatment
                                                                     Cost
                                                                 </span>
                                                             </div>
-                                                            <p className="text-xl font-bold text-green-800">
+                                                            <p className="text-lg sm:text-xl font-bold text-green-800">
                                                                 ₱
                                                                 {treatment.cost.toLocaleString()}
                                                             </p>
@@ -400,14 +428,14 @@ export default function PatientTreatmentsIndex({
                                                     )}
 
                                                     {treatment.estimated_duration_minutes && (
-                                                        <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <Timer className="w-4 h-4 text-orange-600" />
-                                                                <span className="text-sm font-semibold text-orange-700">
+                                                        <div className="bg-orange-50 rounded-lg p-3 sm:p-4 border border-orange-200">
+                                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                                                                <Timer className="w-3 h-3 sm:w-4 sm:h-4 text-orange-600" />
+                                                                <span className="text-xs sm:text-sm font-semibold text-orange-700">
                                                                     Duration
                                                                 </span>
                                                             </div>
-                                                            <p className="text-lg font-bold text-orange-800">
+                                                            <p className="text-base sm:text-lg font-bold text-orange-800">
                                                                 {Math.floor(
                                                                     treatment.estimated_duration_minutes /
                                                                         60
@@ -421,14 +449,14 @@ export default function PatientTreatmentsIndex({
                                                     )}
 
                                                     {treatment.notes && (
-                                                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <FileText className="w-4 h-4 text-blue-600" />
-                                                                <span className="text-sm font-semibold text-blue-700">
+                                                        <div className="bg-blue-50 rounded-lg p-3 sm:p-4 border border-blue-200">
+                                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                                                                <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
+                                                                <span className="text-xs sm:text-sm font-semibold text-blue-700">
                                                                     Notes
                                                                 </span>
                                                             </div>
-                                                            <p className="text-sm text-gray-700 line-clamp-2">
+                                                            <p className="text-xs sm:text-sm text-gray-700 line-clamp-2">
                                                                 {
                                                                     treatment.notes
                                                                 }
@@ -439,7 +467,7 @@ export default function PatientTreatmentsIndex({
                                             </div>
 
                                             {/* Action Button */}
-                                            <div className="flex justify-end pt-4 border-t border-gray-200">
+                                            <div className="flex justify-end pt-3 sm:pt-4 border-t border-gray-200">
                                                 {treatment.id &&
                                                 treatment.id > 0 ? (
                                                     <Link
@@ -451,23 +479,23 @@ export default function PatientTreatmentsIndex({
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
-                                                            className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300 text-blue-700"
+                                                            className="flex items-center gap-1 sm:gap-2 hover:bg-blue-50 hover:border-blue-300 text-blue-700 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm"
                                                         >
-                                                            <Eye className="w-4 h-4" />
+                                                            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                                             View Details
-                                                            <ArrowRight className="w-4 h-4" />
+                                                            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                                                         </Button>
                                                     </Link>
                                                 ) : (
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        className="flex items-center gap-2 opacity-50 cursor-not-allowed"
+                                                        className="flex items-center gap-1 sm:gap-2 opacity-50 cursor-not-allowed px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm"
                                                         disabled
                                                     >
-                                                        <Eye className="w-4 h-4" />
+                                                        <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                                         View Details
-                                                        <ArrowRight className="w-4 h-4" />
+                                                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                                                     </Button>
                                                 )}
                                             </div>
@@ -477,32 +505,32 @@ export default function PatientTreatmentsIndex({
                             </div>
                         ) : (
                             <FadeIn>
-                                <div className="text-center py-16">
-                                    <div className="w-20 h-20 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                                        <Stethoscope className="w-10 h-10 text-blue-600" />
+                                <div className="text-center py-8 sm:py-12 md:py-16">
+                                    <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                                        <Stethoscope className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 text-blue-600" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">
                                         No Treatments Yet
                                     </h3>
-                                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                                    <p className="text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto text-sm sm:text-base">
                                         You haven't received any dental
                                         treatments yet. Book an appointment with
                                         one of our partner clinics to start your
                                         dental care journey!
                                     </p>
-                                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
                                         <Link href="/clinics">
-                                            <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                                                <Plus className="w-4 h-4" />
+                                            <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-4 sm:px-6 py-2 sm:py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base">
+                                                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 Find Clinics
                                             </Button>
                                         </Link>
                                         <Link href="/appointments">
                                             <Button
                                                 variant="outline"
-                                                className="flex items-center gap-2 border-2 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 px-6 py-3 font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300"
+                                                className="flex items-center gap-2 border-2 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 px-4 sm:px-6 py-2 sm:py-3 font-semibold rounded-xl hover:bg-blue-50 transition-all duration-300 text-sm sm:text-base"
                                             >
-                                                <Calendar className="w-4 h-4" />
+                                                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 Book Appointment
                                             </Button>
                                         </Link>
