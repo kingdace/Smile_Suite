@@ -2,6 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import {
     Plus,
     Scissors,
@@ -694,9 +695,9 @@ export default function Index({
                                                                             }
                                                                             className="inline-flex px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded border border-blue-200 font-medium"
                                                                         >
-                                                                            {
-                                                                                dentist.name
-                                                                            }
+                                                                            {getDentistDisplayName(
+                                                                                dentist
+                                                                            )}
                                                                         </span>
                                                                     )
                                                                 )}
@@ -1333,7 +1334,7 @@ export default function Index({
                                                 htmlFor={`dentist_${dentist.id}`}
                                                 className="text-sm font-medium cursor-pointer flex-1"
                                             >
-                                                {dentist.name}
+                                                {getDentistDisplayName(dentist)}
                                             </Label>
                                         </div>
                                     ))}
@@ -1681,7 +1682,7 @@ export default function Index({
                                                 htmlFor={`edit_dentist_${dentist.id}`}
                                                 className="text-sm font-medium cursor-pointer flex-1"
                                             >
-                                                {dentist.name}
+                                                {getDentistDisplayName(dentist)}
                                             </Label>
                                         </div>
                                     ))}
@@ -1925,7 +1926,9 @@ export default function Index({
                                                         className="p-3 bg-blue-100 rounded-lg border border-blue-200"
                                                     >
                                                         <p className="text-sm font-medium text-blue-700">
-                                                            {dentist.name}
+                                                            {getDentistDisplayName(
+                                                                dentist
+                                                            )}
                                                         </p>
                                                     </div>
                                                 )

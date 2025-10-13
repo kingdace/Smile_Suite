@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import {
     format,
     startOfMonth,
@@ -285,7 +286,7 @@ export default function Calendar({ auth, clinic, appointments, filters }) {
                             )?.assigned_dentist;
                             return dentist ? (
                                 <option key={dentistId} value={dentistId}>
-                                    {dentist.name}
+                                    {getDentistDisplayName(dentist)}
                                 </option>
                             ) : null;
                         })}
@@ -483,11 +484,9 @@ export default function Calendar({ auth, clinic, appointments, filters }) {
                                             <div className="flex items-center gap-2">
                                                 <Stethoscope className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm text-gray-600">
-                                                    {
-                                                        appointment
-                                                            .assigned_dentist
-                                                            .name
-                                                    }
+                                                    {getDentistDisplayName(
+                                                        appointment.assigned_dentist
+                                                    )}
                                                 </span>
                                             </div>
                                         )}

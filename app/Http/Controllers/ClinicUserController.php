@@ -75,6 +75,19 @@ class ClinicUserController extends Controller
         }
 
         User::create($userData);
+
+        // Return updated users data for AJAX requests
+        if (request()->expectsJson()) {
+            $users = User::where('clinic_id', $clinic->id)->get();
+            return inertia('Clinic/Users/Index', [
+                'users' => $users,
+                'limit' => $limit,
+                'count' => $users->count(),
+                'plan' => $plan,
+                'success' => 'User created successfully.',
+            ]);
+        }
+
         return redirect()->route('clinic.users.index')->with('success', 'User created successfully.');
     }
 
@@ -107,6 +120,21 @@ class ClinicUserController extends Controller
         ];
 
         $user->update($userData);
+
+        // Return updated users data for AJAX requests
+        if (request()->expectsJson()) {
+            $users = User::where('clinic_id', $clinic->id)->get();
+            $plan = $clinic->subscription_plan ?? 'basic';
+            $limit = $this->planLimits[$plan] ?? 5;
+            return inertia('Clinic/Users/Index', [
+                'users' => $users,
+                'limit' => $limit,
+                'count' => $users->count(),
+                'plan' => $plan,
+                'success' => 'User updated successfully.',
+            ]);
+        }
+
         return redirect()->route('clinic.users.index')->with('success', 'User updated successfully.');
     }
 
@@ -124,6 +152,21 @@ class ClinicUserController extends Controller
             return redirect()->route('clinic.users.index')->withErrors(['delete' => 'You cannot delete your own account.']);
         }
         $user->delete();
+
+        // Return updated users data for AJAX requests
+        if (request()->expectsJson()) {
+            $users = User::where('clinic_id', $clinic->id)->get();
+            $plan = $clinic->subscription_plan ?? 'basic';
+            $limit = $this->planLimits[$plan] ?? 5;
+            return inertia('Clinic/Users/Index', [
+                'users' => $users,
+                'limit' => $limit,
+                'count' => $users->count(),
+                'plan' => $plan,
+                'success' => 'User deleted successfully.',
+            ]);
+        }
+
         return redirect()->route('clinic.users.index')->with('success', 'User deleted successfully.');
     }
 
@@ -181,6 +224,20 @@ class ClinicUserController extends Controller
 
         $user->update(['is_active' => !$user->is_active]);
 
+        // Return updated users data for AJAX requests
+        if (request()->expectsJson()) {
+            $users = User::where('clinic_id', $clinic->id)->get();
+            $plan = $clinic->subscription_plan ?? 'basic';
+            $limit = $this->planLimits[$plan] ?? 5;
+            return inertia('Clinic/Users/Index', [
+                'users' => $users,
+                'limit' => $limit,
+                'count' => $users->count(),
+                'plan' => $plan,
+                'success' => $user->is_active ? 'User activated successfully.' : 'User deactivated successfully.',
+            ]);
+        }
+
         return redirect()->back()->with('success',
             $user->is_active ? 'User activated successfully.' : 'User deactivated successfully.'
         );
@@ -213,7 +270,7 @@ class ClinicUserController extends Controller
         }
 
         return inertia('Clinic/Profile/Show', [
-            'user' => $user->load('clinic'),
+            'user' => $user,
         ]);
     }
 
@@ -228,7 +285,7 @@ class ClinicUserController extends Controller
         }
 
         return inertia('Clinic/Profile/Edit', [
-            'user' => $user->load('clinic'),
+            'user' => $user,
         ]);
     }
 

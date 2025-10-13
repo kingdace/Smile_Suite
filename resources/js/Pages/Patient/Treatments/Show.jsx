@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import SiteHeader from "@/Components/SiteHeader";
 import { cn } from "@/lib/utils";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 
 export default function PatientTreatmentShow({
     auth,
@@ -654,7 +655,9 @@ export default function PatientTreatmentShow({
                                                 <User className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-green-600" />
                                             </div>
                                             <h4 className="font-bold text-gray-900 text-sm sm:text-base md:text-lg">
-                                                {treatment.dentist.name}
+                                                {getDentistDisplayName(
+                                                    treatment.dentist
+                                                )}
                                             </h4>
                                             {treatment.dentist.specialties &&
                                                 treatment.dentist.specialties

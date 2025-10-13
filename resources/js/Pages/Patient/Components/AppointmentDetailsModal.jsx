@@ -17,6 +17,7 @@ import {
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import { cn } from "@/lib/utils";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 
 export default function AppointmentDetailsModal({
     showModal,
@@ -323,7 +324,9 @@ export default function AppointmentDetailsModal({
                                         </label>
                                         <p className="text-xs sm:text-sm text-gray-900 flex items-center gap-1.5 sm:gap-2">
                                             <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                                            {appointment.assignedDentist.name}
+                                            {getDentistDisplayName(
+                                                appointment.assignedDentist
+                                            )}
                                         </p>
                                     </div>
                                 )}

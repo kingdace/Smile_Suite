@@ -148,10 +148,19 @@ export default function Index({
 
         try {
             await router.post(route("clinic.users.store"), formData, {
-                onSuccess: () => {
+                onSuccess: (page) => {
                     setShowCreateModal(false);
-                    // Refresh the page to get updated data
-                    router.reload({ only: ["users", "count"] });
+                    // Update local state with new user data
+                    setUserList(page.props.users);
+                    // Reset form
+                    setFormData({
+                        name: "",
+                        email: "",
+                        password: "",
+                        password_confirmation: "",
+                        role: "staff",
+                        is_active: true,
+                    });
                 },
                 onError: (errors) => {
                     setFormErrors(errors);
@@ -174,9 +183,10 @@ export default function Index({
                 route("clinic.users.update", selectedUser.id),
                 formData,
                 {
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         setShowEditModal(false);
-                        router.reload({ only: ["users"] });
+                        // Update local state with updated user data
+                        setUserList(page.props.users);
                     },
                     onError: (errors) => {
                         setFormErrors(errors);
@@ -197,8 +207,9 @@ export default function Index({
 
         try {
             await router.delete(route("clinic.users.destroy", user.id), {
-                onSuccess: () => {
-                    router.reload({ only: ["users", "count"] });
+                onSuccess: (page) => {
+                    // Update local state with updated user data
+                    setUserList(page.props.users);
                 },
             });
         } catch (error) {
@@ -212,8 +223,9 @@ export default function Index({
                 route("clinic.users.toggle-status", user.id),
                 {},
                 {
-                    onSuccess: () => {
-                        router.reload({ only: ["users"] });
+                    onSuccess: (page) => {
+                        // Update local state with updated user data
+                        setUserList(page.props.users);
                     },
                 }
             );
