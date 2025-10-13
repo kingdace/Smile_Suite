@@ -1,6 +1,7 @@
 import React from "react";
 import { Users, Mail, Phone, MapPin, Award, Star } from "lucide-react";
 import { getInitials, getAvatarColor } from "../Shared/utils";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 
 export default function StaffSection({ clinic, onBookAppointment }) {
     if (!clinic.staff || clinic.staff.length === 0) {
@@ -92,7 +93,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
             </div>
 
             {/* Staff Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 justify-items-center">
                 {clinic.staff.map((member, index) => (
                     <div
                         key={index}
@@ -115,7 +116,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                                 {/* Name and Role */}
                                 <div className="flex-1 min-w-0">
                                     <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1.5 sm:mb-2 group-hover:text-blue-600 transition-colors duration-300">
-                                        {member.name}
+                                        {getDentistDisplayName(member)}
                                     </h3>
                                     <span
                                         className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-semibold border ${getRoleBadgeColor(
@@ -227,7 +228,8 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                                 onClick={onBookAppointment}
                                 className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm"
                             >
-                                Book with {member.name.split(" ")[0]}
+                                Book with{" "}
+                                {getDentistDisplayName(member).split(" ")[0]}
                             </button>
                         </div>
                     </div>
