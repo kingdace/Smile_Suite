@@ -93,21 +93,21 @@ export default function StaffSection({ clinic, onBookAppointment }) {
             </div>
 
             {/* Staff Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 justify-items-center">
                 {clinic.staff.map((member, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-lg sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group flex flex-col h-full"
+                        className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-blue-300/50 overflow-hidden group flex flex-col h-full backdrop-blur-sm"
                     >
                         {/* Header with Avatar and Role */}
-                        <div className="relative p-3 sm:p-5 pb-2 sm:pb-4">
+                        <div className="relative p-4 sm:p-6 pb-3 sm:pb-5 bg-gradient-to-r from-blue-50/30 to-cyan-50/30">
                             <div className="flex items-start gap-3 sm:gap-4">
                                 {/* Avatar */}
                                 <div className="flex-shrink-0">
                                     <div
-                                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${getRoleColor(
+                                        className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${getRoleColor(
                                             member.role
-                                        )} flex items-center justify-center text-base sm:text-xl text-white font-bold shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                                        )} flex items-center justify-center text-lg sm:text-xl text-white font-bold shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300`}
                                     >
                                         {getInitials(member.name)}
                                     </div>
@@ -115,7 +115,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
 
                                 {/* Name and Role */}
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1.5 sm:mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-blue-600 transition-colors duration-300">
                                         {getDentistDisplayName(member)}
                                     </h3>
                                     <span
@@ -133,7 +133,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                         </div>
 
                         {/* Contact Information */}
-                        <div className="px-3 sm:px-5 pb-3 sm:pb-4 space-y-1.5 sm:space-y-2">
+                        <div className="px-4 sm:px-6 pb-4 sm:pb-5 space-y-2 sm:space-y-3">
                             {member.email && (
                                 <div className="flex items-center gap-2 sm:gap-3 text-gray-600 hover:text-blue-600 transition-colors duration-300">
                                     <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" />
@@ -169,7 +169,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                         </div>
 
                         {/* Profile Meta (always renders to keep layout consistent) */}
-                        <div className="px-3 sm:px-5 pb-3 sm:pb-4 space-y-2 sm:space-y-3">
+                        <div className="px-4 sm:px-6 pb-4 sm:pb-5 space-y-3 sm:space-y-4">
                             <div>
                                 <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 sm:mb-2">
                                     {isClinicalRole(member.role)
@@ -220,17 +220,6 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                                     {member.education}
                                 </div>
                             )}
-                        </div>
-
-                        {/* Action Button */}
-                        <div className="px-3 sm:px-5 pb-3 sm:pb-5 mt-auto">
-                            <button
-                                onClick={onBookAppointment}
-                                className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm"
-                            >
-                                Book with{" "}
-                                {getDentistDisplayName(member).split(" ")[0]}
-                            </button>
                         </div>
                     </div>
                 ))}
