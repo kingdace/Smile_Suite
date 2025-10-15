@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
+import { ImageHelper } from "@/Helpers/ImageHelper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -63,11 +64,7 @@ export default function Edit({ auth, user }) {
         confirm: false,
     });
     const [avatarPreview, setAvatarPreview] = useState(
-        user.avatar_url
-            ? user.avatar_url.startsWith("http")
-                ? user.avatar_url
-                : `/storage/${user.avatar_url}`
-            : null
+        user.avatar_url ? ImageHelper.getImageUrl(user.avatar_url) : null
     );
     const fileInputRef = useRef(null);
 
@@ -421,11 +418,9 @@ export default function Edit({ auth, user }) {
                                                         setData("avatar", null);
                                                         setAvatarPreview(
                                                             user.avatar_url
-                                                                ? user.avatar_url.startsWith(
-                                                                      "http"
+                                                                ? ImageHelper.getImageUrl(
+                                                                      user.avatar_url
                                                                   )
-                                                                    ? user.avatar_url
-                                                                    : `/storage/${user.avatar_url}`
                                                                 : null
                                                         );
                                                     }}

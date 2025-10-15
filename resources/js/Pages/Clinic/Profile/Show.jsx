@@ -2,6 +2,7 @@ import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
+import { ImageHelper } from "@/Helpers/ImageHelper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
@@ -83,13 +84,9 @@ export default function Show({ auth, user, success }) {
                                         <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
                                             {user.avatar_url ? (
                                                 <img
-                                                    src={
-                                                        user.avatar_url.startsWith(
-                                                            "http"
-                                                        )
-                                                            ? user.avatar_url
-                                                            : `/storage/${user.avatar_url}`
-                                                    }
+                                                    src={ImageHelper.getImageUrl(
+                                                        user.avatar_url
+                                                    )}
                                                     alt="Profile"
                                                     className="w-full h-full object-cover"
                                                 />

@@ -2,6 +2,7 @@ import React from "react";
 import { Users, Mail, Phone, MapPin, Award, Star } from "lucide-react";
 import { getInitials, getAvatarColor } from "../Shared/utils";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
+import { ImageHelper } from "@/Helpers/ImageHelper";
 
 export default function StaffSection({ clinic, onBookAppointment }) {
     if (!clinic.staff || clinic.staff.length === 0) {
@@ -107,13 +108,9 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                                     {member.avatar_url ? (
                                         <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300">
                                             <img
-                                                src={
-                                                    member.avatar_url.startsWith(
-                                                        "http"
-                                                    )
-                                                        ? member.avatar_url
-                                                        : `/storage/${member.avatar_url}`
-                                                }
+                                                src={ImageHelper.getImageUrl(
+                                                    member.avatar_url
+                                                )}
                                                 alt={member.name}
                                                 className="w-full h-full object-cover"
                                             />

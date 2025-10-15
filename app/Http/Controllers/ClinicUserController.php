@@ -379,9 +379,8 @@ class ClinicUserController extends Controller
                 
                 // Get the full URL for the stored file
                 if ($disk === 's3') {
-                    // For S3, construct the full URL manually
-                    $s3Url = config('filesystems.disks.s3.url');
-                    $avatarUrl = $s3Url . '/' . $avatarPath;
+                    // For S3, use Laravel's built-in URL generation
+                    $avatarUrl = Storage::disk('s3')->url($avatarPath);
                 } else {
                     $avatarUrl = $avatarPath;
                 }
