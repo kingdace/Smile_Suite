@@ -61,7 +61,13 @@ export default function Edit({ auth, user }) {
         new: false,
         confirm: false,
     });
-    const [avatarPreview, setAvatarPreview] = useState(user.avatar_url || null);
+    const [avatarPreview, setAvatarPreview] = useState(
+        user.avatar_url
+            ? user.avatar_url.startsWith("http")
+                ? user.avatar_url
+                : `/storage/${user.avatar_url}`
+            : null
+    );
     const fileInputRef = useRef(null);
 
     const addSpecialty = () => {
@@ -314,7 +320,11 @@ export default function Edit({ auth, user }) {
                                             ) : (
                                                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                                     <span className="text-2xl font-bold text-white">
-                                                        {user.name
+                                                        {(user.role ===
+                                                        "dentist"
+                                                            ? `Dr. ${user.name}`
+                                                            : user.name
+                                                        )
                                                             .split(" ")
                                                             .map((n) => n[0])
                                                             .join("")
@@ -361,8 +371,13 @@ export default function Edit({ auth, user }) {
                                                     onClick={() => {
                                                         setData("avatar", null);
                                                         setAvatarPreview(
-                                                            user.avatar_url ||
-                                                                null
+                                                            user.avatar_url
+                                                                ? user.avatar_url.startsWith(
+                                                                      "http"
+                                                                  )
+                                                                    ? user.avatar_url
+                                                                    : `/storage/${user.avatar_url}`
+                                                                : null
                                                         );
                                                     }}
                                                     className="gap-2 text-red-600 hover:text-red-700"

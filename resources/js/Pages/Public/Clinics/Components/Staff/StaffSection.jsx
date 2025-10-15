@@ -97,20 +97,36 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                 {clinic.staff.map((member, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col min-h-[400px] w-full"
+                        className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col min-h-[320px] w-full"
                     >
                         {/* Header with Avatar and Role */}
                         <div className="relative p-6 bg-gradient-to-r from-blue-50 to-cyan-50">
                             <div className="flex flex-col items-center text-center">
-                                {/* Avatar */}
-                                <div className="mb-4">
-                                    <div
-                                        className={`w-20 h-20 rounded-full bg-gradient-to-br ${getRoleColor(
-                                            member.role
-                                        )} flex items-center justify-center text-2xl text-white font-bold shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300`}
-                                    >
-                                        {getInitials(member.name)}
-                                    </div>
+                                {/* Avatar - Made More Prominent and Showcasing */}
+                                <div className="mb-6">
+                                    {member.avatar_url ? (
+                                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300">
+                                            <img
+                                                src={
+                                                    member.avatar_url.startsWith(
+                                                        "http"
+                                                    )
+                                                        ? member.avatar_url
+                                                        : `/storage/${member.avatar_url}`
+                                                }
+                                                alt={member.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className={`w-32 h-32 rounded-full bg-gradient-to-br ${getRoleColor(
+                                                member.role
+                                            )} flex items-center justify-center text-3xl text-white font-bold shadow-xl group-hover:shadow-2xl group-hover:scale-110 transition-all duration-300`}
+                                        >
+                                            {getInitials(member.name)}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Name and Role */}
@@ -133,8 +149,8 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                             </div>
                         </div>
 
-                        {/* Contact Information */}
-                        <div className="flex-1 px-6 py-4 space-y-3">
+                        {/* Contact Information - Centered */}
+                        <div className="flex-1 px-6 py-4 space-y-3 flex flex-col items-center">
                             {member.email && (
                                 <div className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors duration-300">
                                     <Mail className="w-5 h-5 text-blue-500 flex-shrink-0" />
@@ -169,62 +185,17 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                             )}
                         </div>
 
-                        {/* Profile Meta (always renders to keep layout consistent) */}
-                        <div className="px-6 pb-6 space-y-4">
-                            <div>
-                                <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
-                                    {isClinicalRole(member.role)
-                                        ? "Specialties"
-                                        : "Responsibilities"}
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {isClinicalRole(member.role) ? (
-                                        member.specialties &&
-                                        member.specialties.length > 0 ? (
-                                            member.specialties.map(
-                                                (specialty, idx) => (
-                                                    <span
-                                                        key={idx}
-                                                        className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full border border-blue-200"
-                                                    >
-                                                        {specialty}
-                                                    </span>
-                                                )
-                                            )
-                                        ) : (
-                                            <span className="px-3 py-1 bg-gray-50 text-gray-500 text-sm rounded-full border border-gray-200">
-                                                Not specified
-                                            </span>
-                                        )
-                                    ) : (
-                                        <span className="px-3 py-1 bg-gray-50 text-gray-600 text-sm rounded-full border border-gray-200">
-                                            {member.role
-                                                .charAt(0)
-                                                .toUpperCase() +
-                                                member.role.slice(1)}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {member.experience && (
+                        {/* Experience (if available) */}
+                        {member.experience && (
+                            <div className="px-6 pb-6">
                                 <div className="flex items-center gap-2 text-sm text-gray-600">
                                     <Award className="w-5 h-5 text-yellow-500" />
                                     <span className="font-medium">
                                         {member.experience} years experience
                                     </span>
                                 </div>
-                            )}
-
-                            {member.education && (
-                                <div className="text-sm text-gray-600">
-                                    <span className="font-semibold">
-                                        Education:
-                                    </span>{" "}
-                                    {member.education}
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

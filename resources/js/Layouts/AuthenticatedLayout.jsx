@@ -575,7 +575,11 @@ const Header = ({
                                 </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm font-bold text-white">
-                                        {auth?.user?.name || auth?.name}
+                                        {auth?.user?.role === "dentist"
+                                            ? `Dr. ${
+                                                  auth?.user?.name || auth?.name
+                                              }`
+                                            : auth?.user?.name || auth?.name}
                                     </p>
                                     <p className="text-xs text-blue-100 font-medium">
                                         {(auth?.user?.role || auth?.role)
@@ -691,7 +695,11 @@ const Header = ({
                                         type="button"
                                         className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white hover:text-blue-100 focus:outline-none transition ease-in-out duration-150"
                                     >
-                                        {auth?.user?.name || auth?.name}
+                                        {auth?.user?.role === "dentist"
+                                            ? `Dr. ${
+                                                  auth?.user?.name || auth?.name
+                                              }`
+                                            : auth?.user?.name || auth?.name}
 
                                         <ChevronDown className="ml-2 -mr-0.5 h-4 w-4" />
                                     </button>

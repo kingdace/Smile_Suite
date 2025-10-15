@@ -93,7 +93,9 @@ export default function Show({ auth, user }) {
                                     </div>
                                     <div>
                                         <h1 className="text-3xl font-bold text-white mb-2">
-                                            {user.name}
+                                            {user.role === "dentist"
+                                                ? `Dr. ${user.name}`
+                                                : user.name}
                                         </h1>
                                         <div className="flex items-center gap-4 text-blue-100">
                                             <div className="flex items-center gap-2">
