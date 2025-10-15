@@ -1,5 +1,6 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import {
     LogOut,
     User as UserIcon,
@@ -229,9 +230,7 @@ export default function SiteHeader() {
                                         </AvatarFallback>
                                     </Avatar>
                                     <span className="font-semibold text-slate-700 text-[15px] max-w-[100px] truncate">
-                                        {auth.user.role === "dentist"
-                                            ? `Dr. ${auth.user.name}`
-                                            : auth.user.name}
+                                        {getDentistDisplayName(auth.user)}
                                     </span>
                                     <svg
                                         className={`w-4 h-4 ml-1 transition-transform duration-200 ${

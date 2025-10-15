@@ -1,6 +1,7 @@
 import React from "react";
 import { Head, Link } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
@@ -93,9 +94,7 @@ export default function Show({ auth, user }) {
                                     </div>
                                     <div>
                                         <h1 className="text-3xl font-bold text-white mb-2">
-                                            {user.role === "dentist"
-                                                ? `Dr. ${user.name}`
-                                                : user.name}
+                                            {getDentistDisplayName(user)}
                                         </h1>
                                         <div className="flex items-center gap-4 text-blue-100">
                                             <div className="flex items-center gap-2">

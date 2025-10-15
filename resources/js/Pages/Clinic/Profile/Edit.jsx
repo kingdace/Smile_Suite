@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -320,10 +321,8 @@ export default function Edit({ auth, user }) {
                                             ) : (
                                                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                                     <span className="text-2xl font-bold text-white">
-                                                        {(user.role ===
-                                                        "dentist"
-                                                            ? `Dr. ${user.name}`
-                                                            : user.name
+                                                        {getDentistDisplayName(
+                                                            user
                                                         )
                                                             .split(" ")
                                                             .map((n) => n[0])

@@ -307,24 +307,35 @@ class ClinicUserController extends Controller
         }
 
 
-        $validated = $request->validate([
+        // Base validation rules
+        $validationRules = [
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone_number' => 'nullable|string|max:20',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'current_password' => 'nullable|string',
             'new_password' => 'nullable|string|min:8|confirmed',
-            // Dentist-specific fields
-            'license_number' => 'nullable|string|max:255',
-            'specialties' => 'nullable|array',
-            'qualifications' => 'nullable|array',
-            'years_experience' => 'nullable|integer|min:0|max:50',
-            'bio' => 'nullable|string|max:1000',
-            'emergency_contact' => 'nullable|string|max:255',
-            'emergency_phone' => 'nullable|string|max:20',
-            'working_hours' => 'nullable|array',
-            'unavailable_dates' => 'nullable|array',
-        ]);
+        ];
+
+        // Add dentist-specific validation rules only if user is a dentist
+        if ($user->role === 'dentist') {
+            $validationRules = array_merge($validationRules, [
+                'license_number' => 'nullable|string|max:255',
+                'specialties' => 'nullable|array',
+                'qualifications' => 'nullable|array',
+                'years_experience' => 'nullable|integer|min:0|max:50',
+                'bio' => 'nullable|string|max:1000',
+                'emergency_contact' => 'nullable|string|max:255',
+                'emergency_phone' => 'nullable|string|max:20',
+                'working_hours' => 'nullable|array',
+                'unavailable_dates' => 'nullable|array',
+            ]);
+        }
+
+        $validated = $request->validate($validationRules);
+        
+        // Debug: Log all validated data to see what's being sent
+        \Log::info('Profile update - All validated data: ', $validated);
 
         // Handle password change
         if (!empty($validated['new_password'])) {
@@ -336,43 +347,83 @@ class ClinicUserController extends Controller
         // Handle avatar upload
         $avatarUrl = $user->avatar_url;
         if ($request->hasFile('avatar')) {
-            // Determine which disk to use based on environment
-            $disk = config('app.env') === 'production' ? 's3' : 'public';
-            
-            // Delete old avatar if exists
-            if ($user->avatar_url) {
-                // Handle both S3 URLs and local paths
-                if ($disk === 's3') {
-                    // For S3, extract the key from the URL
-                    $oldKey = str_replace(config('filesystems.disks.s3.url') . '/', '', $user->avatar_url);
-                    if (Storage::disk('s3')->exists($oldKey)) {
-                        Storage::disk('s3')->delete($oldKey);
-                    }
-                } else {
-                    // For local storage
-                    if (Storage::disk('public')->exists($user->avatar_url)) {
-                        Storage::disk('public')->delete($user->avatar_url);
+            try {
+                // Determine which disk to use based on environment
+                $disk = config('app.env') === 'production' ? 's3' : 'public';
+                
+                \Log::info('Avatar upload - Environment: ' . config('app.env'));
+                \Log::info('Avatar upload - Using disk: ' . $disk);
+                
+                // Delete old avatar if exists
+                if ($user->avatar_url) {
+                    try {
+                        // Handle both S3 URLs and local paths
+                        if ($disk === 's3') {
+                            // For S3, extract the key from the URL
+                            $s3BaseUrl = config('filesystems.disks.s3.url');
+                            if (strpos($user->avatar_url, $s3BaseUrl) === 0) {
+                                $oldKey = str_replace($s3BaseUrl . '/', '', $user->avatar_url);
+                                \Log::info('Avatar upload - Old S3 key: ' . $oldKey);
+                                if (Storage::disk('s3')->exists($oldKey)) {
+                                    Storage::disk('s3')->delete($oldKey);
+                                    \Log::info('Avatar upload - Old avatar deleted from S3');
+                                }
+                            } else {
+                                \Log::info('Avatar upload - Old avatar URL does not match S3 base URL, skipping deletion');
+                            }
+                        } else {
+                            // For local storage
+                            if (Storage::disk('public')->exists($user->avatar_url)) {
+                                Storage::disk('public')->delete($user->avatar_url);
+                                \Log::info('Avatar upload - Old avatar deleted from local storage');
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        \Log::warning('Avatar upload - Failed to delete old avatar: ' . $e->getMessage());
+                        // Continue with upload even if old avatar deletion fails
                     }
                 }
-            }
-            
-            // Store new avatar
-            $avatarPath = $request->file('avatar')->store('user-avatars', $disk);
-            
-            // Get the full URL for the stored file
-            if ($disk === 's3') {
-                $avatarUrl = Storage::disk('s3')->url($avatarPath);
-            } else {
-                $avatarUrl = $avatarPath;
+                
+                // Store new avatar
+                $avatarPath = $request->file('avatar')->store('user-avatars', $disk);
+                \Log::info('Avatar upload - New avatar stored at: ' . $avatarPath);
+                
+                // Get the full URL for the stored file
+                if ($disk === 's3') {
+                    // For S3, construct the full URL manually
+                    $s3Url = config('filesystems.disks.s3.url');
+                    $avatarUrl = $s3Url . '/' . $avatarPath;
+                    \Log::info('Avatar upload - S3 URL generated: ' . $avatarUrl);
+                } else {
+                    $avatarUrl = $avatarPath;
+                    \Log::info('Avatar upload - Local path: ' . $avatarUrl);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Avatar upload error: ' . $e->getMessage());
+                \Log::error('Avatar upload error trace: ' . $e->getTraceAsString());
+                return back()->withErrors(['avatar' => 'Failed to upload avatar: ' . $e->getMessage()]);
             }
         }
 
+        // Build user data array
         $userData = [
-            'name' => !empty($validated['name']) ? $validated['name'] : $user->name,
-            'email' => !empty($validated['email']) ? $validated['email'] : $user->email,
-            'phone_number' => !empty($validated['phone_number']) ? $validated['phone_number'] : $user->phone_number,
             'avatar_url' => $avatarUrl,
         ];
+
+        // Handle name - only update if provided (not empty string)
+        if (isset($validated['name']) && $validated['name'] !== '') {
+            $userData['name'] = $validated['name'];
+        }
+
+        // Handle email - only update if provided (not empty string)
+        if (isset($validated['email']) && $validated['email'] !== '') {
+            $userData['email'] = $validated['email'];
+        }
+
+        // Handle phone number - only update if provided (not empty string)
+        if (isset($validated['phone_number']) && $validated['phone_number'] !== '') {
+            $userData['phone_number'] = $validated['phone_number'];
+        }
 
         // Add password if changing
         if (!empty($validated['new_password'])) {
@@ -381,20 +432,52 @@ class ClinicUserController extends Controller
 
         // Add dentist-specific fields if user is a dentist
         if ($user->role === 'dentist') {
-            $userData = array_merge($userData, [
-                'license_number' => $validated['license_number'] ?? $user->license_number,
-                'specialties' => $validated['specialties'] ?? $user->specialties,
-                'qualifications' => $validated['qualifications'] ?? $user->qualifications,
-                'years_experience' => $validated['years_experience'] ?? $user->years_experience,
-                'bio' => $validated['bio'] ?? $user->bio,
-                'emergency_contact' => $validated['emergency_contact'] ?? $user->emergency_contact,
-                'emergency_phone' => $validated['emergency_phone'] ?? $user->emergency_phone,
-                'working_hours' => $validated['working_hours'] ?? $user->working_hours,
-                'unavailable_dates' => $validated['unavailable_dates'] ?? $user->unavailable_dates,
-            ]);
+            // Only update dentist fields if they are provided and not empty
+            if (isset($validated['license_number']) && $validated['license_number'] !== '') {
+                $userData['license_number'] = $validated['license_number'];
+            }
+            if (isset($validated['specialties']) && !empty($validated['specialties'])) {
+                $userData['specialties'] = $validated['specialties'];
+            }
+            if (isset($validated['qualifications']) && !empty($validated['qualifications'])) {
+                $userData['qualifications'] = $validated['qualifications'];
+            }
+            if (isset($validated['years_experience']) && $validated['years_experience'] !== '') {
+                $userData['years_experience'] = $validated['years_experience'];
+            }
+            if (isset($validated['bio']) && $validated['bio'] !== '') {
+                $userData['bio'] = $validated['bio'];
+            }
+            if (isset($validated['emergency_contact']) && $validated['emergency_contact'] !== '') {
+                $userData['emergency_contact'] = $validated['emergency_contact'];
+            }
+            if (isset($validated['emergency_phone']) && $validated['emergency_phone'] !== '') {
+                $userData['emergency_phone'] = $validated['emergency_phone'];
+            }
+            if (isset($validated['working_hours']) && !empty($validated['working_hours'])) {
+                $userData['working_hours'] = $validated['working_hours'];
+            }
+            if (isset($validated['unavailable_dates']) && !empty($validated['unavailable_dates'])) {
+                $userData['unavailable_dates'] = $validated['unavailable_dates'];
+            }
         }
 
-        $user->update($userData);
-        return redirect()->route('clinic.profile')->with('success', 'Profile updated successfully.');
+        \Log::info('Profile update - Final avatar URL to save: ' . $avatarUrl);
+        \Log::info('Profile update - User data to update: ', $userData);
+        
+        try {
+            $user->update($userData);
+            
+            \Log::info('Profile update - User updated successfully');
+            \Log::info('Profile update - User avatar_url after update: ' . $user->fresh()->avatar_url);
+            
+            return redirect()->route('clinic.profile')->with('success', 'Profile updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Profile update error: ' . $e->getMessage());
+            \Log::error('Profile update error trace: ' . $e->getTraceAsString());
+            \Log::error('Profile update - User data that failed: ', $userData);
+            
+            return back()->withErrors(['general' => 'Failed to update profile: ' . $e->getMessage()]);
+        }
     }
 }
