@@ -129,17 +129,16 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                             key={index}
                             className="bg-white rounded-lg sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group flex flex-col h-full"
                         >
-                            {/* Service Header - Centered */}
-                            <div className="p-2.5 sm:p-4 pb-2 sm:pb-3 flex-shrink-0 text-center">
-                                {/* Service Icon - Centered */}
-                                <div className="flex justify-center mb-2 sm:mb-3">
+                            {/* Service Header */}
+                            <div className="p-2.5 sm:p-4 pb-2 sm:pb-3 flex-shrink-0">
+                                {/* Icon and Badge Row */}
+                                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                                    {/* Service Icon - Left */}
                                     <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg sm:rounded-xl flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
                                         {getServiceIcon(service.name)}
                                     </div>
-                                </div>
 
-                                {/* Category Badge - Centered */}
-                                <div className="flex justify-center mb-2 sm:mb-3">
+                                    {/* Category Badge - Right */}
                                     <span
                                         className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-semibold border ${categoryColor}`}
                                     >
@@ -148,12 +147,12 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                 </div>
 
                                 {/* Service Name - Centered */}
-                                <h3 className="text-sm sm:text-lg font-bold text-gray-900 mb-1.5 sm:mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                                <h3 className="text-sm sm:text-lg font-bold text-gray-900 mb-1.5 sm:mb-2 group-hover:text-blue-600 transition-colors duration-300 text-center">
                                     {service.name}
                                 </h3>
 
                                 {/* Service Description - Centered with See More */}
-                                <div className="min-h-[2.5rem] sm:min-h-[3rem] mb-1.5 sm:mb-3">
+                                <div className="min-h-[2.5rem] sm:min-h-[3rem] mb-1 sm:mb-2">
                                     {service.description ? (
                                         <div className="text-center">
                                             <p
@@ -203,7 +202,7 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                 </div>
 
                                 {/* Service Meta - Centered */}
-                                <div className="flex items-center justify-center gap-2 sm:gap-4 text-xs text-gray-500 mb-1.5 sm:mb-3">
+                                <div className="flex items-center justify-center gap-2 sm:gap-4 text-xs text-gray-500 mb-1 sm:mb-2">
                                     {service.duration && (
                                         <div className="flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
