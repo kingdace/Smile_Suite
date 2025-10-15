@@ -62,10 +62,26 @@ export default function Show({ auth, user }) {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-6">
                                     <div className="relative">
-                                        <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                                            <span className="text-2xl font-bold text-white">
-                                                {getInitials(user.name)}
-                                            </span>
+                                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                                            {user.avatar_url ? (
+                                                <img
+                                                    src={
+                                                        user.avatar_url.startsWith(
+                                                            "http"
+                                                        )
+                                                            ? user.avatar_url
+                                                            : `/storage/${user.avatar_url}`
+                                                    }
+                                                    alt="Profile"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                                    <span className="text-2xl font-bold text-white">
+                                                        {getInitials(user.name)}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                         <div
                                             className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-white ${

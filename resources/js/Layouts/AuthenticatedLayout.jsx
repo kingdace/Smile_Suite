@@ -624,15 +624,18 @@ const Header = ({
                                                 User Management
                                             </Dropdown.Link>
                                         )}
-                                        <Dropdown.Link
-                                            href={route(
-                                                "clinic.subscription.index"
-                                            )}
-                                            className="flex items-center"
-                                        >
-                                            <Crown className="w-4 h-4 mr-2" />
-                                            Subscription
-                                        </Dropdown.Link>
+                                        {auth?.user?.role ===
+                                            "clinic_admin" && (
+                                            <Dropdown.Link
+                                                href={route(
+                                                    "clinic.subscription.index"
+                                                )}
+                                                className="flex items-center"
+                                            >
+                                                <Crown className="w-4 h-4 mr-2" />
+                                                Subscription
+                                            </Dropdown.Link>
+                                        )}
                                         <Dropdown.Link
                                             href={route("logout")}
                                             method="post"

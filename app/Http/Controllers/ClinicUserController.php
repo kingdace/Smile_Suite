@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class ClinicUserController extends Controller
 {
@@ -305,10 +306,14 @@ class ClinicUserController extends Controller
             abort(403);
         }
 
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone_number' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'current_password' => 'nullable|string',
+            'new_password' => 'nullable|string|min:8|confirmed',
             // Dentist-specific fields
             'license_number' => 'nullable|string|max:255',
             'specialties' => 'nullable|array',
@@ -321,11 +326,58 @@ class ClinicUserController extends Controller
             'unavailable_dates' => 'nullable|array',
         ]);
 
+        // Handle password change
+        if (!empty($validated['new_password'])) {
+            if (empty($validated['current_password']) || !Hash::check($validated['current_password'], $user->password)) {
+                return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+            }
+        }
+
+        // Handle avatar upload
+        $avatarUrl = $user->avatar_url;
+        if ($request->hasFile('avatar')) {
+            // Determine which disk to use based on environment
+            $disk = config('app.env') === 'production' ? 's3' : 'public';
+            
+            // Delete old avatar if exists
+            if ($user->avatar_url) {
+                // Handle both S3 URLs and local paths
+                if ($disk === 's3') {
+                    // For S3, extract the key from the URL
+                    $oldKey = str_replace(config('filesystems.disks.s3.url') . '/', '', $user->avatar_url);
+                    if (Storage::disk('s3')->exists($oldKey)) {
+                        Storage::disk('s3')->delete($oldKey);
+                    }
+                } else {
+                    // For local storage
+                    if (Storage::disk('public')->exists($user->avatar_url)) {
+                        Storage::disk('public')->delete($user->avatar_url);
+                    }
+                }
+            }
+            
+            // Store new avatar
+            $avatarPath = $request->file('avatar')->store('user-avatars', $disk);
+            
+            // Get the full URL for the stored file
+            if ($disk === 's3') {
+                $avatarUrl = Storage::disk('s3')->url($avatarPath);
+            } else {
+                $avatarUrl = $avatarPath;
+            }
+        }
+
         $userData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'] ?? $user->phone_number,
+            'name' => !empty($validated['name']) ? $validated['name'] : $user->name,
+            'email' => !empty($validated['email']) ? $validated['email'] : $user->email,
+            'phone_number' => !empty($validated['phone_number']) ? $validated['phone_number'] : $user->phone_number,
+            'avatar_url' => $avatarUrl,
         ];
+
+        // Add password if changing
+        if (!empty($validated['new_password'])) {
+            $userData['password'] = Hash::make($validated['new_password']);
+        }
 
         // Add dentist-specific fields if user is a dentist
         if ($user->role === 'dentist') {

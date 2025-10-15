@@ -592,7 +592,7 @@ Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionCont
             // User Profile Management (for dentists/staff to manage their own profiles)
             Route::get('profile', [\App\Http\Controllers\ClinicUserController::class, 'profile'])->name('clinic.profile');
             Route::get('profile/edit', [\App\Http\Controllers\ClinicUserController::class, 'editProfile'])->name('clinic.profile.edit');
-            Route::put('profile', [\App\Http\Controllers\ClinicUserController::class, 'updateProfile'])->name('clinic.user.profile.update');
+            Route::post('profile/user-update', [\App\Http\Controllers\ClinicUserController::class, 'updateProfile'])->name('clinic.user.profile.update');
 
             // Clinic Profile Management Route
             Route::get('profile/index', [\App\Http\Controllers\ClinicProfileController::class, 'index'])->name('clinic.profile.index');

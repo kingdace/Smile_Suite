@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -20,13 +20,21 @@ import {
     Save,
     ArrowLeft,
     Building2,
+    Camera,
+    Lock,
+    Eye,
+    EyeOff,
 } from "lucide-react";
 
 export default function Edit({ auth, user }) {
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         name: user.name || "",
         email: user.email || "",
         phone_number: user.phone_number || "",
+        avatar: null,
+        current_password: "",
+        new_password: "",
+        new_password_confirmation: "",
         // Dentist-specific fields
         license_number: user.license_number || "",
         specialties: user.specialties || [],
@@ -48,6 +56,13 @@ export default function Edit({ auth, user }) {
 
     const [newSpecialty, setNewSpecialty] = useState("");
     const [newQualification, setNewQualification] = useState("");
+    const [showPasswords, setShowPasswords] = useState({
+        current: false,
+        new: false,
+        confirm: false,
+    });
+    const [avatarPreview, setAvatarPreview] = useState(user.avatar_url || null);
+    const fileInputRef = useRef(null);
 
     const addSpecialty = () => {
         if (
@@ -105,9 +120,21 @@ export default function Edit({ auth, user }) {
         });
     };
 
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData("avatar", file);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setAvatarPreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("clinic.user.profile.update"));
+        post(route("clinic.user.profile.update"));
     };
 
     const days = [
@@ -182,6 +209,13 @@ export default function Edit({ auth, user }) {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
+                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p className="text-sm text-blue-700">
+                                        💡 <strong>Tip:</strong> Leave fields
+                                        empty to keep your current information.
+                                        Only fill in fields you want to update.
+                                    </p>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <Label htmlFor="name">Full Name</Label>
@@ -192,6 +226,7 @@ export default function Edit({ auth, user }) {
                                             onChange={(e) =>
                                                 setData("name", e.target.value)
                                             }
+                                            placeholder="Leave empty to keep current name"
                                             className={
                                                 errors.name
                                                     ? "border-red-500"
@@ -215,6 +250,7 @@ export default function Edit({ auth, user }) {
                                             onChange={(e) =>
                                                 setData("email", e.target.value)
                                             }
+                                            placeholder="Leave empty to keep current email"
                                             className={
                                                 errors.email
                                                     ? "border-red-500"
@@ -253,6 +289,277 @@ export default function Edit({ auth, user }) {
                                             </p>
                                         )}
                                     </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Profile Picture */}
+                        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Camera className="h-5 w-5 text-blue-600" />
+                                    Profile Picture
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="flex items-center gap-6">
+                                    <div className="relative">
+                                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200">
+                                            {avatarPreview ? (
+                                                <img
+                                                    src={avatarPreview}
+                                                    alt="Profile"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                                    <span className="text-2xl font-bold text-white">
+                                                        {user.name
+                                                            .split(" ")
+                                                            .map((n) => n[0])
+                                                            .join("")
+                                                            .toUpperCase()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                fileInputRef.current?.click()
+                                            }
+                                            className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+                                        >
+                                            <Camera className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                            Update Profile Picture
+                                        </h3>
+                                        <p className="text-gray-600 text-sm mb-4">
+                                            Upload a professional photo to help
+                                            patients recognize you. Supported
+                                            formats: JPG, PNG, GIF (max 2MB).
+                                        </p>
+                                        <div className="flex gap-3">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    fileInputRef.current?.click()
+                                                }
+                                                className="gap-2"
+                                            >
+                                                <Camera className="w-4 h-4" />
+                                                Choose Photo
+                                            </Button>
+                                            {avatarPreview && (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        setData("avatar", null);
+                                                        setAvatarPreview(
+                                                            user.avatar_url ||
+                                                                null
+                                                        );
+                                                    }}
+                                                    className="gap-2 text-red-600 hover:text-red-700"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                    Remove
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    className="hidden"
+                                />
+                                {errors.avatar && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.avatar}
+                                    </p>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        {/* Password Change */}
+                        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Lock className="h-5 w-5 text-blue-600" />
+                                    Change Password
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <Label htmlFor="current_password">
+                                            Current Password
+                                        </Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="current_password"
+                                                type={
+                                                    showPasswords.current
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                value={data.current_password}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "current_password",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className={
+                                                    errors.current_password
+                                                        ? "border-red-500 pr-10"
+                                                        : "pr-10"
+                                                }
+                                                placeholder="Enter your current password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPasswords({
+                                                        ...showPasswords,
+                                                        current:
+                                                            !showPasswords.current,
+                                                    })
+                                                }
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            >
+                                                {showPasswords.current ? (
+                                                    <EyeOff className="w-4 h-4" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4" />
+                                                )}
+                                            </button>
+                                        </div>
+                                        {errors.current_password && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {errors.current_password}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="new_password">
+                                            New Password
+                                        </Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="new_password"
+                                                type={
+                                                    showPasswords.new
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                value={data.new_password}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "new_password",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className={
+                                                    errors.new_password
+                                                        ? "border-red-500 pr-10"
+                                                        : "pr-10"
+                                                }
+                                                placeholder="Enter your new password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPasswords({
+                                                        ...showPasswords,
+                                                        new: !showPasswords.new,
+                                                    })
+                                                }
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            >
+                                                {showPasswords.new ? (
+                                                    <EyeOff className="w-4 h-4" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4" />
+                                                )}
+                                            </button>
+                                        </div>
+                                        {errors.new_password && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {errors.new_password}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <Label htmlFor="new_password_confirmation">
+                                            Confirm New Password
+                                        </Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="new_password_confirmation"
+                                                type={
+                                                    showPasswords.confirm
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                value={
+                                                    data.new_password_confirmation
+                                                }
+                                                onChange={(e) =>
+                                                    setData(
+                                                        "new_password_confirmation",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className={
+                                                    errors.new_password_confirmation
+                                                        ? "border-red-500 pr-10"
+                                                        : "pr-10"
+                                                }
+                                                placeholder="Confirm your new password"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowPasswords({
+                                                        ...showPasswords,
+                                                        confirm:
+                                                            !showPasswords.confirm,
+                                                    })
+                                                }
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                            >
+                                                {showPasswords.confirm ? (
+                                                    <EyeOff className="w-4 h-4" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4" />
+                                                )}
+                                            </button>
+                                        </div>
+                                        {errors.new_password_confirmation && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {
+                                                    errors.new_password_confirmation
+                                                }
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p className="text-sm text-blue-700">
+                                        💡 <strong>Tip:</strong> Leave password
+                                        fields empty if you don't want to change
+                                        your password. New password must be at
+                                        least 8 characters long.
+                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
