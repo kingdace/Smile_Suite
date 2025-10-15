@@ -19,6 +19,11 @@ export class ImageHelper {
             return imageUrl;
         }
 
+        // If it's a user-avatars path (for existing avatars), convert to storage path
+        if (imageUrl && imageUrl.startsWith("/user-avatars/")) {
+            return `/storage${imageUrl}`;
+        }
+
         // If it's a relative path, ensure it starts with /
         if (imageUrl && !imageUrl.startsWith("/")) {
             return `/${imageUrl}`;
