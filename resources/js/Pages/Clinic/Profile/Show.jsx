@@ -24,7 +24,7 @@ import {
     XCircle,
 } from "lucide-react";
 
-export default function Show({ auth, user }) {
+export default function Show({ auth, user, success }) {
     const getInitials = (name) => {
         return name
             .split(" ")
@@ -52,6 +52,23 @@ export default function Show({ auth, user }) {
             <Head title="My Profile" />
 
             <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50">
+                {/* Success Message */}
+                {success && (
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <CheckCircle className="h-5 w-5 text-green-400" />
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-green-800">
+                                        {success}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     {/* Enhanced Header */}
                     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-2xl shadow-2xl mb-8">
