@@ -129,17 +129,36 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 5. Run these commands in the terminal:
 
 ```bash
+# If using migrations (recommended)
 php artisan migrate --force
 php artisan db:seed --force
+
+# If using manual MySQL dump (your current setup)
+php artisan railway:seed
 ```
 
-### 3.2 Generate Application Key
+### 3.2 Alternative: Manual Seeder Command
+
+If you're using manual MySQL dump import, you can run the Railway-specific seeder:
+
+```bash
+php artisan railway:seed
+```
+
+This command will:
+
+-   ✅ Check if you already have enough clinics (30+)
+-   ✅ Only run seeders if needed
+-   ✅ Safely handle duplicate data
+-   ✅ Add the 20 Surigao clinics with 2-month subscriptions
+
+### 3.3 Generate Application Key
 
 ```bash
 php artisan key:generate --force
 ```
 
-### 3.3 Clear Caches
+### 3.4 Clear Caches
 
 ```bash
 php artisan config:cache

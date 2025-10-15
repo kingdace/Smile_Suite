@@ -3,6 +3,18 @@
 # Startup script for Railway deployment
 echo "Starting Smile Suite application..."
 
+# Check if we need to run seeders (only if database is empty or missing seed data)
+echo "Checking if seeders need to be run..."
+CLINIC_COUNT=$(php artisan tinker --execute="echo App\Models\Clinic::count();" 2>/dev/null || echo "0")
+
+if [ "$CLINIC_COUNT" -lt "30" ]; then
+    echo "Running database seeders (found $CLINIC_COUNT clinics, need at least 30)..."
+    php artisan db:seed --force
+    echo "✅ Database seeders completed"
+else
+    echo "✅ Database already seeded ($CLINIC_COUNT clinics found)"
+fi
+
 # Ensure storage directories exist
 echo "Creating storage directories..."
 mkdir -p storage/app/public/clinic-gallery

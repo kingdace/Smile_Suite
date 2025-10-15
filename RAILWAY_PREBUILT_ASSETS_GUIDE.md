@@ -114,10 +114,13 @@ After deployment, run these commands in Railway terminal:
 # Generate application key
 php artisan key:generate --force
 
-# Run database migrations
+# Run database migrations (if using migrations)
 php artisan migrate --force
 
-# Seed the database (optional)
+# Seed the database (for manual MySQL dump users)
+php artisan railway:seed
+
+# OR use standard seeder (if using migrations)
 php artisan db:seed --force
 
 # Clear and cache config
