@@ -141,24 +141,7 @@ export default function Edit({ auth, user }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("=== FORM SUBMISSION DEBUG ===");
-        console.log("Form data being sent:", data);
-        console.log("Processing:", processing);
-        console.log("Errors:", errors);
-        console.log("Route:", route("clinic.user.profile.update"));
-        console.log("CSRF Token:", document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
-        
-        post(route("clinic.user.profile.update"), {
-            onSuccess: (page) => {
-                console.log("Form submission successful:", page);
-            },
-            onError: (errors) => {
-                console.log("Form submission errors:", errors);
-            },
-            onFinish: () => {
-                console.log("Form submission finished");
-            }
-        });
+        post(route("clinic.user.profile.update"));
     };
 
     const days = [
@@ -202,8 +185,16 @@ export default function Edit({ auth, user }) {
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                                 <div className="flex items-center">
                                     <div className="flex-shrink-0">
-                                        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                        <svg
+                                            className="h-5 w-5 text-red-400"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                clipRule="evenodd"
+                                            />
                                         </svg>
                                     </div>
                                     <div className="ml-3">
@@ -212,18 +203,33 @@ export default function Edit({ auth, user }) {
                                         </h3>
                                         <div className="mt-2 text-sm text-red-700">
                                             <ul className="list-disc list-inside space-y-1">
-                                                {Object.entries(errors).map(([field, error]) => (
-                                                    <li key={field}>
-                                                        <strong>{field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}:</strong> {error}
-                                                    </li>
-                                                ))}
+                                                {Object.entries(errors).map(
+                                                    ([field, error]) => (
+                                                        <li key={field}>
+                                                            <strong>
+                                                                {field
+                                                                    .replace(
+                                                                        "_",
+                                                                        " "
+                                                                    )
+                                                                    .replace(
+                                                                        /\b\w/g,
+                                                                        (l) =>
+                                                                            l.toUpperCase()
+                                                                    )}
+                                                                :
+                                                            </strong>{" "}
+                                                            {error}
+                                                        </li>
+                                                    )
+                                                )}
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         )}
-                        
+
                         {/* Progress Indicator */}
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
                             <div className="flex items-center justify-between mb-2">

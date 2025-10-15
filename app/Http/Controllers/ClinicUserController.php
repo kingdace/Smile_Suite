@@ -333,9 +333,6 @@ class ClinicUserController extends Controller
         }
 
         $validated = $request->validate($validationRules);
-        
-        // Debug: Log all validated data to see what's being sent
-        \Log::info('Profile update - All validated data: ', $validated);
 
         // Handle password change
         if (!empty($validated['new_password'])) {
@@ -351,8 +348,6 @@ class ClinicUserController extends Controller
                 // Determine which disk to use based on environment
                 $disk = config('app.env') === 'production' ? 's3' : 'public';
                 
-                \Log::info('Avatar upload - Environment: ' . config('app.env'));
-                \Log::info('Avatar upload - Using disk: ' . $disk);
                 
                 // Delete old avatar if exists
                 if ($user->avatar_url) {
@@ -363,19 +358,14 @@ class ClinicUserController extends Controller
                             $s3BaseUrl = config('filesystems.disks.s3.url');
                             if (strpos($user->avatar_url, $s3BaseUrl) === 0) {
                                 $oldKey = str_replace($s3BaseUrl . '/', '', $user->avatar_url);
-                                \Log::info('Avatar upload - Old S3 key: ' . $oldKey);
                                 if (Storage::disk('s3')->exists($oldKey)) {
                                     Storage::disk('s3')->delete($oldKey);
-                                    \Log::info('Avatar upload - Old avatar deleted from S3');
                                 }
-                            } else {
-                                \Log::info('Avatar upload - Old avatar URL does not match S3 base URL, skipping deletion');
                             }
                         } else {
                             // For local storage
                             if (Storage::disk('public')->exists($user->avatar_url)) {
                                 Storage::disk('public')->delete($user->avatar_url);
-                                \Log::info('Avatar upload - Old avatar deleted from local storage');
                             }
                         }
                     } catch (\Exception $e) {
@@ -386,17 +376,14 @@ class ClinicUserController extends Controller
                 
                 // Store new avatar
                 $avatarPath = $request->file('avatar')->store('user-avatars', $disk);
-                \Log::info('Avatar upload - New avatar stored at: ' . $avatarPath);
                 
                 // Get the full URL for the stored file
                 if ($disk === 's3') {
                     // For S3, construct the full URL manually
                     $s3Url = config('filesystems.disks.s3.url');
                     $avatarUrl = $s3Url . '/' . $avatarPath;
-                    \Log::info('Avatar upload - S3 URL generated: ' . $avatarUrl);
                 } else {
                     $avatarUrl = $avatarPath;
-                    \Log::info('Avatar upload - Local path: ' . $avatarUrl);
                 }
             } catch (\Exception $e) {
                 \Log::error('Avatar upload error: ' . $e->getMessage());
@@ -462,21 +449,11 @@ class ClinicUserController extends Controller
             }
         }
 
-        \Log::info('Profile update - Final avatar URL to save: ' . $avatarUrl);
-        \Log::info('Profile update - User data to update: ', $userData);
-        
         try {
             $user->update($userData);
-            
-            \Log::info('Profile update - User updated successfully');
-            \Log::info('Profile update - User avatar_url after update: ' . $user->fresh()->avatar_url);
-            
             return redirect()->route('clinic.profile')->with('success', 'Profile updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Profile update error: ' . $e->getMessage());
-            \Log::error('Profile update error trace: ' . $e->getTraceAsString());
-            \Log::error('Profile update - User data that failed: ', $userData);
-            
             return back()->withErrors(['general' => 'Failed to update profile: ' . $e->getMessage()]);
         }
     }
