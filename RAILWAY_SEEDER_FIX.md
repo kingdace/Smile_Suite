@@ -5,13 +5,28 @@
 The `ClinicSeeder2025` wasn't running on Railway because:
 
 1. **❌ Manual MySQL Dump**: You're using manual database import instead of migrations
-2. **❌ No Seeder Commands**: Railway `nixpacks.toml` and `start.sh` didn't include seeder commands
-3. **❌ Safety Concerns**: Running seeders on existing data could cause duplicates
-4. **❌ Railway-Specific**: Railway deployment process differs from standard Laravel deployment
+2. **❌ Wrong Start Command**: Railway was using `railway.json` startCommand instead of `start.sh`
+3. **❌ No Seeder Commands**: The startCommand didn't include seeder logic
+4. **❌ Safety Concerns**: Running seeders on existing data could cause duplicates
+5. **❌ Railway-Specific**: Railway deployment process differs from standard Laravel deployment
 
 ## ✅ **SOLUTIONS IMPLEMENTED**
 
-### 1. **Updated Railway Start Script (`start.sh`)**
+### 1. **Fixed Railway Configuration (`railway.json`)**
+
+**Problem**: Railway was using the `startCommand` in `railway.json` instead of `start.sh`
+
+**Solution**: Updated `railway.json` to use our seeder-enabled `start.sh`:
+
+```json
+{
+    "deploy": {
+        "startCommand": "./start.sh"
+    }
+}
+```
+
+### 2. **Updated Railway Start Script (`start.sh`)**
 
 **Smart Seeder Detection**:
 
@@ -35,7 +50,7 @@ fi
 -   ✅ **Automatic Detection**: Checks clinic count before running
 -   ✅ **Railway Compatible**: Works with Railway's startup process
 
-### 2. **Created Railway-Specific Seeder Command**
+### 3. **Created Railway-Specific Seeder Command**
 
 **File**: `database/seeders/RailwaySeederCommand.php`
 
@@ -48,7 +63,7 @@ fi
 -   ✅ **Error Handling**: Graceful failure with helpful messages
 -   ✅ **Progress Feedback**: Shows clinic counts before/after
 
-### 3. **Updated Railway Documentation**
+### 4. **Updated Railway Documentation**
 
 **Files Updated**:
 
