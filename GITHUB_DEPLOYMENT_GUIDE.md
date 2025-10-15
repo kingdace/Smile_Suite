@@ -28,6 +28,7 @@
     ```
 
 2. **Create .env.example for production**
+
     ```bash
     cp .env.production .env.example
     ```
@@ -41,6 +42,7 @@
     - Navigate to `public_html` folder
 
 2. **Download from GitHub**
+
     - Go to your GitHub repository
     - Click **Code** → **Download ZIP**
     - Upload the ZIP file to `public_html`
@@ -64,6 +66,7 @@
         ```
 
 2. **Set up Database**
+
     - In cPanel, go to **MySQL Databases**
     - Create database: `smile_suite_prod`
     - Create user and assign to database
@@ -91,11 +94,11 @@
     # Generate app key
     php artisan key:generate --force
 
-    # Run migrations
-    php artisan migrate --force
+     # Run migrations
+     php artisan migrate --force
 
-    # Seed database
-    php artisan db:seed --force
+     # Run seeders (includes ClinicSeeder2025)
+     php artisan db:seed --force
 
     # Clear and cache
     php artisan config:cache
@@ -116,6 +119,7 @@
     - Add your GitHub SSH key to authorized_keys
 
 2. **Clone Repository**
+
     ```bash
     cd ~/public_html
     git clone https://github.com/YOUR_USERNAME/smile-suite.git .
@@ -136,7 +140,7 @@ npm install --production
 npm run build
 php artisan key:generate --force
 php artisan migrate --force
-php artisan db:seed --force
+php artisan db:seed --force  # This will run ClinicSeeder2025
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
@@ -236,4 +240,4 @@ If you encounter issues:
 3. Ensure all dependencies are installed
 4. Check file permissions
 
-Your Smile Suite is production-ready! 🎉
+-   Your Smile Suite is production-ready! 🎉

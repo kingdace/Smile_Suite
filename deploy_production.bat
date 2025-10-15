@@ -38,11 +38,15 @@ REM Step 7: Run database migrations
 echo 🗄️ Running database migrations...
 php artisan migrate --force
 
-REM Step 8: Create storage symlink
+REM Step 8: Run database seeders
+echo 🌱 Running database seeders...
+php artisan db:seed --force
+
+REM Step 9: Create storage symlink
 echo 🔗 Creating storage symlink...
 php artisan storage:link
 
-REM Step 9: Test email configuration
+REM Step 10: Test email configuration
 echo 📧 Testing email configuration...
 php artisan email:test kite.gales10@gmail.com
 

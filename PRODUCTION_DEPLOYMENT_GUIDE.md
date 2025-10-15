@@ -92,6 +92,9 @@ php artisan view:cache
 # Run migrations
 php artisan migrate --force
 
+# Run seeders
+php artisan db:seed --force
+
 # Create storage link
 php artisan storage:link
 

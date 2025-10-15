@@ -41,16 +41,20 @@ php artisan view:cache
 echo "🗄️ Running database migrations..."
 php artisan migrate --force
 
-# Step 8: Create storage symlink
+# Step 8: Run database seeders
+echo "🌱 Running database seeders..."
+php artisan db:seed --force
+
+# Step 9: Create storage symlink
 echo "🔗 Creating storage symlink..."
 php artisan storage:link
 
-# Step 9: Set proper permissions
+# Step 10: Set proper permissions
 echo "🔐 Setting proper permissions..."
 chmod -R 755 storage
 chmod -R 755 bootstrap/cache
 
-# Step 10: Test email configuration
+# Step 11: Test email configuration
 echo "📧 Testing email configuration..."
 php artisan email:test kite.gales10@gmail.com
 
