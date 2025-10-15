@@ -63,9 +63,15 @@ export default function Edit({ auth, user }) {
         new: false,
         confirm: false,
     });
-    const [avatarPreview, setAvatarPreview] = useState(
-        user.avatar_url ? ImageHelper.getImageUrl(user.avatar_url) : null
-    );
+    const [avatarPreview, setAvatarPreview] = useState(() => {
+        if (user.avatar_url) {
+            console.log("Avatar URL from user:", user.avatar_url);
+            const imageUrl = ImageHelper.getImageUrl(user.avatar_url);
+            console.log("ImageHelper result:", imageUrl);
+            return imageUrl;
+        }
+        return null;
+    });
     const fileInputRef = useRef(null);
 
     const addSpecialty = () => {

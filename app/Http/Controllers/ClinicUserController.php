@@ -381,8 +381,10 @@ class ClinicUserController extends Controller
                 if ($disk === 's3') {
                     // For S3, use Laravel's built-in URL generation
                     $avatarUrl = Storage::disk('s3')->url($avatarPath);
+                    \Log::info('Avatar upload - S3 URL generated: ' . $avatarUrl);
                 } else {
                     $avatarUrl = $avatarPath;
+                    \Log::info('Avatar upload - Local path: ' . $avatarUrl);
                 }
             } catch (\Exception $e) {
                 \Log::error('Avatar upload error: ' . $e->getMessage());

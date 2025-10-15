@@ -1,0 +1,1 @@
+import{r as a}from"./app-C344CKnt.js";import{b as t,c as o}from"./ExportButton-DXS2spW4.js";var i=["axis"],s=a.forwardRef((r,e)=>a.createElement(t,{chartName:"LineChart",defaultTooltipEventType:"axis",validateTooltipEventTypes:i,tooltipPayloadSearcher:o,categoricalChartProps:r,ref:e}));export{s as L};

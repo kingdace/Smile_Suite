@@ -84,9 +84,21 @@ export default function Show({ auth, user, success }) {
                                         <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
                                             {user.avatar_url ? (
                                                 <img
-                                                    src={ImageHelper.getImageUrl(
-                                                        user.avatar_url
-                                                    )}
+                                                    src={(() => {
+                                                        console.log(
+                                                            "Profile Show - Avatar URL:",
+                                                            user.avatar_url
+                                                        );
+                                                        const imageUrl =
+                                                            ImageHelper.getImageUrl(
+                                                                user.avatar_url
+                                                            );
+                                                        console.log(
+                                                            "Profile Show - ImageHelper result:",
+                                                            imageUrl
+                                                        );
+                                                        return imageUrl;
+                                                    })()}
                                                     alt="Profile"
                                                     className="w-full h-full object-cover"
                                                 />
