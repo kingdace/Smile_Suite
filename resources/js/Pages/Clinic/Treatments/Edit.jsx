@@ -50,7 +50,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import FileUpload from "@/Components/FileUpload";
-import DentalChart from "@/Components/DentalChart";
+import DentalChartModal from "@/Components/DentalChartModal";
 import TreatmentTemplates from "@/Components/TreatmentTemplates";
 
 export default function Edit({
@@ -62,7 +62,7 @@ export default function Edit({
     appointments = [],
 }) {
     const [showTemplates, setShowTemplates] = useState(false);
-    const [showDentalChart, setShowDentalChart] = useState(false);
+    const [showDentalChartModal, setShowDentalChartModal] = useState(false);
 
     // Show loading state if treatment data is not available
     if (!treatment) {
@@ -230,6 +230,13 @@ export default function Edit({
         { value: "partial", label: "Partial" },
         { value: "completed", label: "Completed" },
     ];
+
+    const handleDentalChartSave = (teeth) => {
+        // Convert numbers to strings to match the form's expected format
+        const teethAsStrings = teeth.map((tooth) => String(tooth));
+        setData("tooth_numbers", teethAsStrings);
+        setShowDentalChartModal(false);
+    };
 
     const treatmentPhases = [
         { value: "initial", label: "Initial" },
@@ -1037,10 +1044,142 @@ export default function Edit({
 
                                 {/* Teeth Involved */}
                                 <div className="space-y-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                        <Circle className="h-5 w-5 text-blue-600" />
-                                        Teeth Involved
-                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                            <Circle className="h-5 w-5 text-blue-600" />
+                                            Teeth Involved
+                                        </h3>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setShowDentalChartModal(true)
+                                            }
+                                            className="bg-white hover:bg-blue-50 text-sm px-3 py-1"
+                                        >
+                                            <svg
+                                                className="w-4 h-4 mr-2"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                                />
+                                            </svg>
+                                            Select from Chart
+                                        </Button>
+                                    </div>
+
+                                    {/* Selected Teeth Display - Always Visible */}
+                                    {data.tooth_numbers &&
+                                        data.tooth_numbers.length > 0 && (
+                                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-semibold text-blue-800">
+                                                            Selected Teeth
+                                                        </span>
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="text-xs px-2 py-1 bg-blue-100 text-blue-700"
+                                                        >
+                                                            {
+                                                                data
+                                                                    .tooth_numbers
+                                                                    .length
+                                                            }
+                                                        </Badge>
+                                                    </div>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setData(
+                                                                "tooth_numbers",
+                                                                []
+                                                            );
+                                                        }}
+                                                        className="h-7 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-100"
+                                                    >
+                                                        Clear All
+                                                    </Button>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {data.tooth_numbers.map(
+                                                        (tooth, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="group flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 rounded-xl border-2 border-blue-200 shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200"
+                                                            >
+                                                                {/* Mini Tooth Display */}
+                                                                <div className="flex items-center justify-center w-8 h-8 bg-white rounded-lg border border-blue-200 shadow-sm">
+                                                                    <svg
+                                                                        width="20"
+                                                                        height="22"
+                                                                        viewBox="0 0 40 36"
+                                                                        fill="none"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                    >
+                                                                        <path
+                                                                            d="M20 2C11 2 6 6 6 12C6 18 6 22 8 27C10 32 14 34 20 34C26 34 30 32 32 27C34 22 34 18 34 12C34 6 29 2 20 2Z M14 8C14 7 16 6 20 6C24 6 26 7 26 8"
+                                                                            className="fill-blue-500 stroke-blue-600"
+                                                                            strokeWidth="1"
+                                                                        />
+                                                                        <line
+                                                                            x1="20"
+                                                                            y1="20"
+                                                                            x2="20"
+                                                                            y2="32"
+                                                                            className="stroke-white/30"
+                                                                            strokeWidth="0.5"
+                                                                        />
+                                                                    </svg>
+                                                                </div>
+
+                                                                {/* Tooth Number */}
+                                                                <span className="text-sm font-bold text-blue-800">
+                                                                    {tooth}
+                                                                </span>
+
+                                                                {/* Remove Button */}
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => {
+                                                                        const newToothNumbers =
+                                                                            (
+                                                                                data.tooth_numbers ||
+                                                                                []
+                                                                            ).filter(
+                                                                                (
+                                                                                    _,
+                                                                                    i
+                                                                                ) =>
+                                                                                    i !==
+                                                                                    index
+                                                                            );
+                                                                        setData(
+                                                                            "tooth_numbers",
+                                                                            newToothNumbers
+                                                                        );
+                                                                    }}
+                                                                    className="h-5 w-5 p-0 hover:bg-red-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                                                >
+                                                                    <X className="h-3 w-3 text-red-500" />
+                                                                </Button>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
 
                                     <div className="space-y-3">
                                         {(data.tooth_numbers || []).map(
@@ -1547,6 +1686,19 @@ export default function Edit({
                     </Card>
                 </div>
             </div>
+
+            {/* Dental Chart Modal */}
+            <DentalChartModal
+                isOpen={showDentalChartModal}
+                onClose={() => setShowDentalChartModal(false)}
+                selectedTeeth={(data.tooth_numbers || []).map((tooth) =>
+                    Number(tooth)
+                )}
+                onSave={handleDentalChartSave}
+                title="Select Teeth for Treatment"
+                description="Choose the teeth involved in this treatment"
+                readOnly={false}
+            />
         </AuthenticatedLayout>
     );
 }

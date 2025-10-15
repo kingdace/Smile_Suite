@@ -675,4 +675,9 @@ Route::get('/view-logs-temp', function () {
         ->header('Content-Type', 'text/html');
 })->middleware('web');
 
+// Test route for improved dental chart
+Route::get('/dentchart', [\App\Http\Controllers\Test\ImprovedDentalChartController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('test.improved-dental-chart');
+
 require __DIR__.'/auth.php';

@@ -697,7 +697,11 @@ const Header = ({
 
                             <Dropdown.Content>
                                 <Dropdown.Link
-                                    href={route("profile.edit")}
+                                    href={route(
+                                        auth?.user?.role === "patient"
+                                            ? "patient.profile.edit"
+                                            : "clinic.profile.edit"
+                                    )}
                                     className="flex items-center"
                                 >
                                     <User className="w-4 h-4 mr-2" />

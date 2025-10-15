@@ -47,8 +47,11 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { format } from "date-fns";
 import ImageGallery from "@/Components/ImageGallery";
+import DentalChartModal from "@/Components/DentalChartModal";
 
 export default function Show({ auth, treatment }) {
+    const [showDentalChartModal, setShowDentalChartModal] = useState(false);
+
     useEffect(() => {
         // Treatment data loaded
     }, [treatment]);
@@ -1113,12 +1116,49 @@ export default function Show({ auth, treatment }) {
                                 {treatment.tooth_numbers &&
                                     treatment.tooth_numbers.length > 0 && (
                                         <div>
-                                            <p className="text-sm font-medium text-gray-600 mb-4 flex items-center gap-2">
-                                                <Circle className="h-4 w-4" />
-                                                Teeth Involved (
-                                                {treatment.tooth_numbers.length}
-                                                )
-                                            </p>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <p className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                                                    <Circle className="h-4 w-4" />
+                                                    Teeth Involved (
+                                                    {
+                                                        treatment.tooth_numbers
+                                                            .length
+                                                    }
+                                                    )
+                                                </p>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        setShowDentalChartModal(
+                                                            true
+                                                        )
+                                                    }
+                                                    className="bg-white hover:bg-blue-50 text-sm px-3 py-1"
+                                                >
+                                                    <svg
+                                                        className="w-4 h-4 mr-2"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                        />
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                        />
+                                                    </svg>
+                                                    View Chart
+                                                </Button>
+                                            </div>
 
                                             {/* Visual Dental Chart */}
                                             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-4">
@@ -1239,8 +1279,34 @@ export default function Show({ auth, treatment }) {
                                                             return (
                                                                 <div
                                                                     key={index}
-                                                                    className={`p-2 rounded-lg border text-xs font-semibold text-center ${quadrantColors[quadrant]}`}
+                                                                    className={`p-3 rounded-xl border-2 text-xs font-semibold text-center shadow-sm hover:shadow-md transition-shadow ${quadrantColors[quadrant]}`}
                                                                 >
+                                                                    {/* Mini Tooth Display */}
+                                                                    <div className="flex items-center justify-center w-10 h-10 mx-auto mb-2 bg-white/80 rounded-lg border border-white/50 shadow-sm">
+                                                                        <svg
+                                                                            width="24"
+                                                                            height="26"
+                                                                            viewBox="0 0 40 36"
+                                                                            fill="none"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                        >
+                                                                            <path
+                                                                                d="M20 2C11 2 6 6 6 12C6 18 6 22 8 27C10 32 14 34 20 34C26 34 30 32 32 27C34 22 34 18 34 12C34 6 29 2 20 2Z M14 8C14 7 16 6 20 6C24 6 26 7 26 8"
+                                                                                className="fill-current"
+                                                                                stroke="currentColor"
+                                                                                strokeWidth="1"
+                                                                            />
+                                                                            <line
+                                                                                x1="20"
+                                                                                y1="20"
+                                                                                x2="20"
+                                                                                y2="32"
+                                                                                className="stroke-current/30"
+                                                                                strokeWidth="0.5"
+                                                                            />
+                                                                        </svg>
+                                                                    </div>
+
                                                                     <div className="font-bold text-sm">
                                                                         {tooth}
                                                                     </div>
@@ -2033,6 +2099,19 @@ export default function Show({ auth, treatment }) {
                     </div>
                 </div>
             </div>
+
+            {/* Dental Chart Modal - Read Only */}
+            <DentalChartModal
+                isOpen={showDentalChartModal}
+                onClose={() => setShowDentalChartModal(false)}
+                selectedTeeth={(treatment.tooth_numbers || []).map((tooth) =>
+                    Number(tooth)
+                )}
+                onSave={() => {}} // No-op for read-only
+                title="Treatment Dental Chart"
+                description="View the teeth involved in this treatment"
+                readOnly={true}
+            />
         </AuthenticatedLayout>
     );
 }
