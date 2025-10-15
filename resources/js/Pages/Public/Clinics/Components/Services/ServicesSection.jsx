@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Stethoscope,
     DollarSign,
@@ -6,9 +6,23 @@ import {
     Star,
     Clock,
     Award,
+    ChevronDown,
+    ChevronUp,
 } from "lucide-react";
 
 export default function ServicesSection({ clinic, onBookAppointment }) {
+    const [expandedServices, setExpandedServices] = useState(new Set());
+
+    const toggleServiceExpansion = (serviceIndex) => {
+        const newExpanded = new Set(expandedServices);
+        if (newExpanded.has(serviceIndex)) {
+            newExpanded.delete(serviceIndex);
+        } else {
+            newExpanded.add(serviceIndex);
+        }
+        setExpandedServices(newExpanded);
+    };
+
     const getServiceIcon = (serviceName) => {
         const name = serviceName.toLowerCase();
         if (name.includes("cleaning") || name.includes("hygiene")) return "🦷";
@@ -115,15 +129,17 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                             key={index}
                             className="bg-white rounded-lg sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group flex flex-col h-full"
                         >
-                            {/* Service Header */}
-                            <div className="p-2.5 sm:p-4 pb-2 sm:pb-3 flex-shrink-0">
-                                <div className="flex items-center justify-between mb-2 sm:mb-3">
-                                    {/* Service Icon */}
+                            {/* Service Header - Centered */}
+                            <div className="p-2.5 sm:p-4 pb-2 sm:pb-3 flex-shrink-0 text-center">
+                                {/* Service Icon - Centered */}
+                                <div className="flex justify-center mb-2 sm:mb-3">
                                     <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg sm:rounded-xl flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
                                         {getServiceIcon(service.name)}
                                     </div>
+                                </div>
 
-                                    {/* Category Badge */}
+                                {/* Category Badge - Centered */}
+                                <div className="flex justify-center mb-2 sm:mb-3">
                                     <span
                                         className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-semibold border ${categoryColor}`}
                                     >
@@ -131,26 +147,63 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                     </span>
                                 </div>
 
-                                {/* Service Name */}
+                                {/* Service Name - Centered */}
                                 <h3 className="text-sm sm:text-lg font-bold text-gray-900 mb-1.5 sm:mb-2 group-hover:text-blue-600 transition-colors duration-300">
                                     {service.name}
                                 </h3>
 
-                                {/* Service Description - Always reserve space */}
+                                {/* Service Description - Centered with See More */}
                                 <div className="min-h-[2.5rem] sm:min-h-[3rem] mb-1.5 sm:mb-3">
                                     {service.description ? (
-                                        <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2">
-                                            {service.description}
-                                        </p>
+                                        <div className="text-center">
+                                            <p
+                                                className={`text-gray-600 text-xs sm:text-sm leading-relaxed ${
+                                                    expandedServices.has(index)
+                                                        ? ""
+                                                        : "line-clamp-2"
+                                                }`}
+                                            >
+                                                {service.description}
+                                            </p>
+                                            {service.description.length >
+                                                100 && (
+                                                <button
+                                                    onClick={() =>
+                                                        toggleServiceExpansion(
+                                                            index
+                                                        )
+                                                    }
+                                                    className="mt-1 text-blue-600 hover:text-blue-700 text-xs font-medium flex items-center gap-1 mx-auto"
+                                                >
+                                                    {expandedServices.has(
+                                                        index
+                                                    ) ? (
+                                                        <>
+                                                            <span>
+                                                                See less
+                                                            </span>
+                                                            <ChevronUp className="w-3 h-3" />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span>
+                                                                See more
+                                                            </span>
+                                                            <ChevronDown className="w-3 h-3" />
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
                                     ) : (
-                                        <p className="text-gray-400 text-xs sm:text-sm leading-relaxed line-clamp-2">
+                                        <p className="text-gray-400 text-xs sm:text-sm leading-relaxed line-clamp-2 text-center">
                                             Professional dental service
                                         </p>
                                     )}
                                 </div>
 
-                                {/* Service Meta */}
-                                <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500 mb-1.5 sm:mb-3">
+                                {/* Service Meta - Centered */}
+                                <div className="flex items-center justify-center gap-2 sm:gap-4 text-xs text-gray-500 mb-1.5 sm:mb-3">
                                     {service.duration && (
                                         <div className="flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
@@ -167,12 +220,12 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                 </div>
                             </div>
 
-                            {/* Service Footer - Always at bottom */}
-                            <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 mt-auto">
-                                {/* Price Section - Always reserve space */}
-                                <div className="mb-1.5 sm:mb-3 min-h-[2rem] sm:min-h-[2.5rem] flex items-end justify-end">
+                            {/* Service Footer - Centered */}
+                            <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 mt-auto text-center">
+                                {/* Price Section - Centered */}
+                                <div className="mb-1.5 sm:mb-3 min-h-[2rem] sm:min-h-[2.5rem] flex items-end justify-center">
                                     {service.price ? (
-                                        <div className="text-right">
+                                        <div className="text-center">
                                             <div className="text-base sm:text-xl font-bold text-gray-900">
                                                 ₱
                                                 {service.price.toLocaleString()}
@@ -187,7 +240,7 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                                 )}
                                         </div>
                                     ) : (
-                                        <div className="text-right">
+                                        <div className="text-center">
                                             <div className="text-base sm:text-xl font-bold text-gray-400">
                                                 Contact for pricing
                                             </div>
@@ -195,10 +248,10 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                     )}
                                 </div>
 
-                                {/* Special Offers */}
+                                {/* Special Offers - Centered */}
                                 {service.special_offer && (
                                     <div className="mb-2 sm:mb-3 pt-2 sm:pt-3 border-t border-gray-200">
-                                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                                        <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
                                             <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-600" />
                                             <span className="text-yellow-700 font-medium">
                                                 {service.special_offer}

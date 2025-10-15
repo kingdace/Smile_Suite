@@ -583,13 +583,6 @@ export default function Index({
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            {service.description && (
-                                                                <div className="text-xs text-gray-500 line-clamp-1">
-                                                                    {
-                                                                        service.description
-                                                                    }
-                                                                </div>
-                                                            )}
                                                         </div>
                                                     </div>
                                                 </td>
