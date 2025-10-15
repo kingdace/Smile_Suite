@@ -98,116 +98,125 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                 {clinic.staff
                     .sort((a, b) => {
                         // Sort dentists first, then staff
-                        const aIsDentist = a.role?.toLowerCase().includes('dentist') || a.role?.toLowerCase().includes('doctor');
-                        const bIsDentist = b.role?.toLowerCase().includes('dentist') || b.role?.toLowerCase().includes('doctor');
-                        
+                        const aIsDentist =
+                            a.role?.toLowerCase().includes("dentist") ||
+                            a.role?.toLowerCase().includes("doctor");
+                        const bIsDentist =
+                            b.role?.toLowerCase().includes("dentist") ||
+                            b.role?.toLowerCase().includes("doctor");
+
                         if (aIsDentist && !bIsDentist) return -1; // a (dentist) comes first
-                        if (!aIsDentist && bIsDentist) return 1;  // b (dentist) comes first
+                        if (!aIsDentist && bIsDentist) return 1; // b (dentist) comes first
                         return 0; // same type, maintain original order
                     })
                     .map((member, index) => (
-                    <div
-                        key={index}
-                        className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col min-h-[280px] sm:min-h-[320px] w-full"
-                    >
-                        {/* Header with Avatar and Role - Mobile Compact */}
-                        <div className="relative p-3 sm:p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-cyan-50">
-                            <div className="flex flex-col items-center text-center">
-                                {/* Avatar - Mobile Responsive Size */}
-                                <div className="mb-3 sm:mb-4 lg:mb-6">
-                                    {member.avatar_url ? (
-                                        <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden border-2 sm:border-4 border-white shadow-lg sm:shadow-xl group-hover:shadow-xl sm:group-hover:shadow-2xl group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-300">
-                                            <img
-                                                src={ImageHelper.getImageUrl(
-                                                    member.avatar_url
-                                                )}
-                                                alt={member.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br ${getRoleColor(
+                        <div
+                            key={index}
+                            className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col min-h-[280px] sm:min-h-[320px] w-full"
+                        >
+                            {/* Header with Avatar and Role - Mobile Compact */}
+                            <div className="relative p-3 sm:p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-cyan-50">
+                                <div className="flex flex-col items-center text-center">
+                                    {/* Avatar - Mobile Responsive Size */}
+                                    <div className="mb-3 sm:mb-4 lg:mb-6">
+                                        {member.avatar_url ? (
+                                            <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden border-2 sm:border-4 border-white shadow-lg sm:shadow-xl group-hover:shadow-xl sm:group-hover:shadow-2xl group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-300">
+                                                <img
+                                                    src={ImageHelper.getImageUrl(
+                                                        member.avatar_url
+                                                    )}
+                                                    alt={member.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br ${getRoleColor(
+                                                    member.role
+                                                )} flex items-center justify-center text-xl sm:text-2xl lg:text-3xl text-white font-bold shadow-lg sm:shadow-xl group-hover:shadow-xl sm:group-hover:shadow-2xl group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-300`}
+                                            >
+                                                {getInitials(member.name)}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Name and Role - Mobile Optimized */}
+                                    <div className="w-full">
+                                        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
+                                            {getDentistDisplayName(member)}
+                                        </h3>
+                                        <span
+                                            className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border ${getRoleBadgeColor(
                                                 member.role
-                                            )} flex items-center justify-center text-xl sm:text-2xl lg:text-3xl text-white font-bold shadow-lg sm:shadow-xl group-hover:shadow-xl sm:group-hover:shadow-2xl group-hover:scale-105 sm:group-hover:scale-110 transition-all duration-300`}
+                                            )}`}
                                         >
-                                            {getInitials(member.name)}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Name and Role - Mobile Optimized */}
-                                <div className="w-full">
-                                    <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2">
-                                        {getDentistDisplayName(member)}
-                                    </h3>
-                                    <span
-                                        className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border ${getRoleBadgeColor(
-                                            member.role
-                                        )}`}
-                                    >
-                                        <span className="mr-1 sm:mr-2 text-xs sm:text-sm">
-                                            {getRoleIcon(member.role)}
+                                            <span className="mr-1 sm:mr-2 text-xs sm:text-sm">
+                                                {getRoleIcon(member.role)}
+                                            </span>
+                                            <span className="truncate">
+                                                {member.role
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    member.role.slice(1)}
+                                            </span>
                                         </span>
-                                        <span className="truncate">
-                                            {member.role.charAt(0).toUpperCase() +
-                                                member.role.slice(1)}
-                                        </span>
-                                    </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Contact Information - Mobile Compact */}
-                        <div className="flex-1 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 space-y-2 sm:space-y-3 flex flex-col items-center">
-                            {member.email && (
-                                <div className="flex items-center gap-2 sm:gap-3 text-gray-600 hover:text-blue-600 transition-colors duration-300 w-full justify-center">
-                                    <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
-                                    <a
-                                        href={`mailto:${member.email}`}
-                                        className="text-xs sm:text-sm hover:underline truncate max-w-[200px] sm:max-w-none"
-                                        title={member.email}
-                                    >
-                                        {member.email}
-                                    </a>
-                                </div>
-                            )}
+                            {/* Contact Information - Mobile Compact */}
+                            <div className="flex-1 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 space-y-2 sm:space-y-3 flex flex-col items-center">
+                                {member.email && (
+                                    <div className="flex items-center gap-2 sm:gap-3 text-gray-600 hover:text-blue-600 transition-colors duration-300 w-full justify-center">
+                                        <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" />
+                                        <a
+                                            href={`mailto:${member.email}`}
+                                            className="text-xs sm:text-sm hover:underline truncate max-w-[200px] sm:max-w-none"
+                                            title={member.email}
+                                        >
+                                            {member.email}
+                                        </a>
+                                    </div>
+                                )}
 
-                            {member.phone && (
-                                <div className="flex items-center gap-2 sm:gap-3 text-gray-600 hover:text-green-600 transition-colors duration-300 w-full justify-center">
-                                    <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
-                                    <a
-                                        href={`tel:${member.phone}`}
-                                        className="text-xs sm:text-sm hover:underline"
-                                    >
-                                        {member.phone}
-                                    </a>
-                                </div>
-                            )}
+                                {member.phone && (
+                                    <div className="flex items-center gap-2 sm:gap-3 text-gray-600 hover:text-green-600 transition-colors duration-300 w-full justify-center">
+                                        <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                        <a
+                                            href={`tel:${member.phone}`}
+                                            className="text-xs sm:text-sm hover:underline"
+                                        >
+                                            {member.phone}
+                                        </a>
+                                    </div>
+                                )}
 
-                            {member.location && (
-                                <div className="flex items-center gap-2 sm:gap-3 text-gray-600 w-full justify-center">
-                                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />
-                                    <span className="text-xs sm:text-sm truncate max-w-[200px] sm:max-w-none" title={member.location}>
-                                        {member.location}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Experience (if available) - Mobile Compact */}
-                        {member.experience && (
-                            <div className="px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 lg:pb-6">
-                                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 justify-center">
-                                    <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
-                                    <span className="font-medium">
-                                        {member.experience} years experience
-                                    </span>
-                                </div>
+                                {member.location && (
+                                    <div className="flex items-center gap-2 sm:gap-3 text-gray-600 w-full justify-center">
+                                        <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />
+                                        <span
+                                            className="text-xs sm:text-sm truncate max-w-[200px] sm:max-w-none"
+                                            title={member.location}
+                                        >
+                                            {member.location}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                ))}
+
+                            {/* Experience (if available) - Mobile Compact */}
+                            {member.experience && (
+                                <div className="px-3 sm:px-4 lg:px-6 pb-3 sm:pb-4 lg:pb-6">
+                                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 justify-center">
+                                        <Award className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+                                        <span className="font-medium">
+                                            {member.experience} years experience
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
             </div>
 
             {/* Team Highlights - Mobile Optimized */}
