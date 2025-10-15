@@ -73,7 +73,7 @@ class ClinicSeeder2025 extends Seeder
                 'address' => '1st Floor, Centro Building, Borromeo Street, Surigao City, Surigao del Norte'
             ],
             [
-                'clinic_name' => 'SpringDent Dental Care',
+                'clinic_name' => 'Dent Dental Care',
                 'email' => 'smile@springdentcare.com',
                 'contact_number' => '+639345221567',
                 'license_number' => 'DENT-2025-008',

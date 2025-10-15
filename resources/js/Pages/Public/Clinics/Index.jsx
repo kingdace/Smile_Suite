@@ -520,14 +520,14 @@ export default function ClinicDirectory({ clinics }) {
                                         {/* Clinic Logo and Info */}
                                         <div className="flex items-center space-x-3 sm:space-x-4">
                                             <div className="relative">
-                                                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-0.5">
+                                                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden shadow-lg border-2 border-white">
                                                     <img
                                                         src={ImageHelper.getImageUrl(
                                                             clinic.logo_url,
                                                             "/images/clinic-logo.png"
                                                         )}
                                                         alt={clinic.name}
-                                                        className="w-full h-full rounded-lg sm:rounded-xl object-cover"
+                                                        className="w-full h-full object-cover"
                                                         onError={(e) => {
                                                             e.target.src =
                                                                 "/images/clinic-logo.png";

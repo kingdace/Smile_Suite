@@ -113,10 +113,10 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                     return (
                         <div
                             key={index}
-                            className="bg-white rounded-lg sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group"
+                            className="bg-white rounded-lg sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 overflow-hidden group flex flex-col h-full"
                         >
                             {/* Service Header */}
-                            <div className="p-2.5 sm:p-4 pb-2 sm:pb-3">
+                            <div className="p-2.5 sm:p-4 pb-2 sm:pb-3 flex-shrink-0">
                                 <div className="flex items-center justify-between mb-2 sm:mb-3">
                                     {/* Service Icon */}
                                     <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg sm:rounded-xl flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:shadow-md transition-all duration-300">
@@ -136,12 +136,18 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                     {service.name}
                                 </h3>
 
-                                {/* Service Description */}
-                                {service.description && (
-                                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-1.5 sm:mb-3 line-clamp-2">
-                                        {service.description}
-                                    </p>
-                                )}
+                                {/* Service Description - Always reserve space */}
+                                <div className="min-h-[2.5rem] sm:min-h-[3rem] mb-1.5 sm:mb-3">
+                                    {service.description ? (
+                                        <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2">
+                                            {service.description}
+                                        </p>
+                                    ) : (
+                                        <p className="text-gray-400 text-xs sm:text-sm leading-relaxed line-clamp-2">
+                                            Professional dental service
+                                        </p>
+                                    )}
+                                </div>
 
                                 {/* Service Meta */}
                                 <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500 mb-1.5 sm:mb-3">
@@ -161,41 +167,37 @@ export default function ServicesSection({ clinic, onBookAppointment }) {
                                 </div>
                             </div>
 
-                            {/* Service Footer */}
-                            <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4">
-                                {/* Price Section */}
-                                {service.price && (
-                                    <div className="mb-1.5 sm:mb-3">
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-right">
-                                                <div className="text-base sm:text-xl font-bold text-gray-900">
-                                                    ₱
-                                                    {service.price.toLocaleString()}
-                                                </div>
-                                                {service.original_price &&
-                                                    service.original_price >
-                                                        service.price && (
-                                                        <div className="text-xs sm:text-sm text-gray-500 line-through">
-                                                            ₱
-                                                            {service.original_price.toLocaleString()}
-                                                        </div>
-                                                    )}
+                            {/* Service Footer - Always at bottom */}
+                            <div className="px-2.5 sm:px-4 pb-2.5 sm:pb-4 mt-auto">
+                                {/* Price Section - Always reserve space */}
+                                <div className="mb-1.5 sm:mb-3 min-h-[2rem] sm:min-h-[2.5rem] flex items-end justify-end">
+                                    {service.price ? (
+                                        <div className="text-right">
+                                            <div className="text-base sm:text-xl font-bold text-gray-900">
+                                                ₱
+                                                {service.price.toLocaleString()}
+                                            </div>
+                                            {service.original_price &&
+                                                service.original_price >
+                                                    service.price && (
+                                                    <div className="text-xs sm:text-sm text-gray-500 line-through">
+                                                        ₱
+                                                        {service.original_price.toLocaleString()}
+                                                    </div>
+                                                )}
+                                        </div>
+                                    ) : (
+                                        <div className="text-right">
+                                            <div className="text-base sm:text-xl font-bold text-gray-400">
+                                                Contact for pricing
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-
-                                {/* Book Now Button */}
-                                <button
-                                    onClick={onBookAppointment}
-                                    className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg"
-                                >
-                                    Book Now
-                                </button>
+                                    )}
+                                </div>
 
                                 {/* Special Offers */}
                                 {service.special_offer && (
-                                    <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-200">
+                                    <div className="mb-2 sm:mb-3 pt-2 sm:pt-3 border-t border-gray-200">
                                         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
                                             <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-600" />
                                             <span className="text-yellow-700 font-medium">
