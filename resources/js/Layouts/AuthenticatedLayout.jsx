@@ -564,9 +564,13 @@ const Header = ({
                             {/* Enhanced User Menu */}
                             <div className="flex items-center gap-3">
                                 <div className="relative">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-blue-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/60 overflow-hidden">
-                                        {auth?.user?.avatar_url ||
-                                        auth?.avatar_url ? (
+                                    <div className="w-10 h-10 rounded-full overflow-hidden shadow-xl border border-white/60">
+                                        {(() => {
+                                            const avatarUrl = auth?.user?.avatar_url || auth?.avatar_url;
+                                            console.log('Avatar URL:', avatarUrl);
+                                            console.log('Auth object:', auth);
+                                            return avatarUrl;
+                                        })() ? (
                                             <img
                                                 src={ImageHelper.getImageUrl(
                                                     auth?.user?.avatar_url ||
@@ -575,9 +579,11 @@ const Header = ({
                                                 alt="User Avatar"
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    // Fallback to clinic logo if avatar fails to load
-                                                    e.target.src =
-                                                        "/images/clinic-logo.png";
+                                                    console.log('Avatar image failed to load, falling back to clinic logo');
+                                                    e.target.src = "/images/clinic-logo.png";
+                                                }}
+                                                onLoad={() => {
+                                                    console.log('Avatar image loaded successfully');
                                                 }}
                                             />
                                         ) : (
@@ -594,8 +600,8 @@ const Header = ({
                                                 }}
                                             />
                                         )}
-                                        <span
-                                            className="text-blue-700 text-sm font-bold absolute inset-0 flex items-center justify-center bg-gradient-to-br from-white/95 to-blue-100/95"
+                                        <div
+                                            className="absolute inset-0 bg-gradient-to-br from-white/95 to-blue-100/95 flex items-center justify-center"
                                             style={{
                                                 display:
                                                     auth?.user?.avatar_url ||
@@ -604,13 +610,18 @@ const Header = ({
                                                         : "flex",
                                             }}
                                         >
-                                            {(auth?.user?.name || auth?.name)
-                                                ?.charAt(0)
-                                                ?.toUpperCase() || "U"}
-                                        </span>
+                                            <span className="text-blue-700 text-sm font-bold">
+                                                {(
+                                                    auth?.user?.name ||
+                                                    auth?.name
+                                                )
+                                                    ?.charAt(0)
+                                                    ?.toUpperCase() || "U"}
+                                            </span>
+                                        </div>
                                     </div>
                                     {/* Enhanced glow effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-200/30 rounded-full animate-pulse"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-200/30 rounded-full animate-pulse pointer-events-none"></div>
                                 </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm font-bold text-white">
