@@ -508,13 +508,13 @@ const Header = ({
                                             <img
                                                 src={ImageHelper.getImageUrl(
                                                     auth.clinic.logo_url,
-                                                    "/images/clinic-logo1.png"
+                                                    "/images/clinic-logo2.png"
                                                 )}
                                                 alt={`${auth.clinic.name} Logo`}
                                                 className="w-9 h-9 object-contain"
                                                 onError={(e) => {
                                                     e.target.src =
-                                                        "/images/clinic-logo1.png";
+                                                        "/images/clinic-logo2.png";
                                                 }}
                                             />
                                         ) : (
@@ -602,7 +602,7 @@ const Header = ({
                                                         "Avatar image failed to load, falling back to clinic logo"
                                                     );
                                                     e.target.src =
-                                                        "/images/clinic-logo1.png";
+                                                        "/images/clinic-logo2.png";
                                                 }}
                                                 onLoad={() => {
                                                     console.log(
@@ -612,7 +612,7 @@ const Header = ({
                                             />
                                         ) : (
                                             <img
-                                                src="/images/clinic-logo1.png"
+                                                src="/images/clinic-logo2.png"
                                                 alt="Clinic Logo"
                                                 className="w-full h-full object-contain"
                                                 style={{

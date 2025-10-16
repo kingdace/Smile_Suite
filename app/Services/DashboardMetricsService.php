@@ -543,8 +543,8 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
      */
     private function getAppointmentChartData(Clinic $clinic, array $dateRange, string $timeRange = 'week'): array
     {
-        $query = Appointment::where('clinic_id', $clinic->id)
-            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+        // Get ALL appointments for this clinic
+        $query = Appointment::where('clinic_id', $clinic->id);
 
         // For year range, group by months for better visualization
         if ($timeRange === 'year') {
@@ -565,22 +565,57 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 ];
             })
             ->toArray();
+        } elseif ($timeRange === 'month') {
+            // For month range, group by days within the current month
+            $data = $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
+                ->select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('COUNT(*) as count')
+                )
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => Carbon::parse($item->date)->format('M j'),
+                        'y' => $item->count
+                    ];
+                })
+                ->toArray();
+        } elseif ($timeRange === 'week') {
+            // For week range, group by days within the current week
+            $data = $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
+                ->select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('COUNT(*) as count')
+                )
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => Carbon::parse($item->date)->format('M j'),
+                        'y' => $item->count
+                    ];
+                })
+                ->toArray();
         } else {
-            // For other ranges, group by days
-            $data = $query->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'x' => Carbon::parse($item->date)->format('M j'),
-                    'y' => $item->count
-                ];
-            })
-            ->toArray();
+            // For today and other ranges, group by days
+            $data = $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
+                ->select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('COUNT(*) as count')
+                )
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => Carbon::parse($item->date)->format('M j'),
+                        'y' => $item->count
+                    ];
+                })
+                ->toArray();
         }
 
         // If no data, return empty array with proper structure
@@ -602,8 +637,8 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
     private function getServiceDistributionData(Clinic $clinic, array $dateRange): array
     {
         try {
+            // Get ALL appointments for this clinic, not just within date range
             $appointments = Appointment::where('clinic_id', $clinic->id)
-                ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
                 ->whereNotNull('service_id')
                 ->with('service')
                 ->get();
@@ -655,9 +690,9 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
      */
     private function getRevenueChartData(Clinic $clinic, array $dateRange, string $timeRange = 'week'): array
     {
+        // Get ALL payments for this clinic, not just within the date range
         $query = Payment::where('clinic_id', $clinic->id)
-            ->where('status', 'completed')
-            ->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']]);
+            ->where('status', 'completed');
 
         // For year range, group by months for better visualization
         if ($timeRange === 'year') {
@@ -678,22 +713,57 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 ];
             })
             ->toArray();
+        } elseif ($timeRange === 'month') {
+            // For month range, group by days within the current month
+            $data = $query->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']])
+                ->select(
+                    DB::raw('DATE(payment_date) as date'),
+                    DB::raw('SUM(amount) as revenue')
+                )
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => Carbon::parse($item->date)->format('M j'),
+                        'y' => (float) $item->revenue
+                    ];
+                })
+                ->toArray();
+        } elseif ($timeRange === 'week') {
+            // For week range, group by days within the current week
+            $data = $query->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']])
+                ->select(
+                    DB::raw('DATE(payment_date) as date'),
+                    DB::raw('SUM(amount) as revenue')
+                )
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => Carbon::parse($item->date)->format('M j'),
+                        'y' => (float) $item->revenue
+                    ];
+                })
+                ->toArray();
         } else {
-            // For other ranges, group by days
-            $data = $query->select(
-                DB::raw('DATE(payment_date) as date'),
-                DB::raw('SUM(amount) as revenue')
-            )
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'x' => Carbon::parse($item->date)->format('M j'),
-                    'y' => (float) $item->revenue
-                ];
-            })
-            ->toArray();
+            // For today and other ranges, group by days
+            $data = $query->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']])
+                ->select(
+                    DB::raw('DATE(payment_date) as date'),
+                    DB::raw('SUM(amount) as revenue')
+                )
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'x' => Carbon::parse($item->date)->format('M j'),
+                        'y' => (float) $item->revenue
+                    ];
+                })
+                ->toArray();
         }
 
         // If no data, return empty array with proper structure

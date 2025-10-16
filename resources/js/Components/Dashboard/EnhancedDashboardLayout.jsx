@@ -348,7 +348,11 @@ const EnhancedDashboardLayout = ({
                                         }
                                         type="line"
                                         title="Revenue Trends"
-                                        subtitle={`Revenue over ${timeRange}`}
+                                        subtitle={`All completed payments ${
+                                            timeRange === "year"
+                                                ? "by month"
+                                                : "by day"
+                                        }`}
                                         height={280}
                                         compact={isCompact}
                                         className="mb-6"
@@ -376,7 +380,7 @@ const EnhancedDashboardLayout = ({
                                         }
                                         type="pie"
                                         title="Service Distribution"
-                                        subtitle="Popular services this month"
+                                        subtitle="All services used by patients"
                                         height={280}
                                         compact={isCompact}
                                     />
@@ -456,8 +460,12 @@ const EnhancedDashboardLayout = ({
                                                   ]
                                         }
                                         type="line"
-                                        title="Monthly Appointment Trends"
-                                        subtitle="Appointment volume over the year"
+                                        title="Appointment Trends"
+                                        subtitle={`All appointments ${
+                                            timeRange === "year"
+                                                ? "by month"
+                                                : "by day"
+                                        }`}
                                         height={280}
                                         compact={isCompact}
                                     />
