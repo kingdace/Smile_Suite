@@ -37,7 +37,7 @@ class TreatmentController extends Controller
         $clinicId = Auth::user()->clinic->id;
 
         $query = Treatment::where('clinic_id', $clinicId)
-                         ->with(['patient.user', 'dentist', 'service']);
+                         ->with(['patient.user', 'dentist', 'service', 'inventoryItems']);
 
         // Apply filters
         if ($request->filled('search')) {
@@ -89,6 +89,14 @@ class TreatmentController extends Controller
         }
 
         $treatments = $query->paginate(10)->withQueryString();
+
+        // Calculate total cost for each treatment (service cost + inventory cost)
+        $treatments->getCollection()->transform(function ($treatment) {
+            $serviceCost = $treatment->cost ?? 0;
+            $inventoryCost = $treatment->inventoryItems->sum('total_cost') ?? 0;
+            $treatment->total_cost = $serviceCost + $inventoryCost;
+            return $treatment;
+        });
 
         // Get clinic services for filtering
         $services = Auth::user()->clinic->services()

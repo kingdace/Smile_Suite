@@ -669,13 +669,13 @@ export default function Index({ auth, treatments, services, filters }) {
                                             <TableHead
                                                 className="cursor-pointer hover:bg-green-100/50 transition-colors text-gray-700 font-semibold"
                                                 onClick={() =>
-                                                    handleSort("service_id")
+                                                    handleSort("name")
                                                 }
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <Stethoscope className="h-4 w-4 text-blue-600" />
-                                                    Service
-                                                    {getSortIcon("service_id")}
+                                                    Treatment
+                                                    {getSortIcon("name")}
                                                 </div>
                                             </TableHead>
                                             <TableHead
@@ -880,16 +880,27 @@ export default function Index({ auth, treatments, services, filters }) {
                                                             <div className="flex items-center gap-2">
                                                                 <Stethoscope className="h-3 w-3 text-gray-400" />
                                                                 <span className="text-sm font-medium text-gray-900 truncate">
-                                                                    {treatment
-                                                                        .service
-                                                                        ?.name || (
+                                                                    {treatment.name || (
                                                                         <span className="text-gray-400 italic font-normal">
                                                                             No
-                                                                            service
+                                                                            treatment
+                                                                            name
                                                                         </span>
                                                                     )}
                                                                 </span>
                                                             </div>
+                                                            {treatment.service
+                                                                ?.name && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
+                                                                        {
+                                                                            treatment
+                                                                                .service
+                                                                                .name
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            )}
                                                             <div className="flex items-center gap-2">
                                                                 <FileText className="h-3 w-3 text-gray-400" />
                                                                 <span className="text-sm font-medium text-gray-900 line-clamp-2">
@@ -965,10 +976,24 @@ export default function Index({ auth, treatments, services, filters }) {
                                                             <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-xs border border-emerald-200 font-bold">
                                                                 ₱
                                                                 {parseFloat(
-                                                                    treatment.cost ||
+                                                                    treatment.total_cost ||
+                                                                        treatment.cost ||
                                                                         0
                                                                 ).toLocaleString()}
                                                             </span>
+                                                            {treatment.total_cost &&
+                                                                treatment.total_cost !==
+                                                                    treatment.cost && (
+                                                                    <div className="text-xs text-gray-500 mt-1">
+                                                                        (Service:
+                                                                        ₱
+                                                                        {parseFloat(
+                                                                            treatment.cost ||
+                                                                                0
+                                                                        ).toLocaleString()}
+                                                                        )
+                                                                    </div>
+                                                                )}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="px-4 py-4">

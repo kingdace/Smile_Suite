@@ -89,9 +89,9 @@ export default function EditPayment({
         );
         setSelectedTreatment(treatment);
 
-        // Auto-fill amount if treatment has cost and amount is empty
-        if (treatment && treatment.cost && !data.amount) {
-            setData("amount", treatment.cost.toString());
+        // Auto-fill amount if treatment has total cost and amount is empty
+        if (treatment && treatment.total_cost && !data.amount) {
+            setData("amount", treatment.total_cost.toString());
         }
     };
 
@@ -383,13 +383,13 @@ export default function EditPayment({
                                                                     {
                                                                         treatment.name
                                                                     }
-                                                                    {treatment.cost && (
+                                                                    {treatment.total_cost && (
                                                                         <Badge
                                                                             variant="outline"
                                                                             className="ml-auto"
                                                                         >
                                                                             {formatCurrency(
-                                                                                treatment.cost
+                                                                                treatment.total_cost
                                                                             )}
                                                                         </Badge>
                                                                     )}

@@ -263,4 +263,22 @@ class Treatment extends Model
     {
         return $this->inventoryItems()->count();
     }
+
+    /**
+     * Get the total cost of the treatment (service cost + inventory cost)
+     */
+    public function getTotalCostAttribute()
+    {
+        $serviceCost = $this->cost ?? 0;
+        $inventoryCost = $this->total_inventory_cost ?? 0;
+        return $serviceCost + $inventoryCost;
+    }
+
+    /**
+     * Get formatted total cost
+     */
+    public function getFormattedTotalCostAttribute()
+    {
+        return '₱' . number_format($this->total_cost, 2);
+    }
 }

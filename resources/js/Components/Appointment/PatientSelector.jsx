@@ -14,7 +14,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import { Check, ChevronsUpDown, Search, User } from "lucide-react";
+import { Check, ChevronsUpDown, Search, User, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { debounce } from "lodash";
 import axios from "axios";
@@ -73,9 +73,9 @@ export default function PatientSelector({
     };
 
     return (
-        <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-                Select Patient
+        <div>
+            <label className="text-base font-medium text-gray-700 mb-3 block">
+                Select Patient *
             </label>
 
             <Popover open={open} onOpenChange={setOpen}>
@@ -85,7 +85,7 @@ export default function PatientSelector({
                         role="combobox"
                         aria-expanded={open}
                         className={cn(
-                            "w-full justify-between",
+                            "w-full justify-between h-14 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl text-base",
                             error && "border-red-500",
                             disabled && "opacity-50 cursor-not-allowed"
                         )}
@@ -153,7 +153,12 @@ export default function PatientSelector({
                 </PopoverContent>
             </Popover>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && (
+                <div className="text-red-500 text-sm mt-2 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4" />
+                    {error}
+                </div>
+            )}
         </div>
     );
 }

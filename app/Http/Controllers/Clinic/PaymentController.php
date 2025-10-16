@@ -140,7 +140,17 @@ class PaymentController extends Controller
                 $p->name = trim($p->first_name . ' ' . $p->last_name);
                 return $p;
             });
-        $treatments = $clinic->treatments()->select('id', 'name')->get();
+        $treatments = $clinic->treatments()
+            ->with(['inventoryItems'])
+            ->select('id', 'name', 'cost')
+            ->get()
+            ->map(function ($treatment) {
+                // Calculate total cost (service cost + inventory cost)
+                $serviceCost = $treatment->cost ?? 0;
+                $inventoryCost = $treatment->inventoryItems->sum('total_cost') ?? 0;
+                $treatment->total_cost = $serviceCost + $inventoryCost;
+                return $treatment;
+            });
 
         return Inertia::render('Clinic/Payments/Create', [
             'patients' => $patients,
@@ -265,7 +275,17 @@ class PaymentController extends Controller
                 $p->name = trim($p->first_name . ' ' . $p->last_name);
                 return $p;
             });
-        $treatments = $clinic->treatments()->select('id', 'name')->get();
+        $treatments = $clinic->treatments()
+            ->with(['inventoryItems'])
+            ->select('id', 'name', 'cost')
+            ->get()
+            ->map(function ($treatment) {
+                // Calculate total cost (service cost + inventory cost)
+                $serviceCost = $treatment->cost ?? 0;
+                $inventoryCost = $treatment->inventoryItems->sum('total_cost') ?? 0;
+                $treatment->total_cost = $serviceCost + $inventoryCost;
+                return $treatment;
+            });
         return Inertia::render('Clinic/Payments/Edit', [
             'clinic' => $clinic,
             'payment' => $payment,
