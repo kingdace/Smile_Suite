@@ -585,31 +585,31 @@ export default function Index({ auth, clinic, schedules, dentists }) {
 
             <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
                 <div className="max-w-7xl mx-auto px-6 py-8">
-                    {/* Enhanced Header */}
-                    <div className="mb-8">
+                    {/* Compact Header */}
+                    <div className="mb-6">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full shadow-lg">
-                                    <CalendarClock className="h-8 w-8 text-white" />
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg shadow-md">
+                                    <CalendarClock className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-4xl font-bold text-gray-900">
+                                    <h1 className="text-2xl font-bold text-gray-900">
                                         Dentist Schedule Management
                                     </h1>
-                                    <p className="text-gray-600 mt-2 text-lg">
-                                        Manage dentist availability and time
-                                        slots
+                                    <p className="text-gray-600 text-sm">
+                                        Manage dentist availability and time slots
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                                 <Button
                                     onClick={() => {
                                         setSelectedTemplate(null); // Reset template selection
                                         setIsTemplateDialogOpen(true);
                                     }}
                                     variant="outline"
-                                    className="px-6 py-3 bg-white border-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 shadow-sm"
+                                    size="sm"
+                                    className="px-4 py-2 bg-white border-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 shadow-sm"
                                 >
                                     <Settings className="h-4 w-4 mr-2" />
                                     Templates
@@ -621,9 +621,10 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                         reset();
                                         setIsDialogOpen(true);
                                     }}
-                                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                                    size="sm"
+                                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                                 >
-                                    <Plus className="h-5 w-5 mr-2" />
+                                    <Plus className="h-4 w-4 mr-2" />
                                     Add Schedule
                                 </Button>
                             </div>
@@ -639,7 +640,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div className="flex flex-wrap justify-center gap-4">
                                 {dentists.map((dentist) => (
                                     <Button
                                         key={dentist.id}
@@ -654,7 +655,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                 dentist.id.toString()
                                             )
                                         }
-                                        className={`flex flex-col items-center gap-3 h-auto py-6 px-4 transition-all duration-300 ${
+                                        className={`flex flex-col items-center gap-3 h-auto py-6 px-4 transition-all duration-300 w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)] max-w-xs ${
                                             selectedDentist ===
                                             dentist.id.toString()
                                                 ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg transform scale-105"

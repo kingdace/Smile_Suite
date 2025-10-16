@@ -810,61 +810,6 @@ export default function Index({
 
                     {/* Combined Search, Filters & Table Section */}
                     <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden">
-                        <CardHeader className="pb-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-100 rounded-lg">
-                                        <FileText className="h-5 w-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-xl font-bold text-gray-900">
-                                            Payment Records
-                                        </CardTitle>
-                                        <p className="text-sm text-gray-600">
-                                            Manage and track all payment
-                                            transactions
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <form
-                                        onSubmit={handleSearch}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                            <Input
-                                                type="text"
-                                                placeholder="Search payments by reference number, patient name, or notes..."
-                                                value={search}
-                                                onChange={(e) =>
-                                                    setSearch(e.target.value)
-                                                }
-                                                className="h-11 pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
-                                            />
-                                        </div>
-                                        <Button
-                                            type="submit"
-                                            className="h-11 px-6 bg-blue-600 hover:bg-blue-700"
-                                        >
-                                            <Search className="h-4 w-4 mr-2" />
-                                            Search
-                                        </Button>
-                                        {search && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={() => setSearch("")}
-                                                className="h-11 px-6"
-                                            >
-                                                Clear
-                                            </Button>
-                                        )}
-                                    </form>
-                                </div>
-                            </div>
-                        </CardHeader>
-
                         <CardContent className="p-0">
                             {/* Bulk Actions */}
                             {showBulkActions && selectedPayments.length > 0 && (
@@ -948,7 +893,50 @@ export default function Index({
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-4">
+                                                {/* Search Functionality */}
+                                                <form
+                                                    onSubmit={handleSearch}
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <div className="relative">
+                                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Search payments..."
+                                                            value={search}
+                                                            onChange={(e) =>
+                                                                setSearch(
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-10 pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg w-64"
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        type="submit"
+                                                        size="sm"
+                                                        className="h-10 px-4 bg-blue-600 hover:bg-blue-700"
+                                                    >
+                                                        <Search className="h-4 w-4 mr-2" />
+                                                        Search
+                                                    </Button>
+                                                    {search && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                setSearch("")
+                                                            }
+                                                            className="h-10 px-4"
+                                                        >
+                                                            Clear
+                                                        </Button>
+                                                    )}
+                                                </form>
+                                                {/* Total Payments Count */}
                                                 <div className="text-right">
                                                     <div className="text-2xl font-bold text-blue-600">
                                                         {payments.total || 0}

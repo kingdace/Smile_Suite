@@ -503,7 +503,10 @@ export default function Inventory({
                                                 <p className="font-medium">
                                                     {item.name}
                                                 </p>
-                                                <p className="text-sm text-gray-500">
+                                                <p
+                                                    className="text-sm text-gray-500 truncate max-w-xs"
+                                                    title={item.description}
+                                                >
                                                     {item.description}
                                                 </p>
                                             </div>
