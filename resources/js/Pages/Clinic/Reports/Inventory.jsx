@@ -393,7 +393,7 @@ export default function Inventory({
                             <Label htmlFor="search">Search</Label>
                             <Input
                                 id="search"
-                                placeholder="Item name, SKU, description..."
+                                placeholder="Item name, SKU..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyPress={(e) =>
@@ -502,12 +502,6 @@ export default function Inventory({
                                             <div>
                                                 <p className="font-medium">
                                                     {item.name}
-                                                </p>
-                                                <p
-                                                    className="text-sm text-gray-500 truncate max-w-xs"
-                                                    title={item.description}
-                                                >
-                                                    {item.description}
                                                 </p>
                                             </div>
                                         </TableCell>
