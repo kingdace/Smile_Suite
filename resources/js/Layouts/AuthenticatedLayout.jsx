@@ -564,8 +564,46 @@ const Header = ({
                             {/* Enhanced User Menu */}
                             <div className="flex items-center gap-3">
                                 <div className="relative">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-blue-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/60">
-                                        <span className="text-blue-700 text-sm font-bold">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-white/95 to-blue-100/95 rounded-full flex items-center justify-center shadow-xl border border-white/60 overflow-hidden">
+                                        {auth?.user?.avatar_url ||
+                                        auth?.avatar_url ? (
+                                            <img
+                                                src={ImageHelper.getImageUrl(
+                                                    auth?.user?.avatar_url ||
+                                                        auth?.avatar_url
+                                                )}
+                                                alt="User Avatar"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    // Fallback to clinic logo if avatar fails to load
+                                                    e.target.src =
+                                                        "/images/clinic-logo.png";
+                                                }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src="/images/clinic-logo.png"
+                                                alt="Clinic Logo"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    // Final fallback to initials if clinic logo fails
+                                                    e.target.style.display =
+                                                        "none";
+                                                    e.target.nextSibling.style.display =
+                                                        "flex";
+                                                }}
+                                            />
+                                        )}
+                                        <span
+                                            className="text-blue-700 text-sm font-bold absolute inset-0 flex items-center justify-center bg-gradient-to-br from-white/95 to-blue-100/95"
+                                            style={{
+                                                display:
+                                                    auth?.user?.avatar_url ||
+                                                    auth?.avatar_url
+                                                        ? "none"
+                                                        : "flex",
+                                            }}
+                                        >
                                             {(auth?.user?.name || auth?.name)
                                                 ?.charAt(0)
                                                 ?.toUpperCase() || "U"}

@@ -1,6 +1,7 @@
 import { Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
+import { ImageHelper } from "@/Helpers/ImageHelper.js";
 import {
     LogOut,
     User as UserIcon,
@@ -225,6 +226,33 @@ export default function SiteHeader() {
                                     title="Go to Dashboard"
                                 >
                                     <Avatar className="h-8 w-8 border border-slate-200 bg-white">
+                                        {auth.user?.avatar_url ? (
+                                            <img
+                                                src={ImageHelper.getImageUrl(
+                                                    auth.user.avatar_url
+                                                )}
+                                                alt="User Avatar"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    // Fallback to clinic logo if avatar fails to load
+                                                    e.target.src =
+                                                        "/images/clinic-logo.png";
+                                                }}
+                                            />
+                                        ) : (
+                                            <img
+                                                src="/images/clinic-logo.png"
+                                                alt="Clinic Logo"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    // Final fallback to user icon if clinic logo fails
+                                                    e.target.style.display =
+                                                        "none";
+                                                    e.target.nextSibling.style.display =
+                                                        "flex";
+                                                }}
+                                            />
+                                        )}
                                         <AvatarFallback className="flex items-center justify-center w-full h-full">
                                             <UserIcon className="w-4 h-4 text-blue-600" />
                                         </AvatarFallback>
