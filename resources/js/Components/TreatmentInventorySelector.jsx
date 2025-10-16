@@ -310,7 +310,7 @@ export default function TreatmentInventorySelector({
                                                     <SelectTrigger className="mt-1">
                                                         <SelectValue placeholder="Select inventory item" />
                                                     </SelectTrigger>
-                                                    <SelectContent>
+                                                    <SelectContent className="max-h-60 overflow-y-auto">
                                                         {inventory.length ===
                                                         0 ? (
                                                             <div className="p-2 text-sm text-gray-500 text-center">

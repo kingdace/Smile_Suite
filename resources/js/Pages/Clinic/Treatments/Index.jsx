@@ -431,34 +431,27 @@ export default function Index({ auth, treatments, services, filters }) {
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-purple-100/50">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-indigo-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
                             <CardContent className="p-6 relative">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-purple-500 via-purple-600 to-violet-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <DollarSign className="h-7 w-7 text-white" />
+                                    <div className="p-4 bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                                        <Activity className="h-7 w-7 text-white" />
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Revenue
+                                            Active Treatments
                                         </p>
                                         <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            ₱
-                                            {treatments.data
-                                                ?.reduce(
-                                                    (sum, t) =>
-                                                        sum +
-                                                        (parseFloat(t.cost) ||
-                                                            0),
-                                                    0
-                                                )
-                                                .toLocaleString() || 0}
+                                            {treatments.data?.filter(
+                                                (t) => t.status === "in_progress"
+                                            ).length || 0}
                                         </p>
                                         <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-purple-600 font-medium">
-                                                Total earnings
+                                            <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                                            <span className="text-xs text-indigo-600 font-medium">
+                                                Currently in progress
                                             </span>
                                         </div>
                                     </div>
