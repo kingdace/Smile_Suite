@@ -58,28 +58,28 @@ class DashboardMetricsService
         $dateRange = $this->getDateRange($timeRange);
 
         $totalAppointments = Appointment::where('clinic_id', $clinic->id)
-            ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']])
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
             ->count();
 
         $confirmedAppointments = Appointment::where('clinic_id', $clinic->id)
             ->whereHas('status', function($query) {
                 $query->where('name', 'Confirmed');
             })
-            ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']])
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
             ->count();
 
         $completedAppointments = Appointment::where('clinic_id', $clinic->id)
             ->whereHas('status', function($query) {
                 $query->where('name', 'Completed');
             })
-            ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']])
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
             ->count();
 
         $cancelledAppointments = Appointment::where('clinic_id', $clinic->id)
             ->whereHas('status', function($query) {
                 $query->where('name', 'Cancelled');
             })
-            ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']])
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
             ->count();
 
         // Calculate efficiency metrics
@@ -93,7 +93,7 @@ class DashboardMetricsService
         // Get previous period data for comparison
         $previousRange = $this->getPreviousDateRange($timeRange);
         $previousTotalAppointments = Appointment::where('clinic_id', $clinic->id)
-            ->whereBetween('scheduled_at', [$previousRange['start'], $previousRange['end']])
+            ->whereBetween('created_at', [$previousRange['start'], $previousRange['end']])
             ->count();
 
         // Calculate trend
@@ -544,13 +544,13 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
     private function getAppointmentChartData(Clinic $clinic, array $dateRange, string $timeRange = 'week'): array
     {
         $query = Appointment::where('clinic_id', $clinic->id)
-            ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']]);
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
 
         // For year range, group by months for better visualization
         if ($timeRange === 'year') {
             $data = $query->select(
-                DB::raw('YEAR(scheduled_at) as year'),
-                DB::raw('MONTH(scheduled_at) as month'),
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
                 DB::raw('COUNT(*) as count')
             )
             ->groupBy('year', 'month')
@@ -568,7 +568,7 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
         } else {
             // For other ranges, group by days
             $data = $query->select(
-                DB::raw('DATE(scheduled_at) as date'),
+                DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as count')
             )
             ->groupBy('date')
@@ -603,7 +603,7 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
     {
         try {
             $appointments = Appointment::where('clinic_id', $clinic->id)
-                ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']])
+                ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
                 ->whereNotNull('service_id')
                 ->with('service')
                 ->get();
@@ -725,9 +725,9 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
     private function getAppointmentTrends(Clinic $clinic, array $dateRange): array
     {
         return Appointment::where('clinic_id', $clinic->id)
-            ->whereBetween('scheduled_at', [$dateRange['start'], $dateRange['end']])
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
             ->select(
-                DB::raw('DATE(scheduled_at) as date'),
+                DB::raw('DATE(created_at) as date'),
                 DB::raw('COUNT(*) as count')
             )
             ->groupBy('date')

@@ -564,7 +564,12 @@ const Header = ({
                             {/* Enhanced User Menu */}
                             <div className="flex items-center gap-3">
                                 <div className="relative">
-                                    <div className="w-10 h-10 rounded-full overflow-hidden shadow-xl border border-white/60">
+                                    <div
+                                        className="w-10 h-10 rounded-full overflow-hidden shadow-xl border border-white/60"
+                                        style={{
+                                            imageRendering: "crisp-edges",
+                                        }}
+                                    >
                                         {(() => {
                                             const avatarUrl =
                                                 auth?.user?.avatar_url ||
@@ -609,7 +614,11 @@ const Header = ({
                                             <img
                                                 src="/images/clinic-logo1.png"
                                                 alt="Clinic Logo"
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-contain"
+                                                style={{
+                                                    imageRendering:
+                                                        "crisp-edges",
+                                                }}
                                                 onError={(e) => {
                                                     // Final fallback to initials if clinic logo fails
                                                     e.target.style.display =
