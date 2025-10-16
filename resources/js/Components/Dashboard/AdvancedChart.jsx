@@ -248,14 +248,14 @@ const AdvancedChart = ({
                     },
                     radialLabelsSkipAngle: 10,
                     radialLabelsTextXOffset: 6,
-                    radialLabelsTextColor: "#1E40AF",
+                    radialLabelsTextColor: "#FFFFFF",
                     radialLabelsLinkOffset: 0,
                     radialLabelsLinkDiagonalLength: 16,
                     radialLabelsLinkHorizontalLength: 24,
                     radialLabelsLinkStrokeWidth: 2,
                     radialLabelsLinkColor: { from: "color" },
                     sliceLabelsSkipAngle: 10,
-                    sliceLabelsTextColor: "#1E40AF",
+                    sliceLabelsTextColor: "#FFFFFF",
                 };
             default:
                 return baseConfig;

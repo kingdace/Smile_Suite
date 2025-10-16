@@ -555,8 +555,8 @@ const EnhancedDashboardLayout = ({
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                                 {/* Patient Demographics */}
                                 <Card className="border-0 shadow-lg bg-white">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="text-sm font-semibold text-blue-900 leading-tight">
                                                     Patient Demographics
@@ -569,7 +569,7 @@ const EnhancedDashboardLayout = ({
                                                 <Users className="h-4 w-4 text-blue-600" />
                                             </div>
                                         </div>
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm text-blue-700">
                                                     Age 0-18
@@ -644,11 +644,11 @@ const EnhancedDashboardLayout = ({
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-sm text-blue-700">
-                                                    Age 51-65
+                                                    Age 51-65+
                                                 </span>
                                                 <span className="text-sm font-medium text-blue-900">
                                                     {patientDemographics
-                                                        ?.age_51_65
+                                                        ?.age_51_65_plus
                                                         ?.percentage || 0}
                                                     %
                                                 </span>
@@ -659,31 +659,7 @@ const EnhancedDashboardLayout = ({
                                                     style={{
                                                         width: `${
                                                             patientDemographics
-                                                                ?.age_51_65
-                                                                ?.percentage ||
-                                                            0
-                                                        }%`,
-                                                    }}
-                                                ></div>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-blue-700">
-                                                    Age 65+
-                                                </span>
-                                                <span className="text-sm font-medium text-blue-900">
-                                                    {patientDemographics
-                                                        ?.age_65_plus
-                                                        ?.percentage || 0}
-                                                    %
-                                                </span>
-                                            </div>
-                                            <div className="w-full bg-blue-100 rounded-full h-2">
-                                                <div
-                                                    className="bg-blue-500 h-2 rounded-full"
-                                                    style={{
-                                                        width: `${
-                                                            patientDemographics
-                                                                ?.age_65_plus
+                                                                ?.age_51_65_plus
                                                                 ?.percentage ||
                                                             0
                                                         }%`,
@@ -696,8 +672,8 @@ const EnhancedDashboardLayout = ({
 
                                 {/* Treatment Success Rate */}
                                 <Card className="border-0 shadow-lg bg-white">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="text-sm font-semibold text-blue-900 leading-tight">
                                                     Treatment Success
@@ -711,15 +687,15 @@ const EnhancedDashboardLayout = ({
                                             </div>
                                         </div>
                                         <div className="text-center">
-                                            <div className="text-3xl font-bold text-emerald-600 mb-2">
+                                            <div className="text-2xl font-bold text-emerald-600 mb-1">
                                                 {treatmentSuccess?.success_rate ||
                                                     0}
                                                 %
                                             </div>
-                                            <div className="text-sm text-blue-600 mb-4">
+                                            <div className="text-sm text-blue-600 mb-3">
                                                 Success Rate
                                             </div>
-                                            <div className="space-y-2">
+                                            <div className="space-y-1">
                                                 <div className="flex items-center justify-between text-sm">
                                                     <span className="text-blue-700">
                                                         Completed
@@ -763,8 +739,8 @@ const EnhancedDashboardLayout = ({
 
                                 {/* Peak Hours Analysis */}
                                 <Card className="border-0 shadow-lg bg-white">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="text-sm font-semibold text-blue-900 leading-tight">
                                                     Peak Hours
@@ -777,8 +753,8 @@ const EnhancedDashboardLayout = ({
                                                 <Clock className="h-4 w-4 text-amber-600" />
                                             </div>
                                         </div>
-                                        <div className="text-center mb-4">
-                                            <div className="text-2xl font-bold text-amber-600 mb-1">
+                                        <div className="text-center mb-3">
+                                            <div className="text-xl font-bold text-amber-600 mb-1">
                                                 {peakHours?.peak_hour_formatted ||
                                                     "9:00-10:00"}
                                             </div>
@@ -786,7 +762,7 @@ const EnhancedDashboardLayout = ({
                                                 Peak Time
                                             </div>
                                         </div>
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             {peakHours?.top_hours
                                                 ?.slice(0, 4)
                                                 .map((hour, index) => (
@@ -823,8 +799,8 @@ const EnhancedDashboardLayout = ({
 
                                 {/* Staff Performance */}
                                 <Card className="border-0 shadow-lg bg-white">
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <h3 className="text-sm font-semibold text-blue-900 leading-tight">
                                                     Staff Performance
@@ -837,8 +813,8 @@ const EnhancedDashboardLayout = ({
                                                 <Star className="h-4 w-4 text-yellow-600" />
                                             </div>
                                         </div>
-                                        <div className="text-center mb-4">
-                                            <div className="text-2xl font-bold text-yellow-600 mb-1">
+                                        <div className="text-center mb-3">
+                                            <div className="text-xl font-bold text-yellow-600 mb-1">
                                                 {staffPerformanceMetrics?.overall_average_rating ||
                                                     0}
                                             </div>
@@ -849,7 +825,7 @@ const EnhancedDashboardLayout = ({
                                                 reviews)
                                             </div>
                                         </div>
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             {staffPerformanceMetrics
                                                 ?.staff_performance?.length >
                                             0 ? (

@@ -343,8 +343,7 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                     'age_0_18' => ['count' => 0, 'percentage' => 0],
                     'age_19_35' => ['count' => 0, 'percentage' => 0],
                     'age_36_50' => ['count' => 0, 'percentage' => 0],
-                    'age_51_65' => ['count' => 0, 'percentage' => 0],
-                    'age_65_plus' => ['count' => 0, 'percentage' => 0],
+                    'age_51_65_plus' => ['count' => 0, 'percentage' => 0],
                     'total_patients' => 0
                 ];
             }
@@ -353,8 +352,7 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 'age_0_18' => 0,
                 'age_19_35' => 0,
                 'age_36_50' => 0,
-                'age_51_65' => 0,
-                'age_65_plus' => 0
+                'age_51_65_plus' => 0
             ];
 
             foreach ($patients as $patient) {
@@ -366,10 +364,8 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                     $ageGroups['age_19_35']++;
                 } elseif ($age <= 50) {
                     $ageGroups['age_36_50']++;
-                } elseif ($age <= 65) {
-                    $ageGroups['age_51_65']++;
                 } else {
-                    $ageGroups['age_65_plus']++;
+                    $ageGroups['age_51_65_plus']++;
                 }
             }
 
@@ -386,13 +382,9 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                     'count' => $ageGroups['age_36_50'],
                     'percentage' => round(($ageGroups['age_36_50'] / $totalPatients) * 100, 1)
                 ],
-                'age_51_65' => [
-                    'count' => $ageGroups['age_51_65'],
-                    'percentage' => round(($ageGroups['age_51_65'] / $totalPatients) * 100, 1)
-                ],
-                'age_65_plus' => [
-                    'count' => $ageGroups['age_65_plus'],
-                    'percentage' => round(($ageGroups['age_65_plus'] / $totalPatients) * 100, 1)
+                'age_51_65_plus' => [
+                    'count' => $ageGroups['age_51_65_plus'],
+                    'percentage' => round(($ageGroups['age_51_65_plus'] / $totalPatients) * 100, 1)
                 ],
                 'total_patients' => $totalPatients
             ];
@@ -401,8 +393,7 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 'age_0_18' => ['count' => 0, 'percentage' => 0],
                 'age_19_35' => ['count' => 0, 'percentage' => 0],
                 'age_36_50' => ['count' => 0, 'percentage' => 0],
-                'age_51_65' => ['count' => 0, 'percentage' => 0],
-                'age_65_plus' => ['count' => 0, 'percentage' => 0],
+                'age_51_65_plus' => ['count' => 0, 'percentage' => 0],
                 'total_patients' => 0
             ];
         }
