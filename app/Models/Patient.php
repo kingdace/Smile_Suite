@@ -396,20 +396,20 @@ class Patient extends Model
      * Scope for patients that should be visible in clinic management
      * Shows:
      * 1. Manually created patients (no user_id) - always visible
-     * 2. Patients with confirmed appointments
+     * 2. Patients with confirmed or completed appointments
      * 3. Patients with no appointments (manually created)
      * Excludes:
-     * 1. Online booking patients with only pending appointments
+     * 1. Online booking patients with only pending, cancelled, no-show, or pending reschedule appointments
      */
     public function scopeVisibleInClinic($query)
     {
         return $query->where(function($q) {
             // Manually created patients (no user_id) - always visible
             $q->whereNull('user_id')
-              // OR patients with confirmed appointments
+              // OR patients with confirmed or completed appointments
               ->orWhereHas('appointments', function($appointmentQuery) {
                   $appointmentQuery->whereHas('status', function($statusQuery) {
-                      $statusQuery->where('name', 'Confirmed');
+                      $statusQuery->whereIn('name', ['Confirmed', 'Completed']);
                   });
               })
               // OR patients with no appointments at all (manually created)
