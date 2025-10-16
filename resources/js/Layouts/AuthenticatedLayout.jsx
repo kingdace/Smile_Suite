@@ -650,8 +650,6 @@ const Header = ({
                                             </span>
                                         </div>
                                     </div>
-                                    {/* Enhanced glow effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-200/30 rounded-full pointer-events-none"></div>
                                 </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm font-bold text-white">
@@ -659,7 +657,7 @@ const Header = ({
                                             auth?.user || auth
                                         )}
                                     </p>
-                                    <p className="text-xs text-blue-100 font-medium">
+                                    <p className="text-xs text-blue-100 font-medium text-center">
                                         {(auth?.user?.role || auth?.role)
                                             ?.replace("_", " ")
                                             ?.split(" ")
