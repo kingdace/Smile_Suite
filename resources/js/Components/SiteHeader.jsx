@@ -226,7 +226,16 @@ export default function SiteHeader() {
                                     title="Go to Dashboard"
                                 >
                                     <Avatar className="h-8 w-8 border border-slate-200 bg-white">
-                                        {auth.user?.avatar_url ? (
+                                        {(() => {
+                                            const isClinicAdmin =
+                                                auth.user?.role ===
+                                                "clinic_admin";
+                                            // For clinic_admin, always show clinic logo, for others show avatar if available
+                                            return (
+                                                !isClinicAdmin &&
+                                                auth.user?.avatar_url
+                                            );
+                                        })() ? (
                                             <img
                                                 src={ImageHelper.getImageUrl(
                                                     auth.user.avatar_url

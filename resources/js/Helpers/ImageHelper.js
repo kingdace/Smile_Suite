@@ -6,7 +6,7 @@ export class ImageHelper {
      * Get image URL with fallback for missing images
      */
     static getImageUrl(imageUrl, fallback = null) {
-        // If it's already a full URL (external), return as is
+        // If it's already a full URL (external or localhost), return as is
         if (
             imageUrl &&
             (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))

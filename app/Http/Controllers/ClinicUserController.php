@@ -347,8 +347,8 @@ class ClinicUserController extends Controller
             try {
                 // Determine which disk to use based on environment
                 $disk = config('app.env') === 'production' ? 's3' : 'public';
-                
-                
+
+
                 // Delete old avatar if exists
                 if ($user->avatar_url) {
                     try {
@@ -373,18 +373,21 @@ class ClinicUserController extends Controller
                         // Continue with upload even if old avatar deletion fails
                     }
                 }
-                
+
                 // Store new avatar
                 $avatarPath = $request->file('avatar')->store('user-avatars', $disk);
-                
+                \Log::info('Avatar upload - File stored at path: ' . $avatarPath);
+
                 // Get the full URL for the stored file
                 if ($disk === 's3') {
                     // For S3, use Laravel's built-in URL generation
                     $avatarUrl = Storage::disk('s3')->url($avatarPath);
                     \Log::info('Avatar upload - S3 URL generated: ' . $avatarUrl);
                 } else {
-                    $avatarUrl = $avatarPath;
-                    \Log::info('Avatar upload - Local path: ' . $avatarUrl);
+                    // For local storage, generate the proper URL
+                    $avatarUrl = Storage::disk('public')->url($avatarPath);
+                    \Log::info('Avatar upload - Local URL generated: ' . $avatarUrl);
+                    \Log::info('Avatar upload - File exists check: ' . (Storage::disk('public')->exists($avatarPath) ? 'YES' : 'NO'));
                 }
             } catch (\Exception $e) {
                 \Log::error('Avatar upload error: ' . $e->getMessage());
@@ -397,6 +400,8 @@ class ClinicUserController extends Controller
         $userData = [
             'avatar_url' => $avatarUrl,
         ];
+        \Log::info('Profile update - Avatar URL to be saved: ' . $avatarUrl);
+        \Log::info('Profile update - User data array: ' . json_encode($userData));
 
         // Handle name - only update if provided (not empty string)
         if (isset($validated['name']) && $validated['name'] !== '') {
@@ -452,6 +457,9 @@ class ClinicUserController extends Controller
 
         try {
             $user->update($userData);
+            // Refresh the user data to get the updated avatar_url
+            $user->refresh();
+            \Log::info('Profile update - After update, user avatar_url: ' . $user->avatar_url);
             return redirect()->route('clinic.profile')->with('success', 'Profile updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Profile update error: ' . $e->getMessage());

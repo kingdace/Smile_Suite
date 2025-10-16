@@ -566,10 +566,24 @@ const Header = ({
                                 <div className="relative">
                                     <div className="w-10 h-10 rounded-full overflow-hidden shadow-xl border border-white/60">
                                         {(() => {
-                                            const avatarUrl = auth?.user?.avatar_url || auth?.avatar_url;
-                                            console.log('Avatar URL:', avatarUrl);
-                                            console.log('Auth object:', auth);
-                                            return avatarUrl;
+                                            const avatarUrl =
+                                                auth?.user?.avatar_url ||
+                                                auth?.avatar_url;
+                                            const isClinicAdmin =
+                                                auth?.user?.role ===
+                                                    "clinic_admin" ||
+                                                auth?.role === "clinic_admin";
+                                            console.log(
+                                                "Avatar URL:",
+                                                avatarUrl
+                                            );
+                                            console.log("Auth object:", auth);
+                                            console.log(
+                                                "Is Clinic Admin:",
+                                                isClinicAdmin
+                                            );
+                                            // For clinic_admin, always show clinic logo, for others show avatar if available
+                                            return !isClinicAdmin && avatarUrl;
                                         })() ? (
                                             <img
                                                 src={ImageHelper.getImageUrl(
@@ -579,11 +593,16 @@ const Header = ({
                                                 alt="User Avatar"
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    console.log('Avatar image failed to load, falling back to clinic logo');
-                                                    e.target.src = "/images/clinic-logo.png";
+                                                    console.log(
+                                                        "Avatar image failed to load, falling back to clinic logo"
+                                                    );
+                                                    e.target.src =
+                                                        "/images/clinic-logo.png";
                                                 }}
                                                 onLoad={() => {
-                                                    console.log('Avatar image loaded successfully');
+                                                    console.log(
+                                                        "Avatar image loaded successfully"
+                                                    );
                                                 }}
                                             />
                                         ) : (
@@ -603,11 +622,22 @@ const Header = ({
                                         <div
                                             className="absolute inset-0 bg-gradient-to-br from-white/95 to-blue-100/95 flex items-center justify-center"
                                             style={{
-                                                display:
-                                                    auth?.user?.avatar_url ||
-                                                    auth?.avatar_url
-                                                        ? "none"
-                                                        : "flex",
+                                                display: (() => {
+                                                    const avatarUrl =
+                                                        auth?.user
+                                                            ?.avatar_url ||
+                                                        auth?.avatar_url;
+                                                    const isClinicAdmin =
+                                                        auth?.user?.role ===
+                                                            "clinic_admin" ||
+                                                        auth?.role ===
+                                                            "clinic_admin";
+                                                    // Show initials only if not clinic_admin and no avatar
+                                                    return !isClinicAdmin &&
+                                                        !avatarUrl
+                                                        ? "flex"
+                                                        : "none";
+                                                })(),
                                             }}
                                         >
                                             <span className="text-blue-700 text-sm font-bold">
@@ -621,7 +651,7 @@ const Header = ({
                                         </div>
                                     </div>
                                     {/* Enhanced glow effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-200/30 rounded-full animate-pulse pointer-events-none"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-blue-200/30 rounded-full pointer-events-none"></div>
                                 </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm font-bold text-white">
