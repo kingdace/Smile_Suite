@@ -422,11 +422,6 @@ export default function Index({ auth, clinic, inventory, filters }) {
                                                             ID: {item.id}
                                                         </span>
                                                     </div>
-                                                    {item.description && (
-                                                        <div className="text-xs text-gray-500 line-clamp-1">
-                                                            {item.description}
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
                                         </TableCell>
