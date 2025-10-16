@@ -309,66 +309,60 @@ const SmartWidget = ({
                 <CardContent className={`${compact ? "p-3" : "p-4"}`}>
                     {loading ? (
                         <div className="space-y-2">
-                            {Array.from(
-                                { length: type === "appointments" ? 5 : 4 },
-                                (_, i) => (
-                                    <div key={i} className="animate-pulse">
-                                        <div className="flex items-center justify-between p-3 bg-blue-50/30 rounded-lg border border-blue-100/50">
-                                            <div className="flex items-center space-x-3">
-                                                <div className="w-8 h-8 bg-blue-200/50 rounded-full"></div>
-                                                <div className="space-y-2">
-                                                    <div className="h-4 bg-blue-200/50 rounded w-24"></div>
-                                                    <div className="h-3 bg-blue-200/30 rounded w-16"></div>
-                                                </div>
-                                            </div>
+                            {Array.from({ length: 4 }, (_, i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="flex items-center justify-between p-3 bg-blue-50/30 rounded-lg border border-blue-100/50">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-8 h-8 bg-blue-200/50 rounded-full"></div>
                                             <div className="space-y-2">
-                                                <div className="h-4 bg-blue-200/50 rounded w-12"></div>
-                                                <div className="h-5 bg-blue-200/30 rounded w-16"></div>
+                                                <div className="h-4 bg-blue-200/50 rounded w-24"></div>
+                                                <div className="h-3 bg-blue-200/30 rounded w-16"></div>
                                             </div>
                                         </div>
+                                        <div className="space-y-2">
+                                            <div className="h-4 bg-blue-200/50 rounded w-12"></div>
+                                            <div className="h-5 bg-blue-200/30 rounded w-16"></div>
+                                        </div>
                                     </div>
-                                )
-                            )}
+                                </div>
+                            ))}
                         </div>
                     ) : children ? (
                         children
                     ) : (
                         <div className="space-y-2">
-                            {/* Show 5 items for appointments, 4 for others */}
-                            {Array.from(
-                                { length: type === "appointments" ? 5 : 4 },
-                                (_, index) => {
-                                    const item = data && data[index];
+                            {/* Show 4 items for all types */}
+                            {Array.from({ length: 4 }, (_, index) => {
+                                const item = data && data[index];
 
-                                    if (item) {
-                                        return renderDataItem(item, index);
-                                    } else {
-                                        // Optimized skeleton placeholder for empty slots
-                                        return (
-                                            <motion.div
-                                                key={`skeleton-${index}`}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{
-                                                    delay: index * 0.1,
-                                                }}
-                                                className="flex items-center justify-center p-2.5 bg-blue-50/20 rounded-lg border border-blue-100/30"
-                                            >
-                                                <div className="flex items-center space-x-2.5">
-                                                    <div className="w-6 h-6 bg-blue-200/40 rounded-full flex items-center justify-center">
-                                                        <div className="w-2 h-2 bg-blue-300/60 rounded-full"></div>
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <p className="text-xs text-blue-500 font-medium leading-tight">
-                                                            No data yet
-                                                        </p>
-                                                    </div>
+                                if (item) {
+                                    return renderDataItem(item, index);
+                                } else {
+                                    // Optimized skeleton placeholder for empty slots
+                                    return (
+                                        <motion.div
+                                            key={`skeleton-${index}`}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{
+                                                delay: index * 0.1,
+                                            }}
+                                            className="flex items-center justify-center p-2.5 bg-blue-50/20 rounded-lg border border-blue-100/30"
+                                        >
+                                            <div className="flex items-center space-x-2.5">
+                                                <div className="w-6 h-6 bg-blue-200/40 rounded-full flex items-center justify-center">
+                                                    <div className="w-2 h-2 bg-blue-300/60 rounded-full"></div>
                                                 </div>
-                                            </motion.div>
-                                        );
-                                    }
+                                                <div className="text-center">
+                                                    <p className="text-xs text-blue-500 font-medium leading-tight">
+                                                        No data yet
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
                                 }
-                            )}
+                            })}
                         </div>
                     )}
                 </CardContent>

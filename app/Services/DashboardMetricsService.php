@@ -583,6 +583,11 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
             ->toArray();
         }
 
+        // If no data, return empty array with proper structure
+        if (empty($data)) {
+            $data = [['x' => 'No Data', 'y' => 0]];
+        }
+
         return [
             [
                 'id' => 'appointments',
@@ -633,10 +638,15 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 return $b['value'] - $a['value'];
             });
 
+            // If no data, return empty array with proper structure
+            if (empty($result)) {
+                $result = [['id' => 'No Data', 'value' => 1, 'color' => '#E5E7EB']];
+            }
+
             return $result;
         } catch (\Exception $e) {
-            // Return empty array if there's an error
-            return [];
+            // Return empty array with proper structure if there's an error
+            return [['id' => 'No Data', 'value' => 1, 'color' => '#E5E7EB']];
         }
     }
 
@@ -684,6 +694,11 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 ];
             })
             ->toArray();
+        }
+
+        // If no data, return empty array with proper structure
+        if (empty($data)) {
+            $data = [['x' => 'No Data', 'y' => 0]];
         }
 
         return [
