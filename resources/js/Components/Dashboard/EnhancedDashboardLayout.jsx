@@ -38,6 +38,7 @@ import {
 import EnhancedKPICard from "./EnhancedKPICard";
 import AdvancedChart from "./AdvancedChart";
 import SmartWidget from "./SmartWidget";
+import TimeRangeSelector from "./TimeRangeSelector";
 
 const EnhancedDashboardLayout = ({
     clinic,
@@ -54,7 +55,8 @@ const EnhancedDashboardLayout = ({
     patientDemographics,
     treatmentSuccess,
     peakHours,
-    timeRange = "month",
+    timeRange = new Date().getFullYear().toString(),
+    availableTimeRanges = [],
     onTimeRangeChange,
     loading = false,
     className = "",
@@ -175,31 +177,12 @@ const EnhancedDashboardLayout = ({
 
                                 <div className="flex items-center space-x-3">
                                     {/* Time Range Selector */}
-                                    <div className="flex items-center space-x-2">
-                                        {["today", "week", "month", "year"].map(
-                                            (range) => (
-                                                <Button
-                                                    key={range}
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className={`border-white/50 text-white hover:bg-white/30 backdrop-blur-sm bg-white/10 ${
-                                                        timeRange === range
-                                                            ? "bg-white/20 border-white/70"
-                                                            : ""
-                                                    }`}
-                                                    onClick={() =>
-                                                        onTimeRangeChange &&
-                                                        onTimeRangeChange(range)
-                                                    }
-                                                >
-                                                    {range
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        range.slice(1)}
-                                                </Button>
-                                            )
-                                        )}
-                                    </div>
+                                    <TimeRangeSelector
+                                        value={timeRange}
+                                        onChange={onTimeRangeChange}
+                                        availableRanges={availableTimeRanges}
+                                        loading={loading}
+                                    />
 
                                     {/* Control Buttons */}
                                     <Button
@@ -346,13 +329,9 @@ const EnhancedDashboardLayout = ({
                                                 ? chartData.revenue_chart
                                                 : sampleChartData
                                         }
-                                        type="line"
+                                        type="bar"
                                         title="Revenue Trends"
-                                        subtitle={`All completed payments ${
-                                            timeRange === "year"
-                                                ? "by month"
-                                                : "by day"
-                                        }`}
+                                        subtitle={`Monthly revenue for ${timeRange}`}
                                         height={280}
                                         compact={isCompact}
                                         className="mb-6"
@@ -459,13 +438,9 @@ const EnhancedDashboardLayout = ({
                                                       },
                                                   ]
                                         }
-                                        type="line"
+                                        type="bar"
                                         title="Appointment Trends"
-                                        subtitle={`All appointments ${
-                                            timeRange === "year"
-                                                ? "by month"
-                                                : "by day"
-                                        }`}
+                                        subtitle={`Monthly appointments for ${timeRange}`}
                                         height={280}
                                         compact={isCompact}
                                     />

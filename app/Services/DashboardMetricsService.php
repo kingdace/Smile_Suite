@@ -268,8 +268,17 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
      */
     private function getDateRange(string $timeRange): array
     {
-        $end = Carbon::now();
+        // Handle year-specific ranges (e.g., "2025", "2026")
+        if (is_numeric($timeRange)) {
+            $year = (int) $timeRange;
+            return [
+                'start' => Carbon::create($year, 1, 1)->startOfYear(),
+                'end' => Carbon::create($year, 12, 31)->endOfYear()
+            ];
+        }
 
+        // Legacy support for old time ranges (should not be used anymore)
+        $end = Carbon::now();
         switch ($timeRange) {
             case 'today':
                 $start = Carbon::today();
@@ -287,7 +296,7 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
                 $start = Carbon::now()->startOfYear();
                 break;
             default:
-                $start = Carbon::now()->startOfWeek();
+                $start = Carbon::now()->startOfYear(); // Default to current year
         }
 
         return ['start' => $start, 'end' => $end];
@@ -298,6 +307,16 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
      */
     private function getPreviousDateRange(string $timeRange): array
     {
+        // Handle year-specific ranges (e.g., "2025", "2026")
+        if (is_numeric($timeRange)) {
+            $year = (int) $timeRange;
+            return [
+                'start' => Carbon::create($year - 1, 1, 1)->startOfYear(),
+                'end' => Carbon::create($year - 1, 12, 31)->endOfYear()
+            ];
+        }
+
+        // Legacy support for old time ranges (should not be used anymore)
         $current = $this->getDateRange($timeRange);
         $diff = $current['end']->diffInDays($current['start']);
 
@@ -543,11 +562,50 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
      */
     private function getAppointmentChartData(Clinic $clinic, array $dateRange, string $timeRange = 'week'): array
     {
-        // Get ALL appointments for this clinic
-        $query = Appointment::where('clinic_id', $clinic->id);
+        // For year ranges, always show monthly data
+        if (is_numeric($timeRange)) {
+            $query = Appointment::where('clinic_id', $clinic->id)
+                ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
 
-        // For year range, group by months for better visualization
+            // For year: show all 12 months with data
+            $data = $query->select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                $monthName = Carbon::create()->month($item->month)->format('M');
+                return [
+                    'x' => $monthName,
+                    'y' => $item->count
+                ];
+            })
+            ->toArray();
+
+            // If no data, return empty array with proper structure
+            if (empty($data)) {
+                $data = [['x' => 'No Data', 'y' => 0]];
+            }
+
+            return [
+                [
+                    'id' => 'appointments',
+                    'data' => $data
+                ]
+            ];
+        }
+
+        // Legacy support for old time ranges (should not be used anymore)
+        $query = Appointment::where('clinic_id', $clinic->id)
+            ->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+
+        // Generate data based on time range
         if ($timeRange === 'year') {
+            // For year: show all 12 months with data
             $data = $query->select(
                 DB::raw('YEAR(created_at) as year'),
                 DB::raw('MONTH(created_at) as month'),
@@ -566,56 +624,78 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
             })
             ->toArray();
         } elseif ($timeRange === 'month') {
-            // For month range, group by days within the current month
-            $data = $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
-                ->select(
-                    DB::raw('DATE(created_at) as date'),
-                    DB::raw('COUNT(*) as count')
-                )
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => Carbon::parse($item->date)->format('M j'),
-                        'y' => $item->count
-                    ];
-                })
-                ->toArray();
+            // For month: show all days in the selected month
+            $startDate = Carbon::parse($dateRange['start']);
+            $endDate = Carbon::parse($dateRange['end']);
+            $daysInMonth = $startDate->daysInMonth;
+
+            // Get actual appointment data
+            $appointmentData = $query->select(
+                DB::raw('DAY(created_at) as day'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get()
+            ->keyBy('day')
+            ->toArray();
+
+            // Create complete month data (1-31 days)
+            $data = [];
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $count = isset($appointmentData[$day]) ? (int) $appointmentData[$day]['count'] : 0;
+                $data[] = [
+                    'x' => $day,
+                    'y' => $count
+                ];
+            }
         } elseif ($timeRange === 'week') {
-            // For week range, group by days within the current week
-            $data = $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
-                ->select(
-                    DB::raw('DATE(created_at) as date'),
-                    DB::raw('COUNT(*) as count')
-                )
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => Carbon::parse($item->date)->format('M j'),
-                        'y' => $item->count
-                    ];
-                })
-                ->toArray();
+            // For week: show all 7 days in the selected week
+            $startDate = Carbon::parse($dateRange['start']);
+            $endDate = Carbon::parse($dateRange['end']);
+
+            // Get actual appointment data
+            $appointmentData = $query->select(
+                DB::raw('DAYOFWEEK(created_at) as day_of_week'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('day_of_week')
+            ->orderBy('day_of_week')
+            ->get()
+            ->keyBy('day_of_week')
+            ->toArray();
+
+            // Create complete week data (Mon-Sun)
+            $dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            $data = [];
+            for ($i = 1; $i <= 7; $i++) {
+                $count = isset($appointmentData[$i]) ? (int) $appointmentData[$i]['count'] : 0;
+                $data[] = [
+                    'x' => $dayNames[$i - 1],
+                    'y' => $count
+                ];
+            }
         } else {
-            // For today and other ranges, group by days
-            $data = $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']])
-                ->select(
-                    DB::raw('DATE(created_at) as date'),
-                    DB::raw('COUNT(*) as count')
-                )
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => Carbon::parse($item->date)->format('M j'),
-                        'y' => $item->count
-                    ];
-                })
-                ->toArray();
+            // For today: show hourly data for the selected day
+            $appointmentData = $query->select(
+                DB::raw('HOUR(created_at) as hour'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('hour')
+            ->orderBy('hour')
+            ->get()
+            ->keyBy('hour')
+            ->toArray();
+
+            // Create complete day data (0-23 hours)
+            $data = [];
+            for ($hour = 0; $hour <= 23; $hour++) {
+                $count = isset($appointmentData[$hour]) ? (int) $appointmentData[$hour]['count'] : 0;
+                $data[] = [
+                    'x' => $hour . ':00',
+                    'y' => $count
+                ];
+            }
         }
 
         // If no data, return empty array with proper structure
@@ -690,12 +770,52 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
      */
     private function getRevenueChartData(Clinic $clinic, array $dateRange, string $timeRange = 'week'): array
     {
-        // Get ALL payments for this clinic, not just within the date range
-        $query = Payment::where('clinic_id', $clinic->id)
-            ->where('status', 'completed');
+        // For year ranges, always show monthly data
+        if (is_numeric($timeRange)) {
+            $query = Payment::where('clinic_id', $clinic->id)
+                ->where('status', 'completed')
+                ->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']]);
 
-        // For year range, group by months for better visualization
+            // For year: show all 12 months with data
+            $data = $query->select(
+                DB::raw('YEAR(payment_date) as year'),
+                DB::raw('MONTH(payment_date) as month'),
+                DB::raw('SUM(amount) as revenue')
+            )
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                $monthName = Carbon::create()->month($item->month)->format('M');
+                return [
+                    'x' => $monthName,
+                    'y' => (float) $item->revenue
+                ];
+            })
+            ->toArray();
+
+            // If no data, return empty array with proper structure
+            if (empty($data)) {
+                $data = [['x' => 'No Data', 'y' => 0]];
+            }
+
+            return [
+                [
+                    'id' => 'revenue',
+                    'data' => $data
+                ]
+            ];
+        }
+
+        // Legacy support for old time ranges (should not be used anymore)
+        $query = Payment::where('clinic_id', $clinic->id)
+            ->where('status', 'completed')
+            ->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']]);
+
+        // Generate data based on time range
         if ($timeRange === 'year') {
+            // For year: show all 12 months with data
             $data = $query->select(
                 DB::raw('YEAR(payment_date) as year'),
                 DB::raw('MONTH(payment_date) as month'),
@@ -714,56 +834,78 @@ public function getPatientSatisfactionMetrics(Clinic $clinic, string $timeRange 
             })
             ->toArray();
         } elseif ($timeRange === 'month') {
-            // For month range, group by days within the current month
-            $data = $query->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']])
-                ->select(
-                    DB::raw('DATE(payment_date) as date'),
-                    DB::raw('SUM(amount) as revenue')
-                )
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => Carbon::parse($item->date)->format('M j'),
-                        'y' => (float) $item->revenue
-                    ];
-                })
-                ->toArray();
+            // For month: show all days in the selected month
+            $startDate = Carbon::parse($dateRange['start']);
+            $endDate = Carbon::parse($dateRange['end']);
+            $daysInMonth = $startDate->daysInMonth;
+
+            // Get actual payment data
+            $paymentData = $query->select(
+                DB::raw('DAY(payment_date) as day'),
+                DB::raw('SUM(amount) as revenue')
+            )
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get()
+            ->keyBy('day')
+            ->toArray();
+
+            // Create complete month data (1-31 days)
+            $data = [];
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $revenue = isset($paymentData[$day]) ? (float) $paymentData[$day]['revenue'] : 0;
+                $data[] = [
+                    'x' => $day,
+                    'y' => $revenue
+                ];
+            }
         } elseif ($timeRange === 'week') {
-            // For week range, group by days within the current week
-            $data = $query->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']])
-                ->select(
-                    DB::raw('DATE(payment_date) as date'),
-                    DB::raw('SUM(amount) as revenue')
-                )
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => Carbon::parse($item->date)->format('M j'),
-                        'y' => (float) $item->revenue
-                    ];
-                })
-                ->toArray();
+            // For week: show all 7 days in the selected week
+            $startDate = Carbon::parse($dateRange['start']);
+            $endDate = Carbon::parse($dateRange['end']);
+
+            // Get actual payment data
+            $paymentData = $query->select(
+                DB::raw('DAYOFWEEK(payment_date) as day_of_week'),
+                DB::raw('SUM(amount) as revenue')
+            )
+            ->groupBy('day_of_week')
+            ->orderBy('day_of_week')
+            ->get()
+            ->keyBy('day_of_week')
+            ->toArray();
+
+            // Create complete week data (Mon-Sun)
+            $dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            $data = [];
+            for ($i = 1; $i <= 7; $i++) {
+                $revenue = isset($paymentData[$i]) ? (float) $paymentData[$i]['revenue'] : 0;
+                $data[] = [
+                    'x' => $dayNames[$i - 1],
+                    'y' => $revenue
+                ];
+            }
         } else {
-            // For today and other ranges, group by days
-            $data = $query->whereBetween('payment_date', [$dateRange['start'], $dateRange['end']])
-                ->select(
-                    DB::raw('DATE(payment_date) as date'),
-                    DB::raw('SUM(amount) as revenue')
-                )
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'x' => Carbon::parse($item->date)->format('M j'),
-                        'y' => (float) $item->revenue
-                    ];
-                })
-                ->toArray();
+            // For today: show hourly data for the selected day
+            $paymentData = $query->select(
+                DB::raw('HOUR(payment_date) as hour'),
+                DB::raw('SUM(amount) as revenue')
+            )
+            ->groupBy('hour')
+            ->orderBy('hour')
+            ->get()
+            ->keyBy('hour')
+            ->toArray();
+
+            // Create complete day data (0-23 hours)
+            $data = [];
+            for ($hour = 0; $hour <= 23; $hour++) {
+                $revenue = isset($paymentData[$hour]) ? (float) $paymentData[$hour]['revenue'] : 0;
+                $data[] = [
+                    'x' => $hour . ':00',
+                    'y' => $revenue
+                ];
+            }
         }
 
         // If no data, return empty array with proper structure

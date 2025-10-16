@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Inventory;
 use App\Models\Patient;
+use App\Models\Payment;
 use App\Models\Treatment;
 use App\Services\SubscriptionService;
 use App\Services\DashboardMetricsService;
@@ -37,11 +38,11 @@ class DashboardController extends Controller
 
         $user = Auth::user();
 
-        // Get time range from request, default to 'month'
-        $timeRange = $request->get('range', 'month');
-        $validRanges = ['today', 'week', 'month', 'quarter', 'year'];
+        // Get time range from request, default to current year
+        $timeRange = $request->get('range', date('Y'));
+        $validRanges = $this->getAvailableYears();
         if (!in_array($timeRange, $validRanges)) {
-            $timeRange = 'month';
+            $timeRange = date('Y');
         }
 
         // Check if user is inactive
@@ -180,12 +181,63 @@ class DashboardController extends Controller
     }
 
     /**
+     * Get available years for time range selection
+     */
+    private function getAvailableYears(): array
+    {
+        $currentYear = (int) date('Y');
+        $years = [];
+
+        // Get years from existing data (payments and appointments)
+        $paymentYears = Payment::selectRaw('YEAR(payment_date) as year')
+            ->distinct()
+            ->pluck('year')
+            ->filter()
+            ->toArray();
+
+        $appointmentYears = Appointment::selectRaw('YEAR(created_at) as year')
+            ->distinct()
+            ->pluck('year')
+            ->filter()
+            ->toArray();
+
+        // Combine and get unique years
+        $dataYears = array_unique(array_merge($paymentYears, $appointmentYears));
+
+        // Always include current year and next year
+        $years[] = $currentYear;
+        $years[] = $currentYear + 1;
+
+        // Add any years from data
+        foreach ($dataYears as $year) {
+            if ($year >= 2020 && $year <= $currentYear + 5) { // Reasonable range
+                $years[] = (int) $year;
+            }
+        }
+
+        // Sort and return unique years
+        $years = array_unique($years);
+        sort($years);
+
+        return array_map('strval', $years); // Convert to strings for consistency
+    }
+
+    /**
      * Get previous date range for comparison
      */
     private function getPreviousDateRange(string $timeRange): array
     {
-        $end = Carbon::now();
+        // For year ranges, get the previous year
+        if (is_numeric($timeRange)) {
+            $year = (int) $timeRange;
+            return [
+                'start' => Carbon::create($year - 1, 1, 1)->startOfYear(),
+                'end' => Carbon::create($year - 1, 12, 31)->endOfYear()
+            ];
+        }
 
+        // Legacy support for old time ranges (should not be used anymore)
+        $end = Carbon::now();
         switch ($timeRange) {
             case 'today':
                 $start = Carbon::yesterday();

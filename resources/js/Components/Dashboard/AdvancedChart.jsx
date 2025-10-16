@@ -44,31 +44,48 @@ const AdvancedChart = ({
             // Return default empty data structure based on chart type
             if (type === "pie") {
                 return [{ id: "No Data", value: 1, color: "#E5E7EB" }];
+            } else if (type === "bar") {
+                return [{ x: "No Data", y: 0 }];
             } else {
                 return [{ id: "No Data", data: [{ x: "No Data", y: 0 }] }];
             }
         }
 
         // Ensure data has the correct structure
-        return data.map((item) => {
-            if (type === "pie") {
-                return {
-                    id: item.id || "Unknown",
-                    value: typeof item.value === "number" ? item.value : 0,
-                    color: item.color || "#3B82F6",
-                };
-            } else {
-                return {
-                    id: item.id || "Unknown",
-                    data: Array.isArray(item.data)
-                        ? item.data.map((point) => ({
-                              x: point.x || "Unknown",
-                              y: typeof point.y === "number" ? point.y : 0,
-                          }))
-                        : [{ x: "No Data", y: 0 }],
-                };
-            }
-        });
+        if (type === "bar") {
+            // For bar charts, flatten the data structure
+            const flattenedData = [];
+            data.forEach((series) => {
+                if (Array.isArray(series.data)) {
+                    series.data.forEach((point) => {
+                        flattenedData.push({
+                            x: point.x || "Unknown",
+                            y: typeof point.y === "number" ? point.y : 0,
+                        });
+                    });
+                }
+            });
+            return flattenedData.length > 0
+                ? flattenedData
+                : [{ x: "No Data", y: 0 }];
+        } else if (type === "pie") {
+            return data.map((item) => ({
+                id: item.id || "Unknown",
+                value: typeof item.value === "number" ? item.value : 0,
+                color: item.color || "#3B82F6",
+            }));
+        } else {
+            // For line charts, keep the original structure
+            return data.map((item) => ({
+                id: item.id || "Unknown",
+                data: Array.isArray(item.data)
+                    ? item.data.map((point) => ({
+                          x: point.x || "Unknown",
+                          y: typeof point.y === "number" ? point.y : 0,
+                      }))
+                    : [{ x: "No Data", y: 0 }],
+            }));
+        }
     }, [data, type]);
 
     // Subtle Blue Color Scheme
@@ -215,6 +232,8 @@ const AdvancedChart = ({
                     },
                     borderRadius: 3,
                     borderWidth: 0,
+                    keys: ["y"], // Use 'y' as the value key
+                    indexBy: "x", // Use 'x' as the index key
                 };
             case "pie":
                 return {
