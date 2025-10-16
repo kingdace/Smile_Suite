@@ -269,6 +269,19 @@ class PatientController extends Controller
         $this->authorize('update', $patient);
 
         $validated = $request->validated();
+
+        // Apply intelligent name parsing if both first_name and last_name are provided
+        if (isset($validated['first_name']) && isset($validated['last_name'])) {
+            // If the first_name contains multiple words, parse it intelligently
+            $first_name_parts = explode(' ', trim($validated['first_name']));
+            if (count($first_name_parts) > 1) {
+                // Use the intelligent name parsing algorithm
+                $nameParts = $this->parseFullName($validated['first_name'] . ' ' . $validated['last_name']);
+                $validated['first_name'] = $nameParts['first_name'];
+                $validated['last_name'] = $nameParts['last_name'];
+            }
+        }
+
         $patient->update($validated);
 
         // Check if the request expects JSON (API request)
@@ -366,6 +379,26 @@ class PatientController extends Controller
             ->get();
 
         return response()->json($patients);
+    }
+
+    /**
+     * Parse full name into first_name and last_name intelligently
+     */
+    private function parseFullName(string $fullName): array
+    {
+        $fullName = trim($fullName);
+        $parts = explode(' ', $fullName);
+
+        if (count($parts) === 1) {
+            return ['first_name' => $parts[0], 'last_name' => ''];
+        } elseif (count($parts) === 2) {
+            return ['first_name' => $parts[0], 'last_name' => $parts[1]];
+        } else {
+            // For 3+ parts, put everything except the last part as first_name
+            $lastName = array_pop($parts);
+            $firstName = implode(' ', $parts);
+            return ['first_name' => $firstName, 'last_name' => $lastName];
+        }
     }
 
     /**
