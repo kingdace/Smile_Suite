@@ -83,7 +83,7 @@ export default function Dashboard({
     peak_hours,
 }) {
     // State for dashboard customization and real-time updates
-    const [timeRange, setTimeRange] = useState(current_time_range || "week");
+    const [timeRange, setTimeRange] = useState(current_time_range || "month");
     const [loading, setLoading] = useState(false);
     const [dashboardWidgets, setDashboardWidgets] = useState([
         { id: "revenue", title: "Revenue Metrics", visible: true },

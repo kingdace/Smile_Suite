@@ -54,7 +54,7 @@ const EnhancedDashboardLayout = ({
     patientDemographics,
     treatmentSuccess,
     peakHours,
-    timeRange = "week",
+    timeRange = "month",
     onTimeRangeChange,
     loading = false,
     className = "",

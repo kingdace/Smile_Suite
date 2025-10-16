@@ -37,11 +37,11 @@ class DashboardController extends Controller
 
         $user = Auth::user();
 
-        // Get time range from request, default to 'week'
-        $timeRange = $request->get('range', 'week');
+        // Get time range from request, default to 'month'
+        $timeRange = $request->get('range', 'month');
         $validRanges = ['today', 'week', 'month', 'quarter', 'year'];
         if (!in_array($timeRange, $validRanges)) {
-            $timeRange = 'week';
+            $timeRange = 'month';
         }
 
         // Check if user is inactive
@@ -76,7 +76,7 @@ class DashboardController extends Controller
             ->whereDate('scheduled_at', '>', today())
             ->whereIn('appointment_status_id', [1, 2]) // 1 = Pending, 2 = Confirmed
             ->orderBy('scheduled_at')
-            ->take(5)
+            ->take(4)
             ->get();
 
         // For Today's Schedule: If no appointments today, show upcoming appointments
@@ -87,7 +87,7 @@ class DashboardController extends Controller
         // Get recent patients
         $recentPatients = Patient::where('clinic_id', $clinic->id)
             ->latest()
-            ->take(5)
+            ->take(4)
             ->get();
 
         // Get low stock items
