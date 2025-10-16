@@ -272,14 +272,10 @@ class PatientController extends Controller
 
         // Apply intelligent name parsing if both first_name and last_name are provided
         if (isset($validated['first_name']) && isset($validated['last_name'])) {
-            // If the first_name contains multiple words, parse it intelligently
-            $first_name_parts = explode(' ', trim($validated['first_name']));
-            if (count($first_name_parts) > 1) {
-                // Use the intelligent name parsing algorithm
-                $nameParts = $this->parseFullName($validated['first_name'] . ' ' . $validated['last_name']);
-                $validated['first_name'] = $nameParts['first_name'];
-                $validated['last_name'] = $nameParts['last_name'];
-            }
+                // Always apply intelligent name parsing to ensure consistent name handling
+            $nameParts = $this->parseFullName($validated['first_name'] . ' ' . $validated['last_name']);
+            $validated['first_name'] = $nameParts['first_name'];
+            $validated['last_name'] = $nameParts['last_name'];
         }
 
         $patient->update($validated);

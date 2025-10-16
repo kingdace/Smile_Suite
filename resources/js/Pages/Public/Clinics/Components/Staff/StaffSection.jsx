@@ -93,8 +93,8 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                 </p>
             </div>
 
-            {/* Staff Grid - Mobile Optimized */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            {/* Staff Grid - Mobile Optimized with Centered Layout */}
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-6">
                 {clinic.staff
                     .sort((a, b) => {
                         // Sort dentists first, then staff
@@ -112,7 +112,7 @@ export default function StaffSection({ clinic, onBookAppointment }) {
                     .map((member, index) => (
                         <div
                             key={index}
-                            className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col min-h-[280px] sm:min-h-[320px] w-full"
+                            className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group flex flex-col min-h-[280px] sm:min-h-[320px] w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-1rem)] max-w-sm"
                         >
                             {/* Header with Avatar and Role - Mobile Compact */}
                             <div className="relative p-3 sm:p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-cyan-50">
