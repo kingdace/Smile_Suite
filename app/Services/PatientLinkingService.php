@@ -123,11 +123,12 @@ class PatientLinkingService
         }
 
         // Patient doesn't exist in clinic - create new patient record
+        $nameParts = $this->parseFullName($user->name);
         $newPatient = Patient::create([
             'clinic_id' => $clinic->id,
             'user_id' => $user->id,
-            'first_name' => explode(' ', $user->name)[0] ?? $user->name,
-            'last_name' => explode(' ', $user->name)[1] ?? '',
+            'first_name' => $nameParts['first_name'],
+            'last_name' => $nameParts['last_name'],
             'email' => $user->email,
             'phone_number' => $user->phone_number,
             'email_verified' => true, // Since they have a verified user account
@@ -515,6 +516,46 @@ class PatientLinkingService
 
         foreach ($unlinkedPatients as $patient) {
             $patient->linkToUser($user);
+        }
+    }
+
+    /**
+     * Parse full name into first name and last name
+     * Uses intelligent parsing: last word = last name, everything else = first name
+     *
+     * Examples:
+     * - "John" → first_name: "John", last_name: ""
+     * - "John Doe" → first_name: "John", last_name: "Doe"
+     * - "Dy Mark Gales" → first_name: "Dy Mark", last_name: "Gales"
+     * - "Maria Elena Rodriguez" → first_name: "Maria Elena", last_name: "Rodriguez"
+     * - "Jose Maria Dela Cruz" → first_name: "Jose Maria Dela", last_name: "Cruz"
+     */
+    private function parseFullName(string $fullName): array
+    {
+        $fullName = trim($fullName);
+        $parts = explode(' ', $fullName);
+
+        if (count($parts) === 1) {
+            // Single name - put in first_name
+            return [
+                'first_name' => $parts[0],
+                'last_name' => ''
+            ];
+        } elseif (count($parts) === 2) {
+            // Two names - standard first/last
+            return [
+                'first_name' => $parts[0],
+                'last_name' => $parts[1]
+            ];
+        } else {
+            // Multiple names - everything except last word = first_name, last word = last_name
+            $lastName = array_pop($parts); // Remove and get the last element
+            $firstName = implode(' ', $parts); // Join remaining parts
+
+            return [
+                'first_name' => $firstName,
+                'last_name' => $lastName
+            ];
         }
     }
 }

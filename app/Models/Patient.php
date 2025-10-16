@@ -127,6 +127,94 @@ class Patient extends Model
         return "{$this->first_name} {$this->last_name}";
     }
 
+    /**
+     * Check if this patient record has incorrect name splitting
+     * This happens when patients were created with the old flawed name parsing logic
+     */
+    public function hasIncorrectNameSplitting(): bool
+    {
+        // If first_name contains multiple words but last_name is empty, it's likely incorrect
+        if (!empty($this->first_name) && empty($this->last_name)) {
+            $first_name_parts = explode(' ', trim($this->first_name));
+            return count($first_name_parts) > 1;
+        }
+
+        // If first_name has multiple words and last_name is a single word,
+        // it might be missing the actual last name
+        if (!empty($this->first_name) && !empty($this->last_name)) {
+            $first_name_parts = explode(' ', trim($this->first_name));
+            $last_name_parts = explode(' ', trim($this->last_name));
+
+            // If first_name has multiple words but last_name is single word,
+            // and the patient has a linked user account, we should check
+            if (count($first_name_parts) > 1 && count($last_name_parts) === 1 && $this->user_id) {
+                return true; // Likely needs fixing
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Fix incorrect name splitting using the intelligent parsing algorithm
+     * This should be called when we detect incorrect name splitting
+     */
+    public function fixNameSplitting(): bool
+    {
+        if (!$this->hasIncorrectNameSplitting()) {
+            return false; // No fixing needed
+        }
+
+        // If we have a linked user account, use the user's name as the source of truth
+        if ($this->user_id && $this->user) {
+            $nameParts = $this->parseFullName($this->user->name);
+            $this->first_name = $nameParts['first_name'];
+            $this->last_name = $nameParts['last_name'];
+            return $this->save();
+        }
+
+        // If no user account, try to fix based on current first_name
+        if (!empty($this->first_name)) {
+            $nameParts = $this->parseFullName($this->first_name);
+            $this->first_name = $nameParts['first_name'];
+            $this->last_name = $nameParts['last_name'];
+            return $this->save();
+        }
+
+        return false;
+    }
+
+    /**
+     * Parse full name into first name and last name
+     * Uses intelligent parsing: last word = last name, everything else = first name
+     */
+    private function parseFullName(string $fullName): array
+    {
+        $fullName = trim($fullName);
+        $parts = explode(' ', $fullName);
+
+        if (count($parts) === 1) {
+            return [
+                'first_name' => $parts[0],
+                'last_name' => ''
+            ];
+        } elseif (count($parts) === 2) {
+            return [
+                'first_name' => $parts[0],
+                'last_name' => $parts[1]
+            ];
+        } else {
+            // Multiple names - everything except last word = first_name, last word = last_name
+            $lastName = array_pop($parts);
+            $firstName = implode(' ', $parts);
+
+            return [
+                'first_name' => $firstName,
+                'last_name' => $lastName
+            ];
+        }
+    }
+
     public function getAgeAttribute()
     {
         return $this->date_of_birth->age;
@@ -301,6 +389,31 @@ class Patient extends Model
             $q->whereHas('status', function($statusQuery) {
                 $statusQuery->where('name', 'Confirmed');
             });
+        });
+    }
+
+    /**
+     * Scope for patients that should be visible in clinic management
+     * Shows:
+     * 1. Manually created patients (no user_id) - always visible
+     * 2. Patients with confirmed appointments
+     * 3. Patients with no appointments (manually created)
+     * Excludes:
+     * 1. Online booking patients with only pending appointments
+     */
+    public function scopeVisibleInClinic($query)
+    {
+        return $query->where(function($q) {
+            // Manually created patients (no user_id) - always visible
+            $q->whereNull('user_id')
+              // OR patients with confirmed appointments
+              ->orWhereHas('appointments', function($appointmentQuery) {
+                  $appointmentQuery->whereHas('status', function($statusQuery) {
+                      $statusQuery->where('name', 'Confirmed');
+                  });
+              })
+              // OR patients with no appointments at all (manually created)
+              ->orWhereDoesntHave('appointments');
         });
     }
 

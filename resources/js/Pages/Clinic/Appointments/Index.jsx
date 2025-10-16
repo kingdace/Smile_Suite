@@ -689,6 +689,12 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                                     Service
                                                 </div>
                                             </th>
+                                            <th className="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <CheckCircle className="h-4 w-4" />
+                                                    Status Actions
+                                                </div>
+                                            </th>
                                             <th className="px-6 py-4 text-right text-xs font-semibold text-white uppercase tracking-wider">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Settings className="h-4 w-4" />
@@ -867,6 +873,99 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                                                 </span>
                                                             )}
                                                         </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                                            <div className="flex items-center justify-center gap-2">
+                                                                {isOnline &&
+                                                                    statusName ===
+                                                                        "pending" && (
+                                                                        <>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                onClick={() =>
+                                                                                    handleApprove(
+                                                                                        appointment
+                                                                                    )
+                                                                                }
+                                                                                className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 px-3 py-1.5 rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-1.5"
+                                                                                title="Approve Appointment"
+                                                                            >
+                                                                                <Check className="h-3.5 w-3.5" />
+                                                                                <span className="text-xs font-medium">
+                                                                                    Approve
+                                                                                </span>
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                onClick={() =>
+                                                                                    handleDeny(
+                                                                                        appointment
+                                                                                    )
+                                                                                }
+                                                                                className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 px-3 py-1.5 rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-1.5"
+                                                                                title="Deny Appointment"
+                                                                            >
+                                                                                <X className="h-3.5 w-3.5" />
+                                                                                <span className="text-xs font-medium">
+                                                                                    Deny
+                                                                                </span>
+                                                                            </Button>
+                                                                        </>
+                                                                    )}
+                                                                {appointment
+                                                                    .status
+                                                                    ?.name ===
+                                                                    "Pending Reschedule" && (
+                                                                    <>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            onClick={() =>
+                                                                                handleApproveReschedule(
+                                                                                    appointment
+                                                                                )
+                                                                            }
+                                                                            className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 px-3 py-1.5 rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-1.5"
+                                                                            title="Approve Reschedule"
+                                                                        >
+                                                                            <Check className="h-3.5 w-3.5" />
+                                                                            <span className="text-xs font-medium">
+                                                                                Approve
+                                                                            </span>
+                                                                        </Button>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            onClick={() =>
+                                                                                handleDenyReschedule(
+                                                                                    appointment
+                                                                                )
+                                                                            }
+                                                                            className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 hover:border-red-300 px-3 py-1.5 rounded-lg transition-all duration-200 hover:scale-105 flex items-center gap-1.5"
+                                                                            title="Deny Reschedule"
+                                                                        >
+                                                                            <X className="h-3.5 w-3.5" />
+                                                                            <span className="text-xs font-medium">
+                                                                                Deny
+                                                                            </span>
+                                                                        </Button>
+                                                                    </>
+                                                                )}
+                                                                {!isOnline ||
+                                                                    (statusName !==
+                                                                        "pending" &&
+                                                                        appointment
+                                                                            .status
+                                                                            ?.name !==
+                                                                            "Pending Reschedule" && (
+                                                                            <span className="text-gray-400 text-xs">
+                                                                                No
+                                                                                actions
+                                                                            </span>
+                                                                        ))}
+                                                            </div>
+                                                        </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                             <div className="flex items-center justify-end gap-2">
                                                                 <Button
@@ -905,71 +1004,6 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                                                 >
                                                                     <Edit className="h-4 w-4" />
                                                                 </Button>
-                                                                {isOnline &&
-                                                                    statusName ===
-                                                                        "pending" && (
-                                                                        <>
-                                                                            <Button
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                onClick={() =>
-                                                                                    handleApprove(
-                                                                                        appointment
-                                                                                    )
-                                                                                }
-                                                                                className="text-green-600 hover:text-green-700 hover:bg-green-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                                                title="Approve Appointment"
-                                                                            >
-                                                                                <Check className="h-4 w-4" />
-                                                                            </Button>
-                                                                            <Button
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                onClick={() =>
-                                                                                    handleDeny(
-                                                                                        appointment
-                                                                                    )
-                                                                                }
-                                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                                                title="Deny Appointment"
-                                                                            >
-                                                                                <X className="h-4 w-4" />
-                                                                            </Button>
-                                                                        </>
-                                                                    )}
-                                                                {appointment
-                                                                    .status
-                                                                    ?.name ===
-                                                                    "Pending Reschedule" && (
-                                                                    <>
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="sm"
-                                                                            onClick={() =>
-                                                                                handleApproveReschedule(
-                                                                                    appointment
-                                                                                )
-                                                                            }
-                                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                                            title="Approve Reschedule"
-                                                                        >
-                                                                            <Check className="h-4 w-4" />
-                                                                        </Button>
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="sm"
-                                                                            onClick={() =>
-                                                                                handleDenyReschedule(
-                                                                                    appointment
-                                                                                )
-                                                                            }
-                                                                            className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                                                            title="Deny Reschedule"
-                                                                        >
-                                                                            <X className="h-4 w-4" />
-                                                                        </Button>
-                                                                    </>
-                                                                )}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1033,22 +1067,30 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                     results
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {appointments?.links?.map((link, index) => (
-                                        <Link
-                                            key={index}
-                                            href={link.url}
-                                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                                                link.active
-                                                    ? "bg-blue-600 text-white"
-                                                    : link.url
-                                                    ? "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-                                                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            }`}
-                                            dangerouslySetInnerHTML={{
-                                                __html: link.label,
-                                            }}
-                                        />
-                                    ))}
+                                    {appointments?.links?.map((link, index) =>
+                                        link.url ? (
+                                            <Link
+                                                key={index}
+                                                href={link.url}
+                                                className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                                    link.active
+                                                        ? "bg-blue-600 text-white"
+                                                        : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                                                }`}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+                                        ) : (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+                                        )
+                                    )}
                                 </div>
                             </div>
                         )}

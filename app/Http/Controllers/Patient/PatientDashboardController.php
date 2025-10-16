@@ -30,6 +30,13 @@ class PatientDashboardController extends Controller
         // Get all patient records for this user (one per clinic)
         $patients = \App\Models\Patient::where('user_id', $user->id)->with('clinic')->get();
 
+        // Auto-fix incorrect name splitting for all patient records
+        foreach ($patients as $patient) {
+            if ($patient->hasIncorrectNameSplitting()) {
+                $patient->fixNameSplitting();
+            }
+        }
+
         // Get all appointments for all patient records (not just future ones)
         $appointments = \App\Models\Appointment::with(['clinic', 'status'])
             ->whereIn('patient_id', $patients->pluck('id'))

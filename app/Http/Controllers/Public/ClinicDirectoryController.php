@@ -136,8 +136,8 @@ class ClinicDirectoryController extends Controller
                 'clinic_id' => $clinic->id,
             ],
             [
-                'first_name' => $user->name,
-                'last_name' => '',
+                'first_name' => $this->parseFullName($user->name)['first_name'],
+                'last_name' => $this->parseFullName($user->name)['last_name'],
                 'email' => $user->email,
                 'phone_number' => $user->phone_number,
                 'date_of_birth' => now()->subYears(18), // Placeholder
@@ -211,5 +211,44 @@ class ClinicDirectoryController extends Controller
         }
 
         return back()->with('success', 'Appointment request submitted successfully! You will receive a confirmation email shortly.');
+    }
+
+    /**
+     * Parse full name into first name and last name
+     * Uses intelligent parsing: last word = last name, everything else = first name
+     *
+     * Examples:
+     * - "John" → first_name: "John", last_name: ""
+     * - "John Doe" → first_name: "John", last_name: "Doe"
+     * - "Kram Yd Gales" → first_name: "Kram Yd", last_name: "Gales"
+     * - "Maria Elena Rodriguez" → first_name: "Maria Elena", last_name: "Rodriguez"
+     */
+    private function parseFullName(string $fullName): array
+    {
+        $fullName = trim($fullName);
+        $parts = explode(' ', $fullName);
+
+        if (count($parts) === 1) {
+            // Single name - put in first_name
+            return [
+                'first_name' => $parts[0],
+                'last_name' => ''
+            ];
+        } elseif (count($parts) === 2) {
+            // Two names - standard first/last
+            return [
+                'first_name' => $parts[0],
+                'last_name' => $parts[1]
+            ];
+        } else {
+            // Multiple names - everything except last word = first_name, last word = last_name
+            $lastName = array_pop($parts); // Remove and get the last element
+            $firstName = implode(' ', $parts); // Join remaining parts
+
+            return [
+                'first_name' => $firstName,
+                'last_name' => $lastName
+            ];
+        }
     }
 }

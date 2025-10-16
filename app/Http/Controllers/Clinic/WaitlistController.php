@@ -93,7 +93,7 @@ class WaitlistController extends Controller
         $this->authorize('create', [Waitlist::class, $clinic]);
 
         $patients = $clinic->patients()
-            ->withConfirmedAppointments()
+            ->visibleInClinic()
             ->orderBy('first_name')
             ->get();
 
@@ -191,7 +191,7 @@ class WaitlistController extends Controller
         $waitlist->load(['patient', 'preferredDentist', 'service', 'appointmentType']);
 
         $patients = $clinic->patients()
-            ->withConfirmedAppointments()
+            ->visibleInClinic()
             ->orderBy('first_name')
             ->get();
 

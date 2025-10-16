@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Checkbox } from "@/Components/ui/checkbox";
+import PatientSelector from "@/Components/Appointment/PatientSelector";
 import { Link } from "@inertiajs/react";
 import {
     ArrowLeft,
@@ -30,7 +31,7 @@ import {
     Heart,
     Star,
 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function Edit({
     auth,
@@ -63,6 +64,24 @@ export default function Edit({
     const [selectedDays, setSelectedDays] = useState(
         waitlist.preferred_days || []
     );
+    const [selectedPatient, setSelectedPatient] = useState(null);
+
+    const handlePatientSelect = (patient) => {
+        setSelectedPatient(patient);
+        setData("patient_id", patient.id);
+    };
+
+    // Initialize selectedPatient with current waitlist's patient
+    React.useEffect(() => {
+        if (waitlist?.patient_id && patients) {
+            const currentPatient = patients.find(
+                (p) => p.id.toString() === waitlist.patient_id.toString()
+            );
+            if (currentPatient) {
+                setSelectedPatient(currentPatient);
+            }
+        }
+    }, [waitlist, patients]);
 
     const handleDayToggle = (day) => {
         const newDays = selectedDays.includes(day)
@@ -138,36 +157,12 @@ export default function Edit({
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div>
-                            <Label htmlFor="patient_id">Patient *</Label>
-                            <Select
-                                value={data.patient_id}
-                                onValueChange={(value) =>
-                                    setData("patient_id", value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a patient" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {patients.map((patient) => (
-                                        <SelectItem
-                                            key={patient.id}
-                                            value={patient.id}
-                                        >
-                                            {patient.first_name}{" "}
-                                            {patient.last_name} -{" "}
-                                            {patient.email}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.patient_id && (
-                                <p className="text-sm text-red-600 mt-1">
-                                    {errors.patient_id}
-                                </p>
-                            )}
-                        </div>
+                        <PatientSelector
+                            clinic={clinic}
+                            selectedPatient={selectedPatient}
+                            onPatientSelect={handlePatientSelect}
+                            error={errors.patient_id}
+                        />
                     </CardContent>
                 </Card>
 

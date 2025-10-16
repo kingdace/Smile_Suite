@@ -1098,12 +1098,7 @@ export default function Edit({
                                                 }}
                                             >
                                                 <SelectTrigger className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                    <SelectValue placeholder="Select Region">
-                                                        {psgcData.region
-                                                            ? psgcData.region
-                                                                  .name
-                                                            : "Select Region"}
-                                                    </SelectValue>
+                                                    <SelectValue placeholder="Select Region" />
                                                 </SelectTrigger>
                                                 <SelectContent className="max-h-[300px] overflow-y-auto">
                                                     {(regions &&
@@ -1149,12 +1144,7 @@ export default function Edit({
                                                 }
                                             >
                                                 <SelectTrigger className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                    <SelectValue placeholder="Select Province">
-                                                        {psgcData.province
-                                                            ? psgcData.province
-                                                                  .name
-                                                            : "Select Province"}
-                                                    </SelectValue>
+                                                    <SelectValue placeholder="Select Province" />
                                                 </SelectTrigger>
                                                 <SelectContent className="max-h-[300px] overflow-y-auto">
                                                     {(provinces &&
@@ -1204,13 +1194,7 @@ export default function Edit({
                                                 }
                                             >
                                                 <SelectTrigger className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                    <SelectValue placeholder="Select City/Municipality">
-                                                        {psgcData.cityMunicipality
-                                                            ? psgcData
-                                                                  .cityMunicipality
-                                                                  .name
-                                                            : "Select City/Municipality"}
-                                                    </SelectValue>
+                                                    <SelectValue placeholder="Select City/Municipality" />
                                                 </SelectTrigger>
                                                 <SelectContent className="max-h-[300px] overflow-y-auto">
                                                     {(cities &&
@@ -1255,12 +1239,7 @@ export default function Edit({
                                                 }
                                             >
                                                 <SelectTrigger className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                                                    <SelectValue placeholder="Select Barangay">
-                                                        {psgcData.barangay
-                                                            ? psgcData.barangay
-                                                                  .name
-                                                            : "Select Barangay"}
-                                                    </SelectValue>
+                                                    <SelectValue placeholder="Select Barangay" />
                                                 </SelectTrigger>
                                                 <SelectContent className="max-h-[300px] overflow-y-auto">
                                                     {(barangays &&

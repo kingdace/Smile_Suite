@@ -31,6 +31,13 @@ class PatientProfileController extends Controller
         // Get all patient records for this user
         $patients = $user->patients()->with('clinic')->get();
 
+        // Auto-fix incorrect name splitting for all patient records
+        foreach ($patients as $patient) {
+            if ($patient->hasIncorrectNameSplitting()) {
+                $patient->fixNameSplitting();
+            }
+        }
+
         return Inertia::render('Patient/Profile/Show', [
             'user' => $user,
             'patients' => $patients,
@@ -50,6 +57,13 @@ class PatientProfileController extends Controller
 
         // Get all patient records for this user
         $patients = $user->patients()->with('clinic')->get();
+
+        // Auto-fix incorrect name splitting for all patient records
+        foreach ($patients as $patient) {
+            if ($patient->hasIncorrectNameSplitting()) {
+                $patient->fixNameSplitting();
+            }
+        }
 
         return Inertia::render('Patient/Profile/Edit', [
             'user' => $user,

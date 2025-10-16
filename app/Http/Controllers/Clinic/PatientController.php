@@ -37,7 +37,7 @@ class PatientController extends Controller
         $this->checkSubscriptionAccess();
 
         $query = Auth::user()->clinic->patients()
-            ->withConfirmedAppointments()
+            ->visibleInClinic()
             ->with(['appointments', 'treatments', 'payments']);
 
         if ($request->search) {
@@ -98,18 +98,18 @@ class PatientController extends Controller
             ];
         });
 
-        // Calculate statistics using model scopes (only confirmed patients)
+        // Calculate statistics using model scopes (visible patients)
         $clinicId = Auth::user()->clinic_id;
-        $totalPatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->count();
+        $totalPatients = Patient::where('clinic_id', $clinicId)->visibleInClinic()->count();
         $newThisMonth = Patient::where('clinic_id', $clinicId)
-            ->withConfirmedAppointments()
+            ->visibleInClinic()
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
-        $recentVisits = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->active()->count();
-        $activePatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->active()->count();
-        $newPatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->new()->count();
-        $inactivePatients = Patient::where('clinic_id', $clinicId)->withConfirmedAppointments()->inactive()->count();
+        $recentVisits = Patient::where('clinic_id', $clinicId)->visibleInClinic()->active()->count();
+        $activePatients = Patient::where('clinic_id', $clinicId)->visibleInClinic()->active()->count();
+        $newPatients = Patient::where('clinic_id', $clinicId)->visibleInClinic()->new()->count();
+        $inactivePatients = Patient::where('clinic_id', $clinicId)->visibleInClinic()->inactive()->count();
 
         // Debug logging
         Log::info('Patient statistics debug', [
@@ -190,6 +190,12 @@ class PatientController extends Controller
     {
         $this->authorize('view', $patient);
 
+        // Auto-fix incorrect name splitting if detected
+        if ($patient->hasIncorrectNameSplitting()) {
+            $patient->fixNameSplitting();
+            $patient->refresh(); // Reload the model to get updated data
+        }
+
         // Load basic relationships
         $patient->load(['appointments', 'treatments', 'payments']);
 
@@ -228,11 +234,19 @@ class PatientController extends Controller
     {
         $this->authorize('update', $patient);
 
+        // Auto-fix incorrect name splitting if detected
+        if ($patient->hasIncorrectNameSplitting()) {
+            $patient->fixNameSplitting();
+            $patient->refresh(); // Reload the model to get updated data
+        }
+
         $regions = $this->psgcApi->getRegions()->getData();
 
         // Debug: Log the patient data being passed
         Log::info('Patient data for edit:', [
             'id' => $patient->id,
+            'first_name' => $patient->first_name,
+            'last_name' => $patient->last_name,
             'region_code' => $patient->region_code,
             'province_code' => $patient->province_code,
             'city_municipality_code' => $patient->city_municipality_code,
@@ -341,7 +355,7 @@ class PatientController extends Controller
         $search = $request->input('search');
 
         $patients = $clinic->patients()
-            ->withConfirmedAppointments()
+            ->visibleInClinic()
             ->where(function ($query) use ($search) {
                 $query->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
@@ -423,7 +437,7 @@ class PatientController extends Controller
         $clinic = Auth::user()->clinic;
 
         $query = $clinic->patients()
-            ->withConfirmedAppointments()
+            ->visibleInClinic()
             ->withCount(['appointments', 'treatments'])
             ->withSum('payments', 'amount')
             ->withAvg('reviews', 'rating');

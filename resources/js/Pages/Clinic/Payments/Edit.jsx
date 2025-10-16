@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Badge } from "@/Components/ui/badge";
+import PatientSelector from "@/Components/Appointment/PatientSelector";
 import {
     DollarSign,
     ArrowLeft,
@@ -76,10 +77,9 @@ export default function EditPayment({
         }).format(amount || 0);
     };
 
-    const handlePatientChange = (patientId) => {
-        setData("patient_id", patientId);
-        const patient = patients.find((p) => p.id.toString() === patientId);
+    const handlePatientSelect = (patient) => {
         setSelectedPatient(patient);
+        setData("patient_id", patient.id);
     };
 
     const handleTreatmentChange = (treatmentId) => {
@@ -344,43 +344,14 @@ export default function EditPayment({
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <Label
-                                                htmlFor="patient_id"
-                                                className="text-base font-medium text-gray-700 mb-3 block"
-                                            >
-                                                Patient *
-                                            </Label>
-                                            <Select
-                                                value={data.patient_id}
-                                                onValueChange={
-                                                    handlePatientChange
-                                                }
-                                            >
-                                                <SelectTrigger className="h-14 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
-                                                    <SelectValue placeholder="Select patient" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {patients.map((patient) => (
-                                                        <SelectItem
-                                                            key={patient.id}
-                                                            value={patient.id.toString()}
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <User className="h-4 w-4 text-gray-400" />
-                                                                {patient.name}
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.patient_id && (
-                                                <div className="text-red-500 text-sm mt-2 flex items-center gap-2">
-                                                    <AlertCircle className="h-4 w-4" />
-                                                    {errors.patient_id}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <PatientSelector
+                                            clinic={auth.clinic}
+                                            selectedPatient={selectedPatient}
+                                            onPatientSelect={
+                                                handlePatientSelect
+                                            }
+                                            error={errors.patient_id}
+                                        />
 
                                         <div>
                                             <Label

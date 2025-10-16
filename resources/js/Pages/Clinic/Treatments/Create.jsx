@@ -6,6 +6,7 @@ import { Label } from "@/Components/ui/label";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector";
+import PatientSelector from "@/Components/Appointment/PatientSelector";
 import InputError from "@/Components/InputError";
 import { Textarea } from "@/Components/ui/textarea";
 import {
@@ -100,6 +101,12 @@ export default function Create({
 
     const [showTemplates, setShowTemplates] = useState(false);
     const [showDentalChartModal, setShowDentalChartModal] = useState(false);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+
+    const handlePatientSelect = (patient) => {
+        setSelectedPatient(patient);
+        setData("patient_id", patient.id);
+    };
 
     const statuses = [
         { value: "scheduled", label: "Scheduled" },
@@ -304,57 +311,16 @@ export default function Create({
                                     <CardContent className="p-4">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                             {/* Patient Select */}
-                                            <div className="space-y-2">
-                                                <Label
-                                                    htmlFor="patient_id"
-                                                    className="font-medium text-gray-700 text-sm"
-                                                >
-                                                    Patient *
-                                                </Label>
-                                                <Select
-                                                    onValueChange={(value) =>
-                                                        setData(
-                                                            "patient_id",
-                                                            value
-                                                        )
-                                                    }
-                                                    value={data.patient_id}
-                                                >
-                                                    <SelectTrigger className="w-full h-10 text-sm">
-                                                        <SelectValue placeholder="Select a patient" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {patients &&
-                                                            patients.map(
-                                                                (patient) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            patient.id
-                                                                        }
-                                                                        value={patient.id.toString()}
-                                                                        className="text-sm"
-                                                                    >
-                                                                        {patient.user
-                                                                            ? patient
-                                                                                  .user
-                                                                                  .name
-                                                                            : `${
-                                                                                  patient.first_name ||
-                                                                                  ""
-                                                                              } ${
-                                                                                  patient.last_name ||
-                                                                                  ""
-                                                                              }`}
-                                                                    </SelectItem>
-                                                                )
-                                                            )}
-                                                    </SelectContent>
-                                                </Select>
-                                                <InputError
-                                                    message={errors.patient_id}
-                                                    className="mt-2"
-                                                />
-                                            </div>
+                                            <PatientSelector
+                                                clinic={auth.clinic}
+                                                selectedPatient={
+                                                    selectedPatient
+                                                }
+                                                onPatientSelect={
+                                                    handlePatientSelect
+                                                }
+                                                error={errors.patient_id}
+                                            />
 
                                             {/* Dentist Select */}
                                             <div className="space-y-2">
@@ -1377,9 +1343,7 @@ export default function Create({
                                             <div className="flex items-center justify-center mb-6"></div>
                                             <div className="w-full">
                                                 <TreatmentInventorySelector
-                                                    clinicId={
-                                                        auth.user.clinic.id
-                                                    }
+                                                    clinicId={auth.clinic.id}
                                                     value={data.inventory_items}
                                                     onChange={(items) =>
                                                         setData(

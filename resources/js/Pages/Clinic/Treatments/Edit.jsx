@@ -15,6 +15,7 @@ import {
 } from "@/Components/ui/select";
 import { Badge } from "@/Components/ui/badge";
 import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector";
+import PatientSelector from "@/Components/Appointment/PatientSelector";
 import {
     CalendarIcon,
     Loader2,
@@ -63,6 +64,7 @@ export default function Edit({
 }) {
     const [showTemplates, setShowTemplates] = useState(false);
     const [showDentalChartModal, setShowDentalChartModal] = useState(false);
+    const [selectedPatient, setSelectedPatient] = useState(null);
 
     // Show loading state if treatment data is not available
     if (!treatment) {
@@ -217,6 +219,23 @@ export default function Edit({
                     "This inventory item may have been deleted or renamed",
             })) || [],
     });
+
+    const handlePatientSelect = (patient) => {
+        setSelectedPatient(patient);
+        setData("patient_id", patient.id);
+    };
+
+    // Initialize selectedPatient with current treatment's patient
+    useEffect(() => {
+        if (treatment?.patient_id && patients) {
+            const currentPatient = patients.find(
+                (p) => p.id.toString() === treatment.patient_id.toString()
+            );
+            if (currentPatient) {
+                setSelectedPatient(currentPatient);
+            }
+        }
+    }, [treatment, patients]);
 
     const statuses = [
         { value: "scheduled", label: "Scheduled" },
@@ -613,46 +632,14 @@ export default function Edit({
                                     </h3>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <Label htmlFor="patient_id">
-                                                Patient
-                                            </Label>
-                                            <Select
-                                                onValueChange={(value) =>
-                                                    setData("patient_id", value)
-                                                }
-                                                value={data.patient_id}
-                                            >
-                                                <SelectTrigger className="mt-1">
-                                                    <SelectValue placeholder="Select a patient" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {(patients || []).map(
-                                                        (patient) => (
-                                                            <SelectItem
-                                                                key={patient.id}
-                                                                value={patient.id.toString()}
-                                                            >
-                                                                {patient.user
-                                                                    ?.name ||
-                                                                    `${
-                                                                        patient.first_name ||
-                                                                        ""
-                                                                    } ${
-                                                                        patient.last_name ||
-                                                                        ""
-                                                                    }`.trim() ||
-                                                                    "Unknown Patient"}
-                                                            </SelectItem>
-                                                        )
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            <InputError
-                                                message={errors.patient_id}
-                                                className="mt-2"
-                                            />
-                                        </div>
+                                        <PatientSelector
+                                            clinic={auth.clinic}
+                                            selectedPatient={selectedPatient}
+                                            onPatientSelect={
+                                                handlePatientSelect
+                                            }
+                                            error={errors.patient_id}
+                                        />
 
                                         <div>
                                             <Label htmlFor="dentist_id">
