@@ -5,30 +5,36 @@
 ### **New Files Created/Modified:**
 
 #### **🗄️ Database Migrations (NEW)**
-- `2025_10_17_101451_create_permissions_table.php`
-- `2025_10_17_101515_create_role_permissions_table.php`
+
+-   `2025_10_17_101451_create_permissions_table.php`
+-   `2025_10_17_101515_create_role_permissions_table.php`
 
 #### **🌱 Database Seeders (MODIFIED)**
-- `DatabaseSeeder.php` - Added PermissionSeeder and RolePermissionSeeder
-- `PermissionSeeder.php` - Added all IAM permissions
-- `RolePermissionSeeder.php` - Added role-permission assignments
+
+-   `DatabaseSeeder.php` - Added PermissionSeeder and RolePermissionSeeder
+-   `PermissionSeeder.php` - Added all IAM permissions
+-   `RolePermissionSeeder.php` - Added role-permission assignments
 
 #### **🔒 Middleware (NEW)**
-- `app/Http/Middleware/CheckRole.php` - Role-based access control
-- `app/Http/Kernel.php` - Registered new middleware
+
+-   `app/Http/Middleware/CheckRole.php` - Role-based access control
+-   `app/Http/Kernel.php` - Registered new middleware
 
 #### **🛡️ Policies (NEW)**
-- `app/Policies/DentistSchedulePolicy.php` - Dentist schedule authorization
+
+-   `app/Policies/DentistSchedulePolicy.php` - Dentist schedule authorization
 
 #### **🎨 Frontend Components (MODIFIED)**
-- `resources/js/Components/PermissionDeniedModal.jsx` - Enhanced UI/UX
-- `resources/js/Components/ProtectedRoute.jsx` - Button protection
-- `resources/js/Layouts/AuthenticatedLayout.jsx` - Upgrade/Renew restrictions
-- `resources/js/Pages/Clinic/DentistSchedules/Index.jsx` - Frontend restrictions
-- `resources/js/Pages/Clinic/Treatments/Index.jsx` - Staff restrictions
+
+-   `resources/js/Components/PermissionDeniedModal.jsx` - Enhanced UI/UX
+-   `resources/js/Components/ProtectedRoute.jsx` - Button protection
+-   `resources/js/Layouts/AuthenticatedLayout.jsx` - Upgrade/Renew restrictions
+-   `resources/js/Pages/Clinic/DentistSchedules/Index.jsx` - Frontend restrictions
+-   `resources/js/Pages/Clinic/Treatments/Index.jsx` - Staff restrictions
 
 #### **🛣️ Routes (MODIFIED)**
-- `routes/web.php` - Added permission middleware to routes
+
+-   `routes/web.php` - Added permission middleware to routes
 
 ---
 
@@ -111,12 +117,12 @@ INSERT INTO permissions (name, display_name, description, category, created_at, 
 ```sql
 -- File: role_permissions_data.sql
 -- Clinic Admin - All permissions
-INSERT INTO role_permissions (role, permission_id, created_at, updated_at) 
+INSERT INTO role_permissions (role, permission_id, created_at, updated_at)
 SELECT 'clinic_admin', id, NOW(), NOW() FROM permissions;
 
 -- Dentist - Clinical permissions
-INSERT INTO role_permissions (role, permission_id, created_at, updated_at) 
-SELECT 'dentist', id, NOW(), NOW() FROM permissions 
+INSERT INTO role_permissions (role, permission_id, created_at, updated_at)
+SELECT 'dentist', id, NOW(), NOW() FROM permissions
 WHERE name IN (
     'view_patients', 'add_patients', 'edit_patients',
     'view_appointments', 'create_appointments', 'edit_appointments', 'assign_dentists',
@@ -128,8 +134,8 @@ WHERE name IN (
 );
 
 -- Staff - Operational permissions
-INSERT INTO role_permissions (role, permission_id, created_at, updated_at) 
-SELECT 'staff', id, NOW(), NOW() FROM permissions 
+INSERT INTO role_permissions (role, permission_id, created_at, updated_at)
+SELECT 'staff', id, NOW(), NOW() FROM permissions
 WHERE name IN (
     'view_patients', 'add_patients', 'edit_patients',
     'view_appointments', 'create_appointments', 'edit_appointments', 'assign_dentists',
@@ -164,10 +170,10 @@ git push railway main
 1. **Open HeidiSQL**
 2. **Connect to your Railway MySQL database**
 3. **Run the SQL files in this order:**
-   - `2025_10_17_101451_create_permissions_table.sql`
-   - `2025_10_17_101515_create_role_permissions_table.sql`
-   - `permissions_data.sql`
-   - `role_permissions_data.sql`
+    - `2025_10_17_101451_create_permissions_table.sql`
+    - `2025_10_17_101515_create_role_permissions_table.sql`
+    - `permissions_data.sql`
+    - `role_permissions_data.sql`
 
 #### **3.3 Run Laravel Commands on Railway**
 
@@ -194,20 +200,21 @@ php artisan db:seed --class=RolePermissionSeeder --force
 
 1. **Login as different roles** (clinic_admin, dentist, staff)
 2. **Test permission restrictions:**
-   - Try accessing restricted buttons
-   - Verify permission modals appear
-   - Check dashboard navigation works
+    - Try accessing restricted buttons
+    - Verify permission modals appear
+    - Check dashboard navigation works
 3. **Test specific features:**
-   - Dentist Schedule restrictions
-   - Treatment module restrictions
-   - Upgrade/Renew button restrictions
+    - Dentist Schedule restrictions
+    - Treatment module restrictions
+    - Upgrade/Renew button restrictions
 
 #### **4.2 Check Database**
 
 Verify in HeidiSQL that:
-- `permissions` table exists with all permissions
-- `role_permissions` table exists with all assignments
-- Data is properly inserted
+
+-   `permissions` table exists with all permissions
+-   `role_permissions` table exists with all assignments
+-   Data is properly inserted
 
 ---
 
@@ -216,13 +223,17 @@ Verify in HeidiSQL that:
 ### **Common Issues:**
 
 #### **Issue 1: Migration Fails**
+
 **Solution:** Run migrations manually via HeidiSQL using the SQL files above
 
 #### **Issue 2: Seeder Data Missing**
+
 **Solution:** Run the permission and role_permission data SQL files
 
 #### **Issue 3: Frontend Not Working**
+
 **Solution:** Clear caches and rebuild assets:
+
 ```bash
 php artisan config:clear
 php artisan cache:clear
@@ -230,22 +241,23 @@ npm run build
 ```
 
 #### **Issue 4: Permission Checks Failing**
+
 **Solution:** Verify database data and check middleware registration
 
 ---
 
 ## ✅ **DEPLOYMENT CHECKLIST**
 
-- [ ] Code pushed to Railway
-- [ ] Database migrations applied via HeidiSQL
-- [ ] Permission data inserted
-- [ ] Role-permission data inserted
-- [ ] Laravel caches cleared
-- [ ] Frontend assets rebuilt
-- [ ] IAM functionality tested
-- [ ] All roles tested (clinic_admin, dentist, staff)
-- [ ] Permission modals working
-- [ ] Dashboard navigation working
+-   [ ] Code pushed to Railway
+-   [ ] Database migrations applied via HeidiSQL
+-   [ ] Permission data inserted
+-   [ ] Role-permission data inserted
+-   [ ] Laravel caches cleared
+-   [ ] Frontend assets rebuilt
+-   [ ] IAM functionality tested
+-   [ ] All roles tested (clinic_admin, dentist, staff)
+-   [ ] Permission modals working
+-   [ ] Dashboard navigation working
 
 ---
 

@@ -1,5 +1,5 @@
 import { useState, cloneElement } from "react";
-import { usePermissions } from "@/Hooks/usePermissions";
+import { usePermissions } from "@/hooks/usePermissions";
 import PermissionDeniedModal from "./PermissionDeniedModal";
 import { Lock } from "lucide-react";
 

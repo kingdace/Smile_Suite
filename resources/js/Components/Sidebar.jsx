@@ -1,7 +1,7 @@
 import { Link } from "@inertiajs/react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { usePermissions } from "@/Hooks/usePermissions";
+import { usePermissions } from "@/hooks/usePermissions";
 import ProtectedRoute from "./ProtectedRoute";
 
 // Custom scrollbar styles
