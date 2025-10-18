@@ -107,24 +107,36 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Request subscription upgrade
+     * Request subscription upgrade with automatic approval
      */
     public function requestUpgrade(Request $request)
     {
-        $clinic = Auth::user()->clinic;
+        $user = Auth::user();
+        $clinic = $user->clinic;
 
         // Debug logging
         Log::info('Upgrade request started', [
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
+            'user_role' => $user->role,
             'clinic_id' => $clinic ? $clinic->id : null,
-            'clinic_exists' => $clinic ? true : false
+            'clinic_exists' => $clinic ? true : false,
+            'user_clinic_id' => $user->clinic_id
         ]);
 
         if (!$clinic) {
-            Log::error('No clinic found for user', ['user_id' => Auth::id()]);
+            Log::error('No clinic found for user', [
+                'user_id' => $user->id,
+                'user_clinic_id' => $user->clinic_id,
+                'user_role' => $user->role
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'No clinic found for this user.'
+                'message' => 'No clinic found for this user. Please contact support.',
+                'debug' => [
+                    'user_id' => $user->id,
+                    'clinic_id' => $user->clinic_id,
+                    'role' => $user->role
+                ]
             ], 400);
         }
 
@@ -152,14 +164,20 @@ class SubscriptionController extends Controller
             // Calculate total amount
             $totalAmount = $requestedPlan['price'] * $validated['duration_months'];
 
-            // Store the upgrade request in database
-            Log::info('Creating subscription request', [
+            // 🚀 AUTOMATIC APPROVAL: Skip admin approval and generate payment token immediately
+            $paymentToken = \Illuminate\Support\Str::random(64);
+            $paymentDeadline = now()->addDays(7);
+
+            // Store the upgrade request in database with automatic approval
+            Log::info('Creating automatically approved subscription request', [
                 'clinic_id' => $clinic->id,
                 'request_type' => 'upgrade',
                 'current_plan' => $clinic->subscription_plan,
                 'requested_plan' => $validated['new_plan'],
                 'duration_months' => $validated['duration_months'],
                 'calculated_amount' => $totalAmount,
+                'payment_token' => $paymentToken,
+                'auto_approved' => true
             ]);
 
             $subscriptionRequest = SubscriptionRequest::create([
@@ -169,54 +187,51 @@ class SubscriptionController extends Controller
                 'requested_plan' => $validated['new_plan'],
                 'duration_months' => $validated['duration_months'],
                 'message' => $validated['message'] ?? null,
-                'status' => 'pending',
+                'status' => 'approved', // 🚀 AUTOMATICALLY APPROVED
                 'calculated_amount' => $totalAmount,
+                'payment_token' => $paymentToken, // 🚀 IMMEDIATE PAYMENT TOKEN
+                'payment_deadline' => $paymentDeadline, // 🚀 IMMEDIATE DEADLINE
+                'processed_at' => now(), // 🚀 IMMEDIATE PROCESSING
+                'processed_by' => null, // System processed
             ]);
 
-            Log::info('Subscription request created successfully', [
-                'request_id' => $subscriptionRequest->id
+            Log::info('Subscription request automatically approved and payment token generated', [
+                'request_id' => $subscriptionRequest->id,
+                'payment_token' => $paymentToken,
+                'payment_deadline' => $paymentDeadline
             ]);
 
-            // Send upgrade request email to admin
-            Log::info('Sending upgrade request email to admin');
-            try {
-                Mail::to(config('mail.admin_email', 'admin@smilesuite.com'))->send(
-                    new SubscriptionUpgradeRequest($clinic, $validated)
-                );
-                Log::info('Admin email sent successfully');
-            } catch (\Exception $mailError) {
-                Log::error('Failed to send admin email: ' . $mailError->getMessage());
-                // Don't fail the entire request if email fails
-            }
-
-            // Send confirmation email to clinic
-            Log::info('Sending confirmation email to clinic');
+            // 🚀 IMMEDIATE PAYMENT INSTRUCTIONS: Send payment instructions email to clinic
+            Log::info('Sending immediate payment instructions email to clinic');
             try {
                 Mail::to($clinic->email)->send(
-                    new \App\Mail\SubscriptionUpgradeConfirmation($clinic, $validated)
+                    new \App\Mail\SubscriptionPaymentInstructions($subscriptionRequest)
                 );
-                Log::info('Clinic confirmation email sent successfully');
+                Log::info('Payment instructions email sent successfully');
             } catch (\Exception $mailError) {
-                Log::error('Failed to send clinic confirmation email: ' . $mailError->getMessage());
+                Log::error('Failed to send payment instructions email: ' . $mailError->getMessage());
                 // Don't fail the entire request if email fails
             }
 
-            Log::info('Subscription upgrade request sent', [
+            Log::info('Subscription upgrade request automatically approved and payment instructions sent', [
                 'clinic_id' => $clinic->id,
                 'clinic_name' => $clinic->name,
                 'current_plan' => $clinic->subscription_plan,
                 'requested_plan' => $validated['new_plan'],
                 'duration' => $validated['duration_months'],
                 'request_id' => $subscriptionRequest->id,
-                'amount' => $totalAmount
+                'amount' => $totalAmount,
+                'payment_token' => $paymentToken
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Upgrade request sent successfully! You will receive payment instructions via email within 24 hours.',
+                'message' => 'Upgrade request approved! Please check your email for payment instructions.',
                 'request_id' => $subscriptionRequest->id,
                 'amount' => $totalAmount,
-                'plan_details' => $requestedPlan
+                'plan_details' => $requestedPlan,
+                'email_sent' => true,
+                'check_email' => true
             ]);
 
         } catch (\Exception $e) {
@@ -224,31 +239,43 @@ class SubscriptionController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send upgrade request. Please try again or contact support.',
+                'message' => 'Failed to process upgrade request. Please try again or contact support.',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Request subscription renewal
+     * Request subscription renewal with automatic approval
      */
     public function requestRenewal(Request $request)
     {
-        $clinic = Auth::user()->clinic;
+        $user = Auth::user();
+        $clinic = $user->clinic;
 
         // Debug logging
         Log::info('Renewal request started', [
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
+            'user_role' => $user->role,
             'clinic_id' => $clinic ? $clinic->id : null,
-            'clinic_exists' => $clinic ? true : false
+            'clinic_exists' => $clinic ? true : false,
+            'user_clinic_id' => $user->clinic_id
         ]);
 
         if (!$clinic) {
-            Log::error('No clinic found for user', ['user_id' => Auth::id()]);
+            Log::error('No clinic found for user', [
+                'user_id' => $user->id,
+                'user_clinic_id' => $user->clinic_id,
+                'user_role' => $user->role
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'No clinic found for this user.'
+                'message' => 'No clinic found for this user. Please contact support.',
+                'debug' => [
+                    'user_id' => $user->id,
+                    'clinic_id' => $user->clinic_id,
+                    'role' => $user->role
+                ]
             ], 400);
         }
 
@@ -277,13 +304,19 @@ class SubscriptionController extends Controller
                 $newEndDate = $currentEndDate ? $currentEndDate->addDays($newDurationDays) : now()->addDays($newDurationDays);
             }
 
-            // Store the renewal request in database
-            Log::info('Creating renewal request', [
+            // 🚀 AUTOMATIC APPROVAL: Skip admin approval and generate payment token immediately
+            $paymentToken = \Illuminate\Support\Str::random(64);
+            $paymentDeadline = now()->addDays(7);
+
+            // Store the renewal request in database with automatic approval
+            Log::info('Creating automatically approved renewal request', [
                 'clinic_id' => $clinic->id,
                 'request_type' => 'renewal',
                 'current_plan' => $clinic->subscription_plan,
                 'duration_months' => $validated['duration_months'],
                 'calculated_amount' => $totalAmount,
+                'payment_token' => $paymentToken,
+                'auto_approved' => true
             ]);
 
             $subscriptionRequest = SubscriptionRequest::create([
@@ -293,39 +326,33 @@ class SubscriptionController extends Controller
                 'requested_plan' => $clinic->subscription_plan, // Same plan for renewal
                 'duration_months' => $validated['duration_months'],
                 'message' => $validated['message'] ?? null,
-                'status' => 'pending',
+                'status' => 'approved', // 🚀 AUTOMATICALLY APPROVED
                 'calculated_amount' => $totalAmount,
+                'payment_token' => $paymentToken, // 🚀 IMMEDIATE PAYMENT TOKEN
+                'payment_deadline' => $paymentDeadline, // 🚀 IMMEDIATE DEADLINE
+                'processed_at' => now(), // 🚀 IMMEDIATE PROCESSING
+                'processed_by' => null, // System processed
             ]);
 
-            Log::info('Renewal request created successfully', [
-                'request_id' => $subscriptionRequest->id
+            Log::info('Renewal request automatically approved and payment token generated', [
+                'request_id' => $subscriptionRequest->id,
+                'payment_token' => $paymentToken,
+                'payment_deadline' => $paymentDeadline
             ]);
 
-            // Send renewal request email to admin
-            Log::info('Sending renewal request email to admin');
-            try {
-                Mail::to(config('mail.admin_email', 'admin@smilesuite.com'))->send(
-                    new SubscriptionRenewalRequest($clinic, $validated)
-                );
-                Log::info('Admin renewal email sent successfully');
-            } catch (\Exception $mailError) {
-                Log::error('Failed to send admin renewal email: ' . $mailError->getMessage());
-                // Don't fail the entire request if email fails
-            }
-
-            // Send renewal confirmation email to clinic
-            Log::info('Sending renewal confirmation email to clinic');
+            // 🚀 IMMEDIATE PAYMENT INSTRUCTIONS: Send payment instructions email to clinic
+            Log::info('Sending immediate payment instructions email to clinic');
             try {
                 Mail::to($clinic->email)->send(
-                    new \App\Mail\SubscriptionRenewalConfirmation($clinic, $validated)
+                    new \App\Mail\SubscriptionPaymentInstructions($subscriptionRequest)
                 );
-                Log::info('Clinic renewal confirmation email sent successfully');
+                Log::info('Payment instructions email sent successfully');
             } catch (\Exception $mailError) {
-                Log::error('Failed to send clinic renewal confirmation email: ' . $mailError->getMessage());
+                Log::error('Failed to send payment instructions email: ' . $mailError->getMessage());
                 // Don't fail the entire request if email fails
             }
 
-            Log::info('Subscription renewal request sent', [
+            Log::info('Subscription renewal request automatically approved and payment instructions sent', [
                 'clinic_id' => $clinic->id,
                 'clinic_name' => $clinic->name,
                 'current_plan' => $clinic->subscription_plan,
@@ -333,17 +360,20 @@ class SubscriptionController extends Controller
                 'request_id' => $subscriptionRequest->id,
                 'amount' => $totalAmount,
                 'current_end_date' => $currentEndDate,
-                'new_end_date' => $newEndDate
+                'new_end_date' => $newEndDate,
+                'payment_token' => $paymentToken
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Renewal request sent successfully! You will receive payment instructions via email within 24 hours.',
+                'message' => 'Renewal request approved! Please check your email for payment instructions.',
                 'request_id' => $subscriptionRequest->id,
                 'amount' => $totalAmount,
                 'plan_details' => $currentPlan,
                 'duration_days' => $newDurationDays,
-                'new_end_date' => $newEndDate->format('Y-m-d')
+                'new_end_date' => $newEndDate->format('Y-m-d'),
+                'email_sent' => true,
+                'check_email' => true
             ]);
 
         } catch (\Exception $e) {
@@ -351,7 +381,7 @@ class SubscriptionController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send renewal request. Please try again or contact support.',
+                'message' => 'Failed to process renewal request. Please try again or contact support.',
                 'error' => $e->getMessage()
             ], 500);
         }

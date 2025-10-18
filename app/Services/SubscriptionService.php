@@ -112,7 +112,7 @@ class SubscriptionService
     }
 
     /**
-     * Handle successful payment simulation
+     * Handle successful payment simulation with automatic verification
      */
     public function handleSuccessfulPayment($paymentIntentId, $paymentMethod = 'simulation')
     {
@@ -129,20 +129,38 @@ class SubscriptionService
             $request = ClinicRegistrationRequest::find($registrationId);
 
             if ($request) {
-                // Update payment status to pending verification
+                // AUTOMATIC VERIFICATION: Mark payment as paid immediately
                 $request->update([
-                    'payment_status' => 'pending_verification',
+                    'payment_status' => 'paid',
                     'stripe_payment_intent_id' => $paymentIntentId,
                 ]);
 
-                // Log the payment confirmation
-                Log::info("Payment confirmation received", [
+                // Log the automatic payment verification
+                Log::info("Payment automatically verified", [
                     'payment_intent_id' => $paymentIntentId,
                     'payment_method' => $paymentMethod,
                     'amount' => $paymentIntent['amount'],
                     'clinic_registration_id' => $registrationId,
-                    'status' => 'pending_verification',
+                    'status' => 'paid',
+                    'verification_type' => 'automatic'
                 ]);
+
+                // AUTOMATIC EMAIL SENDING: Send setup email immediately
+                try {
+                    $this->sendSetupEmail($request);
+                    Log::info("Setup email sent automatically", [
+                        'clinic_registration_id' => $registrationId,
+                        'email' => $request->email,
+                        'clinic_name' => $request->clinic_name
+                    ]);
+                } catch (\Exception $emailError) {
+                    Log::error("Failed to send setup email automatically", [
+                        'clinic_registration_id' => $registrationId,
+                        'email' => $request->email,
+                        'error' => $emailError->getMessage()
+                    ]);
+                    // Don't fail the payment if email fails - admin can resend
+                }
 
                 // Clear the payment intent from cache
                 Cache::forget("payment_intent_{$paymentIntentId}");
@@ -477,14 +495,14 @@ class SubscriptionService
             ]);
 
             Log::info("Subscription upgraded for clinic: {$clinic->id}, new plan: {$newPlan}, duration: {$totalDays} days");
-            
+
             // Verify the upgrade was successful
             $clinic->refresh();
             if ($clinic->subscription_plan !== $newPlan) {
                 Log::error("Subscription upgrade verification failed: expected plan {$newPlan}, got {$clinic->subscription_plan}");
                 throw new \Exception("Subscription upgrade verification failed: plan mismatch");
             }
-            
+
             return true;
         } catch (\Exception $e) {
             Log::error('Subscription upgrade failed: ' . $e->getMessage());
@@ -526,14 +544,14 @@ class SubscriptionService
             ]);
 
             Log::info("Subscription renewed for clinic: {$clinic->id}, plan: {$plan}, duration: {$totalDays} days, new end date: {$newEndDate->format('Y-m-d')}");
-            
+
             // Verify the renewal was successful
             $clinic->refresh();
             if ($clinic->subscription_end_date->format('Y-m-d') !== $newEndDate->format('Y-m-d')) {
                 Log::error("Subscription renewal verification failed: expected end date {$newEndDate->format('Y-m-d')}, got {$clinic->subscription_end_date->format('Y-m-d')}");
                 throw new \Exception("Subscription renewal verification failed: end date mismatch");
             }
-            
+
             return true;
         } catch (\Exception $e) {
             Log::error('Subscription renewal failed: ' . $e->getMessage());
@@ -639,7 +657,7 @@ class SubscriptionService
             [
                 'id' => 'gcash',
                 'name' => 'GCash',
-                'icon' => '📱',
+                'icon' => '/icons/gcash.png',
                 'description' => 'Pay using your GCash wallet',
                 'instructions' => 'Scan the QR code below with your GCash app to complete payment',
                 'qr_code' => '/icons/gcashqr.png',
@@ -650,7 +668,7 @@ class SubscriptionService
             [
                 'id' => 'paymaya',
                 'name' => 'PayMaya',
-                'icon' => '📱',
+                'icon' => '/icons/paymaya.png',
                 'description' => 'Pay using your PayMaya wallet',
                 'instructions' => 'Scan the QR code below with your PayMaya app to complete payment',
                 'qr_code' => '/icons/paymayaqr.png',
@@ -661,7 +679,7 @@ class SubscriptionService
             [
                 'id' => 'bank_transfer',
                 'name' => 'Bank Transfer',
-                'icon' => '🏦',
+                'icon' => '/icons/debit.png',
                 'description' => 'Direct bank transfer',
                 'instructions' => 'Transfer to BDO Account: 1234-5678-9012',
                 'reference_format' => 'BANK-{DATE}-{ID}',
@@ -672,25 +690,149 @@ class SubscriptionService
     }
 
     /**
-     * Simulate payment processing
+     * Simulate payment processing with enhanced validation
      */
-    public function simulatePayment($paymentIntentId, $paymentMethod)
+    public function simulatePayment($paymentIntentId, $paymentMethod, $paymentDetails = null)
     {
         try {
-            // Simulate payment processing delay
-            sleep(2);
+            Log::info('Starting payment simulation', [
+                'payment_intent_id' => $paymentIntentId,
+                'payment_method' => $paymentMethod,
+                'has_payment_details' => !is_null($paymentDetails)
+            ]);
 
-            // Simulate success (you can add random failures for testing)
-            $success = true; // You can make this random for testing
+            // Simulate realistic payment processing delay (2-4 seconds)
+            $processingTime = rand(2, 4);
+            sleep($processingTime);
 
-            if ($success) {
+            // Enhanced payment validation
+            $isValid = $this->validatePaymentDetails($paymentDetails, $paymentMethod);
+
+            if (!$isValid) {
+                Log::warning('Payment validation failed', [
+                    'payment_intent_id' => $paymentIntentId,
+                    'payment_method' => $paymentMethod,
+                    'payment_details' => $paymentDetails
+                ]);
+                throw new \Exception('Payment validation failed. Please check your payment details.');
+            }
+
+            // Simulate payment gateway response
+            $gatewayResponse = $this->simulateGatewayResponse($paymentMethod, $paymentDetails);
+
+            if ($gatewayResponse['success']) {
+                Log::info('Payment simulation successful', [
+                    'payment_intent_id' => $paymentIntentId,
+                    'payment_method' => $paymentMethod,
+                    'processing_time' => $processingTime,
+                    'gateway_response' => $gatewayResponse
+                ]);
+
                 return $this->handleSuccessfulPayment($paymentIntentId, $paymentMethod);
             } else {
-                throw new \Exception('Payment simulation failed');
+                Log::warning('Payment simulation failed', [
+                    'payment_intent_id' => $paymentIntentId,
+                    'payment_method' => $paymentMethod,
+                    'gateway_response' => $gatewayResponse
+                ]);
+                throw new \Exception($gatewayResponse['error'] ?? 'Payment processing failed');
             }
         } catch (\Exception $e) {
-            Log::error('Payment simulation failed: ' . $e->getMessage());
+            Log::error('Payment simulation failed: ' . $e->getMessage(), [
+                'payment_intent_id' => $paymentIntentId,
+                'payment_method' => $paymentMethod,
+                'trace' => $e->getTraceAsString()
+            ]);
             throw $e;
+        }
+    }
+
+    /**
+     * Validate payment details for different payment methods
+     */
+    private function validatePaymentDetails($paymentDetails, $paymentMethod)
+    {
+        // For non-QR payments (like credit card), no additional validation needed
+        if (!$paymentDetails) {
+            return true;
+        }
+
+        // Validate QR payment details (GCash, PayMaya)
+        $requiredFields = ['sender_name', 'sender_phone', 'transaction_reference', 'payment_amount'];
+
+        foreach ($requiredFields as $field) {
+            if (empty($paymentDetails[$field])) {
+                Log::warning('Missing payment field', ['field' => $field, 'payment_details' => $paymentDetails]);
+                return false;
+            }
+        }
+
+        // Validate phone number format (Philippine mobile)
+        $phone = $paymentDetails['sender_phone'];
+        if (!preg_match('/^(\+63|0)9\d{9}$/', $phone)) {
+            Log::warning('Invalid phone number format', ['phone' => $phone]);
+            return false;
+        }
+
+        // Validate transaction reference format
+        $reference = $paymentDetails['transaction_reference'];
+        if (strlen($reference) < 8 || !preg_match('/^[A-Z0-9-]+$/', $reference)) {
+            Log::warning('Invalid transaction reference format', ['reference' => $reference]);
+            return false;
+        }
+
+        // Validate payment amount (should be positive)
+        $amount = floatval($paymentDetails['payment_amount']);
+        if ($amount <= 0) {
+            Log::warning('Invalid payment amount', ['amount' => $amount]);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Simulate payment gateway response
+     */
+    private function simulateGatewayResponse($paymentMethod, $paymentDetails)
+    {
+        // Simulate different success rates based on payment method
+        $successRates = [
+            'gcash' => 0.95,      // 95% success rate
+            'paymaya' => 0.93,    // 93% success rate
+            'bank_transfer' => 0.90, // 90% success rate
+            'credit_card' => 0.98,   // 98% success rate
+            'simulation' => 1.0   // 100% success rate for testing
+        ];
+
+        $successRate = $successRates[$paymentMethod] ?? 0.95;
+        $isSuccess = (mt_rand() / mt_getrandmax()) < $successRate;
+
+        if ($isSuccess) {
+            return [
+                'success' => true,
+                'transaction_id' => 'TXN_' . strtoupper(substr(md5(uniqid()), 0, 12)),
+                'gateway_reference' => 'GW_' . strtoupper(substr(md5(uniqid()), 0, 8)),
+                'processed_at' => now()->toISOString(),
+                'status' => 'completed',
+                'message' => 'Payment processed successfully'
+            ];
+        } else {
+            $errorMessages = [
+                'gcash' => 'GCash payment failed. Please check your account balance and try again.',
+                'paymaya' => 'PayMaya payment failed. Please verify your account details.',
+                'bank_transfer' => 'Bank transfer failed. Please check your account details.',
+                'credit_card' => 'Card payment failed. Please check your card details.',
+                'simulation' => 'Payment simulation failed for testing purposes.'
+            ];
+
+            return [
+                'success' => false,
+                'error' => $errorMessages[$paymentMethod] ?? 'Payment processing failed',
+                'error_code' => 'PAYMENT_FAILED',
+                'processed_at' => now()->toISOString(),
+                'status' => 'failed'
+            ];
         }
     }
 

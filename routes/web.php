@@ -85,6 +85,9 @@ Route::get('/subscription/payment/{token}', [\App\Http\Controllers\Public\Subscr
 Route::post('/subscription/payment/{token}/success', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'handlePaymentSuccess'])->name('subscription.payment.success');
 Route::get('/subscription/payment/{token}/success', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'showPaymentSuccess'])->name('subscription.payment.success.show');
 
+// Subscription Upgrade/Renewal Success Route
+Route::get('/subscription/upgrade-renewal/{token}/success', [\App\Http\Controllers\Public\PaymentController::class, 'showSubscriptionSuccess'])->name('subscription.upgrade.renewal.success');
+
 // Permission denied route
 Route::get('/permission-denied/{permission}', [PermissionController::class, 'denied'])
     ->middleware(['auth', 'verified'])
@@ -670,22 +673,7 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:create_appointments')
             ->name('clinic.appointments.add-to-waitlist');
 
-        // Subscription Management Route (Clinic Admin Only)
-        Route::get('subscription', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'index'])
-            ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
-            ->name('clinic.subscription.index');
-        Route::get('subscription/test', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'test'])
-            ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
-            ->name('clinic.subscription.test');
-        Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])
-            ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
-            ->name('clinic.subscription.upgrade');
-        Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])
-            ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
-            ->name('clinic.subscription.renew');
-        Route::get('subscription/quick-renewal', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'quickRenewal'])
-            ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
-            ->name('clinic.subscription.quick-renewal');
+        // Subscription Management Route (Clinic Admin Only) - MOVED INSIDE AUTH GROUP
 
         // Clinic User Management Routes
         Route::middleware(['auth'])->prefix('clinic')->group(function () {
@@ -712,6 +700,23 @@ Route::middleware('auth')->group(function () {
             // Gallery upload/delete
             Route::post('profile/gallery/upload', [\App\Http\Controllers\ClinicProfileController::class, 'uploadGalleryImage'])->name('clinic.profile.gallery.upload');
             Route::delete('profile/gallery/{id}/delete', [\App\Http\Controllers\ClinicProfileController::class, 'deleteGalleryImage'])->name('clinic.profile.gallery.delete');
+
+            // Subscription Management Routes (Clinic Admin Only) - NOW INSIDE AUTH GROUP
+            Route::get('subscription', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'index'])
+                ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
+                ->name('clinic.subscription.index');
+            Route::get('subscription/test', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'test'])
+                ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
+                ->name('clinic.subscription.test');
+            Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])
+                ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
+                ->name('clinic.subscription.upgrade');
+            Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])
+                ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
+                ->name('clinic.subscription.renew');
+            Route::get('subscription/quick-renewal', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'quickRenewal'])
+                ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
+                ->name('clinic.subscription.quick-renewal');
         });
     });
 });

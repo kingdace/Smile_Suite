@@ -122,108 +122,195 @@ const SubscriptionCountdown = ({ clinic }) => {
     };
 
     const handleUpgradeSubmit = async (selectedPlan = null) => {
-        // Use selected plan if provided, otherwise determine next available plan
-        let nextPlan = selectedPlan;
-
-        if (!nextPlan) {
-            // Fallback logic for backward compatibility
-            if (clinic?.subscription_plan === "basic") {
-                nextPlan = "premium"; // Basic -> Premium
-            } else if (clinic?.subscription_plan === "premium") {
-                nextPlan = "enterprise"; // Premium -> Enterprise
-            } else if (clinic?.subscription_plan === "enterprise") {
-                // If already enterprise, show error
-                return {
-                    success: false,
-                    message: "You are already on the highest plan available.",
-                };
-            }
-        }
-
-        const response = await fetch(route("clinic.subscription.upgrade"), {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({
-                new_plan: nextPlan,
-                duration_months: 1,
-                message: `Requested upgrade from ${
-                    clinic?.subscription_plan || "Basic"
-                } to ${nextPlan} via main header Upgrade button`,
-            }),
-        });
-
-        if (!response.ok) {
-            try {
-                const errorData = await response.json();
-                return errorData;
-            } catch (parseError) {
-                // If response is not JSON (e.g., HTML error page), return a generic error
-                console.error("Failed to parse error response:", parseError);
-                return {
-                    success: false,
-                    message: `Request failed with status ${response.status}. Please try again or contact support.`,
-                };
-            }
-        }
-
         try {
+            // Use selected plan if provided, otherwise determine next available plan
+            let nextPlan = selectedPlan;
+
+            if (!nextPlan) {
+                // Fallback logic for backward compatibility
+                if (clinic?.subscription_plan === "basic") {
+                    nextPlan = "premium"; // Basic -> Premium
+                } else if (clinic?.subscription_plan === "premium") {
+                    nextPlan = "enterprise"; // Premium -> Enterprise
+                } else if (clinic?.subscription_plan === "enterprise") {
+                    // If already enterprise, show error
+                    return {
+                        success: false,
+                        message:
+                            "You are already on the highest plan available.",
+                    };
+                }
+            }
+
+            // Get CSRF token
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+            if (!csrfToken) {
+                console.error("CSRF token not found");
+                return {
+                    success: false,
+                    message:
+                        "Security token not found. Please refresh the page and try again.",
+                };
+            }
+
+            // Refresh CSRF token if needed
+            try {
+                await fetch("/sanctum/csrf-cookie");
+            } catch (error) {
+                console.warn("Failed to refresh CSRF token:", error);
+            }
+
+            const response = await fetch(route("clinic.subscription.upgrade"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                body: JSON.stringify({
+                    new_plan: nextPlan,
+                    duration_months: 1,
+                    message: `Requested upgrade from ${
+                        clinic?.subscription_plan || "Basic"
+                    } to ${nextPlan} via main header Upgrade button`,
+                }),
+            });
+
+            if (!response.ok) {
+                let errorMessage = `Request failed with status ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                    console.error("Upgrade request failed:", errorData);
+
+                    // Handle CSRF token mismatch specifically
+                    if (
+                        errorData.message &&
+                        errorData.message.includes("CSRF token mismatch")
+                    ) {
+                        errorMessage =
+                            "Session expired. Please refresh the page and try again.";
+                    }
+                } catch (parseError) {
+                    console.error(
+                        "Failed to parse error response:",
+                        parseError
+                    );
+                }
+                return {
+                    success: false,
+                    message: errorMessage,
+                };
+            }
+
             const result = await response.json();
+
+            // 🚀 AUTOMATIC APPROVAL: Show success message and ask user to check email
+            if (result.success && result.check_email) {
+                return {
+                    success: true,
+                    message: result.message,
+                    checkEmail: true,
+                    emailSent: result.email_sent,
+                };
+            }
+
             return result;
-        } catch (parseError) {
-            console.error("Failed to parse success response:", parseError);
+        } catch (error) {
+            console.error("Upgrade request error:", error);
             return {
                 success: false,
                 message:
-                    "Received invalid response from server. Please try again or contact support.",
+                    "Network error. Please check your connection and try again.",
             };
         }
     };
 
     const handleRenewSubmit = async () => {
-        const response = await fetch(route("clinic.subscription.renew"), {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({
-                duration_months: 1,
-                message: `Requested via main header ${
-                    isTrial ? "Extend Trial" : "Renew"
-                } button`,
-            }),
-        });
-
-        if (!response.ok) {
-            try {
-                const errorData = await response.json();
-                return errorData;
-            } catch (parseError) {
-                // If response is not JSON (e.g., HTML error page), return a generic error
-                console.error("Failed to parse error response:", parseError);
+        try {
+            // Get CSRF token
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content");
+            if (!csrfToken) {
+                console.error("CSRF token not found");
                 return {
                     success: false,
-                    message: `Request failed with status ${response.status}. Please try again or contact support.`,
+                    message:
+                        "Security token not found. Please refresh the page and try again.",
                 };
             }
-        }
 
-        try {
+            // Refresh CSRF token if needed
+            try {
+                await fetch("/sanctum/csrf-cookie");
+            } catch (error) {
+                console.warn("Failed to refresh CSRF token:", error);
+            }
+
+            const response = await fetch(route("clinic.subscription.renew"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                body: JSON.stringify({
+                    duration_months: 1,
+                    message: `Requested via main header ${
+                        isTrial ? "Extend Trial" : "Renew"
+                    } button`,
+                }),
+            });
+
+            if (!response.ok) {
+                let errorMessage = `Request failed with status ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                    console.error("Renewal request failed:", errorData);
+
+                    // Handle CSRF token mismatch specifically
+                    if (
+                        errorData.message &&
+                        errorData.message.includes("CSRF token mismatch")
+                    ) {
+                        errorMessage =
+                            "Session expired. Please refresh the page and try again.";
+                    }
+                } catch (parseError) {
+                    console.error(
+                        "Failed to parse error response:",
+                        parseError
+                    );
+                }
+                return {
+                    success: false,
+                    message: errorMessage,
+                };
+            }
+
             const result = await response.json();
+
+            // 🚀 AUTOMATIC APPROVAL: Show success message and ask user to check email
+            if (result.success && result.check_email) {
+                return {
+                    success: true,
+                    message: result.message,
+                    checkEmail: true,
+                    emailSent: result.email_sent,
+                };
+            }
+
             return result;
-        } catch (parseError) {
-            console.error("Failed to parse success response:", parseError);
+        } catch (error) {
+            console.error("Renewal request error:", error);
             return {
                 success: false,
                 message:
-                    "Received invalid response from server. Please try again or contact support.",
+                    "Network error. Please check your connection and try again.",
             };
         }
     };
@@ -282,27 +369,30 @@ const SubscriptionCountdown = ({ clinic }) => {
                 </div>
             )}
 
-            {/* Upgrade Buttons - Visible to all but only clickable by clinic_admin */}
+            {/* Upgrade Buttons - Hidden for enterprise plans, visible to all others but only clickable by clinic_admin */}
             <div className="flex items-center gap-1 lg:gap-2">
-                <Button
-                    size="sm"
-                    onClick={() => {
-                        const userRole = auth?.user?.role || auth?.role;
-                        if (
-                            userRole === "clinic_admin" ||
-                            userRole === "admin"
-                        ) {
-                            handleUpgradeClick();
-                        } else {
-                            setPermissionModalOpen(true);
-                        }
-                    }}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
-                >
-                    <Crown className="w-3 h-3 mr-1" />
-                    <span className="hidden sm:inline">Upgrade Now</span>
-                    <span className="sm:hidden">Upgrade</span>
-                </Button>
+                {/* Show Upgrade button only for non-enterprise plans */}
+                {clinic?.subscription_plan !== "enterprise" && (
+                    <Button
+                        size="sm"
+                        onClick={() => {
+                            const userRole = auth?.user?.role || auth?.role;
+                            if (
+                                userRole === "clinic_admin" ||
+                                userRole === "admin"
+                            ) {
+                                handleUpgradeClick();
+                            } else {
+                                setPermissionModalOpen(true);
+                            }
+                        }}
+                        className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
+                    >
+                        <Crown className="w-3 h-3 mr-1" />
+                        <span className="hidden sm:inline">Upgrade Now</span>
+                        <span className="sm:hidden">Upgrade</span>
+                    </Button>
+                )}
                 {/* Show Renew button only for non-trial accounts */}
                 {!isTrial && (
                     <Button

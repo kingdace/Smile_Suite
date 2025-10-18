@@ -1,6 +1,6 @@
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
@@ -25,10 +25,16 @@ import {
 import axios from "axios";
 import SmileyDy from "@/Components/Chatbot/SmileyDy";
 
-const PaymentForm = ({ request, token, paymentMethods }) => {
+const PaymentForm = ({
+    request,
+    token,
+    paymentMethods,
+    requestType = "registration",
+}) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [successData, setSuccessData] = useState(null);
     const [selectedMethod, setSelectedMethod] = useState(null);
     const [paymentIntentId, setPaymentIntentId] = useState(null);
     const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -36,8 +42,23 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
         sender_name: "",
         sender_phone: "",
         transaction_reference: "",
-        payment_amount: request.subscription_amount,
+        payment_amount:
+            requestType === "subscription"
+                ? request.calculated_amount
+                : request.subscription_amount,
     });
+
+    // Handle automatic redirect after successful payment
+    useEffect(() => {
+        if (success && successData?.redirect_url) {
+            // Redirect after 3 seconds to show success message
+            const timer = setTimeout(() => {
+                window.location.href = successData.redirect_url;
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [success, successData]);
 
     const handlePaymentMethodSelect = async (method) => {
         setSelectedMethod(method);
@@ -77,12 +98,16 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
 
         try {
             // Simulate payment processing
-            await axios.post(route("payment.success", { token }), {
-                payment_intent_id: paymentIntentId,
-                payment_method: selectedMethod.key,
-                payment_details: showPaymentForm ? paymentDetails : null,
-            });
+            const response = await axios.post(
+                route("payment.success", { token }),
+                {
+                    payment_intent_id: paymentIntentId,
+                    payment_method: selectedMethod.key,
+                    payment_details: showPaymentForm ? paymentDetails : null,
+                }
+            );
 
+            setSuccessData(response.data);
             setSuccess(true);
         } catch (err) {
             setError(
@@ -112,67 +137,163 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
     if (success) {
         return (
             <div className="text-center py-12">
-                <div className="relative">
-                    <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <CheckCircle className="w-10 h-10 text-white" />
+                {/* Enhanced Success Animation */}
+                <div className="relative mb-8">
+                    <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-pulse">
+                        <CheckCircle className="w-12 h-12 text-white animate-bounce" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
-                        <Sparkles className="w-4 h-4 text-white" />
+                    <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-ping">
+                        <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                        <Sparkles className="w-5 h-5 text-white" />
                     </div>
                 </div>
 
-                <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                    🎉 Payment Confirmed!
-                </h2>
-                <p className="text-gray-600 mb-8 text-lg">
-                    Thank you for confirming your payment! Our admin will verify
-                    and send you setup instructions shortly.
-                </p>
+                {/* Enhanced Success Message */}
+                <div className="mb-8">
+                    <h2 className="text-4xl font-bold text-gray-900 mb-4 animate-fade-in">
+                        🎉 Payment Confirmed!
+                    </h2>
+                    <p className="text-gray-600 mb-6 text-xl font-medium">
+                        {successData?.message ||
+                            "Your payment has been successfully processed!"}
+                    </p>
 
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-8">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
-                        <span className="font-semibold text-green-800">
+                    {/* Success Badge */}
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold border border-green-200">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Payment Automatically Verified
+                    </div>
+                </div>
+
+                {/* Enhanced Next Steps */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-8 mb-8 shadow-lg">
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <CheckCircle2 className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="font-bold text-green-800 text-xl">
                             What's Next?
                         </span>
                     </div>
-                    <div className="space-y-3 text-sm text-green-700">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>
-                                Admin will verify your payment (within 24 hours)
+                    <div className="space-y-4 text-sm text-green-700">
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                    1
+                                </span>
+                            </div>
+                            <span className="font-medium">
+                                ✅ Payment automatically verified (instant)
                             </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>
-                                Setup instructions will be sent to your email
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                    2
+                                </span>
+                            </div>
+                            <span className="font-medium">
+                                📧 Setup instructions sent to your email
                             </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>Complete your clinic profile setup</span>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                    3
+                                </span>
+                            </div>
+                            <span className="font-medium">
+                                🔗 Complete your clinic profile setup
+                            </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>Start managing your dental practice</span>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                    4
+                                </span>
+                            </div>
+                            <span className="font-medium">
+                                🚀 Start managing your dental practice
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                        <p className="text-sm text-blue-800 text-center">
-                            📧 Check your email for payment verification updates
+                {/* Enhanced Action Buttons */}
+                <div className="space-y-6">
+                    {/* Primary Action */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        {successData?.redirect_url ? (
+                            <Button
+                                onClick={() =>
+                                    (window.location.href =
+                                        successData.redirect_url)
+                                }
+                                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
+                            >
+                                <span>
+                                    {requestType === "subscription"
+                                        ? "🎉 View Subscription Details"
+                                        : "🚀 Continue to Setup"}
+                                </span>
+                                <ArrowRight className="w-5 h-5" />
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={() =>
+                                    (window.location.href = route(
+                                        "clinic.setup",
+                                        {
+                                            token,
+                                        }
+                                    ))
+                                }
+                                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
+                            >
+                                <span>🚀 Continue to Setup</span>
+                                <ArrowRight className="w-5 h-5" />
+                            </Button>
+                        )}
+
+                        <Button
+                            onClick={() => (window.location.href = "/")}
+                            className="bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
+                        >
+                            <span>🏠 Return to Homepage</span>
+                        </Button>
+                    </div>
+
+                    {/* Email Notification */}
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-6 shadow-sm">
+                        <div className="flex items-center justify-center gap-3 mb-2">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                <Mail className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="font-semibold text-blue-800">
+                                Email Notification
+                            </span>
+                        </div>
+                        <p className="text-sm text-blue-700 text-center">
+                            📧 Check your email ({request.email}) for detailed
+                            setup instructions and your secure setup link.
                         </p>
                     </div>
-                    <Button
-                        onClick={() => (window.location.href = "/")}
-                        className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    >
-                        <span>Return to Homepage</span>
-                        <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
+
+                    {/* Security Note */}
+                    <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <Shield className="w-5 h-5 text-amber-600" />
+                            <span className="font-semibold text-amber-800">
+                                Security Note
+                            </span>
+                        </div>
+                        <p className="text-sm text-amber-700 text-center">
+                            🔒 Your setup link is secure and will expire in 7
+                            days for your protection.
+                        </p>
+                    </div>
                 </div>
             </div>
         );
@@ -218,17 +339,12 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                                             : "bg-gradient-to-br from-gray-100 to-gray-200"
                                     }`}
                                 >
-                                    {key === "gcash" ? (
+                                    {method.icon &&
+                                    method.icon.startsWith("/") ? (
                                         <img
-                                            src="/icons/gcash.png"
-                                            alt="GCash"
-                                            className="w-50 h-50 object-contain"
-                                        />
-                                    ) : key === "paymaya" ? (
-                                        <img
-                                            src="/icons/paymaya.png"
-                                            alt="PayMaya"
-                                            className="w-30 h-30 object-contain"
+                                            src={method.icon}
+                                            alt={method.name}
+                                            className="w-12 h-12 object-contain"
                                         />
                                     ) : (
                                         <span className="text-3xl">
@@ -330,7 +446,10 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                                 </span>
                             </div>
                             <p className="text-lg font-bold text-green-700">
-                                ₱{request.subscription_amount}
+                                ₱
+                                {requestType === "subscription"
+                                    ? request.calculated_amount
+                                    : request.subscription_amount}
                             </p>
                         </div>
                     </div>
@@ -471,7 +590,10 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                             />
                             <p className="text-xs text-gray-600 mt-1">
                                 Amount you sent (should match ₱
-                                {request.subscription_amount})
+                                {requestType === "subscription"
+                                    ? request.calculated_amount
+                                    : request.subscription_amount}
+                                )
                             </p>
                         </div>
 
@@ -548,22 +670,43 @@ const PaymentForm = ({ request, token, paymentMethods }) => {
                 className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
             >
                 {loading ? (
-                    <>
-                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                        Confirming Payment...
-                    </>
+                    <div className="flex items-center justify-center gap-3">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Processing Payment...</span>
+                        <div className="flex gap-1">
+                            <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                            <div
+                                className="w-2 h-2 bg-white rounded-full animate-bounce"
+                                style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                                className="w-2 h-2 bg-white rounded-full animate-bounce"
+                                style={{ animationDelay: "0.2s" }}
+                            ></div>
+                        </div>
+                    </div>
                 ) : (
-                    <>
-                        <CheckCircle className="w-5 h-5 mr-3" />
-                        Confirm Payment - ₱{request.subscription_amount}
-                    </>
+                    <div className="flex items-center justify-center gap-3">
+                        <CheckCircle className="w-5 h-5" />
+                        <span>
+                            Confirm Payment - ₱
+                            {requestType === "subscription"
+                                ? request.calculated_amount
+                                : request.subscription_amount}
+                        </span>
+                    </div>
                 )}
             </Button>
         </div>
     );
 };
 
-export default function Payment({ request, token, paymentMethods }) {
+export default function Payment({
+    request,
+    token,
+    paymentMethods,
+    requestType = "registration",
+}) {
     return (
         <GuestLayout>
             <Head title="Complete Payment - Smile Suite" />
@@ -636,6 +779,7 @@ export default function Payment({ request, token, paymentMethods }) {
                                         request={request}
                                         token={token}
                                         paymentMethods={paymentMethods}
+                                        requestType={requestType}
                                     />
                                 </CardContent>
                             </Card>
@@ -699,12 +843,24 @@ export default function Payment({ request, token, paymentMethods }) {
                                                     Subscription Plan
                                                 </p>
                                                 <Badge className="bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200">
-                                                    {request.subscription_plan
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        request.subscription_plan.slice(
-                                                            1
-                                                        )}
+                                                    {requestType ===
+                                                    "subscription"
+                                                        ? (
+                                                              request.requested_plan ||
+                                                              request.current_plan
+                                                          )
+                                                              ?.charAt(0)
+                                                              ?.toUpperCase() +
+                                                          (
+                                                              request.requested_plan ||
+                                                              request.current_plan
+                                                          )?.slice(1)
+                                                        : request.subscription_plan
+                                                              ?.charAt(0)
+                                                              ?.toUpperCase() +
+                                                          request.subscription_plan?.slice(
+                                                              1
+                                                          )}
                                                 </Badge>
                                             </div>
                                         </div>
@@ -718,9 +874,10 @@ export default function Payment({ request, token, paymentMethods }) {
                                                 </span>
                                                 <span className="text-blue-600">
                                                     ₱
-                                                    {
-                                                        request.subscription_amount
-                                                    }
+                                                    {requestType ===
+                                                    "subscription"
+                                                        ? request.calculated_amount
+                                                        : request.subscription_amount}
                                                 </span>
                                             </div>
                                         </div>

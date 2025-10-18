@@ -94,7 +94,7 @@
             <h3>💳 Complete Your Payment</h3>
             <p>Click the button below to complete your payment securely:</p>
             <div style="text-align: center; margin: 20px 0;">
-                <a href="{{ route('subscription.payment', ['token' => $subscriptionRequest->payment_token]) }}" class="button">
+                <a href="{{ route('payment.show', ['token' => $subscriptionRequest->payment_token]) }}" class="button">
                     🚀 Complete Payment
                 </a>
             </div>
