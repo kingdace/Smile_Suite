@@ -1,19 +1,43 @@
 import { useState, cloneElement } from "react";
+import { usePage } from "@inertiajs/react";
 import { usePermissions } from "@/hooks/usePermissions";
 import PermissionDeniedModal from "./PermissionDeniedModal";
 import { Lock } from "lucide-react";
 
 const ProtectedRoute = ({
     permission,
+    role,
     children,
     fallback,
     showLockIcon = true,
     isButton = false, // New prop to distinguish button clicks from navigation
 }) => {
-    const { hasPermission } = usePermissions();
+    const { hasPermission, hasRole } = usePermissions();
     const [showModal, setShowModal] = useState(false);
 
-    if (!hasPermission(permission)) {
+    // Safety check for functions
+    if (typeof hasRole !== "function" || typeof hasPermission !== "function") {
+        return children; // Return children without protection if functions are not available
+    }
+
+    // Check permission or role
+    const hasAccess = permission
+        ? hasPermission(permission)
+        : role
+        ? hasRole(role)
+        : true;
+
+    // Temporary debug - remove after testing
+    if (role === "clinic_admin") {
+        console.log("ProtectedRoute access check:", {
+            role,
+            hasAccess,
+            hasRoleResult: hasRole(role),
+            userRole: usePage().props.auth?.user?.role,
+        });
+    }
+
+    if (!hasAccess) {
         if (fallback) {
             return fallback;
         }
@@ -41,7 +65,7 @@ const ProtectedRoute = ({
                         </div>
                     )}
                     <PermissionDeniedModal
-                        permission={permission}
+                        permission={permission || role}
                         isOpen={showModal}
                         onClose={() => setShowModal(false)}
                     />

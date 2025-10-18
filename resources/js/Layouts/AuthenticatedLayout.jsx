@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { usePage } from "@inertiajs/react";
 import ClinicLogo from "@/Components/ClinicLogo";
 import Dropdown from "@/Components/Dropdown";
 import NavLink from "@/Components/NavLink";
@@ -32,13 +33,15 @@ import { route } from "ziggy-js";
 import SiteHeader from "@/Components/SiteHeader";
 import CompactSubscriptionStatus from "@/Components/CompactSubscriptionStatus";
 import SubscriptionRequestDialog from "@/Components/SubscriptionRequestDialog";
-import ProtectedRoute from "@/Components/ProtectedRoute";
+import PermissionDeniedModal from "@/Components/PermissionDeniedModal";
 
 // Subscription Countdown Component
 const SubscriptionCountdown = ({ clinic }) => {
+    const { auth } = usePage().props;
     const [currentTime, setCurrentTime] = useState(new Date());
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogType, setDialogType] = useState(null);
+    const [permissionModalOpen, setPermissionModalOpen] = useState(false);
 
     // Update time every second for real-time countdown
     useEffect(() => {
@@ -281,44 +284,46 @@ const SubscriptionCountdown = ({ clinic }) => {
 
             {/* Upgrade Buttons - Visible to all but only clickable by clinic_admin */}
             <div className="flex items-center gap-1 lg:gap-2">
-                <ProtectedRoute
-                    permission="clinic_admin"
-                    isButton={true}
-                    customCheck={() =>
-                        auth?.user?.role === "clinic_admin" ||
-                        auth?.role === "clinic_admin"
-                    }
+                <Button
+                    size="sm"
+                    onClick={() => {
+                        const userRole = auth?.user?.role || auth?.role;
+                        if (
+                            userRole === "clinic_admin" ||
+                            userRole === "admin"
+                        ) {
+                            handleUpgradeClick();
+                        } else {
+                            setPermissionModalOpen(true);
+                        }
+                    }}
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
                 >
-                    <Button
-                        size="sm"
-                        onClick={handleUpgradeClick}
-                        className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
-                    >
-                        <Crown className="w-3 h-3 mr-1" />
-                        <span className="hidden sm:inline">Upgrade Now</span>
-                        <span className="sm:hidden">Upgrade</span>
-                    </Button>
-                </ProtectedRoute>
+                    <Crown className="w-3 h-3 mr-1" />
+                    <span className="hidden sm:inline">Upgrade Now</span>
+                    <span className="sm:hidden">Upgrade</span>
+                </Button>
                 {/* Show Renew button only for non-trial accounts */}
                 {!isTrial && (
-                    <ProtectedRoute
-                        permission="clinic_admin"
-                        isButton={true}
-                        customCheck={() =>
-                            auth?.user?.role === "clinic_admin" ||
-                            auth?.role === "clinic_admin"
-                        }
+                    <Button
+                        size="sm"
+                        onClick={() => {
+                            const userRole = auth?.user?.role || auth?.role;
+                            if (
+                                userRole === "clinic_admin" ||
+                                userRole === "admin"
+                            ) {
+                                handleRenewClick();
+                            } else {
+                                setPermissionModalOpen(true);
+                            }
+                        }}
+                        className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
                     >
-                        <Button
-                            size="sm"
-                            onClick={handleRenewClick}
-                            className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
-                        >
-                            <Zap className="w-3 h-3 mr-1" />
-                            <span className="hidden sm:inline">Renew</span>
-                            <span className="sm:hidden">Renew</span>
-                        </Button>
-                    </ProtectedRoute>
+                        <Zap className="w-3 h-3 mr-1" />
+                        <span className="hidden sm:inline">Renew</span>
+                        <span className="sm:hidden">Renew</span>
+                    </Button>
                 )}
             </div>
 
@@ -334,6 +339,13 @@ const SubscriptionCountdown = ({ clinic }) => {
                 }
                 isTrial={isTrial}
                 clinic={clinic}
+            />
+
+            {/* Permission Denied Modal */}
+            <PermissionDeniedModal
+                permission="clinic_admin"
+                isOpen={permissionModalOpen}
+                onClose={() => setPermissionModalOpen(false)}
             />
         </div>
     );
@@ -600,16 +612,6 @@ const Header = ({
                                             const isStaff =
                                                 auth?.user?.role === "staff" ||
                                                 auth?.role === "staff";
-                                            console.log(
-                                                "Avatar URL:",
-                                                avatarUrl
-                                            );
-                                            console.log("Auth object:", auth);
-                                            console.log(
-                                                "Is Clinic Admin:",
-                                                isClinicAdmin
-                                            );
-                                            console.log("Is Staff:", isStaff);
                                             // For clinic_admin only, always show clinic logo, for others show avatar if available
                                             return !isClinicAdmin && avatarUrl;
                                         })() ? (
