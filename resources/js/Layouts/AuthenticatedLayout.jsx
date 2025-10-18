@@ -695,7 +695,7 @@ const Header = ({
                                             auth?.user || auth
                                         )}
                                     </p>
-                                    <p className="text-xs text-blue-100 font-medium">
+                                    <p className="text-xs text-blue-100 font-medium text-center">
                                         {(auth?.user?.role || auth?.role)
                                             ?.replace("_", " ")
                                             ?.split(" ")
