@@ -12,26 +12,26 @@ class InventoryPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('view_inventory');
     }
 
     public function view(User $user, Inventory $inventory): bool
     {
-        return $user->clinic->id === $inventory->clinic_id;
+        return $user->hasPermission('view_inventory') && $user->clinic->id === $inventory->clinic_id;
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasPermission('add_inventory');
     }
 
     public function update(User $user, Inventory $inventory): bool
     {
-        return $user->clinic->id === $inventory->clinic_id;
+        return $user->hasPermission('edit_inventory') && $user->clinic->id === $inventory->clinic_id;
     }
 
     public function delete(User $user, Inventory $inventory): bool
     {
-        return $user->clinic->id === $inventory->clinic_id;
+        return $user->hasPermission('delete_inventory') && $user->clinic->id === $inventory->clinic_id;
     }
 }

@@ -12,52 +12,51 @@ class PaymentPolicy
 
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->hasPermission('view_payments');
     }
 
     public function view(User $user, Payment $payment): bool
     {
-        return $user->clinic->id === $payment->clinic_id;
+        return $user->hasPermission('view_payments') && $user->clinic->id === $payment->clinic_id;
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasPermission('process_payments');
     }
 
     public function update(User $user, Payment $payment): bool
     {
-        return $user->clinic->id === $payment->clinic_id;
+        return $user->hasPermission('process_payments') && $user->clinic->id === $payment->clinic_id;
     }
 
     public function delete(User $user, Payment $payment): bool
     {
-        return $user->clinic->id === $payment->clinic_id;
+        return $user->hasPermission('process_payments') && $user->clinic->id === $payment->clinic_id;
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->role === 'clinic_admin' || $user->role === 'admin';
+        return $user->hasPermission('process_payments');
     }
 
     public function updateAny(User $user): bool
     {
-        return $user->role === 'clinic_admin' || $user->role === 'admin';
+        return $user->hasPermission('process_payments');
     }
 
     public function refund(User $user, Payment $payment): bool
     {
-        return $user->clinic->id === $payment->clinic_id &&
-               ($user->role === 'clinic_admin' || $user->role === 'admin');
+        return $user->hasPermission('refund_payments') && $user->clinic->id === $payment->clinic_id;
     }
 
     public function export(User $user): bool
     {
-        return true;
+        return $user->hasPermission('view_payments');
     }
 
     public function viewStatistics(User $user): bool
     {
-        return true;
+        return $user->hasPermission('view_payments');
     }
 }

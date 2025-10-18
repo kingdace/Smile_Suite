@@ -1,6 +1,7 @@
 import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import {
@@ -106,16 +107,25 @@ export default function Index({ auth, clinic, suppliers, filters }) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Link
-                                    href={route("clinic.suppliers.create", [
-                                        clinic.id,
-                                    ])}
+                                <ProtectedRoute
+                                    permission="manage_suppliers"
+                                    isButton={true}
                                 >
-                                    <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-xl transition-all duration-300">
+                                    <Button
+                                        onClick={() =>
+                                            router.visit(
+                                                route(
+                                                    "clinic.suppliers.create",
+                                                    [clinic.id]
+                                                )
+                                            )
+                                        }
+                                        className="gap-2 bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-xl transition-all duration-300"
+                                    >
                                         <Plus className="h-4 w-4" />
                                         Add Supplier
                                     </Button>
-                                </Link>
+                                </ProtectedRoute>
                             </div>
                         </div>
                     </div>
@@ -361,24 +371,30 @@ export default function Index({ auth, clinic, suppliers, filters }) {
                                                                 View
                                                             </Button>
                                                         </Link>
-                                                        <Link
-                                                            href={route(
-                                                                "clinic.suppliers.edit",
-                                                                [
-                                                                    clinic.id,
-                                                                    supplier.id,
-                                                                ]
-                                                            )}
+                                                        <ProtectedRoute
+                                                            permission="manage_suppliers"
+                                                            isButton={true}
                                                         >
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
+                                                                onClick={() =>
+                                                                    router.visit(
+                                                                        route(
+                                                                            "clinic.suppliers.edit",
+                                                                            [
+                                                                                clinic.id,
+                                                                                supplier.id,
+                                                                            ]
+                                                                        )
+                                                                    )
+                                                                }
                                                                 className="h-8 px-3"
                                                             >
                                                                 <Edit className="h-3 w-3 mr-1" />
                                                                 Edit
                                                             </Button>
-                                                        </Link>
+                                                        </ProtectedRoute>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -401,17 +417,27 @@ export default function Index({ auth, clinic, suppliers, filters }) {
                                                             supplier
                                                         </p>
                                                     </div>
-                                                    <Link
-                                                        href={route(
-                                                            "clinic.suppliers.create",
-                                                            [clinic.id]
-                                                        )}
+                                                    <ProtectedRoute
+                                                        permission="manage_suppliers"
+                                                        isButton={true}
                                                     >
-                                                        <Button className="mt-2">
+                                                        <Button
+                                                            onClick={() =>
+                                                                router.visit(
+                                                                    route(
+                                                                        "clinic.suppliers.create",
+                                                                        [
+                                                                            clinic.id,
+                                                                        ]
+                                                                    )
+                                                                )
+                                                            }
+                                                            className="mt-2"
+                                                        >
                                                             <Plus className="h-4 w-4 mr-2" />
                                                             Add Supplier
                                                         </Button>
-                                                    </Link>
+                                                    </ProtectedRoute>
                                                 </div>
                                             </TableCell>
                                         </TableRow>

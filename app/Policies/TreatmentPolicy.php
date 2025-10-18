@@ -15,7 +15,7 @@ class TreatmentPolicy
     {
         // Allow clinic staff to view treatments in their clinic
         if ($user->isClinicStaff() && $clinic && $user->clinic_id === $clinic->id) {
-            return true;
+            return $user->hasPermission('view_treatments');
         }
 
         // Allow patients to view their own treatments (no clinic parameter needed)
@@ -30,7 +30,7 @@ class TreatmentPolicy
     {
         // Allow clinic staff to view treatments in their clinic
         if ($user->isClinicStaff() && $user->clinic_id === $treatment->clinic_id) {
-            return true;
+            return $user->hasPermission('view_treatments');
         }
 
         // Allow patients to view their own treatments
@@ -43,16 +43,16 @@ class TreatmentPolicy
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasPermission('create_treatments');
     }
 
     public function update(User $user, Treatment $treatment): bool
     {
-        return $user->clinic->id === $treatment->clinic_id;
+        return $user->hasPermission('edit_treatments') && $user->clinic->id === $treatment->clinic_id;
     }
 
     public function delete(User $user, Treatment $treatment): bool
     {
-        return $user->clinic->id === $treatment->clinic_id;
+        return $user->hasPermission('delete_treatments') && $user->clinic->id === $treatment->clinic_id;
     }
 }

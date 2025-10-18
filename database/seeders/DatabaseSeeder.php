@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             ClinicGallerySeeder::class,
             ClinicSeeder::class,
             ClinicSeeder2025::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
         ]);
     }
 }

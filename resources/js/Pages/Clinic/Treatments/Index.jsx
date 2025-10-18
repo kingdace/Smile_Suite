@@ -20,6 +20,7 @@ import {
 } from "@/Components/ui/select";
 import { Badge } from "@/Components/ui/badge";
 import Pagination from "@/Components/Pagination";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 import { format } from "date-fns";
 import {
     Search,
@@ -329,17 +330,22 @@ export default function Index({ auth, treatments, services, filters }) {
                                             : "Show Bulk Actions"}
                                     </Button>
                                 )}
-                                <Button
-                                    onClick={() =>
-                                        router.visit(
-                                            `/clinic/${auth.clinic_id}/treatments/create`
-                                        )
-                                    }
-                                    className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
+                                <ProtectedRoute
+                                    permission="create_treatments"
+                                    isButton={true}
                                 >
-                                    <PlusCircle className="h-4 w-4" />
-                                    Add Treatment
-                                </Button>
+                                    <Button
+                                        onClick={() =>
+                                            router.visit(
+                                                `/clinic/${auth.clinic_id}/treatments/create`
+                                            )
+                                        }
+                                        className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
+                                    >
+                                        <PlusCircle className="h-4 w-4" />
+                                        Add Treatment
+                                    </Button>
+                                </ProtectedRoute>
                             </div>
                         </div>
                     </div>
@@ -447,13 +453,17 @@ export default function Index({ auth, treatments, services, filters }) {
                                             ₱
                                             {treatments.data
                                                 ?.filter(
-                                                    (t) => t.payment_status === "completed"
+                                                    (t) =>
+                                                        t.payment_status ===
+                                                        "completed"
                                                 )
                                                 ?.reduce(
                                                     (sum, t) =>
                                                         sum +
-                                                        (parseFloat(t.total_cost || t.cost) ||
-                                                            0),
+                                                        (parseFloat(
+                                                            t.total_cost ||
+                                                                t.cost
+                                                        ) || 0),
                                                     0
                                                 )
                                                 .toLocaleString() || 0}
@@ -626,15 +636,22 @@ export default function Index({ auth, treatments, services, filters }) {
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Button
-                                                    onClick={handleBulkDelete}
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="gap-2 text-xs px-3 py-1"
+                                                <ProtectedRoute
+                                                    permission="delete_treatments"
+                                                    isButton={true}
                                                 >
-                                                    <Trash2 className="h-3 w-3" />
-                                                    Delete Selected
-                                                </Button>
+                                                    <Button
+                                                        onClick={
+                                                            handleBulkDelete
+                                                        }
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="gap-2 text-xs px-3 py-1"
+                                                    >
+                                                        <Trash2 className="h-3 w-3" />
+                                                        Delete Selected
+                                                    </Button>
+                                                </ProtectedRoute>
                                             </div>
                                         </div>
                                     </div>
@@ -777,18 +794,25 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                 (f) =>
                                                                     f === "all"
                                                             ) && (
-                                                                <Button
-                                                                    onClick={() =>
-                                                                        router.visit(
-                                                                            `/clinic/${auth.clinic_id}/treatments/create`
-                                                                        )
+                                                                <ProtectedRoute
+                                                                    permission="create_treatments"
+                                                                    isButton={
+                                                                        true
                                                                     }
-                                                                    className="gap-2 mt-2"
                                                                 >
-                                                                    <PlusCircle className="h-4 w-4" />
-                                                                    Create
-                                                                    Treatment
-                                                                </Button>
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            router.visit(
+                                                                                `/clinic/${auth.clinic_id}/treatments/create`
+                                                                            )
+                                                                        }
+                                                                        className="gap-2 mt-2"
+                                                                    >
+                                                                        <PlusCircle className="h-4 w-4" />
+                                                                        Create
+                                                                        Treatment
+                                                                    </Button>
+                                                                </ProtectedRoute>
                                                             )}
                                                     </div>
                                                 </TableCell>
@@ -1043,21 +1067,28 @@ export default function Index({ auth, treatments, services, filters }) {
                                                             >
                                                                 <Eye className="h-3 w-3" />
                                                             </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    router.visit(
-                                                                        `/clinic/${auth.clinic_id}/treatments/${treatment.id}/edit`
-                                                                    )
-                                                                }
-                                                                className="h-8 w-8 p-0 bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-200"
-                                                                title="Edit Treatment"
+                                                            <ProtectedRoute
+                                                                permission="edit_treatments"
+                                                                isButton={true}
                                                             >
-                                                                <Pencil className="h-3 w-3" />
-                                                            </Button>
-                                                            {auth.user.role ===
-                                                                "clinic_admin" && (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        router.visit(
+                                                                            `/clinic/${auth.clinic_id}/treatments/${treatment.id}/edit`
+                                                                        )
+                                                                    }
+                                                                    className="h-8 w-8 p-0 bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-200"
+                                                                    title="Edit Treatment"
+                                                                >
+                                                                    <Pencil className="h-3 w-3" />
+                                                                </Button>
+                                                            </ProtectedRoute>
+                                                            <ProtectedRoute
+                                                                permission="delete_treatments"
+                                                                isButton={true}
+                                                            >
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
@@ -1075,7 +1106,7 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                 >
                                                                     <Trash2 className="h-3 w-3" />
                                                                 </Button>
-                                                            )}
+                                                            </ProtectedRoute>
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>

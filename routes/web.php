@@ -18,6 +18,7 @@ use App\Http\Controllers\Clinic\AppointmentController;
 use App\Http\Controllers\Clinic\TreatmentController;
 use App\Http\Controllers\Clinic\InventoryController;
 use App\Http\Controllers\Clinic\PaymentController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Clinic\ReportController;
 use App\Http\Controllers\Clinic\SupplierController;
 use App\Http\Controllers\Clinic\DentistScheduleController;
@@ -83,6 +84,11 @@ Route::post('/payment/{token}/failure', [\App\Http\Controllers\Public\PaymentCon
 Route::get('/subscription/payment/{token}', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'showPayment'])->name('subscription.payment');
 Route::post('/subscription/payment/{token}/success', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'handlePaymentSuccess'])->name('subscription.payment.success');
 Route::get('/subscription/payment/{token}/success', [\App\Http\Controllers\Public\SubscriptionPaymentController::class, 'showPaymentSuccess'])->name('subscription.payment.success.show');
+
+// Permission denied route
+Route::get('/permission-denied/{permission}', [PermissionController::class, 'denied'])
+    ->middleware(['auth', 'verified'])
+    ->name('permission.denied');
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
@@ -244,18 +250,22 @@ Route::middleware('auth')->group(function () {
 
         // Patient search route
         Route::get('clinic/{clinic}/patients/search', [PatientController::class, 'search'])
+            ->middleware('permission:view_patients')
             ->name('clinic.patients.search');
 
         // Patient bulk destroy route (must be before resource routes)
         Route::delete('clinic/{clinic}/patients/bulk-destroy', [PatientController::class, 'bulkDestroy'])
+            ->middleware('permission:delete_patients')
             ->name('clinic.patients.bulk-destroy');
 
         // Patient export route
         Route::get('clinic/{clinic}/patients/export', [PatientController::class, 'export'])
+            ->middleware('permission:view_patients')
             ->name('clinic.patients.export');
 
         // Patient restore route (must be before resource routes)
         Route::patch('clinic/{clinic}/patients/{patient}/restore', [PatientController::class, 'restore'])
+            ->middleware('permission:delete_patients')
             ->name('clinic.patients.restore');
 
         // Patient Management Routes
@@ -272,41 +282,62 @@ Route::middleware('auth')->group(function () {
 
         // Simplified Appointment Creation Route (MUST BE BEFORE RESOURCE ROUTE)
         Route::get('/clinic/{clinic}/appointments/create-simplified', [AppointmentController::class, 'createSimplified'])
+            ->middleware('permission:create_appointments')
             ->name('clinic.appointments.create-simplified');
 
         // Appointment Management Routes (without create - using simplified version)
         Route::get('clinic/{clinic}/appointments', [AppointmentController::class, 'index'])
+            ->middleware('permission:view_appointments')
             ->name('clinic.appointments.index');
         Route::get('clinic/{clinic}/appointments/calendar', [AppointmentController::class, 'calendar'])
+            ->middleware('permission:view_appointments')
             ->name('clinic.appointments.calendar');
         Route::get('clinic/{clinic}/appointments/export', [AppointmentController::class, 'export'])
+            ->middleware('permission:view_appointments')
             ->name('clinic.appointments.export');
         Route::post('clinic/{clinic}/appointments', [AppointmentController::class, 'store'])
+            ->middleware('permission:create_appointments')
             ->name('clinic.appointments.store');
         Route::get('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'show'])
+            ->middleware('permission:view_appointments')
             ->name('clinic.appointments.show');
         Route::get('clinic/{clinic}/appointments/{appointment}/edit', [AppointmentController::class, 'edit'])
+            ->middleware('permission:edit_appointments')
             ->name('clinic.appointments.edit');
         Route::put('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'update'])
+            ->middleware('permission:edit_appointments')
             ->name('clinic.appointments.update');
         Route::delete('clinic/{clinic}/appointments/{appointment}', [AppointmentController::class, 'destroy'])
+            ->middleware('permission:delete_appointments')
             ->name('clinic.appointments.destroy');
 
         // Treatment export route (MUST BE BEFORE RESOURCE ROUTE)
         Route::get('clinic/{clinic}/treatments/export', [TreatmentController::class, 'export'])
+            ->middleware('permission:view_treatments')
             ->name('clinic.treatments.export');
 
         // Treatment Management Routes
-        Route::resource('clinic/{clinic}/treatments', TreatmentController::class)
-            ->names([
-                'index' => 'clinic.treatments.index',
-                'create' => 'clinic.treatments.create',
-                'store' => 'clinic.treatments.store',
-                'show' => 'clinic.treatments.show',
-                'edit' => 'clinic.treatments.edit',
-                'update' => 'clinic.treatments.update',
-                'destroy' => 'clinic.treatments.destroy',
-            ]);
+        Route::get('clinic/{clinic}/treatments', [TreatmentController::class, 'index'])
+            ->middleware('permission:view_treatments')
+            ->name('clinic.treatments.index');
+        Route::get('clinic/{clinic}/treatments/create', [TreatmentController::class, 'create'])
+            ->middleware('permission:create_treatments')
+            ->name('clinic.treatments.create');
+        Route::post('clinic/{clinic}/treatments', [TreatmentController::class, 'store'])
+            ->middleware('permission:create_treatments')
+            ->name('clinic.treatments.store');
+        Route::get('clinic/{clinic}/treatments/{treatment}', [TreatmentController::class, 'show'])
+            ->middleware('permission:view_treatments')
+            ->name('clinic.treatments.show');
+        Route::get('clinic/{clinic}/treatments/{treatment}/edit', [TreatmentController::class, 'edit'])
+            ->middleware('permission:edit_treatments')
+            ->name('clinic.treatments.edit');
+        Route::put('clinic/{clinic}/treatments/{treatment}', [TreatmentController::class, 'update'])
+            ->middleware('permission:edit_treatments')
+            ->name('clinic.treatments.update');
+        Route::delete('clinic/{clinic}/treatments/{treatment}', [TreatmentController::class, 'destroy'])
+            ->middleware('permission:delete_treatments')
+            ->name('clinic.treatments.destroy');
 
         // Test route to verify TreatmentController is working
         Route::get('clinic/{clinic}/treatments/test-export', function($clinic) {
@@ -319,14 +350,19 @@ Route::middleware('auth')->group(function () {
 
         // Treatment-Inventory Integration Routes
         Route::get('clinic/{clinic}/treatments/inventory/available', [TreatmentController::class, 'getAvailableInventory'])
+            ->middleware('permission:view_treatments')
             ->name('clinic.treatments.inventory.available');
         Route::post('clinic/{clinic}/treatments/{treatment}/inventory/deduct', [TreatmentController::class, 'deductInventory'])
+            ->middleware('permission:edit_treatments')
             ->name('clinic.treatments.inventory.deduct');
         Route::post('clinic/{clinic}/treatments/{treatment}/inventory/reverse', [TreatmentController::class, 'reverseInventoryDeduction'])
+            ->middleware('permission:edit_treatments')
             ->name('clinic.treatments.inventory.reverse');
         Route::get('clinic/{clinic}/treatments/{treatment}/inventory/summary', [TreatmentController::class, 'getInventorySummary'])
+            ->middleware('permission:view_treatments')
             ->name('clinic.treatments.inventory.summary');
         Route::post('clinic/{clinic}/treatments/{treatment}/complete', [TreatmentController::class, 'completeTreatment'])
+            ->middleware('permission:edit_treatments')
             ->name('clinic.treatments.complete');
 
         // Inventory Usage Reports
@@ -341,16 +377,27 @@ Route::middleware('auth')->group(function () {
             ->name('clinic.inventory.export');
 
         // Inventory Management Routes
-        Route::resource('clinic/{clinic}/inventory', InventoryController::class)
-            ->names([
-                'index' => 'clinic.inventory.index',
-                'create' => 'clinic.inventory.create',
-                'store' => 'clinic.inventory.store',
-                'show' => 'clinic.inventory.show',
-                'edit' => 'clinic.inventory.edit',
-                'update' => 'clinic.inventory.update',
-                'destroy' => 'clinic.inventory.destroy',
-            ]);
+        Route::get('clinic/{clinic}/inventory', [InventoryController::class, 'index'])
+            ->middleware('permission:view_inventory')
+            ->name('clinic.inventory.index');
+        Route::get('clinic/{clinic}/inventory/create', [InventoryController::class, 'create'])
+            ->middleware('permission:add_inventory')
+            ->name('clinic.inventory.create');
+        Route::post('clinic/{clinic}/inventory', [InventoryController::class, 'store'])
+            ->middleware('permission:add_inventory')
+            ->name('clinic.inventory.store');
+        Route::get('clinic/{clinic}/inventory/{inventory}', [InventoryController::class, 'show'])
+            ->middleware('permission:view_inventory')
+            ->name('clinic.inventory.show');
+        Route::get('clinic/{clinic}/inventory/{inventory}/edit', [InventoryController::class, 'edit'])
+            ->middleware('permission:edit_inventory')
+            ->name('clinic.inventory.edit');
+        Route::put('clinic/{clinic}/inventory/{inventory}', [InventoryController::class, 'update'])
+            ->middleware('permission:edit_inventory')
+            ->name('clinic.inventory.update');
+        Route::delete('clinic/{clinic}/inventory/{inventory}', [InventoryController::class, 'destroy'])
+            ->middleware('permission:delete_inventory')
+            ->name('clinic.inventory.destroy');
 
         // Inventory Transaction Routes
         Route::get('clinic/{clinic}/inventory/transactions', [\App\Http\Controllers\Clinic\InventoryTransactionController::class, 'index'])
@@ -368,6 +415,7 @@ Route::middleware('auth')->group(function () {
 
         // Inventory Quick Actions
         Route::patch('clinic/{clinic}/inventory/{inventory}/adjust-quantity', [InventoryController::class, 'adjustQuantity'])
+            ->middleware('permission:edit_inventory')
             ->name('clinic.inventory.adjust-quantity');
         Route::get('clinic/{clinic}/inventory/statistics', [InventoryController::class, 'statistics'])
             ->name('clinic.inventory.statistics');
@@ -397,16 +445,27 @@ Route::middleware('auth')->group(function () {
             ->name('clinic.payments.export');
 
         // Payment Management Routes
-        Route::resource('clinic/{clinic}/payments', PaymentController::class)
-            ->names([
-                'index' => 'clinic.payments.index',
-                'create' => 'clinic.payments.create',
-                'store' => 'clinic.payments.store',
-                'show' => 'clinic.payments.show',
-                'edit' => 'clinic.payments.edit',
-                'update' => 'clinic.payments.update',
-                'destroy' => 'clinic.payments.destroy',
-            ]);
+        Route::get('clinic/{clinic}/payments', [PaymentController::class, 'index'])
+            ->middleware('permission:view_payments')
+            ->name('clinic.payments.index');
+        Route::get('clinic/{clinic}/payments/create', [PaymentController::class, 'create'])
+            ->middleware('permission:process_payments')
+            ->name('clinic.payments.create');
+        Route::post('clinic/{clinic}/payments', [PaymentController::class, 'store'])
+            ->middleware('permission:process_payments')
+            ->name('clinic.payments.store');
+        Route::get('clinic/{clinic}/payments/{payment}', [PaymentController::class, 'show'])
+            ->middleware('permission:view_payments')
+            ->name('clinic.payments.show');
+        Route::get('clinic/{clinic}/payments/{payment}/edit', [PaymentController::class, 'edit'])
+            ->middleware('permission:process_payments')
+            ->name('clinic.payments.edit');
+        Route::put('clinic/{clinic}/payments/{payment}', [PaymentController::class, 'update'])
+            ->middleware('permission:process_payments')
+            ->name('clinic.payments.update');
+        Route::delete('clinic/{clinic}/payments/{payment}', [PaymentController::class, 'destroy'])
+            ->middleware('permission:process_payments')
+            ->name('clinic.payments.destroy');
 
         // Payment Bulk Operations Routes
         Route::delete('clinic/{clinic}/payments/bulk-destroy', [PaymentController::class, 'bulkDestroy'])
@@ -473,35 +532,54 @@ Route::middleware('auth')->group(function () {
 
 
         // Suppliers Routes
-        Route::resource('clinic/{clinic}/suppliers', SupplierController::class)
-            ->names([
-                'index' => 'clinic.suppliers.index',
-                'create' => 'clinic.suppliers.create',
-                'store' => 'clinic.suppliers.store',
-                'show' => 'clinic.suppliers.show',
-                'edit' => 'clinic.suppliers.edit',
-                'update' => 'clinic.suppliers.update',
-                'destroy' => 'clinic.suppliers.destroy',
-            ]);
+        Route::get('clinic/{clinic}/suppliers', [SupplierController::class, 'index'])
+            ->middleware('permission:view_inventory')
+            ->name('clinic.suppliers.index');
+        Route::get('clinic/{clinic}/suppliers/create', [SupplierController::class, 'create'])
+            ->middleware('permission:manage_suppliers')
+            ->name('clinic.suppliers.create');
+        Route::post('clinic/{clinic}/suppliers', [SupplierController::class, 'store'])
+            ->middleware('permission:manage_suppliers')
+            ->name('clinic.suppliers.store');
+        Route::get('clinic/{clinic}/suppliers/{supplier}', [SupplierController::class, 'show'])
+            ->middleware('permission:view_inventory')
+            ->name('clinic.suppliers.show');
+        Route::get('clinic/{clinic}/suppliers/{supplier}/edit', [SupplierController::class, 'edit'])
+            ->middleware('permission:manage_suppliers')
+            ->name('clinic.suppliers.edit');
+        Route::put('clinic/{clinic}/suppliers/{supplier}', [SupplierController::class, 'update'])
+            ->middleware('permission:manage_suppliers')
+            ->name('clinic.suppliers.update');
+        Route::delete('clinic/{clinic}/suppliers/{supplier}', [SupplierController::class, 'destroy'])
+            ->middleware('permission:manage_suppliers')
+            ->name('clinic.suppliers.destroy');
 
         // Dentist Schedules
         Route::get('/clinic/{clinic}/dentist-schedules', [DentistScheduleController::class, 'index'])
+            ->middleware('permission:view_schedules')
             ->name('clinic.dentist-schedules.index');
         Route::post('/clinic/{clinic}/dentist-schedules', [DentistScheduleController::class, 'store'])
+            ->middleware('permission:manage_dentist_schedules')
             ->name('clinic.dentist-schedules.store');
         Route::put('/clinic/{clinic}/dentist-schedules/{schedule}', [DentistScheduleController::class, 'update'])
+            ->middleware('permission:manage_dentist_schedules')
             ->name('clinic.dentist-schedules.update');
         Route::delete('/clinic/{clinic}/dentist-schedules/{schedule}', [DentistScheduleController::class, 'destroy'])
+            ->middleware('permission:manage_dentist_schedules')
             ->name('clinic.dentist-schedules.destroy');
         Route::get('/clinic/{clinic}/dentist-schedules/available-slots', [DentistScheduleController::class, 'getAvailableSlots'])
+            ->middleware('permission:view_schedules')
             ->name('clinic.dentist-schedules.available-slots');
 
         // Schedule API Routes
         Route::get('clinic/{clinic}/dentist-schedules/get-available-slots', [DentistScheduleController::class, 'getAvailableSlots'])
+            ->middleware('permission:view_schedules')
             ->name('clinic.dentist-schedules.get-available-slots');
         Route::post('clinic/{clinic}/dentist-schedules/create-from-template', [DentistScheduleController::class, 'createFromTemplate'])
+            ->middleware('permission:manage_dentist_schedules')
             ->name('clinic.dentist-schedules.create-from-template');
         Route::get('clinic/{clinic}/dentist-schedules/stats', [DentistScheduleController::class, 'getStats'])
+            ->middleware('permission:view_schedules')
             ->name('clinic.dentist-schedules.stats');
 
         // Waitlist Management Routes
@@ -530,21 +608,34 @@ Route::middleware('auth')->group(function () {
 
         // Unified Schedule Management Routes
         Route::get('clinic/{clinic}/dentist-schedules/unified-info', [DentistScheduleController::class, 'getUnifiedScheduleInfo'])
+            ->middleware('permission:view_schedules')
             ->name('clinic.dentist-schedules.unified-info');
         Route::post('clinic/{clinic}/dentist-schedules/sync-profile', [DentistScheduleController::class, 'syncProfileToSchedule'])
+            ->middleware('permission:manage_dentist_schedules')
             ->name('clinic.dentist-schedules.sync-profile');
 
         // Services Management Routes
-        Route::resource('clinic/{clinic}/services', ServiceController::class)
-            ->names([
-                'index' => 'clinic.services.index',
-                'create' => 'clinic.services.create',
-                'store' => 'clinic.services.store',
-                'show' => 'clinic.services.show',
-                'edit' => 'clinic.services.edit',
-                'update' => 'clinic.services.update',
-                'destroy' => 'clinic.services.destroy',
-            ]);
+        Route::get('clinic/{clinic}/services', [ServiceController::class, 'index'])
+            ->middleware('permission:view_services')
+            ->name('clinic.services.index');
+        Route::get('clinic/{clinic}/services/create', [ServiceController::class, 'create'])
+            ->middleware('permission:manage_services')
+            ->name('clinic.services.create');
+        Route::post('clinic/{clinic}/services', [ServiceController::class, 'store'])
+            ->middleware('permission:manage_services')
+            ->name('clinic.services.store');
+        Route::get('clinic/{clinic}/services/{service}', [ServiceController::class, 'show'])
+            ->middleware('permission:view_services')
+            ->name('clinic.services.show');
+        Route::get('clinic/{clinic}/services/{service}/edit', [ServiceController::class, 'edit'])
+            ->middleware('permission:manage_services')
+            ->name('clinic.services.edit');
+        Route::put('clinic/{clinic}/services/{service}', [ServiceController::class, 'update'])
+            ->middleware('permission:manage_services')
+            ->name('clinic.services.update');
+        Route::delete('clinic/{clinic}/services/{service}', [ServiceController::class, 'destroy'])
+            ->middleware('permission:manage_services')
+            ->name('clinic.services.destroy');
         Route::get('clinic/{clinic}/services/subcategories', [ServiceController::class, 'getSubcategories'])
             ->name('clinic.services.subcategories');
         Route::patch('clinic/{clinic}/services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])
@@ -559,23 +650,42 @@ Route::middleware('auth')->group(function () {
 
 
         // Online Appointment Approval Routes
-        Route::post('/clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])->name('clinic.appointments.approve-online');
-        Route::post('/clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])->name('clinic.appointments.deny-online');
+        Route::post('/clinic/{clinic}/appointments/{appointment}/approve-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveOnlineRequest'])
+            ->middleware('permission:edit_appointments')
+            ->name('clinic.appointments.approve-online');
+        Route::post('/clinic/{clinic}/appointments/{appointment}/deny-online', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyOnlineRequest'])
+            ->middleware('permission:edit_appointments')
+            ->name('clinic.appointments.deny-online');
 
         // Reschedule Approval Routes
-        Route::post('/clinic/{clinic}/appointments/{appointment}/approve-reschedule', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveReschedule'])->name('clinic.appointments.approve-reschedule');
-        Route::post('/clinic/{clinic}/appointments/{appointment}/deny-reschedule', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyReschedule'])->name('clinic.appointments.deny-reschedule');
+        Route::post('/clinic/{clinic}/appointments/{appointment}/approve-reschedule', [\App\Http\Controllers\Clinic\AppointmentController::class, 'approveReschedule'])
+            ->middleware('permission:edit_appointments')
+            ->name('clinic.appointments.approve-reschedule');
+        Route::post('/clinic/{clinic}/appointments/{appointment}/deny-reschedule', [\App\Http\Controllers\Clinic\AppointmentController::class, 'denyReschedule'])
+            ->middleware('permission:edit_appointments')
+            ->name('clinic.appointments.deny-reschedule');
 
         // Waitlist Integration Routes
         Route::post('/clinic/{clinic}/appointments/add-to-waitlist', [\App\Http\Controllers\Clinic\AppointmentController::class, 'addToWaitlist'])
+            ->middleware('permission:create_appointments')
             ->name('clinic.appointments.add-to-waitlist');
 
-        // Subscription Management Route
-        Route::get('subscription', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'index'])->name('clinic.subscription.index');
-        Route::get('subscription/test', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'test'])->name('clinic.subscription.test');
-Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])->name('clinic.subscription.upgrade');
-Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])->name('clinic.subscription.renew');
-        Route::get('subscription/quick-renewal', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'quickRenewal'])->name('clinic.subscription.quick-renewal');
+        // Subscription Management Route (Clinic Admin Only)
+        Route::get('subscription', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'index'])
+            ->middleware('role:clinic_admin')
+            ->name('clinic.subscription.index');
+        Route::get('subscription/test', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'test'])
+            ->middleware('role:clinic_admin')
+            ->name('clinic.subscription.test');
+        Route::post('subscription/upgrade', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestUpgrade'])
+            ->middleware('role:clinic_admin')
+            ->name('clinic.subscription.upgrade');
+        Route::post('subscription/renew', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'requestRenewal'])
+            ->middleware('role:clinic_admin')
+            ->name('clinic.subscription.renew');
+        Route::get('subscription/quick-renewal', [\App\Http\Controllers\Clinic\SubscriptionController::class, 'quickRenewal'])
+            ->middleware('role:clinic_admin')
+            ->name('clinic.subscription.quick-renewal');
 
         // Clinic User Management Routes
         Route::middleware(['auth'])->prefix('clinic')->group(function () {

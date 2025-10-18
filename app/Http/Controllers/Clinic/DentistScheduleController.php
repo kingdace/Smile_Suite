@@ -8,6 +8,7 @@ use App\Models\Clinic;
 use App\Services\ScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Traits\SubscriptionAccessControl;
 
@@ -27,6 +28,9 @@ class DentistScheduleController extends Controller
     {
         // Check subscription access first
         $this->checkSubscriptionAccess();
+
+        // Check permissions
+        $this->authorize('viewAny', [DentistSchedule::class, $clinic]);
 
         $schedules = DentistSchedule::with('dentist')
             ->where('clinic_id', $clinic->id)
@@ -253,30 +257,18 @@ class DentistScheduleController extends Controller
      */
     public function store(Request $request, Clinic $clinic)
     {
-        \Log::info('Store method called', [
+        Log::info('Store method called', [
             'request_data' => $request->all(),
             'clinic_id' => $clinic->id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'is_inertia' => $request->header('X-Inertia') ? 'yes' : 'no'
         ]);
-        
+
         // Check subscription access
         $this->checkSubscriptionAccess();
-        
-        // Authorization: Only clinic admin/owner or the dentist themselves can create schedules
-        $user = auth()->user();
-        
-        // Authorization check passed
-        
-        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner', 'clinic_admin'])) 
-            && !($user->role === 'dentist' && $user->clinic_id === $clinic->id)) {
-            
-            // Return JSON error response
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. Only clinic administrators or dentists can manage schedules.'
-            ], 403);
-        }
+
+        // Check permissions using policy
+        $this->authorize('create', [DentistSchedule::class, $clinic]);
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -312,7 +304,7 @@ class DentistScheduleController extends Controller
         try {
             // Verify dentist belongs to this clinic
             $dentist = $clinic->users()->where('id', $validated['user_id'])->where('role', 'dentist')->first();
-            
+
             if (!$dentist) {
                 return response()->json([
                     'success' => false,
@@ -356,7 +348,7 @@ class DentistScheduleController extends Controller
             ]);
 
             // Return JSON response for fetch requests (like template application)
-            \Log::info('Returning JSON success response');
+            Log::info('Returning JSON success response');
             return response()->json([
                 'success' => true,
                 'message' => 'Schedule created successfully',
@@ -384,7 +376,7 @@ class DentistScheduleController extends Controller
     {
         // Check subscription access
         $this->checkSubscriptionAccess();
-        
+
         // Verify schedule belongs to this clinic
         if ($schedule->clinic_id !== $clinic->id) {
             return response()->json([
@@ -393,15 +385,8 @@ class DentistScheduleController extends Controller
             ], 404);
         }
 
-        // Authorization: Only clinic admin/owner or the dentist who owns the schedule can update
-        $user = auth()->user();
-        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner', 'clinic_admin'])) 
-            && !($user->role === 'dentist' && $user->id === $schedule->user_id)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. You can only edit your own schedule or you must be a clinic administrator.'
-            ], 403);
-        }
+        // Check permissions using policy
+        $this->authorize('update', $schedule);
 
         $validated = $request->validate([
             'day_of_week' => 'nullable|integer|between:0,6',
@@ -415,7 +400,7 @@ class DentistScheduleController extends Controller
             'allow_overlap' => 'boolean',
             'max_appointments_per_day' => 'nullable|integer|min:1|max:50',
         ]);
-        
+
         // Remove _method from validated data if it exists
         unset($validated['_method']);
 
@@ -457,7 +442,7 @@ class DentistScheduleController extends Controller
     {
         // Check subscription access
         $this->checkSubscriptionAccess();
-        
+
         // Verify schedule belongs to this clinic
         if ($schedule->clinic_id !== $clinic->id) {
             return response()->json([
@@ -466,20 +451,13 @@ class DentistScheduleController extends Controller
             ], 404);
         }
 
-        // Authorization: Only clinic admin/owner or the dentist who owns the schedule can delete
-        $user = auth()->user();
-        if (!($user->clinic_id === $clinic->id && in_array($user->role, ['admin', 'owner', 'clinic_admin'])) 
-            && !($user->role === 'dentist' && $user->id === $schedule->user_id)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. You can only delete your own schedule or you must be a clinic administrator.'
-            ], 403);
-        }
+        // Check permissions using policy
+        $this->authorize('delete', $schedule);
 
         try {
             $scheduleId = $schedule->id;
             $dentistId = $schedule->user_id;
-            
+
             $schedule->delete();
 
             Log::info('Schedule deleted successfully', [

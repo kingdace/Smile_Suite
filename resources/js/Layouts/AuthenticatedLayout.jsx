@@ -32,6 +32,7 @@ import { route } from "ziggy-js";
 import SiteHeader from "@/Components/SiteHeader";
 import CompactSubscriptionStatus from "@/Components/CompactSubscriptionStatus";
 import SubscriptionRequestDialog from "@/Components/SubscriptionRequestDialog";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 
 // Subscription Countdown Component
 const SubscriptionCountdown = ({ clinic }) => {
@@ -278,28 +279,46 @@ const SubscriptionCountdown = ({ clinic }) => {
                 </div>
             )}
 
-            {/* Upgrade Buttons - Always show for demo purposes */}
+            {/* Upgrade Buttons - Visible to all but only clickable by clinic_admin */}
             <div className="flex items-center gap-1 lg:gap-2">
-                <Button
-                    size="sm"
-                    onClick={handleUpgradeClick}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
+                <ProtectedRoute
+                    permission="clinic_admin"
+                    isButton={true}
+                    customCheck={() =>
+                        auth?.user?.role === "clinic_admin" ||
+                        auth?.role === "clinic_admin"
+                    }
                 >
-                    <Crown className="w-3 h-3 mr-1" />
-                    <span className="hidden sm:inline">Upgrade Now</span>
-                    <span className="sm:hidden">Upgrade</span>
-                </Button>
-                {/* Show Renew button only for non-trial accounts */}
-                {!isTrial && (
                     <Button
                         size="sm"
-                        onClick={handleRenewClick}
-                        className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
+                        onClick={handleUpgradeClick}
+                        className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold px-2 lg:px-4 py-1.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-yellow-300/50 text-xs lg:text-sm"
                     >
-                        <Zap className="w-3 h-3 mr-1" />
-                        <span className="hidden sm:inline">Renew</span>
-                        <span className="sm:hidden">Renew</span>
+                        <Crown className="w-3 h-3 mr-1" />
+                        <span className="hidden sm:inline">Upgrade Now</span>
+                        <span className="sm:hidden">Upgrade</span>
                     </Button>
+                </ProtectedRoute>
+                {/* Show Renew button only for non-trial accounts */}
+                {!isTrial && (
+                    <ProtectedRoute
+                        permission="clinic_admin"
+                        isButton={true}
+                        customCheck={() =>
+                            auth?.user?.role === "clinic_admin" ||
+                            auth?.role === "clinic_admin"
+                        }
+                    >
+                        <Button
+                            size="sm"
+                            onClick={handleRenewClick}
+                            className="bg-white/20 hover:bg-white/30 text-white font-semibold px-2 lg:px-3 py-1.5 rounded-xl transition-all duration-300 hover:scale-105 border border-white/40 text-xs lg:text-sm"
+                        >
+                            <Zap className="w-3 h-3 mr-1" />
+                            <span className="hidden sm:inline">Renew</span>
+                            <span className="sm:hidden">Renew</span>
+                        </Button>
+                    </ProtectedRoute>
                 )}
             </div>
 
@@ -508,13 +527,13 @@ const Header = ({
                                             <img
                                                 src={ImageHelper.getImageUrl(
                                                     auth.clinic.logo_url,
-                                                    "/images/clinic-logo2.png"
+                                                    "/images/clinic-logo.png"
                                                 )}
                                                 alt={`${auth.clinic.name} Logo`}
                                                 className="w-9 h-9 object-contain"
                                                 onError={(e) => {
                                                     e.target.src =
-                                                        "/images/clinic-logo2.png";
+                                                        "/images/clinic-logo.png";
                                                 }}
                                             />
                                         ) : (
@@ -578,6 +597,9 @@ const Header = ({
                                                 auth?.user?.role ===
                                                     "clinic_admin" ||
                                                 auth?.role === "clinic_admin";
+                                            const isStaff =
+                                                auth?.user?.role === "staff" ||
+                                                auth?.role === "staff";
                                             console.log(
                                                 "Avatar URL:",
                                                 avatarUrl
@@ -587,7 +609,8 @@ const Header = ({
                                                 "Is Clinic Admin:",
                                                 isClinicAdmin
                                             );
-                                            // For clinic_admin, always show clinic logo, for others show avatar if available
+                                            console.log("Is Staff:", isStaff);
+                                            // For clinic_admin only, always show clinic logo, for others show avatar if available
                                             return !isClinicAdmin && avatarUrl;
                                         })() ? (
                                             <img
@@ -602,7 +625,7 @@ const Header = ({
                                                         "Avatar image failed to load, falling back to clinic logo"
                                                     );
                                                     e.target.src =
-                                                        "/images/clinic-logo2.png";
+                                                        "/images/clinic-logo.png";
                                                 }}
                                                 onLoad={() => {
                                                     console.log(
@@ -612,7 +635,7 @@ const Header = ({
                                             />
                                         ) : (
                                             <img
-                                                src="/images/clinic-logo2.png"
+                                                src="/images/clinic-logo.png"
                                                 alt="Clinic Logo"
                                                 className="w-full h-full object-contain"
                                                 style={{
@@ -641,6 +664,10 @@ const Header = ({
                                                             "clinic_admin" ||
                                                         auth?.role ===
                                                             "clinic_admin";
+                                                    const isStaff =
+                                                        auth?.user?.role ===
+                                                            "staff" ||
+                                                        auth?.role === "staff";
                                                     // Show initials only if not clinic_admin and no avatar
                                                     return !isClinicAdmin &&
                                                         !avatarUrl

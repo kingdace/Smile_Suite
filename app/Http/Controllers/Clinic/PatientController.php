@@ -36,6 +36,9 @@ class PatientController extends Controller
         // Check subscription access first
         $this->checkSubscriptionAccess();
 
+        // Check permissions
+        $this->authorize('viewAny', [Patient::class, Auth::user()->clinic]);
+
         $query = Auth::user()->clinic->patients()
             ->visibleInClinic()
             ->with(['appointments', 'treatments', 'payments']);
@@ -142,6 +145,8 @@ class PatientController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Patient::class);
+
         $regions = $this->psgcApi->getRegions()->getData();
 
         return Inertia::render('Clinic/Patients/Create', [
@@ -154,6 +159,8 @@ class PatientController extends Controller
 
     public function store(PatientRequest $request)
     {
+        $this->authorize('create', Patient::class);
+
         $validated = $request->validated();
 
         // Use the patient linking service to handle creation

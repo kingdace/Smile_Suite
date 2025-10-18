@@ -10,26 +10,34 @@ class AppointmentPolicy
 {
     public function viewAny(User $user, Clinic $clinic): bool
     {
-        return (in_array($user->role, ['clinic_admin', 'dentist', 'staff'])) && $user->clinic_id === $clinic->id;
+        return $user->hasPermission('view_appointments') && $user->clinic_id === $clinic->id;
     }
 
     public function view(User $user, Appointment $appointment, Clinic $clinic): bool
     {
-        return (in_array($user->role, ['clinic_admin', 'dentist', 'staff'])) && $user->clinic_id === $clinic->id;
+        return $user->hasPermission('view_appointments') && $user->clinic_id === $clinic->id;
     }
 
     public function create(User $user, Clinic $clinic): bool
     {
-        return (in_array($user->role, ['clinic_admin', 'dentist', 'staff'])) && $user->clinic_id === $clinic->id;
+        return $user->hasPermission('create_appointments') && $user->clinic_id === $clinic->id;
     }
 
     public function update(User $user, Appointment $appointment, Clinic $clinic): bool
     {
-        return (in_array($user->role, ['clinic_admin', 'dentist', 'staff'])) && $user->clinic_id === $clinic->id;
+        return $user->hasPermission('edit_appointments') && $user->clinic_id === $clinic->id;
     }
 
     public function delete(User $user, Appointment $appointment, Clinic $clinic): bool
     {
-        return (in_array($user->role, ['clinic_admin', 'dentist', 'staff'])) && $user->clinic_id === $clinic->id;
+        return $user->hasPermission('delete_appointments') && $user->clinic_id === $clinic->id;
+    }
+
+    /**
+     * Determine whether the user can assign dentists to appointments.
+     */
+    public function assignDentist(User $user, Clinic $clinic): bool
+    {
+        return $user->hasPermission('assign_dentists') && $user->clinic_id === $clinic->id;
     }
 }

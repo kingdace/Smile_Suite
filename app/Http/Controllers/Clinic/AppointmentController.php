@@ -266,13 +266,6 @@ class AppointmentController extends Controller
         return Inertia::render('Clinic/Appointments/Show', [
             'clinic' => $clinic,
             'appointment' => $appointment,
-            'auth' => [
-                'id' => Auth::user()->id,
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => Auth::user()->clinic_id,
-                'clinic' => Auth::user()->clinic,
-            ],
         ]);
     }
 
@@ -290,13 +283,6 @@ class AppointmentController extends Controller
                 ->values(),
             'dentists' => $clinic->users()->where('role', 'dentist')->get(),
             'services' => $clinic->services()->active()->get(),
-            'auth' => [
-                'id' => Auth::user()->id,
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => Auth::user()->clinic_id,
-                'clinic' => Auth::user()->clinic,
-            ],
         ]);
     }
 

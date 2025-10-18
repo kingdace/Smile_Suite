@@ -155,13 +155,6 @@ class PaymentController extends Controller
         return Inertia::render('Clinic/Payments/Create', [
             'patients' => $patients,
             'treatments' => $treatments,
-            'auth' => [
-                'id' => Auth::id(),
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => $clinic->id,
-                'clinic' => $clinic,
-            ],
         ]);
     }
 
@@ -254,13 +247,6 @@ class PaymentController extends Controller
             'clinic' => $clinic,
             'payment' => $payment,
             'relatedPayments' => $relatedPayments,
-            'auth' => [
-                'id' => Auth::id(),
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => $clinic->id,
-                'clinic' => $clinic,
-            ],
         ]);
     }
 
@@ -291,13 +277,6 @@ class PaymentController extends Controller
             'payment' => $payment,
             'patients' => $patients,
             'treatments' => $treatments,
-            'auth' => [
-                'id' => Auth::id(),
-                'name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-                'clinic_id' => $clinic->id,
-                'clinic' => $clinic,
-            ],
         ]);
     }
 

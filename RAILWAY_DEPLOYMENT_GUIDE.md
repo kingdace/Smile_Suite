@@ -1,294 +1,260 @@
-# 🚀 Railway Deployment Guide for Smile Suite
+# 🚀 RAILWAY DEPLOYMENT GUIDE - IAM IMPLEMENTATION
 
-This guide will help you deploy your Smile Suite Laravel application on Railway using their free tier.
+## 📋 **DEPLOYMENT CHECKLIST**
 
-## 📋 Prerequisites
+### **New Files Created/Modified:**
 
--   GitHub account
--   Railway account (free)
--   Your Smile Suite project pushed to GitHub
+#### **🗄️ Database Migrations (NEW)**
+- `2025_10_17_101451_create_permissions_table.php`
+- `2025_10_17_101515_create_role_permissions_table.php`
 
-## 🎯 Railway Free Tier Limits
+#### **🌱 Database Seeders (MODIFIED)**
+- `DatabaseSeeder.php` - Added PermissionSeeder and RolePermissionSeeder
+- `PermissionSeeder.php` - Added all IAM permissions
+- `RolePermissionSeeder.php` - Added role-permission assignments
 
--   **$5 credit monthly** (usually enough for small-medium apps)
--   **512MB RAM** per service
--   **1GB storage** per service
--   **Automatic deployments** from GitHub
--   **Built-in PostgreSQL database**
--   **Custom domains** support
+#### **🔒 Middleware (NEW)**
+- `app/Http/Middleware/CheckRole.php` - Role-based access control
+- `app/Http/Kernel.php` - Registered new middleware
 
-## 📁 Step 1: Prepare Your Project
+#### **🛡️ Policies (NEW)**
+- `app/Policies/DentistSchedulePolicy.php` - Dentist schedule authorization
 
-### 1.1 Create Railway Configuration Files
+#### **🎨 Frontend Components (MODIFIED)**
+- `resources/js/Components/PermissionDeniedModal.jsx` - Enhanced UI/UX
+- `resources/js/Components/ProtectedRoute.jsx` - Button protection
+- `resources/js/Layouts/AuthenticatedLayout.jsx` - Upgrade/Renew restrictions
+- `resources/js/Pages/Clinic/DentistSchedules/Index.jsx` - Frontend restrictions
+- `resources/js/Pages/Clinic/Treatments/Index.jsx` - Staff restrictions
 
-The following files have been created for you:
+#### **🛣️ Routes (MODIFIED)**
+- `routes/web.php` - Added permission middleware to routes
 
--   `railway.json` - Railway deployment configuration
--   `nixpacks.toml` - Build configuration
--   `Procfile` - Process definition
+---
 
-### 1.2 Update Environment Variables
+## 🚀 **STEP-BY-STEP RAILWAY DEPLOYMENT**
 
-Create a production-ready `.env` file:
+### **Step 1: Prepare Migration Files for Railway**
 
-```env
-APP_NAME="Smile Suite"
-APP_ENV=production
-APP_KEY=base64:YOUR_GENERATED_KEY
-APP_DEBUG=false
-APP_TIMEZONE=Asia/Manila
-APP_URL=https://your-app-name.railway.app
+Since Railway doesn't have direct database access, we need to create SQL files for HeidiSQL:
 
-# Database (Railway will provide these)
-DB_CONNECTION=pgsql
-DB_HOST=your-railway-db-host
-DB_PORT=5432
-DB_DATABASE=railway
-DB_USERNAME=postgres
-DB_PASSWORD=your-railway-db-password
+#### **Create Migration SQL Files:**
 
-# Session
-SESSION_DRIVER=database
-SESSION_LIFETIME=120
-SESSION_ENCRYPT=true
-
-# Cache
-CACHE_STORE=database
-
-# Queue
-QUEUE_CONNECTION=database
-
-# Mail (use your Gmail or other SMTP)
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=your-email@gmail.com
-MAIL_FROM_NAME="Smile Suite"
-
-# File Storage
-FILESYSTEM_DISK=local
-
-# Pusher (optional)
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_APP_CLUSTER=
-
-# Vite
-VITE_APP_NAME="${APP_NAME}"
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+```sql
+-- File: 2025_10_17_101451_create_permissions_table.sql
+CREATE TABLE permissions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    display_name VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    category VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT NULL,
+    updated_at TIMESTAMP NULL DEFAULT NULL
+);
 ```
 
-## 🚀 Step 2: Deploy to Railway
+```sql
+-- File: 2025_10_17_101515_create_role_permissions_table.sql
+CREATE TABLE role_permissions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    role VARCHAR(255) NOT NULL,
+    permission_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT NULL,
+    updated_at TIMESTAMP NULL DEFAULT NULL,
+    UNIQUE KEY role_permissions_role_permission_id_unique (role, permission_id),
+    KEY role_permissions_permission_id_foreign (permission_id),
+    CONSTRAINT role_permissions_permission_id_foreign FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
+);
+```
 
-### 2.1 Create Railway Account
+### **Step 2: Prepare Seeder Data for Railway**
 
-1. Go to [railway.app](https://railway.app)
-2. Sign up with your GitHub account
-3. Verify your email address
+#### **Create Permission Data SQL:**
 
-### 2.2 Create New Project
+```sql
+-- File: permissions_data.sql
+INSERT INTO permissions (name, display_name, description, category, created_at, updated_at) VALUES
+('view_patients', 'View Patients', 'Access patient records and information', 'patient_management', NOW(), NOW()),
+('add_patients', 'Add Patients', 'Create new patient records', 'patient_management', NOW(), NOW()),
+('edit_patients', 'Edit Patients', 'Modify patient information', 'patient_management', NOW(), NOW()),
+('delete_patients', 'Delete Patients', 'Remove patient records', 'patient_management', NOW(), NOW()),
+('view_appointments', 'View Appointments', 'Access appointment schedules and information', 'appointment_management', NOW(), NOW()),
+('create_appointments', 'Create Appointments', 'Schedule new appointments', 'appointment_management', NOW(), NOW()),
+('edit_appointments', 'Edit Appointments', 'Modify appointment details', 'appointment_management', NOW(), NOW()),
+('delete_appointments', 'Delete Appointments', 'Cancel or remove appointments', 'appointment_management', NOW(), NOW()),
+('assign_dentists', 'Assign Dentists', 'Assign dentists to appointments', 'appointment_management', NOW(), NOW()),
+('view_treatments', 'View Treatments', 'Access treatment records and history', 'treatment_management', NOW(), NOW()),
+('create_treatments', 'Create Treatments', 'Create new treatment plans', 'treatment_management', NOW(), NOW()),
+('edit_treatments', 'Edit Treatments', 'Modify treatment records', 'treatment_management', NOW(), NOW()),
+('delete_treatments', 'Delete Treatments', 'Remove treatment records', 'treatment_management', NOW(), NOW()),
+('view_inventory', 'View Inventory', 'Access inventory and stock information', 'inventory_management', NOW(), NOW()),
+('add_inventory', 'Add Inventory', 'Add new inventory items', 'inventory_management', NOW(), NOW()),
+('edit_inventory', 'Edit Inventory', 'Modify inventory information', 'inventory_management', NOW(), NOW()),
+('delete_inventory', 'Delete Inventory', 'Remove inventory items', 'inventory_management', NOW(), NOW()),
+('manage_suppliers', 'Manage Suppliers', 'Create, edit, and delete supplier information', 'inventory_management', NOW(), NOW()),
+('view_payments', 'View Payments', 'Access payment records and financial information', 'payment_management', NOW(), NOW()),
+('process_payments', 'Process Payments', 'Process and manage payments', 'payment_management', NOW(), NOW()),
+('refund_payments', 'Refund Payments', 'Process payment refunds', 'payment_management', NOW(), NOW()),
+('view_services', 'View Services', 'Access service catalog', 'service_management', NOW(), NOW()),
+('manage_services', 'Manage Services', 'Create, edit, and delete services', 'service_management', NOW(), NOW()),
+('view_staff', 'View Staff', 'Access staff information', 'staff_management', NOW(), NOW()),
+('add_staff', 'Add Staff', 'Create new staff members', 'staff_management', NOW(), NOW()),
+('edit_staff', 'Edit Staff', 'Modify staff information', 'staff_management', NOW(), NOW()),
+('delete_staff', 'Delete Staff', 'Remove staff members', 'staff_management', NOW(), NOW()),
+('view_schedules', 'View Schedules', 'Access dentist schedules', 'schedule_management', NOW(), NOW()),
+('manage_dentist_schedules', 'Manage Dentist Schedules', 'Create, edit, and delete dentist schedules', 'schedule_management', NOW(), NOW()),
+('manage_clinic', 'Manage Clinic', 'Manage clinic settings and profile', 'clinic_management', NOW(), NOW());
+```
 
-1. Click **"New Project"**
-2. Select **"Deploy from GitHub repo"**
-3. Choose your Smile Suite repository
-4. Railway will automatically detect it's a Laravel project
+#### **Create Role Permission Data SQL:**
 
-### 2.3 Add Database
+```sql
+-- File: role_permissions_data.sql
+-- Clinic Admin - All permissions
+INSERT INTO role_permissions (role, permission_id, created_at, updated_at) 
+SELECT 'clinic_admin', id, NOW(), NOW() FROM permissions;
 
-1. In your Railway project dashboard
-2. Click **"New"** → **"Database"** → **"PostgreSQL"**
-3. Railway will create a PostgreSQL database
-4. Note down the connection details
+-- Dentist - Clinical permissions
+INSERT INTO role_permissions (role, permission_id, created_at, updated_at) 
+SELECT 'dentist', id, NOW(), NOW() FROM permissions 
+WHERE name IN (
+    'view_patients', 'add_patients', 'edit_patients',
+    'view_appointments', 'create_appointments', 'edit_appointments', 'assign_dentists',
+    'view_treatments', 'create_treatments', 'edit_treatments',
+    'view_inventory',
+    'view_payments',
+    'view_services',
+    'view_schedules', 'manage_dentist_schedules'
+);
 
-### 2.4 Configure Environment Variables
+-- Staff - Operational permissions
+INSERT INTO role_permissions (role, permission_id, created_at, updated_at) 
+SELECT 'staff', id, NOW(), NOW() FROM permissions 
+WHERE name IN (
+    'view_patients', 'add_patients', 'edit_patients',
+    'view_appointments', 'create_appointments', 'edit_appointments', 'assign_dentists',
+    'view_treatments',
+    'view_inventory', 'add_inventory', 'edit_inventory', 'manage_suppliers',
+    'view_payments', 'process_payments',
+    'view_services',
+    'view_schedules'
+);
+```
 
-1. Go to your service settings
-2. Click **"Variables"** tab
-3. Add all the environment variables from your `.env` file
-4. Railway will automatically provide database connection details
+### **Step 3: Deploy to Railway**
 
-### 2.5 Deploy
-
-1. Railway will automatically start building and deploying
-2. Monitor the build logs
-3. Wait for deployment to complete
-
-## 🔧 Step 3: Post-Deployment Configuration
-
-### 3.1 Run Database Migrations
-
-1. Go to your service dashboard
-2. Click **"Deployments"** tab
-3. Click on the latest deployment
-4. Go to **"Logs"** tab
-5. Run these commands in the terminal:
+#### **3.1 Push Code to Railway**
 
 ```bash
-# If using migrations (recommended)
+# Make sure you're in the project directory
+cd C:\Users\kiteb\smile_suite
+
+# Add all changes
+git add .
+
+# Commit changes
+git commit -m "feat: Implement comprehensive IAM system with role-based permissions"
+
+# Push to Railway
+git push railway main
+```
+
+#### **3.2 Apply Database Changes via HeidiSQL**
+
+1. **Open HeidiSQL**
+2. **Connect to your Railway MySQL database**
+3. **Run the SQL files in this order:**
+   - `2025_10_17_101451_create_permissions_table.sql`
+   - `2025_10_17_101515_create_role_permissions_table.sql`
+   - `permissions_data.sql`
+   - `role_permissions_data.sql`
+
+#### **3.3 Run Laravel Commands on Railway**
+
+After deployment, run these commands in Railway console:
+
+```bash
+# Clear caches
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+# Run migrations (if any new ones)
 php artisan migrate --force
-php artisan db:seed --force
 
-# If using manual MySQL dump (your current setup)
-php artisan railway:seed
+# Run seeders (if needed)
+php artisan db:seed --class=PermissionSeeder --force
+php artisan db:seed --class=RolePermissionSeeder --force
 ```
 
-### 3.2 Alternative: Manual Seeder Command
+### **Step 4: Verify Deployment**
 
-If you're using manual MySQL dump import, you can run the Railway-specific seeder:
+#### **4.1 Test IAM Functionality**
 
+1. **Login as different roles** (clinic_admin, dentist, staff)
+2. **Test permission restrictions:**
+   - Try accessing restricted buttons
+   - Verify permission modals appear
+   - Check dashboard navigation works
+3. **Test specific features:**
+   - Dentist Schedule restrictions
+   - Treatment module restrictions
+   - Upgrade/Renew button restrictions
+
+#### **4.2 Check Database**
+
+Verify in HeidiSQL that:
+- `permissions` table exists with all permissions
+- `role_permissions` table exists with all assignments
+- Data is properly inserted
+
+---
+
+## 🔧 **TROUBLESHOOTING**
+
+### **Common Issues:**
+
+#### **Issue 1: Migration Fails**
+**Solution:** Run migrations manually via HeidiSQL using the SQL files above
+
+#### **Issue 2: Seeder Data Missing**
+**Solution:** Run the permission and role_permission data SQL files
+
+#### **Issue 3: Frontend Not Working**
+**Solution:** Clear caches and rebuild assets:
 ```bash
-php artisan railway:seed
+php artisan config:clear
+php artisan cache:clear
+npm run build
 ```
 
-This command will:
+#### **Issue 4: Permission Checks Failing**
+**Solution:** Verify database data and check middleware registration
 
--   ✅ Check if you already have enough clinics (30+)
--   ✅ Only run seeders if needed
--   ✅ Safely handle duplicate data
--   ✅ Add the 20 Surigao clinics with 2-month subscriptions
+---
 
-### 3.3 Generate Application Key
+## ✅ **DEPLOYMENT CHECKLIST**
 
-```bash
-php artisan key:generate --force
-```
+- [ ] Code pushed to Railway
+- [ ] Database migrations applied via HeidiSQL
+- [ ] Permission data inserted
+- [ ] Role-permission data inserted
+- [ ] Laravel caches cleared
+- [ ] Frontend assets rebuilt
+- [ ] IAM functionality tested
+- [ ] All roles tested (clinic_admin, dentist, staff)
+- [ ] Permission modals working
+- [ ] Dashboard navigation working
 
-### 3.4 Clear Caches
+---
 
-```bash
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
+## 🎯 **EXPECTED RESULTS AFTER DEPLOYMENT**
 
-## 🌐 Step 4: Configure Custom Domain (Optional)
+1. **Clinic Admin**: Full access to all features
+2. **Dentist**: Restricted access with permission modals for unauthorized actions
+3. **Staff**: View-only access to treatments, restricted upgrade/renew buttons
+4. **Permission Modals**: Modern, compact UI with proper centering
+5. **Button Restrictions**: Upgrade/Renew buttons visible but only clickable by clinic_admin
 
-### 4.1 Add Custom Domain
-
-1. Go to your service settings
-2. Click **"Domains"** tab
-3. Add your custom domain
-4. Update DNS records as instructed
-
-### 4.2 Update Environment Variables
-
-Update `APP_URL` to your custom domain:
-
-```env
-APP_URL=https://your-custom-domain.com
-```
-
-## 📊 Step 5: Monitor Your Application
-
-### 5.1 Railway Dashboard
-
--   **Metrics**: CPU, Memory, Network usage
--   **Logs**: Real-time application logs
--   **Deployments**: Deployment history
--   **Variables**: Environment variables
-
-### 5.2 Application Health
-
--   Check your application URL
--   Test all major features
--   Monitor error logs
--   Check database connectivity
-
-## 🔧 Step 6: Troubleshooting
-
-### Common Issues
-
-1. **Build Failures**
-
-    - Check build logs for errors
-    - Ensure all dependencies are in `composer.json`
-    - Verify Node.js and PHP versions
-
-2. **Database Connection Issues**
-
-    - Verify database credentials
-    - Check if database is running
-    - Ensure migrations are run
-
-3. **Environment Variable Issues**
-
-    - Check all required variables are set
-    - Verify variable names and values
-    - Restart the service after changes
-
-4. **File Permission Issues**
-    - Ensure storage directory is writable
-    - Check file upload permissions
-
-### Debug Commands
-
-```bash
-# Check Laravel configuration
-php artisan config:show
-
-# Check database connection
-php artisan tinker
->>> DB::connection()->getPdo();
-
-# Check routes
-php artisan route:list
-
-# Check environment
-php artisan env
-```
-
-## 💰 Step 7: Cost Optimization
-
-### Free Tier Tips
-
-1. **Monitor Usage**: Check your monthly credit usage
-2. **Optimize Images**: Compress images before upload
-3. **Use CDN**: For static assets
-4. **Database Optimization**: Regular cleanup
-5. **Caching**: Enable Laravel caching
-
-### Upgrade Options
-
--   **Pro Plan**: $20/month for more resources
--   **Team Plan**: $99/month for team collaboration
--   **Enterprise**: Custom pricing for large deployments
-
-## 🚀 Step 8: Production Checklist
-
--   [ ] Environment variables configured
--   [ ] Database migrations run
--   [ ] Application key generated
--   [ ] Caches cleared
--   [ ] File permissions set
--   [ ] SSL certificate active
--   [ ] Error logging configured
--   [ ] Backup strategy in place
--   [ ] Monitoring set up
--   [ ] Performance optimized
-
-## 📞 Support
-
--   **Railway Docs**: [docs.railway.app](https://docs.railway.app)
--   **Railway Discord**: [discord.gg/railway](https://discord.gg/railway)
--   **Laravel Docs**: [laravel.com/docs](https://laravel.com/docs)
-
-## 🎉 Success!
-
-Your Smile Suite application should now be live on Railway!
-
-**Your app URL**: `https://your-app-name.railway.app`
-
-Remember to:
-
--   Monitor your usage
--   Set up backups
--   Configure monitoring
--   Update dependencies regularly
--   Test all features thoroughly
-
-Happy deploying! 🚀
+**Ready to deploy! 🚀**

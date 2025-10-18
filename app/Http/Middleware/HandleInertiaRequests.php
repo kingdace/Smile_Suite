@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                             'avatar_url' => $user->avatar_url,
                             'clinic_id' => $user->clinic_id,
                             'role' => $user->role,
+                            'permissions' => $user->permissions, // Include permissions
                             'clinic' => $user->clinic, // Clinic data nested under user
                         ],
                         'clinic' => $user->clinic, // Clinic data directly under auth for layout compatibility

@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
@@ -396,19 +397,27 @@ export default function Index({
                                         ? "Hide Bulk Actions"
                                         : "Bulk Actions"}
                                 </Button>
-                                <Button
-                                    onClick={() =>
-                                        router.visit(
-                                            route("clinic.payments.create", {
-                                                clinic: auth.clinic?.id,
-                                            })
-                                        )
-                                    }
-                                    className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
+                                <ProtectedRoute
+                                    permission="process_payments"
+                                    isButton={true}
                                 >
-                                    <Plus className="h-4 w-4" />
-                                    Add Payment
-                                </Button>
+                                    <Button
+                                        onClick={() =>
+                                            router.visit(
+                                                route(
+                                                    "clinic.payments.create",
+                                                    {
+                                                        clinic: auth.clinic?.id,
+                                                    }
+                                                )
+                                            )
+                                        }
+                                        className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Add Payment
+                                    </Button>
+                                </ProtectedRoute>
                             </div>
                         </div>
                     </div>
@@ -1190,27 +1199,34 @@ export default function Index({
                                                                                 <Eye className="h-3 w-3" />
                                                                             </Link>
                                                                         </Button>
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="sm"
-                                                                            asChild
-                                                                            className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
-                                                                            title="Edit Payment"
+                                                                        <ProtectedRoute
+                                                                            permission="process_payments"
+                                                                            isButton={
+                                                                                true
+                                                                            }
                                                                         >
-                                                                            <Link
-                                                                                href={route(
-                                                                                    "clinic.payments.edit",
-                                                                                    [
-                                                                                        auth
-                                                                                            .clinic
-                                                                                            ?.id,
-                                                                                        payment.id,
-                                                                                    ]
-                                                                                )}
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="sm"
+                                                                                onClick={() =>
+                                                                                    router.visit(
+                                                                                        route(
+                                                                                            "clinic.payments.edit",
+                                                                                            [
+                                                                                                auth
+                                                                                                    .clinic
+                                                                                                    ?.id,
+                                                                                                payment.id,
+                                                                                            ]
+                                                                                        )
+                                                                                    )
+                                                                                }
+                                                                                className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                                                title="Edit Payment"
                                                                             >
                                                                                 <Edit className="h-3 w-3" />
-                                                                            </Link>
-                                                                        </Button>
+                                                                            </Button>
+                                                                        </ProtectedRoute>
                                                                     </div>
                                                                 </TableCell>
                                                             </TableRow>

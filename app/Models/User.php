@@ -271,6 +271,40 @@ class User extends Authenticatable
         return $this->role === 'staff' && $this->user_type === self::TYPE_CLINIC_STAFF;
     }
 
+    // ==================== PERMISSION METHODS ====================
+
+    /**
+     * Check if user has a specific permission
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return app(\App\Services\PermissionService::class)->hasPermission($this, $permission);
+    }
+
+    /**
+     * Get all permissions for this user
+     */
+    public function getPermissionsAttribute()
+    {
+        return app(\App\Services\PermissionService::class)->getUserPermissions($this)->toArray();
+    }
+
+    /**
+     * Check if user has any of the given permissions
+     */
+    public function hasAnyPermission(array $permissions): bool
+    {
+        return app(\App\Services\PermissionService::class)->hasAnyPermission($this, $permissions);
+    }
+
+    /**
+     * Check if user has all of the given permissions
+     */
+    public function hasAllPermissions(array $permissions): bool
+    {
+        return app(\App\Services\PermissionService::class)->hasAllPermissions($this, $permissions);
+    }
+
     /**
      * Get dentist specialties as array
      */

@@ -1,6 +1,8 @@
 import { Link } from "@inertiajs/react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/Hooks/usePermissions";
+import ProtectedRoute from "./ProtectedRoute";
 
 // Custom scrollbar styles
 const scrollbarStyles = `
@@ -62,6 +64,7 @@ import {
     CheckCircle,
     AlertCircle,
     ShoppingCart,
+    Lock,
 } from "lucide-react";
 
 const getNavigation = (clinicId) => [
@@ -72,6 +75,7 @@ const getNavigation = (clinicId) => [
         icon: LayoutDashboard,
         description: "Overview and statistics",
         hasDropdown: false,
+        permission: null, // Always visible
     },
     {
         name: "Patients",
@@ -79,6 +83,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.patients.*",
         icon: Users,
         description: "Patient management",
+        permission: "view_patients",
     },
     {
         name: "Appointments",
@@ -86,6 +91,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.appointments.*",
         icon: Calendar,
         description: "Schedule management",
+        permission: "view_appointments",
         hasDropdown: true,
         children: [
             {
@@ -94,6 +100,7 @@ const getNavigation = (clinicId) => [
                 routeName: "clinic.appointments.index",
                 icon: Calendar,
                 description: "Appointment list",
+                permission: "view_appointments",
             },
             {
                 name: "Calendar View",
@@ -101,6 +108,7 @@ const getNavigation = (clinicId) => [
                 routeName: "clinic.appointments.calendar",
                 icon: CalendarCheck,
                 description: "Calendar interface",
+                permission: "view_appointments",
             },
             {
                 name: "Waitlist",
@@ -108,6 +116,7 @@ const getNavigation = (clinicId) => [
                 routeName: "clinic.waitlist.*",
                 icon: Clock,
                 description: "Patient waitlist management",
+                permission: "view_appointments",
             },
         ],
     },
@@ -117,6 +126,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.dentist-schedules.*",
         icon: CalendarClock,
         description: "Dentist availability",
+        permission: "view_appointments",
     },
     {
         name: "Treatments",
@@ -124,6 +134,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.treatments.*",
         icon: Stethoscope,
         description: "Treatment records",
+        permission: "view_treatments",
     },
     {
         name: "Services",
@@ -131,6 +142,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.services.*",
         icon: Scissors,
         description: "Service catalog",
+        permission: "view_services",
     },
     {
         name: "Inventory",
@@ -138,6 +150,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.inventory.*",
         icon: Package,
         description: "Stock management",
+        permission: "view_inventory",
         hasDropdown: true,
         children: [
             {
@@ -146,6 +159,7 @@ const getNavigation = (clinicId) => [
                 routeName: "clinic.inventory.*",
                 icon: Package,
                 description: "Manage stock items",
+                permission: "view_inventory",
             },
             {
                 name: "Suppliers",
@@ -153,6 +167,7 @@ const getNavigation = (clinicId) => [
                 routeName: "clinic.suppliers.*",
                 icon: Truck,
                 description: "Supplier directory",
+                permission: "view_inventory",
             },
         ],
     },
@@ -162,6 +177,7 @@ const getNavigation = (clinicId) => [
         routeName: "clinic.payments.*",
         icon: DollarSign,
         description: "Financial tracking",
+        permission: "view_payments",
     },
 ];
 
@@ -288,6 +304,27 @@ export default function Sidebar({ className, auth }) {
                                         : false
                                     : isItemActive(item);
                                 const isExpanded = expandedItems.has(item.name);
+
+                                // Check if user has permission for this item
+                                const hasPermission =
+                                    !item.permission ||
+                                    (auth.user?.permissions &&
+                                        auth.user.permissions.includes(
+                                            item.permission
+                                        ));
+
+                                if (!hasPermission) {
+                                    return (
+                                        <div
+                                            key={item.name}
+                                            className="flex items-center space-x-3 px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                                        >
+                                            <item.icon className="h-5 w-5" />
+                                            <span>{item.name}</span>
+                                            <Lock className="h-4 w-4 ml-auto" />
+                                        </div>
+                                    );
+                                }
 
                                 return (
                                     <div key={item.name}>

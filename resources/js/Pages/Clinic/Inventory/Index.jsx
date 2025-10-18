@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
@@ -178,14 +179,24 @@ export default function Index({ auth, clinic, inventory, filters }) {
                             <Download className="h-4 w-4" />
                             Export All
                         </Button>
-                        <Link
-                            href={route("clinic.inventory.create", [clinic.id])}
+                        <ProtectedRoute
+                            permission="add_inventory"
+                            isButton={true}
                         >
-                            <Button className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm">
+                            <Button
+                                onClick={() =>
+                                    router.visit(
+                                        route("clinic.inventory.create", [
+                                            clinic.id,
+                                        ])
+                                    )
+                                }
+                                className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
+                            >
                                 <PlusCircle className="h-4 w-4" />
                                 Add Item
                             </Button>
-                        </Link>
+                        </ProtectedRoute>
                     </div>
                 </div>
             </div>
@@ -460,35 +471,49 @@ export default function Index({ auth, clinic, inventory, filters }) {
                                         <TableCell className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-medium text-gray-900">
                                                 <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            adjustStock(
-                                                                item,
-                                                                -1
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            item.quantity <= 0
-                                                        }
-                                                        className="h-6 w-6 p-0"
+                                                    <ProtectedRoute
+                                                        permission="edit_inventory"
+                                                        isButton={true}
                                                     >
-                                                        <Minus className="h-3 w-3" />
-                                                    </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                adjustStock(
+                                                                    item,
+                                                                    -1
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                item.quantity <=
+                                                                0
+                                                            }
+                                                            className="h-6 w-6 p-0"
+                                                        >
+                                                            <Minus className="h-3 w-3" />
+                                                        </Button>
+                                                    </ProtectedRoute>
                                                     <span className="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded text-xs border border-blue-200 font-bold">
                                                         {item.quantity}
                                                     </span>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            adjustStock(item, 1)
-                                                        }
-                                                        className="h-6 w-6 p-0"
+                                                    <ProtectedRoute
+                                                        permission="edit_inventory"
+                                                        isButton={true}
                                                     >
-                                                        <Plus className="h-3 w-3" />
-                                                    </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                adjustStock(
+                                                                    item,
+                                                                    1
+                                                                )
+                                                            }
+                                                            className="h-6 w-6 p-0"
+                                                        >
+                                                            <Plus className="h-3 w-3" />
+                                                        </Button>
+                                                    </ProtectedRoute>
                                                 </div>
                                                 {item.minimum_quantity && (
                                                     <div className="mt-1 text-xs text-gray-500">
@@ -546,22 +571,30 @@ export default function Index({ auth, clinic, inventory, filters }) {
                                                         <Eye className="h-3 w-3" />
                                                     </Link>
                                                 </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    asChild
-                                                    className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
-                                                    title="Edit Item"
+                                                <ProtectedRoute
+                                                    permission="edit_inventory"
+                                                    isButton={true}
                                                 >
-                                                    <Link
-                                                        href={route(
-                                                            "clinic.inventory.edit",
-                                                            [clinic.id, item.id]
-                                                        )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            router.visit(
+                                                                route(
+                                                                    "clinic.inventory.edit",
+                                                                    [
+                                                                        clinic.id,
+                                                                        item.id,
+                                                                    ]
+                                                                )
+                                                            )
+                                                        }
+                                                        className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                        title="Edit Item"
                                                     >
                                                         <Pencil className="h-3 w-3" />
-                                                    </Link>
-                                                </Button>
+                                                    </Button>
+                                                </ProtectedRoute>
                                             </div>
                                         </TableCell>
                                     </TableRow>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Head, useForm, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
@@ -95,8 +96,16 @@ export default function Index({ auth, clinic, schedules, dentists }) {
     const [selectedDays, setSelectedDays] = useState([]);
     const [isApplyingTemplate, setIsApplyingTemplate] = useState(false);
 
+    // Auto-select dentist for dentists (but allow them to view others)
+    useEffect(() => {
+        if (auth.user.role === "dentist" && !selectedDentist) {
+            setSelectedDentist(auth.user.id.toString());
+            loadUnifiedScheduleInfo(auth.user.id.toString());
+        }
+    }, [auth.user.role, auth.user.id, selectedDentist]);
+
     const { data, setData, post, put, processing, errors, reset } = useForm({
-        user_id: "",
+        user_id: auth.user.role === "dentist" ? auth.user.id.toString() : "",
         day_of_week: "",
         start_time: "",
         end_time: "",
@@ -168,7 +177,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             if (data.success) {
                 toast.success(data.message);
                 // Refresh data while preserving selected dentist
-                router.reload({ only: ['schedules'] });
+                router.reload({ only: ["schedules"] });
             } else {
                 toast.error(
                     data.message || "Failed to sync profile to schedule"
@@ -182,7 +191,9 @@ export default function Index({ auth, clinic, schedules, dentists }) {
 
     const handleTemplateSelect = (template) => {
         if (!selectedDentist) {
-            toast.error("Please select a dentist first before applying a template");
+            toast.error(
+                "Please select a dentist first before applying a template"
+            );
             return;
         }
         setSelectedTemplate(template);
@@ -194,7 +205,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             toast.error("Please select a template first");
             return;
         }
-        
+
         if (!selectedDentist) {
             toast.error("Please select a dentist first");
             return;
@@ -206,54 +217,64 @@ export default function Index({ auth, clinic, schedules, dentists }) {
         };
 
         setIsApplyingTemplate(true);
-        
+
         // Use fetch instead of Inertia post for better error handling
-        fetch(route("clinic.dentist-schedules.create-from-template", { clinic: clinic.id }), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            body: JSON.stringify(templateData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                toast.success(data.message || `Applied ${selectedTemplate.name} template successfully`);
-                setIsTemplateDialogOpen(false);
-                setSelectedTemplate(null);
-                // Refresh data while preserving selected dentist
-                router.reload({ only: ['schedules'] });
-            } else {
-                toast.error(data.message || "Failed to apply template");
+        fetch(
+            route("clinic.dentist-schedules.create-from-template", {
+                clinic: clinic.id,
+            }),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                },
+                body: JSON.stringify(templateData),
             }
-            setIsApplyingTemplate(false);
-        })
-        .catch(error => {
-            console.error('Template application error:', error);
-            toast.error("Failed to apply template. Please try again.");
-            setIsApplyingTemplate(false);
-        });
+        )
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    toast.success(
+                        data.message ||
+                            `Applied ${selectedTemplate.name} template successfully`
+                    );
+                    setIsTemplateDialogOpen(false);
+                    setSelectedTemplate(null);
+                    // Refresh data while preserving selected dentist
+                    router.reload({ only: ["schedules"] });
+                } else {
+                    toast.error(data.message || "Failed to apply template");
+                }
+                setIsApplyingTemplate(false);
+            })
+            .catch((error) => {
+                console.error("Template application error:", error);
+                toast.error("Failed to apply template. Please try again.");
+                setIsApplyingTemplate(false);
+            });
     };
 
     const handleSubmit = () => {
-        console.log('🚀 handleSubmit called!');
-        console.log('Current state:', { 
-            isQuickSetup, 
-            selectedDays, 
-            editingSchedule, 
-            isCreating, 
-            isUpdating, 
+        console.log("🚀 handleSubmit called!");
+        console.log("Current state:", {
+            isQuickSetup,
+            selectedDays,
+            editingSchedule,
+            isCreating,
+            isUpdating,
             processing,
-            data 
+            data,
         });
-        
+
         // Basic form validation
         if (!data.user_id) {
             toast.error("Please select a dentist");
             return;
         }
-        
+
         // Validate days selection
         if (isQuickSetup && !editingSchedule) {
             if (selectedDays.length === 0) {
@@ -266,7 +287,7 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                 return;
             }
         }
-        
+
         if (!data.start_time || !data.end_time) {
             toast.error("Please set both start and end times");
             return;
@@ -278,14 +299,14 @@ export default function Index({ auth, clinic, schedules, dentists }) {
 
         if (editingSchedule) {
             setIsUpdating(true);
-            
+
             // Validate time format before sending
             if (!data.start_time || !data.end_time) {
                 toast.error("Please set both start and end times");
                 setIsUpdating(false);
                 return;
             }
-            
+
             // Transform data for update (exclude user_id since it shouldn't change)
             const transformedData = {
                 day_of_week: parseInt(data.day_of_week),
@@ -297,75 +318,92 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                 schedule_type: data.schedule_type || "weekly",
                 notes: data.notes || "",
                 allow_overlap: Boolean(data.allow_overlap),
-                max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
+                max_appointments_per_day: data.max_appointments_per_day
+                    ? parseInt(data.max_appointments_per_day)
+                    : null,
             };
-            
-            console.log('Update data being sent:', transformedData);
-            
+
+            console.log("Update data being sent:", transformedData);
+
             // Use fetch method like CREATE
-            fetch(route("clinic.dentist-schedules.update", {
-                clinic: clinic.id,
-                schedule: editingSchedule.id,
-            }), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({
-                    ...transformedData,
-                    _method: 'PUT'
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(JSON.stringify(errorData));
-                    });
+            fetch(
+                route("clinic.dentist-schedules.update", {
+                    clinic: clinic.id,
+                    schedule: editingSchedule.id,
+                }),
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body: JSON.stringify({
+                        ...transformedData,
+                        _method: "PUT",
+                    }),
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    toast.success(data.message || "Schedule updated successfully");
-                    reset();
-                    setEditingSchedule(null);
-                    setIsDialogOpen(false);
-                    setIsUpdating(false);
-                    // Refresh data while preserving selected dentist
-                    router.reload({ only: ['schedules'] });
-                } else {
-                    toast.error(data.message || "Failed to update schedule");
-                    setIsUpdating(false);
-                }
-            })
-            .catch(error => {
-                console.error('Update error:', error);
-                try {
-                    const errorData = JSON.parse(error.message);
-                    if (errorData.errors) {
-                        // Show specific validation errors
-                        Object.values(errorData.errors).flat().forEach(errorMsg => {
-                            toast.error(errorMsg);
+            )
+                .then((response) => {
+                    if (!response.ok) {
+                        return response.json().then((errorData) => {
+                            throw new Error(JSON.stringify(errorData));
                         });
-                    } else {
-                        toast.error(errorData.message || "Failed to update schedule");
                     }
-                } catch {
-                    toast.error("Failed to update schedule. Please try again.");
-                }
-                setIsUpdating(false);
-            });
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        toast.success(
+                            data.message || "Schedule updated successfully"
+                        );
+                        reset();
+                        setEditingSchedule(null);
+                        setIsDialogOpen(false);
+                        setIsUpdating(false);
+                        // Refresh data while preserving selected dentist
+                        router.reload({ only: ["schedules"] });
+                    } else {
+                        toast.error(
+                            data.message || "Failed to update schedule"
+                        );
+                        setIsUpdating(false);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Update error:", error);
+                    try {
+                        const errorData = JSON.parse(error.message);
+                        if (errorData.errors) {
+                            // Show specific validation errors
+                            Object.values(errorData.errors)
+                                .flat()
+                                .forEach((errorMsg) => {
+                                    toast.error(errorMsg);
+                                });
+                        } else {
+                            toast.error(
+                                errorData.message || "Failed to update schedule"
+                            );
+                        }
+                    } catch {
+                        toast.error(
+                            "Failed to update schedule. Please try again."
+                        );
+                    }
+                    setIsUpdating(false);
+                });
         } else {
             setIsCreating(true);
-            
+
             // Handle Quick Setup (multiple days)
             if (isQuickSetup && selectedDays.length > 0) {
-                console.log('Starting Quick Setup for days:', selectedDays);
-                console.log('Base data:', data);
-                
-                const promises = selectedDays.map(dayValue => {
+                console.log("Starting Quick Setup for days:", selectedDays);
+                console.log("Base data:", data);
+
+                const promises = selectedDays.map((dayValue) => {
                     // Transform data for each day (same as single day)
                     const scheduleData = {
                         ...data,
@@ -375,69 +413,100 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                         slot_duration: parseInt(data.slot_duration) || 30,
                         is_available: Boolean(data.is_available),
                         allow_overlap: Boolean(data.allow_overlap),
-                        max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
+                        max_appointments_per_day: data.max_appointments_per_day
+                            ? parseInt(data.max_appointments_per_day)
+                            : null,
                     };
-                    
-                    console.log(`Creating schedule for day ${dayValue}:`, scheduleData);
-                    
-                    return fetch(route("clinic.dentist-schedules.store", { clinic: clinic.id }), {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'X-Requested-With': 'XMLHttpRequest',
-                        },
-                        body: JSON.stringify(scheduleData)
-                    }).then(response => {
-                        console.log(`Response for day ${dayValue}:`, response.status);
-                        return response.json();
-                    }).catch(error => {
-                        console.error(`Error for day ${dayValue}:`, error);
-                        return { success: false, message: `Failed to create schedule for day ${dayValue}` };
-                    });
-                });
-                
-                console.log('All promises created, waiting for results...');
-                
-                Promise.all(promises)
-                    .then(results => {
-                        console.log('All results received:', results);
-                        
-                        const successful = results.filter(r => r.success);
-                        const failed = results.filter(r => !r.success);
-                        
-                        console.log(`Successful: ${successful.length}, Failed: ${failed.length}`);
-                        
-                        if (successful.length > 0) {
-                            toast.success(`Successfully created ${successful.length} schedule(s)`);
+
+                    console.log(
+                        `Creating schedule for day ${dayValue}:`,
+                        scheduleData
+                    );
+
+                    return fetch(
+                        route("clinic.dentist-schedules.store", {
+                            clinic: clinic.id,
+                        }),
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    .getAttribute("content"),
+                                "X-Requested-With": "XMLHttpRequest",
+                            },
+                            body: JSON.stringify(scheduleData),
                         }
-                        
+                    )
+                        .then((response) => {
+                            console.log(
+                                `Response for day ${dayValue}:`,
+                                response.status
+                            );
+                            return response.json();
+                        })
+                        .catch((error) => {
+                            console.error(`Error for day ${dayValue}:`, error);
+                            return {
+                                success: false,
+                                message: `Failed to create schedule for day ${dayValue}`,
+                            };
+                        });
+                });
+
+                console.log("All promises created, waiting for results...");
+
+                Promise.all(promises)
+                    .then((results) => {
+                        console.log("All results received:", results);
+
+                        const successful = results.filter((r) => r.success);
+                        const failed = results.filter((r) => !r.success);
+
+                        console.log(
+                            `Successful: ${successful.length}, Failed: ${failed.length}`
+                        );
+
+                        if (successful.length > 0) {
+                            toast.success(
+                                `Successfully created ${successful.length} schedule(s)`
+                            );
+                        }
+
                         if (failed.length > 0) {
-                            failed.forEach(result => {
-                                toast.error(result.message || "Failed to create schedule");
+                            failed.forEach((result) => {
+                                toast.error(
+                                    result.message ||
+                                        "Failed to create schedule"
+                                );
                             });
                         }
-                        
+
                         if (successful.length > 0) {
                             reset();
                             setIsDialogOpen(false);
                             setSelectedDays([]);
                             setIsQuickSetup(false);
                             // Refresh data while preserving selected dentist
-                            router.reload({ only: ['schedules'] });
+                            router.reload({ only: ["schedules"] });
                         }
-                        
+
                         setIsCreating(false);
                     })
-                    .catch(error => {
-                        console.error('Bulk create error:', error);
-                        toast.error("Failed to create schedules. Please try again.");
+                    .catch((error) => {
+                        console.error("Bulk create error:", error);
+                        toast.error(
+                            "Failed to create schedules. Please try again."
+                        );
                         setIsCreating(false);
                     });
             } else {
                 // Handle single day creation
-                const storeUrl = route("clinic.dentist-schedules.store", { clinic: clinic.id });
-                
+                const storeUrl = route("clinic.dentist-schedules.store", {
+                    clinic: clinic.id,
+                });
+
                 // Transform data to ensure correct types
                 const transformedData = {
                     ...data,
@@ -447,58 +516,70 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                     slot_duration: parseInt(data.slot_duration) || 30,
                     is_available: Boolean(data.is_available),
                     allow_overlap: Boolean(data.allow_overlap),
-                    max_appointments_per_day: data.max_appointments_per_day ? parseInt(data.max_appointments_per_day) : null,
+                    max_appointments_per_day: data.max_appointments_per_day
+                        ? parseInt(data.max_appointments_per_day)
+                        : null,
                 };
-                
+
                 // Use fetch method like the working template application
                 fetch(storeUrl, {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
                     },
-                    body: JSON.stringify(transformedData)
+                    body: JSON.stringify(transformedData),
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        toast.success(data.message || "Schedule created successfully");
-                        reset();
-                        setIsDialogOpen(false);
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            toast.success(
+                                data.message || "Schedule created successfully"
+                            );
+                            reset();
+                            setIsDialogOpen(false);
+                            setIsCreating(false);
+                            // Refresh data while preserving selected dentist
+                            router.reload({ only: ["schedules"] });
+                        } else {
+                            toast.error(
+                                data.message || "Failed to create schedule"
+                            );
+                            setIsCreating(false);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Create error:", error);
+                        toast.error(
+                            "Failed to create schedule. Please try again."
+                        );
                         setIsCreating(false);
-                        // Refresh data while preserving selected dentist
-                        router.reload({ only: ['schedules'] });
-                    } else {
-                        toast.error(data.message || "Failed to create schedule");
-                        setIsCreating(false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Create error:', error);
-                    toast.error("Failed to create schedule. Please try again.");
-                    setIsCreating(false);
-                });
+                    });
             }
         }
     };
 
     const handleEdit = (schedule) => {
-        console.log('Schedule data for editing:', schedule);
+        console.log("Schedule data for editing:", schedule);
         setEditingSchedule(schedule);
-        
+
         // Ensure time format is correct
-        const startTime = schedule.start_time ? 
-            (schedule.start_time.includes('T') ? 
-                schedule.start_time.split('T')[1].substring(0, 5) : 
-                schedule.start_time.substring(0, 5)) : "";
-        
-        const endTime = schedule.end_time ? 
-            (schedule.end_time.includes('T') ? 
-                schedule.end_time.split('T')[1].substring(0, 5) : 
-                schedule.end_time.substring(0, 5)) : "";
-        
-        console.log('Formatted times:', { startTime, endTime });
-        
+        const startTime = schedule.start_time
+            ? schedule.start_time.includes("T")
+                ? schedule.start_time.split("T")[1].substring(0, 5)
+                : schedule.start_time.substring(0, 5)
+            : "";
+
+        const endTime = schedule.end_time
+            ? schedule.end_time.includes("T")
+                ? schedule.end_time.split("T")[1].substring(0, 5)
+                : schedule.end_time.substring(0, 5)
+            : "";
+
+        console.log("Formatted times:", { startTime, endTime });
+
         setData({
             user_id: schedule.user_id.toString(),
             day_of_week: schedule.day_of_week?.toString() || "",
@@ -516,41 +597,54 @@ export default function Index({ auth, clinic, schedules, dentists }) {
     };
 
     const handleDelete = (schedule) => {
-        if (confirm("Are you sure you want to delete this schedule? This action cannot be undone.")) {
+        if (
+            confirm(
+                "Are you sure you want to delete this schedule? This action cannot be undone."
+            )
+        ) {
             setIsDeleting(schedule.id);
-            
+
             // Use fetch method like CREATE and UPDATE
-            fetch(route("clinic.dentist-schedules.destroy", {
-                clinic: clinic.id,
-                schedule: schedule.id,
-            }), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({
-                    _method: 'DELETE'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    toast.success(data.message || "Schedule deleted successfully");
-                    setIsDeleting(null);
-                    // Refresh data while preserving selected dentist
-                    router.reload({ only: ['schedules'] });
-                } else {
-                    toast.error(data.message || "Failed to delete schedule");
-                    setIsDeleting(null);
+            fetch(
+                route("clinic.dentist-schedules.destroy", {
+                    clinic: clinic.id,
+                    schedule: schedule.id,
+                }),
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body: JSON.stringify({
+                        _method: "DELETE",
+                    }),
                 }
-            })
-            .catch(error => {
-                console.error('Delete error:', error);
-                toast.error("Failed to delete schedule. Please try again.");
-                setIsDeleting(null);
-            });
+            )
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        toast.success(
+                            data.message || "Schedule deleted successfully"
+                        );
+                        setIsDeleting(null);
+                        // Refresh data while preserving selected dentist
+                        router.reload({ only: ["schedules"] });
+                    } else {
+                        toast.error(
+                            data.message || "Failed to delete schedule"
+                        );
+                        setIsDeleting(null);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Delete error:", error);
+                    toast.error("Failed to delete schedule. Please try again.");
+                    setIsDeleting(null);
+                });
         }
     };
 
@@ -597,7 +691,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                         Dentist Schedule Management
                                     </h1>
                                     <p className="text-gray-600 text-sm">
-                                        Manage dentist availability and time slots
+                                        Manage dentist availability and time
+                                        slots
                                     </p>
                                 </div>
                             </div>
@@ -614,19 +709,29 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                     <Settings className="h-4 w-4 mr-2" />
                                     Templates
                                 </Button>
-                                <Button
-                                    onClick={() => {
-                                        console.log('🆕 Add Schedule button clicked - clearing editingSchedule');
-                                        setEditingSchedule(null);
-                                        reset();
-                                        setIsDialogOpen(true);
-                                    }}
-                                    size="sm"
-                                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-                                >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Schedule
-                                </Button>
+                                {/* Only show Add Schedule button if user can manage schedules */}
+                                {auth.user.role === "clinic_admin" && (
+                                    <ProtectedRoute
+                                        permission="manage_dentist_schedules"
+                                        isButton={true}
+                                    >
+                                        <Button
+                                            onClick={() => {
+                                                console.log(
+                                                    "🆕 Add Schedule button clicked - clearing editingSchedule"
+                                                );
+                                                setEditingSchedule(null);
+                                                reset();
+                                                setIsDialogOpen(true);
+                                            }}
+                                            size="sm"
+                                            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add Schedule
+                                        </Button>
+                                    </ProtectedRoute>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -904,18 +1009,42 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                         </span>
                                                     </CardTitle>
                                                     <div className="flex items-center gap-2">
-                                                        <Button
-                                                            onClick={() => {
-                                                                console.log('🆕 Add Schedule button clicked (dentist view) - clearing editingSchedule');
-                                                                setEditingSchedule(null);
-                                                                reset();
-                                                                setIsDialogOpen(true);
-                                                            }}
-                                                            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
-                                                        >
-                                                            <Plus className="h-4 w-4 mr-2" />
-                                                            Add Schedule
-                                                        </Button>
+                                                        {/* Only show Add Schedule button if user can manage schedules for this dentist */}
+                                                        {auth.user.role ===
+                                                            "clinic_admin" ||
+                                                        selectedDentist ===
+                                                            auth.user.id.toString() ? (
+                                                            <ProtectedRoute
+                                                                permission="manage_dentist_schedules"
+                                                                isButton={true}
+                                                            >
+                                                                <Button
+                                                                    onClick={() => {
+                                                                        console.log(
+                                                                            "🆕 Add Schedule button clicked (dentist view) - clearing editingSchedule"
+                                                                        );
+                                                                        setEditingSchedule(
+                                                                            null
+                                                                        );
+                                                                        reset();
+                                                                        setIsDialogOpen(
+                                                                            true
+                                                                        );
+                                                                    }}
+                                                                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                                                                >
+                                                                    <Plus className="h-4 w-4 mr-2" />
+                                                                    Add Schedule
+                                                                </Button>
+                                                            </ProtectedRoute>
+                                                        ) : (
+                                                            <div className="text-sm text-gray-500 italic">
+                                                                View Only -
+                                                                Cannot manage
+                                                                schedules for
+                                                                other dentists
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </CardHeader>
@@ -940,18 +1069,47 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                             profile.
                                                         </p>
                                                         <div className="flex items-center justify-center gap-3">
-                                                            <Button
-                                                                onClick={() => {
-                                                                    console.log('🆕 Add Schedule button clicked (empty state) - clearing editingSchedule');
-                                                                    setEditingSchedule(null);
-                                                                    reset();
-                                                                    setIsDialogOpen(true);
-                                                                }}
-                                                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                                                            >
-                                                                <Plus className="h-4 w-4 mr-2" />
-                                                                Add Schedule
-                                                            </Button>
+                                                            {/* Only show Add Schedule button if user can manage schedules for this dentist */}
+                                                            {auth.user.role ===
+                                                                "clinic_admin" ||
+                                                            selectedDentist ===
+                                                                auth.user.id.toString() ? (
+                                                                <ProtectedRoute
+                                                                    permission="manage_dentist_schedules"
+                                                                    isButton={
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    <Button
+                                                                        onClick={() => {
+                                                                            console.log(
+                                                                                "🆕 Add Schedule button clicked (empty state) - clearing editingSchedule"
+                                                                            );
+                                                                            setEditingSchedule(
+                                                                                null
+                                                                            );
+                                                                            reset();
+                                                                            setIsDialogOpen(
+                                                                                true
+                                                                            );
+                                                                        }}
+                                                                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                                    >
+                                                                        <Plus className="h-4 w-4 mr-2" />
+                                                                        Add
+                                                                        Schedule
+                                                                    </Button>
+                                                                </ProtectedRoute>
+                                                            ) : (
+                                                                <div className="text-sm text-gray-500 italic">
+                                                                    View Only -
+                                                                    Cannot
+                                                                    manage
+                                                                    schedules
+                                                                    for other
+                                                                    dentists
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ) : (
@@ -1077,31 +1235,68 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                                         </div>
 
                                                                         <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
-                                                                            <Button
-                                                                                variant="outline"
-                                                                                size="sm"
-                                                                                onClick={() =>
-                                                                                    handleEdit(
-                                                                                        schedule
-                                                                                    )
-                                                                                }
-                                                                                className="flex-1"
-                                                                            >
-                                                                                <Edit className="h-4 w-4 mr-1" />
-                                                                                Edit
-                                                                            </Button>
-                                                                            <Button
-                                                                                variant="outline"
-                                                                                size="sm"
-                                                                                onClick={() =>
-                                                                                    handleDelete(
-                                                                                        schedule
-                                                                                    )
-                                                                                }
-                                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                                            >
-                                                                                <Trash2 className="h-4 w-4" />
-                                                                            </Button>
+                                                                            {/* Only show edit/delete buttons if user can manage this schedule */}
+                                                                            {auth
+                                                                                .user
+                                                                                .role ===
+                                                                                "clinic_admin" ||
+                                                                            schedule.user_id ===
+                                                                                auth
+                                                                                    .user
+                                                                                    .id ? (
+                                                                                <>
+                                                                                    <ProtectedRoute
+                                                                                        permission="manage_dentist_schedules"
+                                                                                        isButton={
+                                                                                            true
+                                                                                        }
+                                                                                    >
+                                                                                        <Button
+                                                                                            variant="outline"
+                                                                                            size="sm"
+                                                                                            onClick={() =>
+                                                                                                handleEdit(
+                                                                                                    schedule
+                                                                                                )
+                                                                                            }
+                                                                                            className="flex-1"
+                                                                                        >
+                                                                                            <Edit className="h-4 w-4 mr-1" />
+                                                                                            Edit
+                                                                                        </Button>
+                                                                                    </ProtectedRoute>
+                                                                                    <ProtectedRoute
+                                                                                        permission="manage_dentist_schedules"
+                                                                                        isButton={
+                                                                                            true
+                                                                                        }
+                                                                                    >
+                                                                                        <Button
+                                                                                            variant="outline"
+                                                                                            size="sm"
+                                                                                            onClick={() =>
+                                                                                                handleDelete(
+                                                                                                    schedule
+                                                                                                )
+                                                                                            }
+                                                                                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                                        >
+                                                                                            <Trash2 className="h-4 w-4" />
+                                                                                        </Button>
+                                                                                    </ProtectedRoute>
+                                                                                </>
+                                                                            ) : (
+                                                                                <div className="text-sm text-gray-500 italic flex-1 text-center">
+                                                                                    View
+                                                                                    Only
+                                                                                    -
+                                                                                    Cannot
+                                                                                    manage
+                                                                                    other
+                                                                                    dentists'
+                                                                                    schedules
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                 )
@@ -1315,15 +1510,19 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                                                                 template
                                                                             )
                                                                         }
-                                                                        className={`w-full ${selectedDentist 
-                                                                            ? "bg-indigo-600 hover:bg-indigo-700" 
-                                                                            : "bg-gray-400 hover:bg-gray-500"
+                                                                        className={`w-full ${
+                                                                            selectedDentist
+                                                                                ? "bg-indigo-600 hover:bg-indigo-700"
+                                                                                : "bg-gray-400 hover:bg-gray-500"
                                                                         }`}
                                                                         size="sm"
-                                                                        disabled={!selectedDentist}
+                                                                        disabled={
+                                                                            !selectedDentist
+                                                                        }
                                                                     >
                                                                         <Settings className="h-4 w-4 mr-2" />
-                                                                        Apply Template
+                                                                        Apply
+                                                                        Template
                                                                     </Button>
                                                                 </CardContent>
                                                             </Card>
@@ -1352,7 +1551,8 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             {!selectedDentist && (
                                 <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                                     <p className="text-yellow-800 text-sm">
-                                        ⚠️ Please select a dentist first before applying a template.
+                                        ⚠️ Please select a dentist first before
+                                        applying a template.
                                     </p>
                                 </div>
                             )}
@@ -1566,7 +1766,9 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                 </Button>
                                 <Button
                                     onClick={applyTemplate}
-                                    disabled={!selectedDentist || isApplyingTemplate}
+                                    disabled={
+                                        !selectedDentist || isApplyingTemplate
+                                    }
                                     className="bg-indigo-600 hover:bg-indigo-700"
                                 >
                                     {isApplyingTemplate
@@ -1580,12 +1782,14 @@ export default function Index({ auth, clinic, schedules, dentists }) {
             </Dialog>
 
             {/* Schedule Form Dialog */}
-            <Dialog 
-                open={isDialogOpen} 
+            <Dialog
+                open={isDialogOpen}
                 onOpenChange={(open) => {
                     setIsDialogOpen(open);
                     if (!open) {
-                        console.log('🚪 Dialog closed - clearing editingSchedule');
+                        console.log(
+                            "🚪 Dialog closed - clearing editingSchedule"
+                        );
                         setEditingSchedule(null);
                         reset();
                     }
@@ -1630,7 +1834,13 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                 onValueChange={(value) =>
                                     setData("user_id", value)
                                 }
-                                disabled={editingSchedule !== null}
+                                disabled={
+                                    editingSchedule !== null ||
+                                    // Dentists can only create schedules for themselves
+                                    (auth.user.role === "dentist" &&
+                                        auth.user.id.toString() !==
+                                            data.user_id)
+                                }
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select dentist" />
@@ -1640,8 +1850,21 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                         <SelectItem
                                             key={dentist.id}
                                             value={dentist.id.toString()}
+                                            disabled={
+                                                // Dentists can only select themselves
+                                                auth.user.role === "dentist" &&
+                                                dentist.id.toString() !==
+                                                    auth.user.id.toString()
+                                            }
                                         >
                                             {dentist.name}
+                                            {auth.user.role === "dentist" &&
+                                                dentist.id.toString() !==
+                                                    auth.user.id.toString() && (
+                                                    <span className="text-gray-400 ml-2">
+                                                        (View Only)
+                                                    </span>
+                                                )}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -1653,28 +1876,46 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                 <Label>Select Days</Label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {WORKING_DAYS.map((day) => (
-                                        <div key={day.value} className="flex items-center space-x-2">
+                                        <div
+                                            key={day.value}
+                                            className="flex items-center space-x-2"
+                                        >
                                             <input
                                                 type="checkbox"
                                                 id={`day-${day.value}`}
-                                                checked={selectedDays.includes(day.value)}
+                                                checked={selectedDays.includes(
+                                                    day.value
+                                                )}
                                                 onChange={(e) => {
                                                     if (e.target.checked) {
-                                                        setSelectedDays([...selectedDays, day.value]);
+                                                        setSelectedDays([
+                                                            ...selectedDays,
+                                                            day.value,
+                                                        ]);
                                                     } else {
-                                                        setSelectedDays(selectedDays.filter(d => d !== day.value));
+                                                        setSelectedDays(
+                                                            selectedDays.filter(
+                                                                (d) =>
+                                                                    d !==
+                                                                    day.value
+                                                            )
+                                                        );
                                                     }
                                                 }}
                                                 className="rounded border-gray-300"
                                             />
-                                            <Label htmlFor={`day-${day.value}`} className="text-sm">
+                                            <Label
+                                                htmlFor={`day-${day.value}`}
+                                                className="text-sm"
+                                            >
                                                 {day.label}
                                             </Label>
                                         </div>
                                     ))}
                                 </div>
                                 <p className="text-xs text-gray-500">
-                                    Select multiple days to create schedules with the same settings
+                                    Select multiple days to create schedules
+                                    with the same settings
                                 </p>
                             </div>
                         ) : (
@@ -1736,11 +1977,16 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                     max="60"
                                     value={data.buffer_time}
                                     onChange={(e) =>
-                                        setData("buffer_time", parseInt(e.target.value) || 15)
+                                        setData(
+                                            "buffer_time",
+                                            parseInt(e.target.value) || 15
+                                        )
                                     }
                                     placeholder="15"
                                 />
-                                <p className="text-xs text-gray-500">Time between appointments</p>
+                                <p className="text-xs text-gray-500">
+                                    Time between appointments
+                                </p>
                             </div>
                             <div className="space-y-2">
                                 <Label>Slot Duration (minutes)</Label>
@@ -1750,27 +1996,41 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                     max="240"
                                     value={data.slot_duration}
                                     onChange={(e) =>
-                                        setData("slot_duration", parseInt(e.target.value) || 30)
+                                        setData(
+                                            "slot_duration",
+                                            parseInt(e.target.value) || 30
+                                        )
                                     }
                                     placeholder="30"
                                 />
-                                <p className="text-xs text-gray-500">Default appointment length</p>
+                                <p className="text-xs text-gray-500">
+                                    Default appointment length
+                                </p>
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Maximum Appointments Per Day (optional)</Label>
+                            <Label>
+                                Maximum Appointments Per Day (optional)
+                            </Label>
                             <Input
                                 type="number"
                                 min="1"
                                 max="50"
                                 value={data.max_appointments_per_day || ""}
                                 onChange={(e) =>
-                                    setData("max_appointments_per_day", e.target.value ? parseInt(e.target.value) : null)
+                                    setData(
+                                        "max_appointments_per_day",
+                                        e.target.value
+                                            ? parseInt(e.target.value)
+                                            : null
+                                    )
                                 }
                                 placeholder="Leave empty for no limit"
                             />
-                            <p className="text-xs text-gray-500">Limit the number of appointments for this day</p>
+                            <p className="text-xs text-gray-500">
+                                Limit the number of appointments for this day
+                            </p>
                         </div>
 
                         <div className="space-y-2">
@@ -1784,7 +2044,9 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                 placeholder="Add any special notes for this schedule"
                                 maxLength="1000"
                             />
-                            <p className="text-xs text-gray-500">Special instructions or notes</p>
+                            <p className="text-xs text-gray-500">
+                                Special instructions or notes
+                            </p>
                         </div>
 
                         <div className="flex items-center space-x-2">
@@ -1805,7 +2067,9 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                                 }
                             />
                             <Label>Allow overlapping appointments</Label>
-                            <p className="text-xs text-gray-500 ml-2">(Advanced: allows double-booking)</p>
+                            <p className="text-xs text-gray-500 ml-2">
+                                (Advanced: allows double-booking)
+                            </p>
                         </div>
 
                         <div className="flex justify-end gap-2">
@@ -1823,17 +2087,23 @@ export default function Index({ auth, clinic, schedules, dentists }) {
                             </Button>
                             <Button
                                 onClick={handleSubmit}
-                                disabled={processing || isCreating || isUpdating}
+                                disabled={
+                                    processing || isCreating || isUpdating
+                                }
                             >
                                 {isCreating
-                                    ? (isQuickSetup && selectedDays.length > 1 ? `Creating ${selectedDays.length} Schedules...` : "Creating...")
+                                    ? isQuickSetup && selectedDays.length > 1
+                                        ? `Creating ${selectedDays.length} Schedules...`
+                                        : "Creating..."
                                     : isUpdating
                                     ? "Updating..."
                                     : processing
                                     ? "Saving..."
                                     : editingSchedule
                                     ? "Update Schedule"
-                                    : (isQuickSetup && selectedDays.length > 1 ? `Create ${selectedDays.length} Schedules` : "Create Schedule")}
+                                    : isQuickSetup && selectedDays.length > 1
+                                    ? `Create ${selectedDays.length} Schedules`
+                                    : "Create Schedule"}
                             </Button>
                         </div>
                     </div>

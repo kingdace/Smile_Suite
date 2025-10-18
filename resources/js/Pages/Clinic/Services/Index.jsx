@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
+import ProtectedRoute from "@/Components/ProtectedRoute";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
@@ -289,13 +290,15 @@ export default function Index({
                                     </p>
                                 </div>
                             </div>
-                            <Button
-                                onClick={handleCreate}
-                                className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add Service
-                            </Button>
+                            <ProtectedRoute permission="manage_services" isButton={true}>
+                                <Button
+                                    onClick={handleCreate}
+                                    className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Add Service
+                                </Button>
+                            </ProtectedRoute>
                         </div>
                     </div>
                 </div>
@@ -726,35 +729,39 @@ export default function Index({
                                                         >
                                                             <Eye className="h-3 w-3" />
                                                         </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                handleEdit(
-                                                                    service
-                                                                )
-                                                            }
-                                                            className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
-                                                            title="Edit Service"
-                                                        >
-                                                            <Edit className="h-3 w-3" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                setDeletingService(
-                                                                    service
-                                                                );
-                                                                setShowDeleteDialog(
-                                                                    true
-                                                                );
-                                                            }}
-                                                            className="h-8 w-8 p-0 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 hover:text-red-700 rounded-lg transition-all duration-200 hover:scale-105"
-                                                            title="Delete Service"
-                                                        >
-                                                            <Trash2 className="h-3 w-3" />
-                                                        </Button>
+                                                        <ProtectedRoute permission="manage_services" isButton={true}>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    handleEdit(
+                                                                        service
+                                                                    )
+                                                                }
+                                                                className="h-8 w-8 p-0 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 hover:text-emerald-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                                title="Edit Service"
+                                                            >
+                                                                <Edit className="h-3 w-3" />
+                                                            </Button>
+                                                        </ProtectedRoute>
+                                                        <ProtectedRoute permission="manage_services" isButton={true}>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    setDeletingService(
+                                                                        service
+                                                                    );
+                                                                    setShowDeleteDialog(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                                className="h-8 w-8 p-0 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 hover:text-red-700 rounded-lg transition-all duration-200 hover:scale-105"
+                                                                title="Delete Service"
+                                                            >
+                                                                <Trash2 className="h-3 w-3" />
+                                                            </Button>
+                                                        </ProtectedRoute>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -787,13 +794,15 @@ export default function Index({
                                             ? "Try adjusting your search or filter criteria to find what you're looking for."
                                             : "Get started by creating your first service to build your clinic's service catalog."}
                                     </p>
-                                    <Button
-                                        onClick={handleCreate}
-                                        className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                                    >
-                                        <Plus className="h-5 w-5 mr-2" />
-                                        Add Service
-                                    </Button>
+                                    <ProtectedRoute permission="manage_services" isButton={true}>
+                                        <Button
+                                            onClick={handleCreate}
+                                            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                                        >
+                                            <Plus className="h-5 w-5 mr-2" />
+                                            Add Service
+                                        </Button>
+                                    </ProtectedRoute>
                                 </div>
                             </CardContent>
                         </Card>
