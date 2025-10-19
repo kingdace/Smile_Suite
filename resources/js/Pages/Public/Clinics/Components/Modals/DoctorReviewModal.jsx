@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X, Star, User, MessageCircle, XCircle } from "lucide-react";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 
 const REVIEW_CATEGORIES = {
     professionalism: {
@@ -263,7 +264,7 @@ export default function DoctorReviewModal({
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-gray-900">
-                                Review Dr. {doctor.name}
+                                Review {getDentistDisplayName(doctor)}
                             </h2>
                             <p className="text-sm text-gray-600">
                                 Share your experience with this doctor

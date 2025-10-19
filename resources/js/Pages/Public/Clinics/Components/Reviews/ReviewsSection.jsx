@@ -10,6 +10,7 @@ import {
     Stethoscope,
 } from "lucide-react";
 import { getInitials, getAvatarColor } from "../Shared/utils";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import DoctorReviewCard from "./DoctorReviewCard";
 import DoctorReviewModal from "../Modals/DoctorReviewModal";
 import Toast from "../../../../../Components/Toast";
@@ -736,10 +737,9 @@ export default function ReviewsSection({
                                                             </div>
                                                             <div className="flex-1">
                                                                 <h4 className="font-semibold text-gray-900 mb-1">
-                                                                    Dr.{" "}
-                                                                    {
-                                                                        doctor.name
-                                                                    }
+                                                                    {getDentistDisplayName(
+                                                                        doctor
+                                                                    )}
                                                                 </h4>
                                                                 <p className="text-sm text-gray-600 mb-2">
                                                                     {doctor.specialization ||

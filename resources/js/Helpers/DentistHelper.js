@@ -14,18 +14,22 @@ export const getDentistDisplayName = (dentist) => {
         return "N/A";
     }
 
-    // If the name already starts with "Dr.", return as is
-    if (dentist.name.startsWith("Dr.")) {
-        return dentist.name;
+    // Clean the name and check if it already starts with "Dr." (case insensitive)
+    const cleanName = dentist.name.trim();
+    const nameLower = cleanName.toLowerCase();
+
+    // If the name already starts with "Dr." (case insensitive), return as is
+    if (nameLower.startsWith("dr.") || nameLower.startsWith("dr ")) {
+        return cleanName;
     }
 
     // Add "Dr." prefix for dentists
     if (dentist.role === "dentist") {
-        return `Dr. ${dentist.name}`;
+        return `Dr. ${cleanName}`;
     }
 
     // Return name as is for non-dentists
-    return dentist.name;
+    return cleanName;
 };
 
 /**

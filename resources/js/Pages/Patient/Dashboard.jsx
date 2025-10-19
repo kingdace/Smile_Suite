@@ -1,6 +1,7 @@
 import { Head, usePage, Link, router } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import { ImageHelper } from "@/Helpers/ImageHelper.js";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import {
     Calendar,
     User,
@@ -499,12 +500,9 @@ const AppointmentsSection = ({ appointments = [] }) => {
                                                             Dentist
                                                         </p>
                                                         <p className="text-sm font-semibold text-gray-700">
-                                                            Dr.{" "}
-                                                            {
-                                                                appointment
-                                                                    .dentist
-                                                                    .name
-                                                            }
+                                                            {getDentistDisplayName(
+                                                                appointment.dentist
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1122,12 +1120,9 @@ const TreatmentsOverview = ({ treatments = [] }) => {
                                                             Dentist
                                                         </p>
                                                         <p className="text-sm font-semibold text-gray-700">
-                                                            Dr.{" "}
-                                                            {
-                                                                treatment
-                                                                    .dentist
-                                                                    .name
-                                                            }
+                                                            {getDentistDisplayName(
+                                                                treatment.dentist
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>

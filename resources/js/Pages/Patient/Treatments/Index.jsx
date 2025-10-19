@@ -18,12 +18,8 @@ import {
     Star,
     TrendingUp,
     Activity,
-    Heart,
-    Shield,
-    ChevronRight,
-    Eye,
-    Timer,
 } from "lucide-react";
+import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
@@ -358,12 +354,9 @@ export default function PatientTreatmentsIndex({
                                                                 </div>
                                                                 <div>
                                                                     <p className="font-semibold text-gray-900 text-xs sm:text-sm">
-                                                                        Dr.{" "}
-                                                                        {
-                                                                            treatment
-                                                                                .dentist
-                                                                                .name
-                                                                        }
+                                                                        {getDentistDisplayName(
+                                                                            treatment.dentist
+                                                                        )}
                                                                     </p>
                                                                     <p className="text-xs text-gray-600">
                                                                         Dentist
