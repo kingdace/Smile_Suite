@@ -43,6 +43,7 @@ import {
     XCircle,
     Timer,
     Download,
+    Phone,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -880,16 +881,29 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                         ?.full_name ||
                                                                         "Unnamed Patient"}
                                                                 </div>
-                                                                <div className="flex items-center gap-1 flex-wrap">
-                                                                    <span className="text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-medium">
-                                                                        ID:{" "}
-                                                                        {
-                                                                            treatment.id
-                                                                        }
-                                                                    </span>
+                                                                <div className="flex items-center gap-1">
                                                                     {treatment
                                                                         .patient
-                                                                        ?.email && (
+                                                                        ?.phone_number ? (
+                                                                        <span className="text-xs text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                                                                            <Phone className="h-3 w-3" />
+                                                                            {
+                                                                                treatment
+                                                                                    .patient
+                                                                                    .phone_number
+                                                                            }
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-xs text-gray-400 italic">
+                                                                            No
+                                                                            contact
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                {treatment
+                                                                    .patient
+                                                                    ?.email && (
+                                                                    <div className="flex items-center gap-1">
                                                                         <span className="text-xs text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
                                                                             {
                                                                                 treatment
@@ -897,24 +911,21 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                                     .email
                                                                             }
                                                                         </span>
-                                                                    )}
-                                                                </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="px-4 py-4">
+                                                    <TableCell className="px-4 py-4 min-w-[200px]">
                                                         <div className="space-y-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <Stethoscope className="h-3 w-3 text-gray-400" />
-                                                                <span className="text-sm font-medium text-gray-900 truncate">
-                                                                    {treatment.name || (
-                                                                        <span className="text-gray-400 italic font-normal">
-                                                                            No
-                                                                            treatment
-                                                                            name
-                                                                        </span>
-                                                                    )}
-                                                                </span>
+                                                            <div className="text-base font-[550] text-gray-750 font-[Arial,Helvetica,sans-serif]">
+                                                                {treatment.name || (
+                                                                    <span className="text-gray-400 italic font-normal">
+                                                                        No
+                                                                        treatment
+                                                                        name
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                             {treatment.service
                                                                 ?.name && (
@@ -928,20 +939,9 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                     </span>
                                                                 </div>
                                                             )}
-                                                            <div className="flex items-center gap-2">
-                                                                <FileText className="h-3 w-3 text-gray-400" />
-                                                                <span className="text-sm font-medium text-gray-900 line-clamp-2">
-                                                                    {treatment.diagnosis || (
-                                                                        <span className="text-gray-400 italic font-normal">
-                                                                            No
-                                                                            diagnosis
-                                                                        </span>
-                                                                    )}
-                                                                </span>
-                                                            </div>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="px-4 py-4">
+                                                    <TableCell className="px-4 py-4 min-w-[140px]">
                                                         <Badge
                                                             variant={
                                                                 treatment.status ===
@@ -977,7 +977,7 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                 : "Cancelled"}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="px-4 py-4">
+                                                    <TableCell className="px-4 py-4 min-w-[140px]">
                                                         <Badge
                                                             className={`text-xs font-semibold px-1.5 py-0.5 ${
                                                                 treatment.payment_status ===
@@ -998,7 +998,7 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                 : "Pending"}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="px-4 py-4">
+                                                    <TableCell className="px-4 py-4 min-w-[140px]">
                                                         <div className="text-sm font-medium text-gray-900">
                                                             <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-xs border border-emerald-200 font-bold">
                                                                 ₱
@@ -1023,7 +1023,7 @@ export default function Index({ auth, treatments, services, filters }) {
                                                                 )}
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell className="px-4 py-4">
+                                                    <TableCell className="px-4 py-4 min-w-[160px]">
                                                         <div className="text-sm font-medium text-gray-900">
                                                             {treatment.start_date ? (
                                                                 <span className="text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded text-xs border border-cyan-200">
