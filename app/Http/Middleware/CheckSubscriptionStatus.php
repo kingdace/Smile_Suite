@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\SubscriptionService;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+
 
 class CheckSubscriptionStatus
 {
