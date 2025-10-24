@@ -300,21 +300,21 @@ export default function ActivityLogsIndex({
         }
     };
 
-    const formatTimeAgo = (date) => {
-        const now = new Date();
+    const formatTimestamp = (date) => {
         const logDate = new Date(date);
-        const diffInMinutes = Math.floor((now - logDate) / (1000 * 60));
 
-        if (diffInMinutes < 1) return "now";
-        if (diffInMinutes < 60) return `${diffInMinutes}m`;
-
-        const diffInHours = Math.floor(diffInMinutes / 60);
-        if (diffInHours < 24) return `${diffInHours}h`;
-
-        const diffInDays = Math.floor(diffInHours / 24);
-        if (diffInDays < 7) return `${diffInDays}d`;
-
-        return format(logDate, "MMM dd");
+        // Always show full date and time: YYYY-MM-DD HH:MM:SS
+        return logDate
+            .toLocaleString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            })
+            .replace(/,/g, ""); // Remove commas for cleaner look
     };
 
     const getRoleColor = (role) => {
@@ -726,7 +726,7 @@ export default function ActivityLogsIndex({
 
                                                         {/* Time */}
                                                         <span className="text-gray-400 font-mono">
-                                                            {formatTimeAgo(
+                                                            {formatTimestamp(
                                                                 log.created_at
                                                             )}
                                                         </span>

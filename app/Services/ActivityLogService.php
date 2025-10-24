@@ -210,7 +210,7 @@ class ActivityLogService
     ) {
         $query = ActivityLog::forClinic($clinicId)
             ->with(['user', 'model'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', 'asc');
 
         // Apply filters
         if (isset($filters['user_id'])) {
