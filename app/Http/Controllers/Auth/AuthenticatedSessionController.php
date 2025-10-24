@@ -6,15 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\ActivityLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
+    {
+        $this->activityLogService = $activityLogService;
+    }
     /**
      * Display the login view.
      */
@@ -36,6 +44,17 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+
+        // Log successful login
+        try {
+            $this->activityLogService->logLogin($user);
+        } catch (\Exception $e) {
+            // Log error but don't break login flow
+            \Illuminate\Support\Facades\Log::error('Failed to log user login', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         // Check if clinic staff user is inactive
         if ($user->user_type === 'clinic_staff' && !$user->is_active) {
@@ -66,6 +85,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+
+        // Log logout before destroying session
+        if ($user) {
+            try {
+                $this->activityLogService->logLogout($user);
+            } catch (\Exception $e) {
+                // Log error but don't break logout flow
+                \Illuminate\Support\Facades\Log::error('Failed to log user logout', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

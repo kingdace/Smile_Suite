@@ -1,0 +1,51 @@
+﻿╔════════════════════════════════════════════════════════════════════════╗
+║              PLANTUML GANTT CHART - QUICK START                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+📁 FILES CREATED:
+   1. gantt_chart.puml         - Detailed version (all tasks)
+   2. gantt_chart_simple.puml  - Simple version (RECOMMENDED) ⭐
+   3. PLANTUML_GANTT_GUIDE.md  - Complete guide
+
+ FASTEST WAY TO USE:
+
+   Step 1: Go to https://www.plantuml.com/plantuml/uml/
+   
+   Step 2: Open gantt_chart_simple.puml and copy ALL the code
+   
+   Step 3: Paste into the online editor
+   
+   Step 4: Download the generated image (PNG, SVG, or PDF)
+   
+   Step 5: Insert into your capstone document!
+
+ YOUR GANTT CHART WILL SHOW:
+
+   Phase 1 (Blue):  Jan-Jul 2024  - Capstone Proposal
+   Phase 2 (Green): Aug-Dec 2024  - Development to Defense
+   
+   Milestones (Red):
+    June 15, 2024  - Proposal Defense
+    Nov 8, 2024    - FINAL DEFENSE
+
+ QUICK EDITS:
+
+   Change dates:
+   [Task] starts 2024-08-01 and lasts 2 weeks
+   
+   Change colors:
+   [Task] is colored in #4472C4  (Blue)
+   [Task] is colored in #70AD47  (Green)
+   
+   Add milestone:
+   [Defense] happens 2024-11-08
+   [Defense] is colored in red
+
+ ALTERNATIVE TOOLS:
+
+    VS Code + PlantUML Extension (needs Java + Graphviz)
+    PlantUML Desktop App
+    Online editors (easiest!)
+
+ DONE! You now have professional Gantt chart code ready to use!
+

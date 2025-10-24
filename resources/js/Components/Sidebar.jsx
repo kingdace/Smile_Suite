@@ -179,6 +179,15 @@ const getNavigation = (clinicId) => [
         description: "Financial tracking",
         permission: "view_payments",
     },
+    {
+        name: "Activity Logs",
+        href: route("clinic.activity-logs.index", [clinicId]),
+        routeName: "clinic.activity-logs.*",
+        icon: Shield,
+        description: "Audit trail and security logs",
+        permission: null, // No permission check needed - handled by isAdminOnly
+        isAdminOnly: true,
+    },
 ];
 
 export default function Sidebar({ className, auth }) {
@@ -312,6 +321,14 @@ export default function Sidebar({ className, auth }) {
                                         auth.user.permissions.includes(
                                             item.permission
                                         ));
+
+                                // Special check for admin-only items
+                                if (
+                                    item.isAdminOnly &&
+                                    auth.user?.role !== "clinic_admin"
+                                ) {
+                                    return null; // Don't show admin-only items to non-admins
+                                }
 
                                 if (!hasPermission) {
                                     return (

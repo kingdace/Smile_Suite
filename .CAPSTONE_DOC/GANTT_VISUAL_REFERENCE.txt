@@ -1,0 +1,39 @@
+﻿SMILE SUITE GANTT CHART - VISUAL REFERENCE
+===========================================
+
+PHASE 1: PROPOSAL (Jan-May 2024)
+---------------------------------
+Jan  [] Learning & Analysis
+Feb  [] Project Selection
+Mar  [] Requirements & Design
+Apr  [] System Design
+May  [] Proposal Defense 
+
+PHASE 2: DEVELOPMENT (Jun-Sep 2024)
+------------------------------------
+Jun  [] Environment Setup + Backend
+Jul  [] Backend + Frontend Start
+Aug  [] Frontend + Features Phase 1
+Sep  [] Features Phase 2 & 3
+
+PHASE 3: DEPLOYMENT (Oct 2024)
+-------------------------------
+Oct  [] Railway Deployment + Testing + Clinic Demo 
+
+PHASE 4: DOCUMENTATION (Nov-Dec 2024)
+--------------------------------------
+Nov  [] Capstone Documentation
+Dec  [] Final Defense Prep + Defense 
+
+LEGEND:
+ = Active work period
+ = No activity
+    = Milestone (Defense)
+
+KEY MILESTONES:
+- May 15, 2024: Proposal Defense
+- Sep 30, 2024: Development Complete
+- Oct 31, 2024: Deployment Complete
+- Dec 20, 2024: Final Defense
+
+TOTAL PROJECT DURATION: 12 months (Jan-Dec 2024)

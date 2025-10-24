@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -52,8 +52,26 @@ export default function EditPayment({
         patient_id: payment.patient_id?.toString() || "",
         treatment_id: payment.treatment_id?.toString() || "",
         amount: payment.amount?.toString() || "",
-        payment_date:
-            payment.payment_date || new Date().toISOString().split("T")[0],
+        payment_date: payment.payment_date
+            ? (() => {
+                  // Handle different date formats properly
+                  if (typeof payment.payment_date === "string") {
+                      // If it's already a string, extract just the date part
+                      return payment.payment_date.split("T")[0];
+                  } else {
+                      // If it's a Date object or Carbon instance, format it properly
+                      const date = new Date(payment.payment_date);
+                      // Use local date formatting to avoid timezone issues
+                      const year = date.getFullYear();
+                      const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                      );
+                      const day = String(date.getDate()).padStart(2, "0");
+                      return `${year}-${month}-${day}`;
+                  }
+              })()
+            : new Date().toISOString().split("T")[0],
         payment_method: payment.payment_method || "",
         status: payment.status || "completed",
         reference_number: payment.reference_number || "",
@@ -308,14 +326,16 @@ export default function EditPayment({
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Button
-                                    onClick={() => window.history.back()}
-                                    variant="outline"
-                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300"
+                                <Link
+                                    href={route("clinic.payments.show", [
+                                        clinic.id,
+                                        payment.id,
+                                    ])}
+                                    className="gap-2 bg-white/20 border-white/30 text-white hover:bg-white/30 text-sm px-4 py-2 rounded-lg transition-all duration-300 border border-white/30 rounded-lg flex items-center"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
                                     Back
-                                </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,36 @@
+@startgantt
+title Smile Suite: Cloud-Based Dental Clinic as a Service
+printscale weekly
+project starts 2024-01-01
+
+[Systems Analysis & Design] lasts 21 days and starts 2024-01-01
+[Project Selection & Feasibility] lasts 43 days and starts 2024-02-01
+[Topic Approval] lasts 7 days and starts 2024-03-15
+[Requirements Gathering] lasts 21 days and starts 2024-03-25
+[System Design (UI/UX)] lasts 30 days and starts 2024-04-15
+[Database Design] lasts 30 days and starts 2024-04-20
+[Use Case & Sequence Diagrams] lasts 24 days and starts 2024-05-01
+[Proposal Document] lasts 21 days and starts 2024-05-20
+[Proposal Defense] happens 2024-06-15
+[Post-Defense Revisions] lasts 14 days and starts 2024-06-16
+[Research & Planning] lasts 30 days and starts 2024-07-01
+[Environment Setup] lasts 7 days and starts 2024-08-01
+[Multi-tenant Architecture] lasts 13 days and starts 2024-08-08
+[Database Migrations] lasts 9 days and starts 2024-08-22
+[Backend API Development] lasts 14 days and starts 2024-09-01
+[Frontend Dashboard] lasts 14 days and starts 2024-09-16
+[Core Admin Functions] lasts 9 days and starts 2024-10-01
+[Operational Modules] lasts 9 days and starts 2024-10-11
+[Advanced Features] lasts 10 days and starts 2024-10-21
+[Railway Deployment] lasts 6 days and starts 2024-10-25
+[System Testing] lasts 6 days and starts 2024-10-28
+[Clinic Demonstration] lasts 3 days and starts 2024-10-30
+[Documentation Writing] lasts 21 days and starts 2024-10-15
+[Final Defense Prep] lasts 7 days and starts 2024-11-01
+[FINAL DEFENSE] happens 2024-11-08
+[Post-Defense Revisions] lasts 11 days and starts 2024-11-09
+[Final Documentation] lasts 9 days and starts 2024-11-21
+[Hard Binding & Submission] lasts 9 days and starts 2024-12-01
+[Project Completion] lasts 9 days and starts 2024-12-11
+
+@endgantt

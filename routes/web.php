@@ -718,6 +718,18 @@ Route::middleware('auth')->group(function () {
                 ->middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')
                 ->name('clinic.subscription.quick-renewal');
         });
+
+        // Activity Logs Routes (Clinic Admin Only)
+        Route::middleware(\App\Http\Middleware\CheckRole::class . ':clinic_admin')->group(function () {
+            Route::get('activity-logs', [\App\Http\Controllers\Clinic\ActivityLogController::class, 'index'])
+                ->name('clinic.activity-logs.index');
+            Route::get('activity-logs/{activityLog}', [\App\Http\Controllers\Clinic\ActivityLogController::class, 'show'])
+                ->name('clinic.activity-logs.show');
+            Route::get('activity-logs/export', [\App\Http\Controllers\Clinic\ActivityLogController::class, 'export'])
+                ->name('clinic.activity-logs.export');
+            Route::get('activity-logs/stats', [\App\Http\Controllers\Clinic\ActivityLogController::class, 'stats'])
+                ->name('clinic.activity-logs.stats');
+        });
     });
 });
 

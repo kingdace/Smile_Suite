@@ -1,0 +1,67 @@
+@startgantt
+title Smile Suite: Cloud-Based Dental Clinic as a Service
+projectscale monthly
+printscale weekly
+
+<style>
+ganttDiagram {
+    timeline {
+        BackgroundColor lightgray
+    }
+}
+</style>
+
+-- Phase 1: Capstone Proposal (Jan-Jul 2024) --
+[Learning & Analysis] starts 2024-01-01 and lasts 3 weeks
+[Learning & Analysis] is colored in #4472C4
+
+[Project Selection & Feasibility] starts 2024-02-01 and lasts 6 weeks
+[Project Selection & Feasibility] is colored in #4472C4
+
+[Requirements Gathering] starts 2024-03-25 and lasts 3 weeks
+[Requirements Gathering] is colored in #4472C4
+
+[System Design] starts 2024-04-15 and lasts 5 weeks
+[System Design] is colored in #4472C4
+
+[Proposal Document] starts 2024-05-20 and lasts 3 weeks
+[Proposal Document] is colored in #4472C4
+
+[Proposal Defense] happens 2024-06-15
+[Proposal Defense] is colored in red
+
+[Post-Defense & Planning] starts 2024-06-16 and lasts 6 weeks
+[Post-Defense & Planning] is colored in #4472C4
+
+-- Phase 2: Development to Defense (Aug-Dec 2024) --
+[Environment Setup] starts 2024-08-01 and lasts 1 week
+[Environment Setup] is colored in #70AD47
+
+[Backend Development] starts 2024-08-08 and lasts 4 weeks
+[Backend Development] is colored in #70AD47
+
+[Frontend Development] starts 2024-09-16 and lasts 2 weeks
+[Frontend Development] is colored in #70AD47
+
+[Feature Development] starts 2024-10-01 and lasts 4 weeks
+[Feature Development] is colored in #70AD47
+
+[Deployment & Testing] starts 2024-10-25 and lasts 2 weeks
+[Deployment & Testing] is colored in #70AD47
+
+[Documentation] starts 2024-10-15 and lasts 3 weeks
+[Documentation] is colored in #70AD47
+
+[Final Defense Prep] starts 2024-11-01 and lasts 1 week
+[Final Defense Prep] is colored in #70AD47
+
+[FINAL DEFENSE] happens 2024-11-08
+[FINAL DEFENSE] is colored in red
+
+[Revisions & Hard Binding] starts 2024-11-09 and lasts 4 weeks
+[Revisions & Hard Binding] is colored in #70AD47
+
+[Final Submission] starts 2024-12-01 and lasts 3 weeks
+[Final Submission] is colored in #70AD47
+
+@endgantt

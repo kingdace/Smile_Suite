@@ -206,14 +206,16 @@ export default function Show({ auth, payment, relatedPayments = [] }) {
                                         Receipt
                                     </Button>
                                 </a>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => window.history.back()}
-                                    className="gap-1 text-sm px-4 py-2 rounded-lg transition-all duration-300 border backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30"
+                                <Link
+                                    href={route(
+                                        "clinic.payments.index",
+                                        auth.clinic?.id
+                                    )}
+                                    className="gap-1 text-sm px-4 py-2 rounded-lg transition-all duration-300 border backdrop-blur-sm bg-white/20 border-white/30 text-white hover:bg-white/30 flex items-center"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
-                                    Back
-                                </Button>
+                                    Back to Payments
+                                </Link>
                             </div>
                         </div>
                     </div>
