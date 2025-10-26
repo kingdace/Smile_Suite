@@ -311,19 +311,6 @@ export default function Index({ auth, requests, filters }) {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <button
-                                        onClick={() =>
-                                            router.visit(
-                                                route(
-                                                    "admin.subscriptions.index"
-                                                )
-                                            )
-                                        }
-                                        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm flex items-center gap-2"
-                                    >
-                                        <Shield className="w-4 h-4" />
-                                        Subscriptions
-                                    </button>
-                                    <button
                                         onClick={() => window.history.back()}
                                         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 rounded-lg transition-all duration-300 text-sm font-semibold shadow-md"
                                     >

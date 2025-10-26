@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class StorageHelper
 {
@@ -21,7 +22,7 @@ class StorageHelper
     {
         try {
             $disk = self::getDisk();
-            \Log::info('StorageHelper: Uploading file', [
+            Log::info('StorageHelper: Uploading file', [
                 'disk' => $disk,
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName()
@@ -40,7 +41,7 @@ class StorageHelper
                     throw new \Exception('File upload failed - store() returned false');
                 }
             } catch (\Exception $uploadException) {
-                \Log::error('StorageHelper: S3 store() failed with exception', [
+                Log::error('StorageHelper: S3 store() failed with exception', [
                     'error' => $uploadException->getMessage(),
                     'disk' => $disk,
                     'path' => $path,
@@ -49,16 +50,16 @@ class StorageHelper
                 throw new \Exception('S3 Upload Error: ' . $uploadException->getMessage());
             }
 
-            \Log::info('StorageHelper: File stored', ['stored_path' => $storedPath]);
+            Log::info('StorageHelper: File stored', ['stored_path' => $storedPath]);
 
             /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
             $storage = Storage::disk($disk);
             $url = $storage->url($storedPath);
 
-            \Log::info('StorageHelper: File uploaded successfully', ['url' => $url]);
+            Log::info('StorageHelper: File uploaded successfully', ['url' => $url]);
             return $url;
         } catch (\Exception $e) {
-            \Log::error('StorageHelper: Upload failed', [
+            Log::error('StorageHelper: Upload failed', [
                 'error' => $e->getMessage(),
                 'file' => $file->getClientOriginalName(),
                 'trace' => $e->getTraceAsString()
@@ -74,7 +75,7 @@ class StorageHelper
     {
         try {
             $disk = self::getDisk();
-            \Log::info('StorageHelper: Uploading file with custom name', [
+            Log::info('StorageHelper: Uploading file with custom name', [
                 'disk' => $disk,
                 'path' => $path,
                 'name' => $name,
@@ -94,7 +95,7 @@ class StorageHelper
                     throw new \Exception('File upload failed - storeAs() returned false');
                 }
             } catch (\Exception $uploadException) {
-                \Log::error('StorageHelper: S3 storeAs() failed with exception', [
+                Log::error('StorageHelper: S3 storeAs() failed with exception', [
                     'error' => $uploadException->getMessage(),
                     'disk' => $disk,
                     'path' => $path,
@@ -104,16 +105,16 @@ class StorageHelper
                 throw new \Exception('S3 Upload Error: ' . $uploadException->getMessage());
             }
 
-            \Log::info('StorageHelper: File stored with custom name', ['stored_path' => $storedPath]);
+            Log::info('StorageHelper: File stored with custom name', ['stored_path' => $storedPath]);
 
             /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
             $storage = Storage::disk($disk);
             $url = $storage->url($storedPath);
 
-            \Log::info('StorageHelper: File uploaded successfully with custom name', ['url' => $url]);
+            Log::info('StorageHelper: File uploaded successfully with custom name', ['url' => $url]);
             return $url;
         } catch (\Exception $e) {
-            \Log::error('StorageHelper: Upload with custom name failed', [
+            Log::error('StorageHelper: Upload with custom name failed', [
                 'error' => $e->getMessage(),
                 'file' => $file->getClientOriginalName(),
                 'name' => $name,
@@ -141,6 +142,50 @@ class StorageHelper
         }
 
         return false;
+    }
+
+    /**
+     * Store a file and return the path (alias for storeAndGetUrl)
+     */
+    public static function storeFile($file, string $path, string $name = null): string
+    {
+        if ($name) {
+            return self::storeAsAndGetUrl($file, $path, $name);
+        }
+        return self::storeAndGetUrl($file, $path);
+    }
+
+    /**
+     * Get file URL from path (handles both local and S3)
+     */
+    public static function getFileUrl(string $path): string
+    {
+        $disk = self::getDisk();
+
+        // If it's already a full URL, return as is
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        // If it's a relative path, make it absolute
+        if (str_starts_with($path, '/')) {
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+            $storage = Storage::disk($disk);
+            return $storage->url($path);
+        }
+
+        // If it starts with storage/, remove the prefix
+        if (str_starts_with($path, 'storage/')) {
+            $cleanPath = str_replace('storage/', '', $path);
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+            $storage = Storage::disk($disk);
+            return $storage->url($cleanPath);
+        }
+
+        // Default: treat as relative path
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk($disk);
+        return $storage->url($path);
     }
 
     /**

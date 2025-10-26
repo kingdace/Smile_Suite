@@ -188,19 +188,6 @@ export default function Index({
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <button
-                                        onClick={() =>
-                                            router.visit(
-                                                route(
-                                                    "admin.subscriptions.index"
-                                                )
-                                            )
-                                        }
-                                        className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm flex items-center gap-2"
-                                    >
-                                        <Shield className="w-4 h-4" />
-                                        Subscriptions
-                                    </button>
-                                    <button
                                         onClick={toggleShowDeleted}
                                         className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 shadow-md text-sm ${
                                             show_deleted

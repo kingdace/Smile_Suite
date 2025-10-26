@@ -9,6 +9,8 @@ import { ImageHelper } from "@/Helpers/ImageHelper.js";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import Sidebar from "@/Components/Sidebar";
 import { Button } from "@/Components/ui/button";
+import NotificationBell from "@/Components/NotificationBell";
+import AdminNotificationBell from "@/Components/AdminNotificationBell";
 import {
     Users,
     Building2,
@@ -28,6 +30,7 @@ import {
     Zap,
     Calendar,
     AlertTriangle,
+    HelpCircle,
 } from "lucide-react";
 import { route } from "ziggy-js";
 import SiteHeader from "@/Components/SiteHeader";
@@ -489,6 +492,9 @@ const Header = ({
                                         !route().current("admin.clinics.*") &&
                                         !route().current(
                                             "admin.clinic-requests.*"
+                                        ) &&
+                                        !route().current(
+                                            "admin.subscriptions.*"
                                         )
                                     }
                                     className={`px-4 py-2 font-medium text-sm transition-all duration-300 flex items-center gap-2 hover:scale-105 border rounded-xl ${
@@ -497,6 +503,9 @@ const Header = ({
                                         !route().current("admin.clinics.*") &&
                                         !route().current(
                                             "admin.clinic-requests.*"
+                                        ) &&
+                                        !route().current(
+                                            "admin.subscriptions.*"
                                         )
                                             ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
                                             : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
@@ -545,16 +554,39 @@ const Header = ({
                                     <FileText className="w-4 h-4" />
                                     Requests
                                 </NavLink>
+                                <NavLink
+                                    href={route("admin.subscriptions.index")}
+                                    active={route().current(
+                                        "admin.subscriptions.*"
+                                    )}
+                                    className={`px-4 py-2 font-medium text-sm transition-all duration-300 flex items-center gap-2 hover:scale-105 border rounded-xl ${
+                                        route().current("admin.subscriptions.*")
+                                            ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
+                                            : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
+                                    }`}
+                                >
+                                    <Shield className="w-4 h-4" />
+                                    Subscriptions
+                                </NavLink>
+                                <NavLink
+                                    href={route("admin.support.index")}
+                                    active={route().current("admin.support.*")}
+                                    className={`px-4 py-2 font-medium text-sm transition-all duration-300 flex items-center gap-2 hover:scale-105 border rounded-xl ${
+                                        route().current("admin.support.*")
+                                            ? "text-slate-900 bg-white/95 backdrop-blur-sm shadow-lg border-white/50 font-semibold"
+                                            : "text-slate-200 hover:text-white hover:bg-white/20 backdrop-blur-sm border-transparent hover:border-white/30"
+                                    }`}
+                                >
+                                    <HelpCircle className="w-4 h-4" />
+                                    Support
+                                </NavLink>
                             </nav>
                         </div>
 
                         {/* Right Side - Notifications, User */}
                         <div className="flex items-center gap-4">
-                            {/* Notifications */}
-                            <button className="relative p-2.5 text-slate-200 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all duration-300 hover:scale-105 border border-slate-600/50 shadow-lg hover:border-white/30">
-                                <Bell className="w-5 h-5" />
-                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse shadow-lg"></span>
-                            </button>
+                            {/* Admin Notifications */}
+                            <AdminNotificationBell auth={auth} />
 
                             {/* User Menu */}
                             <div className="flex items-center gap-3">
@@ -677,10 +709,7 @@ const Header = ({
                         {/* Right Side - Notifications, User */}
                         <div className="flex items-center gap-4">
                             {/* Enhanced Notifications */}
-                            <button className="relative p-2.5 text-white hover:bg-white/25 backdrop-blur-sm rounded-2xl transition-all duration-300 hover:scale-110 border border-white/30 shadow-lg hover:shadow-xl">
-                                <Bell className="w-5 h-5" />
-                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse shadow-lg border border-white"></span>
-                            </button>
+                            <NotificationBell auth={auth} />
 
                             {/* Enhanced User Menu */}
                             <div className="flex items-center gap-3">
@@ -973,8 +1002,6 @@ export default function Authenticated({
     children,
     hideSidebar = false,
 }) {
-    // Debug auth data - removed to prevent console loop
-
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -1048,6 +1075,26 @@ export default function Authenticated({
                                 >
                                     <Building2 className="w-4 h-4 mr-2" />
                                     Clinics
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route("admin.clinic-requests.index")}
+                                    active={route().current(
+                                        "admin.clinic-requests.*"
+                                    )}
+                                    className="flex items-center"
+                                >
+                                    <FileText className="w-4 h-4 mr-2" />
+                                    Requests
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route("admin.subscriptions.index")}
+                                    active={route().current(
+                                        "admin.subscriptions.*"
+                                    )}
+                                    className="flex items-center"
+                                >
+                                    <Shield className="w-4 h-4 mr-2" />
+                                    Subscriptions
                                 </ResponsiveNavLink>
                             </>
                         )}

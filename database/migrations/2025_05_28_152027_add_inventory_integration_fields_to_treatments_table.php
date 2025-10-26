@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::table('treatments', function (Blueprint $table) {
             // Inventory integration tracking
-            $table->boolean('inventory_deducted')->default(false)->after('outcome')
+            $table->boolean('inventory_deducted')->default(false)->after('notes')
                 ->comment('Whether inventory has been deducted for this treatment');
             $table->timestamp('inventory_deducted_at')->nullable()->after('inventory_deducted')
                 ->comment('When inventory was deducted for this treatment');

@@ -1,0 +1,1 @@
+import{r as a}from"./app-DeEiYNi1.js";import{b as t,c as o}from"./ExportButton-PWYyptUe.js";var i=["axis"],s=a.forwardRef((r,e)=>a.createElement(t,{chartName:"LineChart",defaultTooltipEventType:"axis",validateTooltipEventTypes:i,tooltipPayloadSearcher:o,categoricalChartProps:r,ref:e}));export{s as L};

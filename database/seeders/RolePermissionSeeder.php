@@ -23,7 +23,9 @@ class RolePermissionSeeder extends Seeder
             'view_payments', 'process_payments', 'refund_payments',
             'view_services', 'manage_services',
             'view_staff_users', 'add_staff_users', 'edit_staff_users', 'delete_staff_users',
-            'manage_dentist_schedules', 'manage_clinic_profile'
+            'manage_dentist_schedules', 'manage_clinic_profile',
+            // Support permissions
+            'create_support_tickets', 'view_own_support_tickets', 'view_clinic_support_tickets'
         ];
 
         // Dentist - Clinical permissions
@@ -34,7 +36,9 @@ class RolePermissionSeeder extends Seeder
             'view_inventory',
             'view_payments',
             'view_services',
-            'view_schedules', 'manage_dentist_schedules'
+            'view_schedules', 'manage_dentist_schedules',
+            // Support permissions
+            'create_support_tickets', 'view_own_support_tickets'
         ];
 
         // Staff - Operational permissions
@@ -45,7 +49,9 @@ class RolePermissionSeeder extends Seeder
             'view_inventory', 'add_inventory', 'edit_inventory', 'manage_suppliers',
             'view_payments', 'process_payments',
             'view_services',
-            'view_schedules'
+            'view_schedules',
+            // Support permissions
+            'create_support_tickets', 'view_own_support_tickets'
         ];
 
         $this->assignPermissions('clinic_admin', $clinicAdminPermissions);

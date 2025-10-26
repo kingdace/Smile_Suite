@@ -188,6 +188,14 @@ const getNavigation = (clinicId) => [
         permission: null, // No permission check needed - handled by isAdminOnly
         isAdminOnly: true,
     },
+    {
+        name: "Help & Support",
+        href: route("clinic.support.index", [clinicId]),
+        routeName: "clinic.support.*",
+        icon: HelpCircle,
+        description: "Get assistance and support",
+        permission: "create_support_tickets",
+    },
 ];
 
 export default function Sidebar({ className, auth }) {
@@ -602,21 +610,18 @@ export default function Sidebar({ className, auth }) {
                                 </div>
                             </div>
 
-                            {/* Enhanced Help & Support */}
+                            {/* Terms of Service */}
                             <Link
-                                href="#"
-                                className="group flex items-center gap-2 p-2 text-gray-600 hover:text-blue-700 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 rounded-lg transition-all duration-300 border border-transparent hover:border-blue-200/50"
+                                href="/terms"
+                                className="group flex items-center gap-1.5 px-2 py-1.5 text-gray-600 hover:text-blue-700 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 rounded-md transition-all duration-300 border border-transparent hover:border-blue-200/50"
                             >
-                                <div className="p-1.5 rounded-md bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-300 shadow-sm">
-                                    <HelpCircle className="h-3.5 w-3.5 group-hover:text-blue-600 transition-colors" />
+                                <div className="p-1 rounded-sm bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-300 shadow-sm">
+                                    <FileText className="h-3 w-3 group-hover:text-blue-600 transition-colors" />
                                 </div>
                                 <div>
-                                    <span className="text-xs font-semibold group-hover:text-blue-700 transition-colors">
-                                        Help & Support
+                                    <span className="text-xs font-medium group-hover:text-blue-700 transition-colors">
+                                        Terms of Service
                                     </span>
-                                    <p className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors">
-                                        Get assistance
-                                    </p>
                                 </div>
                             </Link>
                         </div>

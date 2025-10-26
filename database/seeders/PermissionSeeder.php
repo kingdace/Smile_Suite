@@ -61,6 +61,12 @@ class PermissionSeeder extends Seeder
 
             // Clinic Management
             ['name' => 'manage_clinic', 'display_name' => 'Manage Clinic', 'description' => 'Manage clinic settings and profile', 'category' => 'clinic_management'],
+
+            // Support Management
+            ['name' => 'create_support_tickets', 'display_name' => 'Create Support Tickets', 'description' => 'Create new support tickets', 'category' => 'support_management'],
+            ['name' => 'view_own_support_tickets', 'display_name' => 'View Own Support Tickets', 'description' => 'View own support tickets', 'category' => 'support_management'],
+            ['name' => 'view_clinic_support_tickets', 'display_name' => 'View Clinic Support Tickets', 'description' => 'View all clinic support tickets', 'category' => 'support_management'],
+            ['name' => 'manage_support_tickets', 'display_name' => 'Manage Support Tickets', 'description' => 'Manage all support tickets', 'category' => 'support_management'],
         ];
 
         foreach ($permissions as $permission) {

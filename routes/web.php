@@ -206,6 +206,33 @@ Route::middleware('auth')->group(function () {
 
         // Test route for subscription access control
         Route::get('test-subscription-access', [App\Http\Controllers\Clinic\TestController::class, 'testSubscriptionAccess'])->name('test.subscription-access');
+
+        // Admin Notification Routes
+        Route::prefix('admin/notifications')->name('admin.notifications.')->group(function () {
+            Route::get('api', [App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])
+                ->name('index');
+            Route::post('api/{id}/read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])
+                ->name('mark-read');
+            Route::post('api/mark-all-read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAllAsRead'])
+                ->name('mark-all-read');
+        });
+
+        Route::get('admin/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'page'])
+            ->name('admin.notifications.page');
+
+        // Admin Support Ticket Routes
+        Route::prefix('support')->name('support.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\AdminSupportTicketController::class, 'index'])
+                ->name('index');
+            Route::get('/{ticket}', [App\Http\Controllers\Admin\AdminSupportTicketController::class, 'show'])
+                ->name('show');
+            Route::put('/{ticket}', [App\Http\Controllers\Admin\AdminSupportTicketController::class, 'update'])
+                ->name('update');
+            Route::post('/{ticket}/messages', [App\Http\Controllers\Admin\AdminSupportTicketController::class, 'addMessage'])
+                ->name('messages.store');
+            Route::get('/attachments/{attachment}/download', [App\Http\Controllers\Admin\AdminSupportTicketController::class, 'downloadAttachment'])
+                ->name('attachments.download');
+        });
     });
 
     // Clinic Routes (Subscription access control handled in controllers)
@@ -730,6 +757,39 @@ Route::middleware('auth')->group(function () {
             Route::get('activity-logs/stats', [\App\Http\Controllers\Clinic\ActivityLogController::class, 'stats'])
                 ->name('clinic.activity-logs.stats');
         });
+
+        // Notification API Routes (All Authenticated Users)
+        Route::prefix('clinic/{clinic}/notifications')->name('clinic.notifications.')->group(function () {
+            Route::get('api', [\App\Http\Controllers\Clinic\NotificationController::class, 'index'])
+                ->name('index');
+            Route::post('api/{id}/read', [\App\Http\Controllers\Clinic\NotificationController::class, 'markAsRead'])
+                ->name('mark-read');
+            Route::post('api/mark-all-read', [\App\Http\Controllers\Clinic\NotificationController::class, 'markAllAsRead'])
+                ->name('mark-all-read');
+            Route::get('api/stats', [\App\Http\Controllers\Clinic\NotificationController::class, 'stats'])
+                ->name('stats');
+        });
+
+        // Notifications Page Route (All Authenticated Users)
+        Route::get('clinic/{clinic}/notifications', [\App\Http\Controllers\Clinic\NotificationController::class, 'page'])
+            ->name('clinic.notifications.page');
+
+        // Support Ticket Routes (All Authenticated Users with Support Permissions)
+        Route::prefix('clinic/{clinic}/support')->name('clinic.support.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Clinic\SupportTicketController::class, 'index'])
+                ->name('index');
+            Route::get('/create', [\App\Http\Controllers\Clinic\SupportTicketController::class, 'create'])
+                ->name('create');
+            Route::post('/', [\App\Http\Controllers\Clinic\SupportTicketController::class, 'store'])
+                ->name('store');
+            Route::get('/{ticket}', [\App\Http\Controllers\Clinic\SupportTicketController::class, 'show'])
+                ->name('show');
+            Route::put('/{ticket}', [\App\Http\Controllers\Clinic\SupportTicketController::class, 'update'])
+                ->name('update');
+            Route::post('/{ticket}/messages', [\App\Http\Controllers\Clinic\SupportTicketController::class, 'addMessage'])
+                ->name('messages.store');
+        });
+
     });
 });
 
