@@ -137,116 +137,85 @@ const EnhancedKPICard = ({
             whileTap={{ scale: 0.98 }}
         >
             <Card
-                className={`relative overflow-hidden border-0 ${colorScheme.shadow} transition-all duration-300 cursor-pointer group ${colorScheme.cardBg} ${className}`}
+                className={`relative overflow-hidden border-0 ${colorScheme.shadow} transition-all duration-300 cursor-pointer group border border-blue-100/50 ${className}`}
                 onClick={onClick}
             >
-                {/* Subtle Background Pattern */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-blue-100/20 opacity-50" />
-
-                {/* Animated Background Elements */}
-                <motion.div
-                    className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/10 to-blue-500/10 rounded-full"
-                    animate={{
-                        scale: [1, 1.1, 1],
-                        opacity: [0.1, 0.2, 0.1],
-                    }}
-                    transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                />
+                {/* Enhanced Background Pattern */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
 
                 <CardContent className={`relative ${compact ? "p-4" : "p-5"}`}>
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col items-center gap-3 text-center">
                         {/* Icon */}
                         <motion.div
-                            className={`w-10 h-10 bg-gradient-to-br ${colorScheme.primary} rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300`}
+                            className={`w-12 h-12 bg-gradient-to-br ${colorScheme.primary} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0`}
                             whileHover={{ rotate: 5 }}
                         >
                             <div className="text-white">{getIcon()}</div>
                         </motion.div>
 
-                        {/* Trend Badge */}
-                        {trend && (
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.3 }}
+                        {/* Content */}
+                        <div className="flex-1 min-w-0 w-full">
+                            {/* Title */}
+                            <h3
+                                className={`text-xs font-medium text-gray-600 mb-1 leading-tight`}
                             >
-                                <Badge
-                                    className={`${
-                                        trendDirection === "up"
-                                            ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                            : "bg-red-100 text-red-700 border-red-200"
-                                    } text-xs font-medium shadow-sm`}
-                                >
-                                    {trendDirection === "up" ? (
-                                        <ArrowUpRight className="h-3 w-3 mr-1" />
-                                    ) : (
-                                        <ArrowDownRight className="h-3 w-3 mr-1" />
-                                    )}
-                                    {trendPercentage.toFixed(1)}%
-                                </Badge>
-                            </motion.div>
-                        )}
-                    </div>
+                                {title}
+                            </h3>
 
-                    {/* Title */}
-                    <h3
-                        className={`text-sm font-medium ${colorScheme.textLight} mb-1`}
-                    >
-                        {title}
-                    </h3>
-
-                    {/* Value */}
-                    <motion.div
-                        className={`${
-                            compact ? "text-xl" : "text-2xl"
-                        } font-bold ${colorScheme.text} mb-1`}
-                        key={displayValue}
-                        initial={{ scale: 1.1 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        {loading ? (
-                            <div className="animate-pulse bg-blue-200 h-6 w-16 rounded" />
-                        ) : (
-                            <>
-                                {formatValue(displayValue)}
-                                {unit && (
-                                    <span className="text-lg ml-1">{unit}</span>
+                            {/* Value */}
+                            <motion.div
+                                className={`text-xl font-bold text-gray-900 mb-1 leading-tight truncate`}
+                                key={displayValue}
+                                initial={{ scale: 1.1 }}
+                                animate={{ scale: 1 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {loading ? (
+                                    <div className="animate-pulse bg-blue-200 h-6 w-16 rounded" />
+                                ) : (
+                                    <>
+                                        {formatValue(displayValue)}
+                                        {unit && (
+                                            <span className="text-sm ml-1">
+                                                {unit}
+                                            </span>
+                                        )}
+                                    </>
                                 )}
-                            </>
-                        )}
-                    </motion.div>
+                            </motion.div>
 
-                    {/* Subtitle */}
-                    {subtitle && (
-                        <p className={`text-xs ${colorScheme.textMuted} mb-2`}>
-                            {subtitle}
-                        </p>
-                    )}
+                            {/* Subtitle with Status Indicator */}
+                            {subtitle && (
+                                <div className="flex items-center justify-center gap-1">
+                                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                                    <span className="text-[10px] text-blue-600 font-medium truncate">
+                                        {subtitle}
+                                    </span>
+                                </div>
+                            )}
 
-                    {/* Progress Bar */}
-                    {progress !== undefined && (
-                        <div className="mt-3">
-                            <div className="flex justify-between text-xs mb-1">
-                                <span className={colorScheme.textMuted}>
-                                    Progress
-                                </span>
-                                <span
-                                    className={`font-medium ${colorScheme.textLight}`}
-                                >
-                                    {progress}%
-                                </span>
-                            </div>
-                            <Progress
-                                value={progress}
-                                className="h-1.5 bg-blue-100"
-                            />
+                            {/* Trend Badge - centered below subtitle */}
+                            {trend && (
+                                <div className="mt-1 flex justify-center">
+                                    <Badge
+                                        className={`${
+                                            trendDirection === "up"
+                                                ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                                : "bg-red-100 text-red-700 border-red-200"
+                                        } text-[10px] font-medium px-1.5 py-0.5 border`}
+                                    >
+                                        {trendDirection === "up" ? (
+                                            <ArrowUpRight className="h-2.5 w-2.5 mr-0.5" />
+                                        ) : (
+                                            <ArrowDownRight className="h-2.5 w-2.5 mr-0.5" />
+                                        )}
+                                        {trendPercentage.toFixed(1)}%
+                                    </Badge>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
 
                     {/* Hover Effect Overlay */}
                     <motion.div

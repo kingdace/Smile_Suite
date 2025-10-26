@@ -19,7 +19,6 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Badge } from "@/Components/ui/badge";
-import Pagination from "@/Components/Pagination";
 import ProtectedRoute from "@/Components/ProtectedRoute";
 import { format } from "date-fns";
 import {
@@ -44,10 +43,12 @@ import {
     Timer,
     Download,
     Phone,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 
-export default function Index({ auth, treatments, services, filters }) {
+export default function Index({ auth, treatments, services, filters, stats }) {
     const [search, setSearch] = useState(filters.search || "");
     const [selectedTreatments, setSelectedTreatments] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
@@ -59,6 +60,48 @@ export default function Index({ auth, treatments, services, filters }) {
         sort_by: filters.sort_by || "created_at",
         sort_direction: filters.sort_direction || "desc",
     });
+
+    // Pagination helper function
+    const getPageNumbers = () => {
+        if (!treatments?.last_page) return [];
+
+        const currentPage = treatments.current_page || 1;
+        const lastPage = treatments.last_page;
+        const pageNumbers = [];
+
+        // Always show first page and last page
+        pageNumbers.push(1);
+
+        // Calculate start and end of page range
+        let start = Math.max(2, currentPage - 1);
+        let end = Math.min(lastPage - 1, currentPage + 1);
+
+        // If current page is near the start
+        if (currentPage <= 3) {
+            start = 2;
+            end = Math.min(5, lastPage - 1);
+        }
+
+        // If current page is near the end
+        if (currentPage >= lastPage - 2) {
+            start = Math.max(2, lastPage - 4);
+            end = lastPage - 1;
+        }
+
+        // Add pages between start and end
+        for (let i = start; i <= end; i++) {
+            if (!pageNumbers.includes(i)) {
+                pageNumbers.push(i);
+            }
+        }
+
+        // Add last page if not already included
+        if (lastPage > 1 && !pageNumbers.includes(lastPage)) {
+            pageNumbers.push(lastPage);
+        }
+
+        return pageNumbers;
+    };
 
     // Clear selection when bulk actions are hidden
     const toggleBulkActions = () => {
@@ -73,7 +116,7 @@ export default function Index({ auth, treatments, services, filters }) {
     const performSearch = (query) => {
         router.reload({
             data: { search: query },
-            only: ["treatments", "filters"],
+            only: ["treatments", "filters", "stats"],
             preserveState: true,
             replace: true,
         });
@@ -95,7 +138,7 @@ export default function Index({ auth, treatments, services, filters }) {
         setFilterState(newFilters);
         router.reload({
             data: newFilters,
-            only: ["treatments", "filters"],
+            only: ["treatments", "filters", "stats"],
             preserveState: true,
             replace: true,
         });
@@ -117,7 +160,7 @@ export default function Index({ auth, treatments, services, filters }) {
         setFilterState(newFilters);
         router.reload({
             data: newFilters,
-            only: ["treatments", "filters"],
+            only: ["treatments", "filters", "stats"],
             preserveState: true,
             replace: true,
         });
@@ -167,7 +210,7 @@ export default function Index({ auth, treatments, services, filters }) {
                 sort_by: "created_at",
                 sort_direction: "desc",
             },
-            only: ["treatments", "filters"],
+            only: ["treatments", "filters", "stats"],
             preserveState: true,
             replace: true,
         });
@@ -352,28 +395,30 @@ export default function Index({ auth, treatments, services, filters }) {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-6 -mt-0 pb-12">
+                <div className="max-w-7xl mx-auto px-6 -mt-18 pb-12">
                     {/* Enhanced Key Metrics Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <Stethoscope className="h-7 w-7 text-white" />
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <Stethoscope className="h-6 w-6 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Total Treatments
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
+                                            Total
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {treatments.total || 0}
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
+                                            {stats?.total_treatments ||
+                                                treatments.total ||
+                                                0}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-blue-600 font-medium">
-                                                All time records
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-blue-600 font-medium truncate">
+                                                All treatments
                                             </span>
                                         </div>
                                     </div>
@@ -384,24 +429,22 @@ export default function Index({ auth, treatments, services, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-green-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <CheckCircle className="h-7 w-7 text-white" />
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <CheckCircle className="h-6 w-6 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             Completed
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {treatments.data?.filter(
-                                                (t) => t.status === "completed"
-                                            ).length || 0}
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
+                                            {stats?.completed || 0}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-green-600 font-medium">
-                                                Successfully treated
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-green-600 font-medium truncate">
+                                                Done
                                             </span>
                                         </div>
                                     </div>
@@ -412,25 +455,50 @@ export default function Index({ auth, treatments, services, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-yellow-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <Timer className="h-7 w-7 text-white" />
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <Timer className="h-6 w-6 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             In Progress
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                                            {treatments.data?.filter(
-                                                (t) =>
-                                                    t.status === "in_progress"
-                                            ).length || 0}
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
+                                            {stats?.in_progress || 0}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-yellow-600 font-medium">
-                                                Currently active
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-yellow-600 font-medium truncate">
+                                                Ongoing
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-emerald-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <DollarSign className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
+                                            Paid
+                                        </p>
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
+                                            {stats?.paid ||
+                                                stats?.completed ||
+                                                0}
+                                        </p>
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-emerald-600 font-medium truncate">
+                                                Fully paid
                                             </span>
                                         </div>
                                     </div>
@@ -441,38 +509,25 @@ export default function Index({ auth, treatments, services, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-green-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-6 relative">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-4 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <DollarSign className="h-7 w-7 text-white" />
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <DollarSign className="h-6 w-6 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             Revenue
                                         </p>
-                                        <p className="text-3xl font-bold text-gray-900 mb-2">
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             ₱
-                                            {treatments.data
-                                                ?.filter(
-                                                    (t) =>
-                                                        t.payment_status ===
-                                                        "completed"
-                                                )
-                                                ?.reduce(
-                                                    (sum, t) =>
-                                                        sum +
-                                                        (parseFloat(
-                                                            t.total_cost ||
-                                                                t.cost
-                                                        ) || 0),
-                                                    0
-                                                )
-                                                .toLocaleString() || 0}
+                                            {(
+                                                stats?.revenue || 0
+                                            ).toLocaleString()}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-green-600 font-medium">
-                                                From completed payments
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-green-600 font-medium truncate">
+                                                Total income
                                             </span>
                                         </div>
                                     </div>
@@ -602,7 +657,7 @@ export default function Index({ auth, treatments, services, filters }) {
                                                         Partial
                                                     </SelectItem>
                                                     <SelectItem value="completed">
-                                                        Completed
+                                                        Paid
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -1116,12 +1171,121 @@ export default function Index({ auth, treatments, services, filters }) {
                                 </Table>
                             </div>
 
-                            {/* Enhanced Pagination */}
-                            {treatments.data.length > 0 && treatments.links && (
-                                <div className="px-6 py-4 border-t border-gray-200 bg-gray-50/50">
-                                    <Pagination links={treatments.links} />
-                                </div>
-                            )}
+                            {/* Pagination */}
+                            {treatments.data.length > 0 &&
+                                treatments.last_page > 1 && (
+                                    <div className="mt-6 flex items-center justify-between px-6 py-4">
+                                        <div className="text-sm text-gray-700">
+                                            Showing {treatments.from} to{" "}
+                                            {treatments.to} of{" "}
+                                            {treatments.total} results
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            {/* Previous Button */}
+                                            {treatments?.links?.find((link) =>
+                                                link.label?.includes("Previous")
+                                            )?.url ? (
+                                                <Link
+                                                    href={
+                                                        treatments.links.find(
+                                                            (link) =>
+                                                                link.label?.includes(
+                                                                    "Previous"
+                                                                )
+                                                        ).url
+                                                    }
+                                                    className="px-3 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+                                                >
+                                                    <ChevronLeft className="h-4 w-4" />
+                                                </Link>
+                                            ) : (
+                                                <span className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                                                    <ChevronLeft className="h-4 w-4" />
+                                                </span>
+                                            )}
+
+                                            {/* Page Numbers */}
+                                            {getPageNumbers().map(
+                                                (page, idx) => {
+                                                    const link =
+                                                        treatments.links.find(
+                                                            (l) =>
+                                                                parseInt(
+                                                                    l.label
+                                                                ) === page
+                                                        );
+
+                                                    return (
+                                                        <React.Fragment
+                                                            key={page}
+                                                        >
+                                                            {/* Show ellipsis before if needed */}
+                                                            {idx > 0 &&
+                                                                getPageNumbers()[
+                                                                    idx - 1
+                                                                ] <
+                                                                    page -
+                                                                        1 && (
+                                                                    <span className="px-2 text-gray-400">
+                                                                        ...
+                                                                    </span>
+                                                                )}
+
+                                                            {link?.url ? (
+                                                                <Link
+                                                                    href={
+                                                                        link.url
+                                                                    }
+                                                                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                                                        link.active
+                                                                            ? "bg-blue-600 text-white"
+                                                                            : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                                                                    }`}
+                                                                >
+                                                                    {page}
+                                                                </Link>
+                                                            ) : (
+                                                                <span
+                                                                    className={`px-3 py-2 text-sm font-medium rounded-lg ${
+                                                                        page ===
+                                                                        treatments.current_page
+                                                                            ? "bg-blue-600 text-white"
+                                                                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                                    }`}
+                                                                >
+                                                                    {page}
+                                                                </span>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                }
+                                            )}
+
+                                            {/* Next Button */}
+                                            {treatments?.links?.find((link) =>
+                                                link.label?.includes("Next")
+                                            )?.url ? (
+                                                <Link
+                                                    href={
+                                                        treatments.links.find(
+                                                            (link) =>
+                                                                link.label?.includes(
+                                                                    "Next"
+                                                                )
+                                                        ).url
+                                                    }
+                                                    className="px-3 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+                                                >
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </Link>
+                                            ) : (
+                                                <span className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                         </CardContent>
                     </Card>
                 </div>

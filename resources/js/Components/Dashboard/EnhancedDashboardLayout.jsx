@@ -153,22 +153,28 @@ const EnhancedDashboardLayout = ({
             {/* Enhanced Header */}
             <motion.div variants={itemVariants} className="pt-4 pb-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Card className="border-0 shadow-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 overflow-hidden">
-                        <CardContent className="p-6">
+                    <Card className="relative border-0 shadow-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
+                        {/* Background Decorations */}
+                        <div className="absolute inset-0 bg-black/5"></div>
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12"></div>
+                        <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-10 -translate-x-10"></div>
+                        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white/3 rounded-full -translate-y-8 -translate-x-8"></div>
+
+                        <CardContent className="relative p-6">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-4">
                                     <motion.div
-                                        className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/30"
+                                        className="w-12 h-12 bg-white/25 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-xl border border-white/40"
                                         whileHover={{ scale: 1.05, rotate: 5 }}
                                         transition={{ duration: 0.2 }}
                                     >
-                                        <Activity className="h-7 w-7 text-white" />
+                                        <Activity className="h-6 w-6 text-white" />
                                     </motion.div>
                                     <div>
-                                        <h1 className="text-2xl font-bold text-white drop-shadow-sm">
+                                        <h1 className="text-2xl font-bold text-white mb-1">
                                             {clinic?.name || "Clinic Dashboard"}
                                         </h1>
-                                        <p className="text-white/80 text-sm font-medium">
+                                        <p className="text-blue-100 text-sm font-medium">
                                             Advanced Analytics & Real-time
                                             Insights
                                         </p>

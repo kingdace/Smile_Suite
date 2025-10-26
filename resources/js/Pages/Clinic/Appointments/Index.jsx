@@ -44,11 +44,13 @@ import {
     Package,
     Settings,
     Download,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function Index({ auth, clinic, appointments, filters }) {
+export default function Index({ auth, clinic, appointments, filters, stats }) {
     const [search, setSearch] = useState(filters.search || "");
     const [status, setStatus] = useState(filters.status || "all");
     const [type, setType] = useState(filters.type || "all");
@@ -67,39 +69,63 @@ export default function Index({ auth, clinic, appointments, filters }) {
     const [actionLoading, setActionLoading] = useState(false);
     const [actionError, setActionError] = useState("");
 
-    // Calculate statistics with safety checks
-    const totalAppointments = appointments?.total || 0;
-    const confirmedAppointments =
-        appointments?.data?.filter((apt) => apt.status?.name === "Confirmed")
-            ?.length || 0;
-    const pendingAppointments =
-        appointments?.data?.filter((apt) => apt.status?.name === "Pending")
-            ?.length || 0;
-    const completedAppointments =
-        appointments?.data?.filter((apt) => apt.status?.name === "Completed")
-            ?.length || 0;
-    const cancelledAppointments =
-        appointments?.data?.filter((apt) => apt.status?.name === "Cancelled")
-            ?.length || 0;
+    // Pagination helper function
+    const getPageNumbers = () => {
+        if (!appointments?.last_page) return [];
 
-    // Calculate Online Booking specific statistics
-    const onlineBookings =
-        appointments?.data?.filter((apt) => apt.type?.name === "Online Booking")
-            ?.length || 0;
-    const pendingOnlineBookings =
-        appointments?.data?.filter(
-            (apt) =>
-                apt.type?.name === "Online Booking" &&
-                apt.status?.name === "Pending"
-        )?.length || 0;
-    const patientCancelledOnline =
-        appointments?.data?.filter(
-            (apt) =>
-                apt.type?.name === "Online Booking" &&
-                apt.status?.name === "Cancelled" &&
-                apt.cancelled_at &&
-                apt.cancellation_reason
-        )?.length || 0;
+        const currentPage = appointments.current_page || 1;
+        const lastPage = appointments.last_page;
+        const pageNumbers = [];
+
+        // Always show first page and last page
+        pageNumbers.push(1);
+
+        // Calculate start and end of page range
+        let start = Math.max(2, currentPage - 1);
+        let end = Math.min(lastPage - 1, currentPage + 1);
+
+        // If current page is near the start
+        if (currentPage <= 3) {
+            start = 2;
+            end = Math.min(5, lastPage - 1);
+        }
+
+        // If current page is near the end
+        if (currentPage >= lastPage - 2) {
+            start = Math.max(2, lastPage - 4);
+            end = lastPage - 1;
+        }
+
+        // Add pages between start and end
+        for (let i = start; i <= end; i++) {
+            if (!pageNumbers.includes(i)) {
+                pageNumbers.push(i);
+            }
+        }
+
+        // Add last page if not already included
+        if (lastPage > 1 && !pageNumbers.includes(lastPage)) {
+            pageNumbers.push(lastPage);
+        }
+
+        return pageNumbers;
+    };
+
+    // Use backend-provided statistics (covers all records, not just current page)
+    const totalAppointments =
+        stats?.total_appointments || appointments?.total || 0;
+    const confirmedAppointments = stats?.confirmed || 0;
+    const pendingAppointments = stats?.pending || 0;
+    const completedAppointments = stats?.completed || 0;
+    const cancelledAppointments = stats?.cancelled || 0;
+
+    // Walk-In specific statistics
+    const walkInAppointments = stats?.walk_in_appointments || 0;
+
+    // Online Booking specific statistics
+    const onlineBookings = stats?.online_bookings || 0;
+    const pendingOnlineBookings = stats?.pending_online_bookings || 0;
+    const patientCancelledOnline = stats?.patient_cancelled_online || 0;
 
     // Helper function to get status color
     const getStatusColor = (statusName) => {
@@ -380,24 +406,21 @@ export default function Index({ auth, clinic, appointments, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-4 relative">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <Calendar className="h-6 w-6 text-white" />
+                            <CardContent className="p-3 relative">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        <Calendar className="h-5 w-5 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs text-gray-600 font-medium mb-1">
-                                            Total Appointments
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-tight">
+                                            Total
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900 mb-1">
+                                        <p className="text-xl font-bold text-gray-900 mb-0.5 leading-none">
                                             {totalAppointments}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-blue-600 font-medium">
-                                                All appointments
-                                            </span>
-                                        </div>
+                                        <span className="text-[10px] text-blue-600 font-medium">
+                                            All Appointments
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -406,24 +429,21 @@ export default function Index({ auth, clinic, appointments, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-green-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-4 relative">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <CheckCircle className="h-6 w-6 text-white" />
+                            <CardContent className="p-3 relative">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        <CheckCircle className="h-5 w-5 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs text-gray-600 font-medium mb-1">
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-tight">
                                             Confirmed
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900 mb-1">
+                                        <p className="text-xl font-bold text-gray-900 mb-0.5 leading-none">
                                             {confirmedAppointments}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-green-600 font-medium">
-                                                Ready to proceed
-                                            </span>
-                                        </div>
+                                        <span className="text-[10px] text-green-600 font-medium">
+                                            Ready to Proceed
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -432,24 +452,21 @@ export default function Index({ auth, clinic, appointments, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-yellow-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-4 relative">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <Clock className="h-6 w-6 text-white" />
+                            <CardContent className="p-3 relative">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        <Clock className="h-5 w-5 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs text-gray-600 font-medium mb-1">
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-tight">
                                             Pending
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900 mb-1">
+                                        <p className="text-xl font-bold text-gray-900 mb-0.5 leading-none">
                                             {pendingAppointments}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-yellow-600 font-medium">
-                                                Awaiting approval
-                                            </span>
-                                        </div>
+                                        <span className="text-[10px] text-yellow-600 font-medium">
+                                            Awaiting Approval
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -458,50 +475,44 @@ export default function Index({ auth, clinic, appointments, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-emerald-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-4 relative">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <Activity className="h-6 w-6 text-white" />
+                            <CardContent className="p-3 relative">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        <Activity className="h-5 w-5 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs text-gray-600 font-medium mb-1">
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-tight">
                                             Completed
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900 mb-1">
+                                        <p className="text-xl font-bold text-gray-900 mb-0.5 leading-none">
                                             {completedAppointments}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-emerald-600 font-medium">
-                                                Successfully done
-                                            </span>
-                                        </div>
+                                        <span className="text-[10px] text-emerald-600 font-medium">
+                                            Successfully Done
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-red-100/50">
-                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-500 to-red-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-4 relative">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-gradient-to-br from-red-500 via-red-600 to-pink-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <XCircle className="h-6 w-6 text-white" />
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-purple-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-3 relative">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        <User className="h-5 w-5 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs text-gray-600 font-medium mb-1">
-                                            Cancelled
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-tight">
+                                            Walk-In
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900 mb-1">
-                                            {cancelledAppointments}
+                                        <p className="text-xl font-bold text-gray-900 mb-0.5 leading-none">
+                                            {walkInAppointments}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-red-600 font-medium">
-                                                Cancelled appointments
-                                            </span>
-                                        </div>
+                                        <span className="text-[10px] text-purple-600 font-medium">
+                                            Direct Appointments
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -511,34 +522,22 @@ export default function Index({ auth, clinic, appointments, filters }) {
                         <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-cyan-100/50">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
                             <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
-                            <CardContent className="p-4 relative">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                        <CalendarClock className="h-6 w-6 text-white" />
+                            <CardContent className="p-3 relative">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-gradient-to-br from-cyan-500 via-cyan-600 to-blue-600 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                                        <CalendarClock className="h-5 w-5 text-white" />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-xs text-gray-600 font-medium mb-1">
-                                            Online Bookings
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-tight">
+                                            Online
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900 mb-1">
+                                        <p className="text-xl font-bold text-gray-900 mb-0.5 leading-none">
                                             {onlineBookings}
                                         </p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                                            <span className="text-xs text-cyan-600 font-medium">
-                                                {pendingOnlineBookings} pending
-                                                approval
-                                            </span>
-                                        </div>
-                                        {patientCancelledOnline > 0 && (
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                                                <span className="text-xs text-orange-600 font-medium">
-                                                    {patientCancelledOnline}{" "}
-                                                    patient cancelled
-                                                </span>
-                                            </div>
-                                        )}
+                                        <span className="text-[10px] text-cyan-600 font-medium">
+                                            {pendingOnlineBookings} pending
+                                            approval
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -1066,30 +1065,99 @@ export default function Index({ auth, clinic, appointments, filters }) {
                                     {appointments.to} of {appointments.total}{" "}
                                     results
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    {appointments?.links?.map((link, index) =>
-                                        link.url ? (
-                                            <Link
-                                                key={index}
-                                                href={link.url}
-                                                className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                                                    link.active
-                                                        ? "bg-blue-600 text-white"
-                                                        : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-                                                }`}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: link.label,
-                                                }}
-                                            />
-                                        ) : (
-                                            <span
-                                                key={index}
-                                                className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: link.label,
-                                                }}
-                                            />
-                                        )
+                                <div className="flex items-center gap-1">
+                                    {/* Previous Button */}
+                                    {appointments?.links?.find((link) =>
+                                        link.label?.includes("Previous")
+                                    )?.url ? (
+                                        <Link
+                                            href={
+                                                appointments.links.find(
+                                                    (link) =>
+                                                        link.label?.includes(
+                                                            "Previous"
+                                                        )
+                                                ).url
+                                            }
+                                            className="px-3 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+                                        >
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </Link>
+                                    ) : (
+                                        <span className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </span>
+                                    )}
+
+                                    {/* Page Numbers */}
+                                    {getPageNumbers().map((page, idx) => {
+                                        const isFirstPage = page === 1;
+                                        const isLastPage =
+                                            page === appointments.last_page;
+                                        const currentPage =
+                                            appointments.current_page;
+                                        const link = appointments.links.find(
+                                            (l) => parseInt(l.label) === page
+                                        );
+
+                                        return (
+                                            <React.Fragment key={page}>
+                                                {/* Show ellipsis before if needed */}
+                                                {idx > 0 &&
+                                                    getPageNumbers()[idx - 1] <
+                                                        page - 1 && (
+                                                        <span className="px-2 text-gray-400">
+                                                            ...
+                                                        </span>
+                                                    )}
+
+                                                {link?.url ? (
+                                                    <Link
+                                                        href={link.url}
+                                                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                                            link.active
+                                                                ? "bg-blue-600 text-white"
+                                                                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                                                        }`}
+                                                    >
+                                                        {page}
+                                                    </Link>
+                                                ) : (
+                                                    <span
+                                                        className={`px-3 py-2 text-sm font-medium rounded-lg ${
+                                                            page === currentPage
+                                                                ? "bg-blue-600 text-white"
+                                                                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        }`}
+                                                    >
+                                                        {page}
+                                                    </span>
+                                                )}
+                                            </React.Fragment>
+                                        );
+                                    })}
+
+                                    {/* Next Button */}
+                                    {appointments?.links?.find((link) =>
+                                        link.label?.includes("Next")
+                                    )?.url ? (
+                                        <Link
+                                            href={
+                                                appointments.links.find(
+                                                    (link) =>
+                                                        link.label?.includes(
+                                                            "Next"
+                                                        )
+                                                ).url
+                                            }
+                                            className="px-3 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+                                        >
+                                            <ChevronRight className="h-4 w-4" />
+                                        </Link>
+                                    ) : (
+                                        <span className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                                            <ChevronRight className="h-4 w-4" />
+                                        </span>
                                     )}
                                 </div>
                             </div>

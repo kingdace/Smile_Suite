@@ -201,6 +201,19 @@ class PaymentController extends Controller
                 if ($totalPaid >= $totalCost) {
                     $treatment->update(['payment_status' => 'completed']);
 
+                    // Auto-update treatment status to "completed" when fully paid
+                    if ($treatment->status !== 'completed') {
+                        $treatment->update(['status' => 'completed']);
+
+                        \Illuminate\Support\Facades\Log::info('Treatment status auto-updated to Completed due to full payment', [
+                            'treatment_id' => $treatment->id,
+                            'treatment_name' => $treatment->name,
+                            'total_paid' => $totalPaid,
+                            'total_cost' => $totalCost,
+                            'payment_id' => $payment->id
+                        ]);
+                    }
+
                     // Auto-update appointment status to "Completed" if treatment is completed and fully paid
                     if ($treatment->status === 'completed' && $treatment->appointment_id) {
                         $appointment = \App\Models\Appointment::find($treatment->appointment_id);
@@ -299,6 +312,50 @@ class PaymentController extends Controller
 
         $validated['currency'] = $validated['currency'] ?? 'PHP';
         $payment->update($validated);
+
+        // Update treatment payment status if payment is linked to a treatment
+        if ($payment->treatment_id && $payment->status === 'completed') {
+            $treatment = Treatment::find($payment->treatment_id);
+            if ($treatment) {
+                // Calculate total paid amount for this treatment
+                $totalPaid = $clinic->payments()
+                    ->where('treatment_id', $treatment->id)
+                    ->where('status', 'completed')
+                    ->sum('amount');
+
+                $totalCost = $treatment->cost + ($treatment->inventoryItems->sum('total_cost') ?? 0);
+
+                // Update treatment payment status based on total paid
+                if ($totalPaid >= $totalCost) {
+                    $treatment->update(['payment_status' => 'completed']);
+
+                    // Auto-update treatment status to "completed" when fully paid
+                    if ($treatment->status !== 'completed') {
+                        $treatment->update(['status' => 'completed']);
+
+                        \Illuminate\Support\Facades\Log::info('Treatment status auto-updated to Completed due to full payment (update)', [
+                            'treatment_id' => $treatment->id,
+                            'treatment_name' => $treatment->name,
+                            'total_paid' => $totalPaid,
+                            'total_cost' => $totalCost,
+                            'payment_id' => $payment->id
+                        ]);
+                    }
+
+                    // Auto-update appointment status to "Completed" if treatment is completed and fully paid
+                    if ($treatment->status === 'completed' && $treatment->appointment_id) {
+                        $appointment = \App\Models\Appointment::find($treatment->appointment_id);
+                        if ($appointment && $appointment->appointment_status_id != 3) { // 3 = "Completed" status
+                            $appointment->update(['appointment_status_id' => 3]);
+                        }
+                    }
+                } elseif ($totalPaid > 0) {
+                    $treatment->update(['payment_status' => 'partial']);
+                } else {
+                    $treatment->update(['payment_status' => 'pending']);
+                }
+            }
+        }
 
         return redirect()->route('clinic.payments.show', [$clinic->id, $payment->id])
             ->with('success', 'Payment updated successfully.');

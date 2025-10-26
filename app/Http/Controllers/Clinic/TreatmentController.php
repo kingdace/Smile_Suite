@@ -98,6 +98,59 @@ class TreatmentController extends Controller
             return $treatment;
         });
 
+        // Calculate statistics for ALL treatments (not just current page)
+        // Use a fresh query without pagination to get complete stats
+        $statsQuery = Treatment::where('clinic_id', $clinicId);
+
+        // Apply the same filters but without pagination for accurate stats
+        if ($request->filled('search')) {
+            $statsQuery->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%')
+                  ->orWhere('notes', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('patient', function($patientQuery) use ($request) {
+                      $patientQuery->where('first_name', 'like', '%' . $request->search . '%')
+                                  ->orWhere('last_name', 'like', '%' . $request->search . '%');
+                  })
+                  ->orWhereHas('dentist', function($dentistQuery) use ($request) {
+                      $dentistQuery->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        if ($request->filled('service_id') && $request->service_id !== 'all') {
+            $statsQuery->where('service_id', $request->service_id);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $statsQuery->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_status') && $request->payment_status !== 'all') {
+            $statsQuery->where('payment_status', $request->payment_status);
+        }
+
+        // Get all matching treatments with inventory for accurate calculations
+        $allTreatments = $statsQuery->with(['inventoryItems'])->get();
+
+        // Calculate statistics
+        $stats = [
+            'total_treatments' => $allTreatments->count(),
+            'completed' => $allTreatments->where('status', 'completed')->count(),
+            'in_progress' => $allTreatments->where('status', 'in_progress')->count(),
+            'scheduled' => $allTreatments->where('status', 'scheduled')->count(),
+            'cancelled' => $allTreatments->where('status', 'cancelled')->count(),
+            'paid' => $allTreatments->where('payment_status', 'completed')->count(),
+            'revenue' => 0,
+        ];
+
+        // Calculate revenue from completed payments
+        foreach ($allTreatments->where('payment_status', 'completed') as $treatment) {
+            $serviceCost = $treatment->cost ?? 0;
+            $inventoryCost = $treatment->inventoryItems->sum('total_cost') ?? 0;
+            $stats['revenue'] += ($serviceCost + $inventoryCost);
+        }
+
         // Get clinic services for filtering
         $services = Auth::user()->clinic->services()
                           ->where('is_active', true)
@@ -107,6 +160,7 @@ class TreatmentController extends Controller
         return Inertia::render('Clinic/Treatments/Index', [
             'treatments' => $treatments,
             'services' => $services,
+            'stats' => $stats,
             'filters' => $request->only(['search', 'service_id', 'status', 'payment_status', 'sort_by', 'sort_direction'])
         ]);
     }

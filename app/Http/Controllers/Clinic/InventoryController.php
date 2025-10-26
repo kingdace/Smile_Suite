@@ -70,9 +70,58 @@ class InventoryController extends Controller
 
         $inventory = $query->paginate(15);
 
+        // Calculate statistics for ALL inventory items (not just current page)
+        // Use a fresh query without pagination to get complete stats
+        $statsQuery = $clinic->inventory();
+
+        // Apply the same filters but without pagination for accurate stats
+        if ($request->search) {
+            $statsQuery->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->category) {
+            $statsQuery->where('category', $request->category);
+        }
+
+        if ($request->stock_filter) {
+            switch ($request->stock_filter) {
+                case 'in_stock':
+                    $statsQuery->where('quantity', '>', 0)
+                          ->whereRaw('quantity > minimum_quantity');
+                    break;
+                case 'low_stock':
+                    $statsQuery->whereRaw('quantity <= minimum_quantity AND quantity > 0');
+                    break;
+                case 'out_of_stock':
+                    $statsQuery->where('quantity', '<=', 0);
+                    break;
+            }
+        }
+
+        // Get all matching inventory items for statistics
+        $allInventory = $statsQuery->get();
+
+        // Calculate statistics
+        $stats = [
+            'total_items' => $allInventory->count(),
+            'low_stock_items' => $allInventory->filter(function($item) {
+                return $item->quantity <= $item->minimum_quantity && $item->quantity > 0;
+            })->count(),
+            'out_of_stock_items' => $allInventory->filter(function($item) {
+                return $item->quantity <= 0;
+            })->count(),
+            'total_value' => $allInventory->sum(function($item) {
+                return $item->quantity * (float)$item->unit_price;
+            }),
+        ];
+
         return Inertia::render('Clinic/Inventory/Index', [
             'clinic' => $clinic,
             'inventory' => $inventory,
+            'stats' => $stats,
             'filters' => $request->only(['search', 'category', 'stock_filter']),
         ]);
     }

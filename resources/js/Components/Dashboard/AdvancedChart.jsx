@@ -234,6 +234,8 @@ const AdvancedChart = ({
                     borderWidth: 0,
                     keys: ["y"], // Use 'y' as the value key
                     indexBy: "x", // Use 'x' as the index key
+                    minValue: 0,
+                    padding: 0.1, // Add padding between bars
                 };
             case "pie":
                 return {
@@ -262,13 +264,65 @@ const AdvancedChart = ({
         }
     };
 
-    const chartConfig = useMemo(
-        () => ({
-            ...getDefaultConfig(activeChart),
+    // Calculate dynamic values for bar charts
+    const barChartMaxValue = useMemo(() => {
+        if (
+            activeChart === "bar" &&
+            validatedData &&
+            Array.isArray(validatedData)
+        ) {
+            const maxValue = Math.max(...validatedData.map((d) => d.y || 0), 0);
+            return maxValue > 0 ? maxValue : null;
+        }
+        return null;
+    }, [activeChart, validatedData]);
+
+    const chartConfig = useMemo(() => {
+        const baseConfig = getDefaultConfig(activeChart);
+
+        // Add dynamic bar chart configurations if needed
+        if (activeChart === "bar" && barChartMaxValue !== null) {
+            // Determine if this is Revenue chart (has peso symbol) or Appointments chart (numbers only)
+            const isRevenueChart = title?.toLowerCase().includes("revenue");
+
+            return {
+                ...baseConfig,
+                // Add more padding to the top for better visualization
+                maxValue: barChartMaxValue * 1.3,
+                // Add minimum height to ensure bars are tall enough for labels
+                // Use 20% of max value to ensure even the smallest bars are very visible
+                minValue: barChartMaxValue > 0 ? -barChartMaxValue * 0.2 : 0,
+                // Enable labels with conditional formatting
+                label: (d) => {
+                    if (isRevenueChart) {
+                        // For Revenue: show peso symbol
+                        return d.value > 1000
+                            ? `₱${(d.value / 1000).toFixed(1)}k`
+                            : `₱${d.value.toFixed(0)}`;
+                    } else {
+                        // For Appointments: show numbers only
+                        return d.value.toString();
+                    }
+                },
+                // Show labels on all bars regardless of size
+                labelSkipWidth: 0,
+                labelSkipHeight: 0,
+                // Add border to ensure bars are visible even when very small
+                borderWidth: 1,
+                borderColor: colors[0],
+                // Add custom label positioning
+                labelTextColor: "white",
+                labelPosition: "insideTop",
+                // Add padding to prevent clipping
+                valueScale: { type: "linear", min: "auto", max: "auto" },
+            };
+        }
+
+        return {
+            ...baseConfig,
             ...chartProps,
-        }),
-        [activeChart, chartProps, colors, colorScheme]
-    );
+        };
+    }, [activeChart, chartProps, colors, colorScheme, barChartMaxValue, title]);
 
     return (
         <motion.div

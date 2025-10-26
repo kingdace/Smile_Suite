@@ -67,13 +67,80 @@ class AppointmentController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Calculate statistics for ALL appointments (not just current page)
+        // Use a fresh query without pagination to get complete stats
+        $statsQuery = $clinic->appointments()->with(['patient', 'type', 'status', 'assignedDentist', 'service']);
+
+        // Apply the same filters but without pagination for accurate stats
+        $statsQuery->when($request->input('search'), function ($query, $search) {
+            $query->whereHas('patient', function ($query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%");
+            });
+        });
+
+        $statsQuery->when($request->input('status'), function ($query, $status) {
+            $query->whereHas('status', function ($query) use ($status) {
+                $query->where('name', $status);
+            });
+        });
+
+        $statsQuery->when($request->input('type'), function ($query, $type) {
+            $query->whereHas('type', function ($query) use ($type) {
+                $query->where('name', $type);
+            });
+        });
+
+        $statsQuery->when($request->input('date'), function ($query, $date) {
+            $query->whereDate('scheduled_at', $date);
+        });
+
+        // Get all matching appointments for statistics
+        $allAppointments = $statsQuery->get();
+
+        // Calculate statistics
+        $stats = [
+            'total_appointments' => $allAppointments->count(),
+            'confirmed' => $allAppointments->filter(function($apt) {
+                return $apt->status && $apt->status->name === 'Confirmed';
+            })->count(),
+            'pending' => $allAppointments->filter(function($apt) {
+                return $apt->status && $apt->status->name === 'Pending';
+            })->count(),
+            'completed' => $allAppointments->filter(function($apt) {
+                return $apt->status && $apt->status->name === 'Completed';
+            })->count(),
+            'cancelled' => $allAppointments->filter(function($apt) {
+                return $apt->status && $apt->status->name === 'Cancelled';
+            })->count(),
+            'walk_in_appointments' => $allAppointments->filter(function($apt) {
+                return $apt->type && $apt->type->name === 'Walk-In';
+            })->count(),
+            'online_bookings' => $allAppointments->filter(function($apt) {
+                return $apt->type && $apt->type->name === 'Online Booking';
+            })->count(),
+            'pending_online_bookings' => $allAppointments->filter(function($apt) {
+                return $apt->type && $apt->type->name === 'Online Booking' &&
+                       $apt->status && $apt->status->name === 'Pending';
+            })->count(),
+            'patient_cancelled_online' => $allAppointments->filter(function($apt) {
+                return $apt->type && $apt->type->name === 'Online Booking' &&
+                       $apt->status && $apt->status->name === 'Cancelled' &&
+                       $apt->cancelled_at && $apt->cancellation_reason;
+            })->count(),
+        ];
+
         Log::info('Appointments data for Index page', [
-            'appointments_data' => $appointments->toArray()
+            'appointments_data' => $appointments->toArray(),
+            'stats' => $stats,
         ]);
 
         return Inertia::render('Clinic/Appointments/Index', [
             'clinic' => $clinic,
             'appointments' => $appointments,
+            'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'type', 'date']),
         ]);
     }

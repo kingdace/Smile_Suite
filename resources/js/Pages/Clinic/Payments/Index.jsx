@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import ProtectedRoute from "@/Components/ProtectedRoute";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -52,6 +52,8 @@ import {
     MoreHorizontal,
     ChevronDown,
     ChevronUp,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 
 export default function Index({
@@ -68,6 +70,48 @@ export default function Index({
     const [selectedPayments, setSelectedPayments] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [showBulkActions, setShowBulkActions] = useState(false);
+
+    // Pagination helper function
+    const getPageNumbers = () => {
+        if (!payments?.last_page) return [];
+
+        const currentPage = payments.current_page || 1;
+        const lastPage = payments.last_page;
+        const pageNumbers = [];
+
+        // Always show first page and last page
+        pageNumbers.push(1);
+
+        // Calculate start and end of page range
+        let start = Math.max(2, currentPage - 1);
+        let end = Math.min(lastPage - 1, currentPage + 1);
+
+        // If current page is near the start
+        if (currentPage <= 3) {
+            start = 2;
+            end = Math.min(5, lastPage - 1);
+        }
+
+        // If current page is near the end
+        if (currentPage >= lastPage - 2) {
+            start = Math.max(2, lastPage - 4);
+            end = lastPage - 1;
+        }
+
+        // Add pages between start and end
+        for (let i = start; i <= end; i++) {
+            if (!pageNumbers.includes(i)) {
+                pageNumbers.push(i);
+            }
+        }
+
+        // Add last page if not already included
+        if (lastPage > 1 && !pageNumbers.includes(lastPage)) {
+            pageNumbers.push(lastPage);
+        }
+
+        return pageNumbers;
+    };
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [filterState, setFilterState] = useState({
         status: filters.status || "",
@@ -423,84 +467,116 @@ export default function Index({
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-8 mt-6 pb-16">
-                    {/* Key Metrics Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-blue-100/30">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">
+                <div className="max-w-7xl mx-auto px-6 -mt-18 pb-16">
+                    {/* Enhanced Key Metrics Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-blue-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <DollarSign className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             Total Revenue
                                         </p>
-                                        <p className="text-3xl font-bold text-blue-600">
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             {formatCurrency(
                                                 summary.total_revenue
                                             )}
                                         </p>
-                                    </div>
-                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                                        <DollarSign className="h-6 w-6 text-blue-600" />
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-blue-600 font-medium truncate">
+                                                All time revenue
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-green-100/30">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-green-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <BarChart2 className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             Total Balance
                                         </p>
-                                        <p className="text-3xl font-bold text-green-600">
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             {formatCurrency(
                                                 summary.total_balance
                                             )}
                                         </p>
-                                    </div>
-                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                        <BarChart2 className="h-6 w-6 text-green-600" />
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-green-600 font-medium truncate">
+                                                Current balance
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-purple-100/30">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-purple-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-purple-500 via-purple-600 to-violet-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <TrendingUp className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             This Month
                                         </p>
-                                        <p className="text-3xl font-bold text-purple-600">
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             {formatCurrency(
                                                 summary.payments_this_month
                                             )}
                                         </p>
-                                    </div>
-                                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                                        <TrendingUp className="h-6 w-6 text-purple-600" />
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-purple-600 font-medium truncate">
+                                                This month
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm overflow-hidden border border-orange-100/30">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-600">
+                        <Card className="group border-0 shadow-xl bg-white/90 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-orange-100/50">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                            <CardContent className="p-5 relative">
+                                <div className="flex flex-col items-center gap-3 text-center">
+                                    <div className="p-3 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
+                                        <Clock className="h-6 w-6 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
                                             Pending
                                         </p>
-                                        <p className="text-3xl font-bold text-orange-600">
+                                        <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             {formatCurrency(
                                                 summary.pending_payments
                                             )}
                                         </p>
-                                    </div>
-                                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                                        <Clock className="h-6 w-6 text-orange-600" />
+                                        <div className="flex items-center justify-center gap-1">
+                                            <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse"></div>
+                                            <span className="text-[10px] text-orange-600 font-medium truncate">
+                                                Awaiting payment
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
@@ -1289,7 +1365,7 @@ export default function Index({
                             </Card>
 
                             {/* Enhanced Pagination */}
-                            {payments.links && (
+                            {payments.links && payments.last_page > 1 && (
                                 <div className="px-6 py-4 bg-gradient-to-r from-gray-50 via-blue-50/20 to-indigo-50/10 border-t border-gray-200/70">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
@@ -1308,40 +1384,115 @@ export default function Index({
                                                 </span>{" "}
                                                 payments
                                             </div>
-                                            <div className="text-sm text-gray-500">
-                                                Page{" "}
-                                                {payments.current_page || 1} of{" "}
-                                                {payments.last_page || 1}
-                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {payments.links.map((link, index) =>
-                                                link.url ? (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() =>
-                                                            router.visit(
-                                                                link.url
-                                                            )
-                                                        }
-                                                        className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                                            link.active
-                                                                ? "bg-blue-600 text-white"
-                                                                : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
-                                                        }`}
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: link.label,
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <span
-                                                        key={index}
-                                                        className="px-3 py-2 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: link.label,
-                                                        }}
-                                                    />
-                                                )
+                                        <div className="flex items-center gap-1">
+                                            {/* Previous Button */}
+                                            {payments.links.find((link) =>
+                                                link.label?.includes("Previous")
+                                            )?.url ? (
+                                                <button
+                                                    onClick={() =>
+                                                        router.visit(
+                                                            payments.links.find(
+                                                                (link) =>
+                                                                    link.label?.includes(
+                                                                        "Previous"
+                                                                    )
+                                                            ).url
+                                                        )
+                                                    }
+                                                    className="px-3 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+                                                >
+                                                    <ChevronLeft className="h-4 w-4" />
+                                                </button>
+                                            ) : (
+                                                <span className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                                                    <ChevronLeft className="h-4 w-4" />
+                                                </span>
+                                            )}
+
+                                            {/* Page Numbers */}
+                                            {getPageNumbers().map(
+                                                (page, idx) => {
+                                                    const link =
+                                                        payments.links.find(
+                                                            (l) =>
+                                                                parseInt(
+                                                                    l.label
+                                                                ) === page
+                                                        );
+
+                                                    return (
+                                                        <React.Fragment
+                                                            key={page}
+                                                        >
+                                                            {/* Show ellipsis before if needed */}
+                                                            {idx > 0 &&
+                                                                getPageNumbers()[
+                                                                    idx - 1
+                                                                ] <
+                                                                    page -
+                                                                        1 && (
+                                                                    <span className="px-2 text-gray-400">
+                                                                        ...
+                                                                    </span>
+                                                                )}
+
+                                                            {link?.url ? (
+                                                                <button
+                                                                    onClick={() =>
+                                                                        router.visit(
+                                                                            link.url
+                                                                        )
+                                                                    }
+                                                                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                                                        link.active
+                                                                            ? "bg-blue-600 text-white"
+                                                                            : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                                                                    }`}
+                                                                >
+                                                                    {page}
+                                                                </button>
+                                                            ) : (
+                                                                <span
+                                                                    className={`px-3 py-2 text-sm font-medium rounded-lg ${
+                                                                        page ===
+                                                                        payments.current_page
+                                                                            ? "bg-blue-600 text-white"
+                                                                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                                    }`}
+                                                                >
+                                                                    {page}
+                                                                </span>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                }
+                                            )}
+
+                                            {/* Next Button */}
+                                            {payments.links.find((link) =>
+                                                link.label?.includes("Next")
+                                            )?.url ? (
+                                                <button
+                                                    onClick={() =>
+                                                        router.visit(
+                                                            payments.links.find(
+                                                                (link) =>
+                                                                    link.label?.includes(
+                                                                        "Next"
+                                                                    )
+                                                            ).url
+                                                        )
+                                                    }
+                                                    className="px-3 py-2 text-sm font-medium rounded-lg bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 transition-all duration-200"
+                                                >
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </button>
+                                            ) : (
+                                                <span className="px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed">
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </span>
                                             )}
                                         </div>
                                     </div>
