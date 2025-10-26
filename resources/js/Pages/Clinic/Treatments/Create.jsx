@@ -102,6 +102,7 @@ export default function Create({
     const [showTemplates, setShowTemplates] = useState(false);
     const [showDentalChartModal, setShowDentalChartModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handlePatientSelect = (patient) => {
         setSelectedPatient(patient);
@@ -143,6 +144,16 @@ export default function Create({
 
     const submit = (e) => {
         e.preventDefault();
+
+        // Prevent multiple submissions
+        if (isSubmitting || processing) {
+            console.log(
+                "Submission already in progress, ignoring duplicate submit"
+            );
+            return;
+        }
+
+        setIsSubmitting(true);
         console.log(
             "Submitting treatment with appointment_id:",
             data.appointment_id
@@ -210,9 +221,14 @@ export default function Create({
                 forceFormData: true,
                 onSuccess: () => {
                     console.log("Treatment created successfully");
+                    setIsSubmitting(false);
                 },
                 onError: (errors) => {
                     console.error("Errors:", errors);
+                    setIsSubmitting(false);
+                },
+                onFinish: () => {
+                    setIsSubmitting(false);
                 },
             }
         );
@@ -1911,10 +1927,10 @@ export default function Create({
                                     </Link>
                                     <Button
                                         type="submit"
-                                        disabled={processing}
-                                        className="inline-flex items-center px-8 py-3 bg-blue-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-wider shadow-md hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        disabled={processing || isSubmitting}
+                                        className="inline-flex items-center px-8 py-3 bg-blue-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-wider shadow-md hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {processing && (
+                                        {(processing || isSubmitting) && (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         )}
                                         <Save className="h-4 w-4 mr-2" />

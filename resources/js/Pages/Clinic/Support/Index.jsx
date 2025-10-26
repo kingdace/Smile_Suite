@@ -63,6 +63,7 @@ import SupportTicketForm from "@/Components/SupportTicketForm";
 export default function Index({ auth, tickets, stats, filters }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showEditModal, setShowEditModal] = useState(null);
+    const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
     const [searchTerm, setSearchTerm] = useState(filters?.search || "");
     const [statusFilter, setStatusFilter] = useState(filters?.status || "all");
     const [priorityFilter, setPriorityFilter] = useState(
@@ -180,6 +181,15 @@ export default function Index({ auth, tickets, stats, filters }) {
     const handleEditSubmit = (e) => {
         e.preventDefault();
 
+        // Prevent multiple submissions
+        if (isSubmittingEdit || editProcessing) {
+            console.log(
+                "Edit submission already in progress, ignoring duplicate submit"
+            );
+            return;
+        }
+
+        setIsSubmittingEdit(true);
         const formDataToSend = new FormData();
         formDataToSend.append("subject", editData.subject);
         formDataToSend.append("description", editData.description);
@@ -206,7 +216,14 @@ export default function Index({ auth, tickets, stats, filters }) {
             {
                 onSuccess: () => {
                     setShowEditModal(null);
+                    setIsSubmittingEdit(false);
                     router.reload();
+                },
+                onError: () => {
+                    setIsSubmittingEdit(false);
+                },
+                onFinish: () => {
+                    setIsSubmittingEdit(false);
                 },
             }
         );
@@ -964,10 +981,12 @@ export default function Index({ auth, tickets, stats, filters }) {
                                     </Button>
                                     <Button
                                         type="submit"
-                                        disabled={editProcessing}
-                                        className="bg-blue-600 hover:bg-blue-700"
+                                        disabled={
+                                            editProcessing || isSubmittingEdit
+                                        }
+                                        className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {editProcessing ? (
+                                        {editProcessing || isSubmittingEdit ? (
                                             <>
                                                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                                                 Updating...
