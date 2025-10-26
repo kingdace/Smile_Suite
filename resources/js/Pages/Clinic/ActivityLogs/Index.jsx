@@ -377,263 +377,238 @@ export default function ActivityLogsIndex({
                     </CardContent>
                 </Card>
 
-                {/* Statistics Cards - Clinic Style */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-blue-700">
-                                Total Activities
-                            </CardTitle>
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <Activity className="h-4 w-4 text-blue-600" />
+                {/* Statistics Cards - Compact Style with Visual Elements */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-blue-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-lg shadow-md flex-shrink-0">
+                                    <Activity className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
+                                        Total Activities
+                                    </p>
+                                    <p className="text-base font-bold text-gray-900 leading-none">
+                                        {stats.summary?.total_activities || 0}
+                                    </p>
+                                    <div className="flex items-center justify-center gap-1 mt-1">
+                                        <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+                                        <span className="text-[9px] text-blue-600 font-medium truncate">
+                                            Last {stats.period_days} days
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-blue-600 font-mono">
-                                {stats.summary?.total_activities || 0}
-                            </div>
-                            <p className="text-xs text-blue-500 mt-1">
-                                Last {stats.period_days} days
-                            </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-emerald-700">
-                                Active Users
-                            </CardTitle>
-                            <div className="p-2 bg-emerald-100 rounded-lg">
-                                <Users className="h-4 w-4 text-emerald-600" />
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-green-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-lg shadow-md flex-shrink-0">
+                                    <Users className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
+                                        Active Users
+                                    </p>
+                                    <p className="text-base font-bold text-gray-900 leading-none">
+                                        {stats.summary?.active_users || 0}
+                                    </p>
+                                    <div className="flex items-center justify-center gap-1 mt-1">
+                                        <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                                        <span className="text-[9px] text-green-600 font-medium truncate">
+                                            Users with activity
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-emerald-600 font-mono">
-                                {stats.summary?.active_users || 0}
-                            </div>
-                            <p className="text-xs text-emerald-500 mt-1">
-                                Users with activity
-                            </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-amber-50 to-orange-100 border-amber-200 hover:border-amber-300 transition-all duration-300 hover:shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-amber-700">
-                                High Priority
-                            </CardTitle>
-                            <div className="p-2 bg-amber-100 rounded-lg">
-                                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-amber-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 rounded-lg shadow-md flex-shrink-0">
+                                    <AlertTriangle className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
+                                        High Priority
+                                    </p>
+                                    <p className="text-base font-bold text-gray-900 leading-none">
+                                        {(stats.summary?.high_activities || 0) +
+                                            (stats.summary
+                                                ?.critical_activities || 0)}
+                                    </p>
+                                    <div className="flex items-center justify-center gap-1 mt-1">
+                                        <div className="w-1 h-1 bg-amber-400 rounded-full animate-pulse"></div>
+                                        <span className="text-[9px] text-amber-600 font-medium truncate">
+                                            High + Critical
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-amber-600 font-mono">
-                                {(stats.summary?.high_activities || 0) +
-                                    (stats.summary?.critical_activities || 0)}
-                            </div>
-                            <p className="text-xs text-amber-500 mt-1">
-                                High + Critical events
-                            </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gradient-to-br from-red-50 to-rose-100 border-red-200 hover:border-red-300 transition-all duration-300 hover:shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-red-700">
-                                Deletions
-                            </CardTitle>
-                            <div className="p-2 bg-red-100 rounded-lg">
-                                <XCircle className="h-4 w-4 text-red-600" />
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-red-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-red-400 to-red-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-red-500 via-red-600 to-rose-600 rounded-lg shadow-md flex-shrink-0">
+                                    <XCircle className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
+                                        Deletions
+                                    </p>
+                                    <p className="text-base font-bold text-gray-900 leading-none">
+                                        {stats.summary?.deleted_items || 0}
+                                    </p>
+                                    <div className="flex items-center justify-center gap-1 mt-1">
+                                        <div className="w-1 h-1 bg-red-400 rounded-full animate-pulse"></div>
+                                        <span className="text-[9px] text-red-600 font-medium truncate">
+                                            Deletion events
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-red-600 font-mono">
-                                {stats.summary?.deleted_items || 0}
-                            </div>
-                            <p className="text-xs text-red-500 mt-1">
-                                Deletion events
-                            </p>
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Compact Filters */}
-                <Card className="bg-gradient-to-br from-sky-50 to-blue-50 border-sky-200 shadow-lg">
-                    <CardContent className="py-4">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Filter className="w-4 h-4 text-blue-600" />
-                            <span className="font-mono text-blue-700 font-medium">
-                                filter-controls
-                            </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                            <div className="space-y-1">
-                                <Label
-                                    htmlFor="search"
-                                    className="text-blue-700 text-sm font-medium"
-                                >
-                                    Search
-                                </Label>
-                                <div className="relative">
-                                    <Search className="absolute left-2 top-2.5 h-3 w-3 text-blue-500" />
-                                    <Input
-                                        id="search"
-                                        placeholder="Search activities..."
-                                        value={searchTerm}
-                                        onChange={(e) =>
-                                            setSearchTerm(e.target.value)
-                                        }
-                                        className="pl-7 h-8 text-sm bg-white border-blue-200 text-gray-700 placeholder-gray-500 focus:border-blue-400 focus:ring-blue-400"
-                                    />
-                                </div>
+                {/* Search and Filters - Compact Single Row */}
+                <Card className="border-0 shadow-lg bg-white border border-gray-200">
+                    <CardContent className="p-3">
+                        <div className="flex items-center gap-3">
+                            {/* Search Bar */}
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                <Input
+                                    type="text"
+                                    placeholder="Search activities..."
+                                    value={searchTerm}
+                                    onChange={(e) =>
+                                        setSearchTerm(e.target.value)
+                                    }
+                                    className="pl-10 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                />
                             </div>
-                            <div className="space-y-1">
-                                <Label className="text-blue-700 text-sm font-medium">
-                                    Severity
-                                </Label>
-                                <Select
-                                    value={selectedSeverity}
-                                    onValueChange={setSelectedSeverity}
-                                >
-                                    <SelectTrigger className="h-8 text-sm bg-white border-blue-200 text-gray-700 focus:border-blue-400 focus:ring-blue-400">
-                                        <SelectValue placeholder="All severities" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white border-blue-200">
+
+                            {/* Filter Dropdowns */}
+                            <Select
+                                value={selectedSeverity}
+                                onValueChange={setSelectedSeverity}
+                            >
+                                <SelectTrigger className="w-28 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    <SelectValue placeholder="Severity" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">
+                                        Severity
+                                    </SelectItem>
+                                    {severityOptions.map((option) => (
                                         <SelectItem
-                                            value="all"
-                                            className="text-gray-700"
+                                            key={option.value}
+                                            value={option.value}
                                         >
-                                            All severities
+                                            {option.label}
                                         </SelectItem>
-                                        {severityOptions.map((option) => (
-                                            <SelectItem
-                                                key={option.value}
-                                                value={option.value}
-                                                className="text-gray-700"
-                                            >
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-blue-700 text-sm font-medium">
-                                    Category
-                                </Label>
-                                <Select
-                                    value={selectedCategory}
-                                    onValueChange={setSelectedCategory}
-                                >
-                                    <SelectTrigger className="h-8 text-sm bg-white border-blue-200 text-gray-700 focus:border-blue-400 focus:ring-blue-400">
-                                        <SelectValue placeholder="All categories" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white border-blue-200">
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select
+                                value={selectedCategory}
+                                onValueChange={setSelectedCategory}
+                            >
+                                <SelectTrigger className="w-36 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">
+                                        Category
+                                    </SelectItem>
+                                    {categoryOptions.map((option) => (
                                         <SelectItem
-                                            value="all"
-                                            className="text-gray-700"
+                                            key={option.value}
+                                            value={option.value}
                                         >
-                                            All categories
+                                            {option.label}
                                         </SelectItem>
-                                        {categoryOptions.map((option) => (
-                                            <SelectItem
-                                                key={option.value}
-                                                value={option.value}
-                                                className="text-gray-700"
-                                            >
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-blue-700 text-sm font-medium">
-                                    Action
-                                </Label>
-                                <Select
-                                    value={selectedAction}
-                                    onValueChange={setSelectedAction}
-                                >
-                                    <SelectTrigger className="h-8 text-sm bg-white border-blue-200 text-gray-700 focus:border-blue-400 focus:ring-blue-400">
-                                        <SelectValue placeholder="All actions" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white border-blue-200">
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select
+                                value={selectedAction}
+                                onValueChange={setSelectedAction}
+                            >
+                                <SelectTrigger className="w-28 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    <SelectValue placeholder="Action" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Action</SelectItem>
+                                    {actionOptions.map((option) => (
                                         <SelectItem
-                                            value="all"
-                                            className="text-gray-700"
+                                            key={option.value}
+                                            value={option.value}
                                         >
-                                            All actions
+                                            {option.label}
                                         </SelectItem>
-                                        {actionOptions.map((option) => (
-                                            <SelectItem
-                                                key={option.value}
-                                                value={option.value}
-                                                className="text-gray-700"
-                                            >
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-blue-700 text-sm font-medium">
-                                    User
-                                </Label>
-                                <Select
-                                    value={selectedUser}
-                                    onValueChange={setSelectedUser}
-                                >
-                                    <SelectTrigger className="h-8 text-sm bg-white border-blue-200 text-gray-700 focus:border-blue-400 focus:ring-blue-400">
-                                        <SelectValue placeholder="All users" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white border-blue-200">
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select
+                                value={selectedUser}
+                                onValueChange={setSelectedUser}
+                            >
+                                <SelectTrigger className="w-36 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    <SelectValue placeholder="User" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">User</SelectItem>
+                                    {filterOptions.users.map((user) => (
                                         <SelectItem
-                                            value="all"
-                                            className="text-gray-700"
+                                            key={user.value}
+                                            value={user.value}
                                         >
-                                            All users
+                                            {user.label}
                                         </SelectItem>
-                                        {filterOptions.users.map((user) => (
-                                            <SelectItem
-                                                key={user.value}
-                                                value={user.value}
-                                                className="text-gray-700"
-                                            >
-                                                {user.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-3">
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Action Buttons */}
                             <Button
                                 onClick={handleSearch}
-                                size="sm"
-                                className="h-7 px-3 text-xs bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg"
+                                className="h-10 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
                             >
-                                <Search className="w-3 h-3 mr-1" />
-                                Execute
+                                <Search className="h-4 w-4 mr-2" />
                             </Button>
                             <Button
                                 variant="outline"
-                                size="sm"
                                 onClick={clearFilters}
-                                className="h-7 px-3 text-xs border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:border-blue-300"
+                                className="h-10 px-4 border-gray-300"
                             >
-                                <FilterX className="w-3 h-3 mr-1" />
-                                Clear
+                                <FilterX className="h-4 w-4" />
                             </Button>
                             <Button
                                 variant="outline"
-                                size="sm"
                                 onClick={() => handleExport("csv")}
-                                className="h-7 px-3 text-xs border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300"
+                                className="h-10 px-4 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                             >
-                                <Download className="w-3 h-3 mr-1" />
-                                Export
+                                <Download className="h-4 w-4" />
                             </Button>
                         </div>
                     </CardContent>

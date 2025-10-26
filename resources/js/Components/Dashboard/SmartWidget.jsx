@@ -41,21 +41,110 @@ const SmartWidget = ({
     children,
 }) => {
     const [isExpanded] = useState(true);
-    // Subtle Blue Color Scheme
-    const colorScheme = {
-        primary: "from-blue-500 to-blue-600",
-        secondary: "from-blue-50 to-blue-100",
-        accent: "from-blue-400 to-blue-500",
-        text: "text-blue-900",
-        textLight: "text-blue-700",
-        textMuted: "text-blue-600",
-        bg: "bg-blue-50",
-        border: "border-blue-200",
-        icon: "text-blue-600",
-        progress: "bg-blue-500",
-        cardBg: "bg-white",
-        headerBg: "from-blue-500 to-blue-600",
+    // Dynamic Color Scheme based on widget type
+    const getColorScheme = () => {
+        const schemes = {
+            appointments: {
+                primary: "from-blue-500 to-blue-600",
+                secondary: "from-blue-50 to-blue-100",
+                accent: "from-blue-400 to-blue-500",
+                text: "text-blue-900",
+                textLight: "text-blue-700",
+                textMuted: "text-blue-600",
+                bg: "bg-blue-50",
+                border: "border-blue-200",
+                icon: "text-blue-600",
+                progress: "bg-blue-500",
+                headerBg: "from-blue-500 to-blue-600",
+            },
+            patients: {
+                primary: "from-teal-500 to-teal-600",
+                secondary: "from-teal-50 to-teal-100",
+                accent: "from-teal-400 to-teal-500",
+                text: "text-teal-900",
+                textLight: "text-teal-700",
+                textMuted: "text-teal-600",
+                bg: "bg-teal-50",
+                border: "border-teal-200",
+                icon: "text-teal-600",
+                progress: "bg-teal-500",
+                headerBg: "from-teal-500 to-teal-600",
+            },
+            alerts: {
+                primary: "from-orange-500 to-orange-600",
+                secondary: "from-orange-50 to-orange-100",
+                accent: "from-orange-400 to-orange-500",
+                text: "text-orange-900",
+                textLight: "text-orange-700",
+                textMuted: "text-orange-600",
+                bg: "bg-orange-50",
+                border: "border-orange-200",
+                icon: "text-orange-600",
+                progress: "bg-orange-500",
+                headerBg: "from-orange-500 to-orange-600",
+            },
+            performance: {
+                primary: "from-emerald-500 to-emerald-600",
+                secondary: "from-emerald-50 to-emerald-100",
+                accent: "from-emerald-400 to-emerald-500",
+                text: "text-emerald-900",
+                textLight: "text-emerald-700",
+                textMuted: "text-emerald-600",
+                bg: "bg-emerald-50",
+                border: "border-emerald-200",
+                icon: "text-emerald-600",
+                progress: "bg-emerald-500",
+                headerBg: "from-emerald-500 to-emerald-600",
+            },
+            satisfaction: {
+                primary: "from-pink-500 to-pink-600",
+                secondary: "from-pink-50 to-pink-100",
+                accent: "from-pink-400 to-pink-500",
+                text: "text-pink-900",
+                textLight: "text-pink-700",
+                textMuted: "text-pink-600",
+                bg: "bg-pink-50",
+                border: "border-pink-200",
+                icon: "text-pink-600",
+                progress: "bg-pink-500",
+                headerBg: "from-pink-500 to-pink-600",
+            },
+            efficiency: {
+                primary: "from-purple-500 to-purple-600",
+                secondary: "from-purple-50 to-purple-100",
+                accent: "from-purple-400 to-purple-500",
+                text: "text-purple-900",
+                textLight: "text-purple-700",
+                textMuted: "text-purple-600",
+                bg: "bg-purple-50",
+                border: "border-purple-200",
+                icon: "text-purple-600",
+                progress: "bg-purple-500",
+                headerBg: "from-purple-500 to-purple-600",
+            },
+            default: {
+                primary: "from-blue-500 to-blue-600",
+                secondary: "from-blue-50 to-blue-100",
+                accent: "from-blue-400 to-blue-500",
+                text: "text-blue-900",
+                textLight: "text-blue-700",
+                textMuted: "text-blue-600",
+                bg: "bg-blue-50",
+                border: "border-blue-200",
+                icon: "text-blue-600",
+                progress: "bg-blue-500",
+                cardBg: "bg-white",
+                headerBg: "from-blue-500 to-blue-600",
+            },
+        };
+
+        return {
+            ...(schemes[type] || schemes.default),
+            cardBg: "bg-white",
+        };
     };
+
+    const colorScheme = getColorScheme();
 
     // Widget type configurations
     const widgetTypes = {
@@ -65,23 +154,23 @@ const SmartWidget = ({
         },
         patients: {
             icon: <Users className="h-4 w-4" />,
-            bgGradient: "from-blue-500 to-blue-600",
+            bgGradient: "from-teal-500 to-teal-600",
         },
         alerts: {
             icon: <Bell className="h-4 w-4" />,
-            bgGradient: "from-blue-500 to-blue-600",
+            bgGradient: "from-orange-500 to-orange-600",
         },
         performance: {
             icon: <Activity className="h-4 w-4" />,
-            bgGradient: "from-blue-500 to-blue-600",
+            bgGradient: "from-emerald-500 to-emerald-600",
         },
         satisfaction: {
             icon: <Heart className="h-4 w-4" />,
-            bgGradient: "from-blue-500 to-blue-600",
+            bgGradient: "from-pink-500 to-pink-600",
         },
         efficiency: {
             icon: <Zap className="h-4 w-4" />,
-            bgGradient: "from-blue-500 to-blue-600",
+            bgGradient: "from-purple-500 to-purple-600",
         },
     };
 
@@ -252,7 +341,7 @@ const SmartWidget = ({
                 {/* Header */}
                 <CardHeader
                     className={`bg-gradient-to-r ${
-                        widgetConfig.bgGradient
+                        colorScheme.headerBg
                     } text-white ${compact ? "py-2" : "py-3"}`}
                 >
                     <div className="flex items-center justify-between">

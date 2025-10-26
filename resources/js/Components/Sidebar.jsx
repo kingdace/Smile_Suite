@@ -180,21 +180,32 @@ const getNavigation = (clinicId) => [
         permission: "view_payments",
     },
     {
-        name: "Activity Logs",
-        href: route("clinic.activity-logs.index", [clinicId]),
-        routeName: "clinic.activity-logs.*",
-        icon: Shield,
-        description: "Audit trail and security logs",
-        permission: null, // No permission check needed - handled by isAdminOnly
-        isAdminOnly: true,
-    },
-    {
-        name: "Help & Support",
-        href: route("clinic.support.index", [clinicId]),
-        routeName: "clinic.support.*",
-        icon: HelpCircle,
-        description: "Get assistance and support",
-        permission: "create_support_tickets",
+        name: "Others",
+        href: "#",
+        routeName: "others",
+        icon: Sparkles,
+        description: "Additional features",
+        permission: null,
+        hasDropdown: true,
+        children: [
+            {
+                name: "Activity Logs",
+                href: route("clinic.activity-logs.index", [clinicId]),
+                routeName: "clinic.activity-logs.*",
+                icon: Activity,
+                description: "Audit trail and security logs",
+                permission: null,
+                isAdminOnly: true,
+            },
+            {
+                name: "Help & Support",
+                href: route("clinic.support.index", [clinicId]),
+                routeName: "clinic.support.*",
+                icon: HelpCircle,
+                description: "Get assistance and support",
+                permission: "create_support_tickets",
+            },
+        ],
     },
 ];
 
@@ -228,6 +239,14 @@ export default function Sidebar({ className, auth }) {
             route().current("clinic.waitlist.*")
         ) {
             expanded.add("Appointments");
+        }
+
+        // Others dropdown (Activity Logs & Help & Support)
+        if (
+            route().current("clinic.activity-logs.*") ||
+            route().current("clinic.support.*")
+        ) {
+            expanded.add("Others");
         }
 
         return expanded;
@@ -295,6 +314,13 @@ export default function Sidebar({ className, auth }) {
         );
     };
 
+    const isOthersActive = () => {
+        return (
+            route().current("clinic.activity-logs.*") ||
+            route().current("clinic.support.*")
+        );
+    };
+
     return (
         <>
             <style>{scrollbarStyles}</style>
@@ -318,6 +344,8 @@ export default function Sidebar({ className, auth }) {
                                         ? isDentistScheduleActive()
                                         : item.name === "Appointments"
                                         ? isAppointmentsActive()
+                                        : item.name === "Others"
+                                        ? isOthersActive()
                                         : false
                                     : isItemActive(item);
                                 const isExpanded = expandedItems.has(item.name);
@@ -336,6 +364,36 @@ export default function Sidebar({ className, auth }) {
                                     auth.user?.role !== "clinic_admin"
                                 ) {
                                     return null; // Don't show admin-only items to non-admins
+                                }
+
+                                // For "Others" dropdown, check if user has access to at least one child
+                                if (
+                                    item.name === "Others" &&
+                                    item.hasDropdown
+                                ) {
+                                    const hasAccessToAnyChild =
+                                        item.children.some((child) => {
+                                            const childHasPermission =
+                                                !child.permission ||
+                                                (auth.user?.permissions &&
+                                                    auth.user.permissions.includes(
+                                                        child.permission
+                                                    ));
+
+                                            if (
+                                                child.isAdminOnly &&
+                                                auth.user?.role !==
+                                                    "clinic_admin"
+                                            ) {
+                                                return false;
+                                            }
+
+                                            return childHasPermission;
+                                        });
+
+                                    if (!hasAccessToAnyChild) {
+                                        return null; // Don't show "Others" if user has no access to any child
+                                    }
                                 }
 
                                 if (!hasPermission) {
@@ -410,60 +468,87 @@ export default function Sidebar({ className, auth }) {
                                                 {isExpanded && (
                                                     <div className="ml-4 mt-2 space-y-1 pl-4 border-l-2 border-gradient-to-b from-blue-200 to-indigo-200">
                                                         {item.children.map(
-                                                            (child) => (
-                                                                <Link
-                                                                    key={
-                                                                        child.name
-                                                                    }
-                                                                    href={
-                                                                        child.href
-                                                                    }
-                                                                    className={cn(
-                                                                        "flex items-center gap-2 rounded-lg pl-3 pr-2 py-2 text-sm font-medium text-gray-600 transition-all duration-300 group relative overflow-hidden",
-                                                                        "hover:bg-gradient-to-r hover:from-sky-50/80 hover:to-cyan-50/80 hover:text-sky-600 hover:shadow-sm hover:scale-[1.01]",
-                                                                        route().current(
-                                                                            child.routeName
-                                                                        )
-                                                                            ? "bg-gradient-to-r from-sky-100/90 to-cyan-100/90 text-sky-700 font-semibold shadow-sm ring-2 ring-sky-200/50"
-                                                                            : ""
-                                                                    )}
-                                                                >
-                                                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 to-purple-500/3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                                                    <div
+                                                            (child) => {
+                                                                // Check if user has permission for this child item
+                                                                const childHasPermission =
+                                                                    !child.permission ||
+                                                                    (auth.user
+                                                                        ?.permissions &&
+                                                                        auth.user.permissions.includes(
+                                                                            child.permission
+                                                                        ));
+
+                                                                // Special check for admin-only child items
+                                                                if (
+                                                                    child.isAdminOnly &&
+                                                                    auth.user
+                                                                        ?.role !==
+                                                                        "clinic_admin"
+                                                                ) {
+                                                                    return null; // Don't show admin-only child items to non-admins
+                                                                }
+
+                                                                if (
+                                                                    !childHasPermission
+                                                                ) {
+                                                                    return null; // Don't show child items without permission
+                                                                }
+
+                                                                return (
+                                                                    <Link
+                                                                        key={
+                                                                            child.name
+                                                                        }
+                                                                        href={
+                                                                            child.href
+                                                                        }
                                                                         className={cn(
-                                                                            "p-2 rounded-lg transition-all duration-300 shadow-sm relative z-10",
+                                                                            "flex items-center gap-2 rounded-lg pl-3 pr-2 py-2 text-sm font-medium text-gray-600 transition-all duration-300 group relative overflow-hidden",
+                                                                            "hover:bg-gradient-to-r hover:from-sky-50/80 hover:to-cyan-50/80 hover:text-sky-600 hover:shadow-sm hover:scale-[1.01]",
                                                                             route().current(
                                                                                 child.routeName
                                                                             )
-                                                                                ? "bg-gradient-to-br from-sky-600 to-cyan-700 shadow-md"
-                                                                                : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-sky-100 group-hover:to-cyan-100 group-hover:shadow-sm"
+                                                                                ? "bg-gradient-to-r from-sky-100/90 to-cyan-100/90 text-sky-700 font-semibold shadow-sm ring-2 ring-sky-200/50"
+                                                                                : ""
                                                                         )}
                                                                     >
-                                                                        <child.icon
+                                                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/3 to-purple-500/3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                                        <div
                                                                             className={cn(
-                                                                                "h-4 w-4 transition-all duration-300",
+                                                                                "p-2 rounded-lg transition-all duration-300 shadow-sm relative z-10",
                                                                                 route().current(
                                                                                     child.routeName
                                                                                 )
-                                                                                    ? "text-white"
-                                                                                    : "text-gray-500 group-hover:text-sky-600"
+                                                                                    ? "bg-gradient-to-br from-sky-600 to-cyan-700 shadow-md"
+                                                                                    : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-sky-100 group-hover:to-cyan-100 group-hover:shadow-sm"
                                                                             )}
-                                                                        />
-                                                                    </div>
-                                                                    <div className="text-left relative z-10">
-                                                                        <div className="font-semibold text-sm">
-                                                                            {
-                                                                                child.name
-                                                                            }
+                                                                        >
+                                                                            <child.icon
+                                                                                className={cn(
+                                                                                    "h-4 w-4 transition-all duration-300",
+                                                                                    route().current(
+                                                                                        child.routeName
+                                                                                    )
+                                                                                        ? "text-white"
+                                                                                        : "text-gray-500 group-hover:text-sky-600"
+                                                                                )}
+                                                                            />
                                                                         </div>
-                                                                        <div className="text-xs text-gray-500 font-medium">
-                                                                            {
-                                                                                child.description
-                                                                            }
+                                                                        <div className="text-left relative z-10">
+                                                                            <div className="font-semibold text-sm">
+                                                                                {
+                                                                                    child.name
+                                                                                }
+                                                                            </div>
+                                                                            <div className="text-xs text-gray-500 font-medium">
+                                                                                {
+                                                                                    child.description
+                                                                                }
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </Link>
-                                                            )
+                                                                    </Link>
+                                                                );
+                                                            }
                                                         )}
                                                     </div>
                                                 )}

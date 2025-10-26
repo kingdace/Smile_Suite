@@ -88,19 +88,99 @@ const AdvancedChart = ({
         }
     }, [data, type]);
 
-    // Subtle Blue Color Scheme
-    const colorScheme = {
-        primary: "#3B82F6",
-        secondary: "#1D4ED8",
-        accent: "#60A5FA",
-        light: "#DBEAFE",
-        gradient: ["#3B82F6", "#1D4ED8", "#1E40AF", "#1E3A8A", "#1E3A8A"],
-        background: "from-blue-50 to-blue-100",
-        text: "text-blue-900",
-        textLight: "text-blue-700",
-        border: "border-blue-200",
-        cardBg: "bg-white",
+    // Dynamic Color Scheme based on chart type
+    const getColorScheme = () => {
+        const schemes = {
+            revenue: {
+                primary: "#10B981",
+                secondary: "#059669",
+                accent: "#34D399",
+                light: "#D1FAE5",
+                gradient: [
+                    "#10B981",
+                    "#059669",
+                    "#047857",
+                    "#065F46",
+                    "#064E3B",
+                ],
+                background: "from-emerald-50 to-emerald-100",
+                text: "text-emerald-900",
+                textLight: "text-emerald-700",
+                border: "border-emerald-200",
+                cardBg: "bg-white",
+            },
+            service: {
+                primary: "#8B5CF6",
+                secondary: "#7C3AED",
+                accent: "#A78BFA",
+                light: "#EDE9FE",
+                gradient: [
+                    "#8B5CF6",
+                    "#7C3AED",
+                    "#6D28D9",
+                    "#5B21B6",
+                    "#4C1D95",
+                ],
+                background: "from-purple-50 to-purple-100",
+                text: "text-purple-900",
+                textLight: "text-purple-700",
+                border: "border-purple-200",
+                cardBg: "bg-white",
+            },
+            appointments: {
+                primary: "#3B82F6",
+                secondary: "#1D4ED8",
+                accent: "#60A5FA",
+                light: "#DBEAFE",
+                gradient: [
+                    "#3B82F6",
+                    "#1D4ED8",
+                    "#1E40AF",
+                    "#1E3A8A",
+                    "#1E3A8A",
+                ],
+                background: "from-blue-50 to-blue-100",
+                text: "text-blue-900",
+                textLight: "text-blue-700",
+                border: "border-blue-200",
+                cardBg: "bg-white",
+            },
+            default: {
+                primary: "#3B82F6",
+                secondary: "#1D4ED8",
+                accent: "#60A5FA",
+                light: "#DBEAFE",
+                gradient: [
+                    "#3B82F6",
+                    "#1D4ED8",
+                    "#1E40AF",
+                    "#1E3A8A",
+                    "#1E3A8A",
+                ],
+                background: "from-blue-50 to-blue-100",
+                text: "text-blue-900",
+                textLight: "text-blue-700",
+                border: "border-blue-200",
+                cardBg: "bg-white",
+            },
+        };
+
+        // Determine scheme based on title
+        const titleLower = title?.toLowerCase() || "";
+        if (titleLower.includes("revenue")) {
+            return schemes.revenue;
+        } else if (
+            titleLower.includes("service") ||
+            titleLower.includes("distribution")
+        ) {
+            return schemes.service;
+        } else if (titleLower.includes("appointment")) {
+            return schemes.appointments;
+        }
+        return schemes.default;
     };
+
+    const colorScheme = getColorScheme();
 
     const colors =
         customColors.length > 0 ? customColors : colorScheme.gradient;
@@ -197,8 +277,12 @@ const AdvancedChart = ({
                     enableSlices: "x",
                     lineWidth: 2,
                     sliceTooltip: ({ slice }) => (
-                        <div className="bg-white p-3 rounded-lg shadow-lg border border-blue-200">
-                            <div className="text-sm font-medium mb-2 text-blue-900">
+                        <div
+                            className={`bg-white p-3 rounded-lg shadow-lg border ${colorScheme.border}`}
+                        >
+                            <div
+                                className={`text-sm font-medium mb-2 ${colorScheme.text}`}
+                            >
                                 {slice.points[0]?.data.x}
                             </div>
                             {slice.points.map((point, index) => (
@@ -212,7 +296,7 @@ const AdvancedChart = ({
                                             backgroundColor: point.serieColor,
                                         }}
                                     />
-                                    <span className="text-blue-700">
+                                    <span className={colorScheme.textLight}>
                                         {point.serieId}: {point.data.y}
                                     </span>
                                 </div>
@@ -248,6 +332,12 @@ const AdvancedChart = ({
                         from: "color",
                         modifiers: [["darker", 0.6]],
                     },
+                    // Arc labels (numbers inside slices)
+                    enableArcLabels: true,
+                    arcLabelsSkipAngle: 10,
+                    arcLabelsTextColor: "#FFFFFF",
+                    arcLabelsRadiusOffset: 0.4,
+                    // Radial labels (labels outside)
                     radialLabelsSkipAngle: 10,
                     radialLabelsTextXOffset: 6,
                     radialLabelsTextColor: "#FFFFFF",
@@ -256,6 +346,7 @@ const AdvancedChart = ({
                     radialLabelsLinkHorizontalLength: 24,
                     radialLabelsLinkStrokeWidth: 2,
                     radialLabelsLinkColor: { from: "color" },
+                    // Legacy slice labels (for compatibility)
                     sliceLabelsSkipAngle: 10,
                     sliceLabelsTextColor: "#FFFFFF",
                 };
@@ -358,7 +449,7 @@ const AdvancedChart = ({
                         {/* Chart Controls */}
                         <div className="flex items-center gap-2">
                             <Badge
-                                className={`${colorScheme.border} ${colorScheme.textLight} bg-blue-50`}
+                                className={`${colorScheme.border} ${colorScheme.textLight} bg-gradient-to-r ${colorScheme.background}`}
                             >
                                 {currentChart.icon}
                                 <span className="ml-1 text-xs">
@@ -382,7 +473,10 @@ const AdvancedChart = ({
                         {/* Loading Overlay */}
                         {!data && (
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                <div
+                                    className="animate-spin rounded-full h-8 w-8 border-b-2"
+                                    style={{ borderColor: colorScheme.primary }}
+                                ></div>
                             </div>
                         )}
 
@@ -390,11 +484,15 @@ const AdvancedChart = ({
                         {data &&
                             (!Array.isArray(data) || data.length === 0) && (
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="text-center text-blue-600">
+                                    <div
+                                        className={`text-center ${colorScheme.textMuted}`}
+                                    >
                                         <div className="text-sm font-medium">
                                             No Data Available
                                         </div>
-                                        <div className="text-xs text-blue-500 mt-1">
+                                        <div
+                                            className={`text-xs ${colorScheme.textLight} mt-1`}
+                                        >
                                             Data will appear when available
                                         </div>
                                     </div>

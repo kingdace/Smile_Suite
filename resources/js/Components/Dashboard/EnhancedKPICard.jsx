@@ -40,21 +40,79 @@ const EnhancedKPICard = ({
     const [displayValue, setDisplayValue] = useState(0);
     const controls = useAnimation();
 
-    // Subtle Blue Color Scheme
-    const colorScheme = {
-        primary: "from-blue-500 to-blue-600",
-        secondary: "from-blue-50 to-blue-100",
-        accent: "from-blue-400 to-blue-500",
-        text: "text-blue-900",
-        textLight: "text-blue-700",
-        textMuted: "text-blue-600",
-        bg: "bg-blue-50",
-        border: "border-blue-200",
-        icon: "text-blue-600",
-        progress: "bg-blue-500",
-        cardBg: "bg-white",
-        shadow: "shadow-lg hover:shadow-xl",
+    // Dynamic Color Scheme based on card type
+    const getColorScheme = () => {
+        const schemes = {
+            appointments: {
+                primary: "from-blue-500 to-blue-600",
+                secondary: "from-blue-50 to-blue-100",
+                accent: "from-blue-400 to-blue-500",
+                text: "text-blue-900",
+                textLight: "text-blue-700",
+                textMuted: "text-blue-600",
+                bg: "bg-blue-50",
+                border: "border-blue-200",
+                icon: "text-blue-600",
+                progress: "bg-blue-500",
+            },
+            patients: {
+                primary: "from-teal-500 to-teal-600",
+                secondary: "from-teal-50 to-teal-100",
+                accent: "from-teal-400 to-teal-500",
+                text: "text-teal-900",
+                textLight: "text-teal-700",
+                textMuted: "text-teal-600",
+                bg: "bg-teal-50",
+                border: "border-teal-200",
+                icon: "text-teal-600",
+                progress: "bg-teal-500",
+            },
+            revenue: {
+                primary: "from-emerald-500 to-emerald-600",
+                secondary: "from-emerald-50 to-emerald-100",
+                accent: "from-emerald-400 to-emerald-500",
+                text: "text-emerald-900",
+                textLight: "text-emerald-700",
+                textMuted: "text-emerald-600",
+                bg: "bg-emerald-50",
+                border: "border-emerald-200",
+                icon: "text-emerald-600",
+                progress: "bg-emerald-500",
+            },
+            satisfaction: {
+                primary: "from-orange-500 to-orange-600",
+                secondary: "from-orange-50 to-orange-100",
+                accent: "from-orange-400 to-orange-500",
+                text: "text-orange-900",
+                textLight: "text-orange-700",
+                textMuted: "text-orange-600",
+                bg: "bg-orange-50",
+                border: "border-orange-200",
+                icon: "text-orange-600",
+                progress: "bg-orange-500",
+            },
+            default: {
+                primary: "from-blue-500 to-blue-600",
+                secondary: "from-blue-50 to-blue-100",
+                accent: "from-blue-400 to-blue-500",
+                text: "text-blue-900",
+                textLight: "text-blue-700",
+                textMuted: "text-blue-600",
+                bg: "bg-blue-50",
+                border: "border-blue-200",
+                icon: "text-blue-600",
+                progress: "bg-blue-500",
+            },
+        };
+
+        return {
+            ...(schemes[type] || schemes.default),
+            cardBg: "bg-white",
+            shadow: "shadow-lg hover:shadow-xl",
+        };
     };
+
+    const colorScheme = getColorScheme();
 
     // Animate counter
     useEffect(() => {
@@ -137,12 +195,19 @@ const EnhancedKPICard = ({
             whileTap={{ scale: 0.98 }}
         >
             <Card
-                className={`relative overflow-hidden border-0 ${colorScheme.shadow} transition-all duration-300 cursor-pointer group border border-blue-100/50 ${className}`}
+                className={`relative overflow-hidden border-0 ${colorScheme.shadow} transition-all duration-300 cursor-pointer group border-2 ${className}`}
+                style={{
+                    borderColor: colorScheme.border.replace("border-", ""),
+                }}
                 onClick={onClick}
             >
-                {/* Enhanced Background Pattern */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-12 translate-x-12 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
-                <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-8 -translate-x-8 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                {/* Enhanced Background Pattern - Dynamic colors based on type */}
+                <div
+                    className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${colorScheme.primary} rounded-full -translate-y-12 translate-x-12 opacity-10`}
+                ></div>
+                <div
+                    className={`absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br ${colorScheme.accent} rounded-full translate-y-8 -translate-x-8 opacity-5`}
+                ></div>
 
                 <CardContent className={`relative ${compact ? "p-4" : "p-5"}`}>
                     <div className="flex flex-col items-center gap-3 text-center">
@@ -172,7 +237,9 @@ const EnhancedKPICard = ({
                                 transition={{ duration: 0.2 }}
                             >
                                 {loading ? (
-                                    <div className="animate-pulse bg-blue-200 h-6 w-16 rounded" />
+                                    <div
+                                        className={`animate-pulse ${colorScheme.bg} h-6 w-16 rounded opacity-50`}
+                                    />
                                 ) : (
                                     <>
                                         {formatValue(displayValue)}
@@ -188,8 +255,15 @@ const EnhancedKPICard = ({
                             {/* Subtitle with Status Indicator */}
                             {subtitle && (
                                 <div className="flex items-center justify-center gap-1">
-                                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
-                                    <span className="text-[10px] text-blue-600 font-medium truncate">
+                                    <div
+                                        className={`w-1.5 h-1.5 ${colorScheme.textMuted.replace(
+                                            "text-",
+                                            "bg-"
+                                        )} rounded-full animate-pulse`}
+                                    ></div>
+                                    <span
+                                        className={`text-[10px] ${colorScheme.textMuted} font-medium truncate`}
+                                    >
                                         {subtitle}
                                     </span>
                                 </div>
@@ -216,12 +290,6 @@ const EnhancedKPICard = ({
                             )}
                         </div>
                     </div>
-
-                    {/* Hover Effect Overlay */}
-                    <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        initial={false}
-                    />
                 </CardContent>
             </Card>
         </motion.div>

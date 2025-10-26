@@ -273,104 +273,113 @@ export default function Index({ auth, tickets, stats, filters }) {
                         </div>
                     </div>
                 </div>
-                {/* Compact Stats Cards */}
-                <div className="mx-5 mb-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Card className="bg-white/90 backdrop-blur-sm border-blue-200/50 shadow-md hover:shadow-lg transition-shadow">
-                        <CardContent className="p-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-medium text-gray-600 mb-1">
+                {/* Compact Stats Cards with Visual Elements */}
+                <div className="mx-5 mb-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-blue-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 rounded-lg shadow-md flex-shrink-0">
+                                    <MessageSquare className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
                                         Total
                                     </p>
-                                    <p className="text-lg font-bold text-gray-900">
+                                    <p className="text-base font-bold text-gray-900 leading-none">
                                         {stats.total}
                                     </p>
                                 </div>
-                                <div className="p-1.5 bg-blue-100 rounded-md">
-                                    <MessageSquare className="w-4 h-4 text-blue-600" />
-                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-white/90 backdrop-blur-sm border-green-200/50 shadow-md hover:shadow-lg transition-shadow">
-                        <CardContent className="p-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-medium text-gray-600 mb-1">
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-green-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-green-400 to-green-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 rounded-lg shadow-md flex-shrink-0">
+                                    <Clock className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
                                         Open
                                     </p>
-                                    <p className="text-lg font-bold text-green-600">
+                                    <p className="text-base font-bold text-gray-900 leading-none">
                                         {stats.open}
                                     </p>
                                 </div>
-                                <div className="p-1.5 bg-green-100 rounded-md">
-                                    <Clock className="w-4 h-4 text-green-600" />
-                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-white/90 backdrop-blur-sm border-gray-200/50 shadow-md hover:shadow-lg transition-shadow">
-                        <CardContent className="p-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-medium text-gray-600 mb-1">
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-gray-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 rounded-lg shadow-md flex-shrink-0">
+                                    <CheckCircle className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
                                         Resolved
                                     </p>
-                                    <p className="text-lg font-bold text-gray-600">
+                                    <p className="text-base font-bold text-gray-900 leading-none">
                                         {stats.resolved}
                                     </p>
                                 </div>
-                                <div className="p-1.5 bg-gray-100 rounded-md">
-                                    <CheckCircle className="w-4 h-4 text-gray-600" />
-                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-white/90 backdrop-blur-sm border-red-200/50 shadow-md hover:shadow-lg transition-shadow">
-                        <CardContent className="p-3">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-medium text-gray-600 mb-1">
+                    <Card className="group border-0 shadow-lg bg-white hover:shadow-xl transition-all duration-300 border border-red-100/50 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full -translate-y-8 translate-x-8 opacity-10 group-hover:opacity-20 transition-all duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-br from-red-400 to-red-500 rounded-full translate-y-6 -translate-x-6 opacity-5 group-hover:opacity-15 transition-all duration-700"></div>
+                        <CardContent className="p-3 relative">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <div className="p-2 bg-gradient-to-br from-red-500 via-red-600 to-rose-600 rounded-lg shadow-md flex-shrink-0">
+                                    <AlertCircle className="h-4 w-4 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0 w-full">
+                                    <p className="text-[10px] text-gray-600 font-medium mb-0.5 leading-none">
                                         Urgent
                                     </p>
-                                    <p className="text-lg font-bold text-red-600">
+                                    <p className="text-base font-bold text-gray-900 leading-none">
                                         {stats.urgent}
                                     </p>
-                                </div>
-                                <div className="p-1.5 bg-red-100 rounded-md">
-                                    <AlertCircle className="w-4 h-4 text-red-600" />
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
-                {/* Compact Filters */}
-                <div className="mx-5 mb-4">
-                    <Card className="bg-white/90 backdrop-blur-sm border-blue-200/50 shadow-md">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-3">
-                                <Filter className="w-4 h-4 text-gray-600" />
-                                <h3 className="text-sm font-semibold text-gray-700">
-                                    Filters
-                                </h3>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                                <Input
-                                    placeholder="Search tickets..."
-                                    value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
-                                    className="w-full h-9"
-                                />
+                {/* Compact Search and Filters - Single Row */}
+                <div className="mx-5 mb-3">
+                    <Card className="border-0 shadow-lg bg-white border border-gray-200">
+                        <CardContent className="p-3">
+                            <div className="flex items-center gap-3">
+                                {/* Search Bar */}
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Search tickets..."
+                                        value={searchTerm}
+                                        onChange={(e) =>
+                                            setSearchTerm(e.target.value)
+                                        }
+                                        className="pl-10 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                    />
+                                </div>
+
+                                {/* Filter Dropdowns */}
                                 <Select
                                     value={statusFilter}
                                     onValueChange={setStatusFilter}
                                 >
-                                    <SelectTrigger className="h-9">
+                                    <SelectTrigger className="w-28 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         <SelectValue placeholder="Status" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -391,11 +400,12 @@ export default function Index({ auth, tickets, stats, filters }) {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
+
                                 <Select
                                     value={priorityFilter}
                                     onValueChange={setPriorityFilter}
                                 >
-                                    <SelectTrigger className="h-9">
+                                    <SelectTrigger className="w-28 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         <SelectValue placeholder="Priority" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -414,11 +424,12 @@ export default function Index({ auth, tickets, stats, filters }) {
                                         <SelectItem value="low">Low</SelectItem>
                                     </SelectContent>
                                 </Select>
+
                                 <Select
                                     value={categoryFilter}
                                     onValueChange={setCategoryFilter}
                                 >
-                                    <SelectTrigger className="h-9">
+                                    <SelectTrigger className="w-32 h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         <SelectValue placeholder="Category" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -442,12 +453,13 @@ export default function Index({ auth, tickets, stats, filters }) {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
+
+                                {/* Action Buttons */}
                                 <Button
                                     onClick={handleFilter}
-                                    className="w-full h-9"
+                                    className="h-10 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
                                 >
-                                    <Search className="w-3.5 h-3.5 mr-1" />
-                                    Apply
+                                    <Search className="h-4 w-4 mr-2" />
                                 </Button>
                             </div>
                         </CardContent>
