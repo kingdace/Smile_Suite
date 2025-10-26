@@ -1,0 +1,15 @@
+# Railway Deployment Commands
+# Run these commands in your terminal AFTER npm run build completes
+
+# Step 1: Commit all changes
+git commit -m "Add: Notifications & Support Ticket System - Complete implementation with clinic and admin panels"
+
+# Step 2: Push to GitHub (Railway will auto-deploy)
+git push origin main
+
+# Step 3: Verify Deployment (After Railway finishes)
+# - Check Railway dashboard for deployment status
+# - Test notifications system
+# - Test support tickets
+# - Verify file uploads work (AWS S3 on Railway)
+
