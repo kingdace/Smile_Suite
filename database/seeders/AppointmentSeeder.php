@@ -19,24 +19,31 @@ class AppointmentSeeder extends Seeder
     {
         $clinicId = 27;
 
+        $this->command->info("Starting AppointmentSeeder for Clinic ID {$clinicId}...");
+
         // Get clinic data
         $patients = Patient::where('clinic_id', $clinicId)->get();
         $dentists = User::where('clinic_id', $clinicId)->where('role', 'dentist')->get();
         $services = Service::where('clinic_id', $clinicId)->get();
         $clinicAdmin = User::where('clinic_id', $clinicId)->where('role', 'clinic_admin')->first();
 
+        $this->command->info("Found {$patients->count()} patients, {$dentists->count()} dentists, {$services->count()} services");
+
         if ($patients->isEmpty()) {
             $this->command->error("No patients found for clinic ID {$clinicId}");
+            $this->command->info("Please ensure Clinic 27 has patients before running this seeder");
             return;
         }
 
         if ($dentists->isEmpty()) {
             $this->command->error("No dentists found for clinic ID {$clinicId}");
+            $this->command->info("Please ensure Clinic 27 has dentists before running this seeder");
             return;
         }
 
         if (!$clinicAdmin) {
             $this->command->error("No clinic admin found for clinic ID {$clinicId}");
+            $this->command->info("Please ensure Clinic 27 has a clinic admin before running this seeder");
             return;
         }
 

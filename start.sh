@@ -33,12 +33,25 @@ else
 
     echo "Clinic 27 currently has $APPOINTMENT_COUNT appointments"
 
+    # Check if Clinic 27 exists and has required data
+    echo "Checking Clinic 27 requirements..."
+    PATIENT_COUNT=$(php artisan tinker --execute="echo App\Models\Patient::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+    DENTIST_COUNT=$(php artisan tinker --execute="echo App\Models\User::where('clinic_id', 27)->where('role', 'dentist')->count();" 2>/dev/null || echo "0")
+    SERVICE_COUNT=$(php artisan tinker --execute="echo App\Models\Service::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+
+    echo "Clinic 27 has: $PATIENT_COUNT patients, $DENTIST_COUNT dentists, $SERVICE_COUNT services"
+
     if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
-        echo "Clinic 27 has insufficient data ($APPOINTMENT_COUNT appointments). Running business data seeders..."
-        php artisan db:seed --class=AppointmentSeeder --force
-        php artisan db:seed --class=TreatmentSeeder --force
-        php artisan db:seed --class=PaymentSeeder --force
-        echo "✅ Business data seeded for Clinic 27"
+        if [ "$PATIENT_COUNT" -eq "0" ] || [ "$DENTIST_COUNT" -eq "0" ] || [ "$SERVICE_COUNT" -eq "0" ]; then
+            echo "⚠️  Clinic 27 missing required data (patients, dentists, or services). Cannot seed business data."
+            echo "   Please ensure Clinic 27 has at least 1 patient, 1 dentist, and 1 service."
+        else
+            echo "Clinic 27 has insufficient data ($APPOINTMENT_COUNT appointments). Running business data seeders..."
+            php artisan db:seed --class=AppointmentSeeder --force
+            php artisan db:seed --class=TreatmentSeeder --force
+            php artisan db:seed --class=PaymentSeeder --force
+            echo "✅ Business data seeded for Clinic 27"
+        fi
     else
         echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
     fi
