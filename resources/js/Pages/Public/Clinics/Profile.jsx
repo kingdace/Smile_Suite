@@ -21,6 +21,10 @@ export default function ClinicProfile({ clinic, auth }) {
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
 
+    // Debug: Log flash messages
+    console.log("Flash messages:", flash);
+    console.log("Flash success:", flash?.success);
+
     // Form state for booking
     const { data, setData, post, processing, errors, reset } = useForm({
         date: "",
@@ -68,10 +72,12 @@ export default function ClinicProfile({ clinic, auth }) {
 
         // Submit the booking
         post(route("public.clinics.book-appointment", clinic.id), {
+            preserveScroll: true,
             onSuccess: () => {
                 setShowBookingModal(false);
                 reset();
                 // Success message will be shown via flash message from backend
+                // Note: The flash message is passed in the page props and will display
             },
             onError: (errors) => {
                 console.error("Booking errors:", errors);

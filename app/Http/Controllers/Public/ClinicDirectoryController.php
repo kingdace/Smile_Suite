@@ -210,7 +210,11 @@ class ClinicDirectoryController extends Controller
             Log::error('Failed to send clinic notification email: ' . $e->getMessage());
         }
 
-        return back()->with('success', 'Appointment request submitted successfully! You will receive a confirmation email shortly.');
+        // Return with success message
+        // Use Inertia redirect to properly handle flash messages
+        return redirect()
+            ->route('public.clinics.profile', $clinic->slug)
+            ->with('success', 'Appointment request submitted successfully! You will receive a confirmation email shortly.');
     }
 
     /**

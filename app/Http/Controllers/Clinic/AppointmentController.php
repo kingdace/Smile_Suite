@@ -525,6 +525,9 @@ class AppointmentController extends Controller
         $patient = $appointment->patient;
         $mailSent = false;
         $mailError = null;
+        $smsSent = false;
+        $smsError = null;
+
         if ($patient && $patient->email) {
             try {
                 Log::info('Sending denial email to: ' . $patient->email);
@@ -535,11 +538,33 @@ class AppointmentController extends Controller
                 $mailError = $e->getMessage();
             }
         }
+
+        // Send SMS notification for denial
+        if ($patient && $patient->phone_number) {
+            try {
+                Log::info('Sending denial SMS to: ' . $patient->phone_number);
+                $smsService = app(SemaphoreSmsService::class);
+                $smsResult = $smsService->sendAppointmentDenial($appointment, $patient, $validated['cancellation_reason'] ?? null);
+                $smsSent = $smsResult['success'];
+
+                if (isset($smsResult['error'])) {
+                    $smsError = $smsResult['error'];
+                }
+
+                Log::info('SMS sent: ' . ($smsSent ? 'Yes' : 'No'), ['result' => $smsResult]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send denial SMS: ' . $e->getMessage());
+                $smsError = $e->getMessage();
+            }
+        }
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'mail_sent' => $mailSent,
                 'mail_error' => $mailError,
+                'sms_sent' => $smsSent,
+                'sms_error' => $smsError,
                 'message' => 'Appointment request denied.'
             ]);
         }
@@ -605,8 +630,11 @@ class AppointmentController extends Controller
         // Send confirmation email to patient
         $appointment->load(['clinic', 'patient', 'assignedDentist']);
         $patient = $appointment->patient;
+        $dentist = $appointment->assignedDentist;
         $mailSent = false;
         $mailError = null;
+        $smsSent = false;
+        $smsError = null;
 
         if ($patient && $patient->email) {
             try {
@@ -619,11 +647,32 @@ class AppointmentController extends Controller
             }
         }
 
+        // Send SMS notification for reschedule approval
+        if ($patient && $patient->phone_number) {
+            try {
+                Log::info('Sending reschedule approval SMS to: ' . $patient->phone_number);
+                $smsService = app(SemaphoreSmsService::class);
+                $smsResult = $smsService->sendRescheduleApproval($appointment, $patient, $dentist);
+                $smsSent = $smsResult['success'];
+
+                if (isset($smsResult['error'])) {
+                    $smsError = $smsResult['error'];
+                }
+
+                Log::info('SMS sent: ' . ($smsSent ? 'Yes' : 'No'), ['result' => $smsResult]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send reschedule approval SMS: ' . $e->getMessage());
+                $smsError = $e->getMessage();
+            }
+        }
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'mail_sent' => $mailSent,
                 'mail_error' => $mailError,
+                'sms_sent' => $smsSent,
+                'sms_error' => $smsError,
                 'message' => 'Reschedule request approved and appointment updated.'
             ]);
         }
@@ -669,6 +718,8 @@ class AppointmentController extends Controller
         $patient = $appointment->patient;
         $mailSent = false;
         $mailError = null;
+        $smsSent = false;
+        $smsError = null;
 
         if ($patient && $patient->email) {
             try {
@@ -681,11 +732,32 @@ class AppointmentController extends Controller
             }
         }
 
+        // Send SMS notification for reschedule denial
+        if ($patient && $patient->phone_number) {
+            try {
+                Log::info('Sending reschedule denial SMS to: ' . $patient->phone_number);
+                $smsService = app(SemaphoreSmsService::class);
+                $smsResult = $smsService->sendRescheduleDenial($appointment, $patient, $validated['denial_reason'] ?? null);
+                $smsSent = $smsResult['success'];
+
+                if (isset($smsResult['error'])) {
+                    $smsError = $smsResult['error'];
+                }
+
+                Log::info('SMS sent: ' . ($smsSent ? 'Yes' : 'No'), ['result' => $smsResult]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send reschedule denial SMS: ' . $e->getMessage());
+                $smsError = $e->getMessage();
+            }
+        }
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'mail_sent' => $mailSent,
                 'mail_error' => $mailError,
+                'sms_sent' => $smsSent,
+                'sms_error' => $smsError,
                 'message' => 'Reschedule request denied.'
             ]);
         }

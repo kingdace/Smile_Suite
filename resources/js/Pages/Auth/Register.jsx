@@ -149,11 +149,10 @@ export default function Register() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
+                    "X-CSRF-TOKEN": window.getCsrfToken(),
                     Accept: "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify(claimData),
             })
                 .then((response) => response.json())
@@ -204,11 +203,10 @@ export default function Register() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute("content"),
+                    "X-CSRF-TOKEN": window.getCsrfToken(),
                     Accept: "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify(verifyData),
             })
                 .then((response) => response.json())

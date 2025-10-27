@@ -42,6 +42,13 @@ class SendAppointmentRemindersDaily extends Command
                 ->whereHas('status', function($query) {
                     $query->whereIn('name', ['Pending', 'Confirmed']);
                 })
+                // Safety: Only get appointments that haven't been reminded today
+                // Check if notes field doesn't contain today's reminder marker
+                ->where(function($query) use ($todayStart) {
+                    $todayMarker = 'sms_reminder_' . $todayStart->format('Y-m-d');
+                    $query->whereNull('notes')
+                          ->orWhere('notes', 'NOT LIKE', "%{$todayMarker}%");
+                })
                 ->get();
 
             $this->info("📋 Found {$todayAppointments->count()} appointments scheduled for today");
@@ -83,6 +90,14 @@ class SendAppointmentRemindersDaily extends Command
 
                             if ($smsResult['success']) {
                                 $stats['sms_sent']++;
+
+                                // Safety: Mark this appointment as reminded today to prevent duplicates
+                                $todayMarker = 'sms_reminder_' . now()->format('Y-m-d');
+                                $currentNotes = $appointment->notes ?? '';
+                                $appointment->update([
+                                    'notes' => $currentNotes . "\n[{$todayMarker}]"
+                                ]);
+
                                 $this->line("\n📱 SMS sent to {$patient->first_name} {$patient->last_name}");
                             } else {
                                 $stats['sms_failed']++;
