@@ -14,18 +14,31 @@ if [ "$CLINIC_COUNT" -lt "30" ]; then
 else
     echo "✅ Database already seeded ($CLINIC_COUNT clinics found)"
 
-    # Check if we need to add business data for Clinic 27
-    echo "Checking if Clinic 27 needs business data..."
-    APPOINTMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Appointment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+    # Check if permissions are missing
+    echo "Checking if permissions are missing..."
+    PERMISSION_COUNT=$(php artisan tinker --execute="echo App\Models\Permission::count();" 2>/dev/null || echo "0")
 
-    if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
-        echo "Clinic 27 has insufficient data. Running business data seeders..."
-        php artisan db:seed --class=AppointmentSeeder
-        php artisan db:seed --class=TreatmentSeeder
-        php artisan db:seed --class=PaymentSeeder
-        echo "✅ Business data seeded for Clinic 27"
+    if [ "$PERMISSION_COUNT" -lt "40" ]; then
+        echo "Permissions missing ($PERMISSION_COUNT found). Running permission seeders..."
+        php artisan db:seed --class=PermissionSeeder --force
+        php artisan db:seed --class=RolePermissionSeeder --force
+        echo "✅ Permissions seeded"
     else
-        echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
+        echo "✅ Permissions exist ($PERMISSION_COUNT found)"
+
+        # Check if we need to add business data for Clinic 27
+        echo "Checking if Clinic 27 needs business data..."
+        APPOINTMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Appointment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+
+        if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
+            echo "Clinic 27 has insufficient data. Running business data seeders..."
+            php artisan db:seed --class=AppointmentSeeder --force
+            php artisan db:seed --class=TreatmentSeeder --force
+            php artisan db:seed --class=PaymentSeeder --force
+            echo "✅ Business data seeded for Clinic 27"
+        else
+            echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
+        fi
     fi
 fi
 
