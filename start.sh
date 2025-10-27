@@ -25,20 +25,22 @@ else
         echo "✅ Permissions seeded"
     else
         echo "✅ Permissions exist ($PERMISSION_COUNT found)"
+    fi
 
-        # Check if we need to add business data for Clinic 27
-        echo "Checking if Clinic 27 needs business data..."
-        APPOINTMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Appointment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+    # Always check if Clinic 27 needs business data (regardless of permission status)
+    echo "Checking if Clinic 27 needs business data..."
+    APPOINTMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Appointment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
 
-        if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
-            echo "Clinic 27 has insufficient data. Running business data seeders..."
-            php artisan db:seed --class=AppointmentSeeder --force
-            php artisan db:seed --class=TreatmentSeeder --force
-            php artisan db:seed --class=PaymentSeeder --force
-            echo "✅ Business data seeded for Clinic 27"
-        else
-            echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
-        fi
+    echo "Clinic 27 currently has $APPOINTMENT_COUNT appointments"
+
+    if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
+        echo "Clinic 27 has insufficient data ($APPOINTMENT_COUNT appointments). Running business data seeders..."
+        php artisan db:seed --class=AppointmentSeeder --force
+        php artisan db:seed --class=TreatmentSeeder --force
+        php artisan db:seed --class=PaymentSeeder --force
+        echo "✅ Business data seeded for Clinic 27"
+    else
+        echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
     fi
 fi
 
