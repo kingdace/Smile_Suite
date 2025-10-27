@@ -41,15 +41,34 @@ else
 
     echo "Clinic 27 has: $PATIENT_COUNT patients, $DENTIST_COUNT dentists, $SERVICE_COUNT services"
 
-    if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
+    if [ "$APPOINTMENT_COUNT" -lt "20" ]; then
         if [ "$PATIENT_COUNT" -eq "0" ] || [ "$DENTIST_COUNT" -eq "0" ] || [ "$SERVICE_COUNT" -eq "0" ]; then
             echo "⚠️  Clinic 27 missing required data (patients, dentists, or services). Cannot seed business data."
             echo "   Please ensure Clinic 27 has at least 1 patient, 1 dentist, and 1 service."
         else
-            echo "Clinic 27 has insufficient data ($APPOINTMENT_COUNT appointments). Running business data seeders..."
-            php artisan db:seed --class=AppointmentSeeder --force
-            php artisan db:seed --class=TreatmentSeeder --force
-            php artisan db:seed --class=PaymentSeeder --force
+            echo "Clinic 27 has $APPOINTMENT_COUNT appointments (need 20+). Checking if seeders can add data..."
+
+            # Check if treatments and payments also need seeding
+            TREATMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Treatment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+            PAYMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Payment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+
+            echo "Clinic 27 has: $TREATMENT_COUNT treatments, $PAYMENT_COUNT payments"
+
+            if [ "$APPOINTMENT_COUNT" -lt "30" ]; then
+                echo "Running business data seeders to reach 30 appointments..."
+                php artisan db:seed --class=AppointmentSeeder --force
+            fi
+
+            if [ "$TREATMENT_COUNT" -lt "30" ]; then
+                echo "Running treatment seeder to reach 30 treatments..."
+                php artisan db:seed --class=TreatmentSeeder --force
+            fi
+
+            if [ "$PAYMENT_COUNT" -lt "40" ]; then
+                echo "Running payment seeder to reach 40 payments..."
+                php artisan db:seed --class=PaymentSeeder --force
+            fi
+
             echo "✅ Business data seeded for Clinic 27"
         fi
     else

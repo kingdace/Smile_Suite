@@ -18,20 +18,30 @@ class PaymentSeeder extends Seeder
     {
         $clinicId = 27;
 
-        // Get treatments created in January, May, July, August, September 2025
+        // Get ALL treatments that don't have payments yet
         $treatments = Treatment::where('clinic_id', $clinicId)
-            ->whereIn(
-                DB::raw('MONTH(created_at)'),
-                [1, 5, 7, 8, 9]
-            )
-            ->whereYear('created_at', 2025)
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('payments')
+                    ->whereColumn('payments.treatment_id', 'treatments.id');
+            })
             ->with(['patient', 'appointment'])
             ->get();
 
-        if ($treatments->isEmpty()) {
-            $this->command->info("No treatments found for the specified months");
+        // Check total payment count first
+        $totalExistingPayments = Payment::where('clinic_id', $clinicId)->count();
+
+        if ($totalExistingPayments >= 40) {
+            $this->command->info("Clinic 27 already has {$totalExistingPayments} payments (target: 40). Skipping.");
             return;
         }
+
+        if ($treatments->isEmpty()) {
+            $this->command->info("No treatments found without payments for clinic ID {$clinicId}");
+            return;
+        }
+
+        $this->command->info("Found {$treatments->count()} treatments without payments");
 
         $this->command->info("Processing " . $treatments->count() . " treatments...");
 

@@ -18,21 +18,18 @@ class TreatmentSeeder extends Seeder
     {
         $clinicId = 27;
 
-        // Get appointments created in January, May, July, August, September
+        // Get ALL appointments that don't have treatments yet
         $appointments = Appointment::where('clinic_id', $clinicId)
-            ->whereMonth('created_at', '>=', 1)
-            ->whereMonth('created_at', '<=', 12)
-            ->whereIn(
-                DB::raw('MONTH(created_at)'),
-                [1, 5, 7, 8, 9]
-            )
+            ->doesntHave('treatments') // Only get appointments without treatments
             ->with(['patient', 'assignedDentist'])
             ->get();
 
         if ($appointments->isEmpty()) {
-            $this->command->info("No appointments found for the specified months");
+            $this->command->info("No appointments found without treatments for clinic ID {$clinicId}");
             return;
         }
+
+        $this->command->info("Found {$appointments->count()} appointments without treatments");
 
         // Get services for this clinic
         $services = Service::where('clinic_id', $clinicId)->get();
@@ -149,16 +146,15 @@ class TreatmentSeeder extends Seeder
             ];
         }
 
-        // Check if treatments for these appointments already exist to prevent duplicates
-        $appointmentIds = collect($treatments)->pluck('appointment_id')->filter();
-        $existingTreatments = Treatment::where('clinic_id', $clinicId)
-            ->whereIn('appointment_id', $appointmentIds)
-            ->count();
+        // Check total treatment count to avoid re-seeding
+        $totalExistingTreatments = Treatment::where('clinic_id', $clinicId)->count();
 
-        if ($existingTreatments > 0) {
-            $this->command->warn("Some treatments already exist for these appointments. Skipping duplicate creation.");
+        if ($totalExistingTreatments >= 30) {
+            $this->command->info("Clinic 27 already has {$totalExistingTreatments} treatments (target: 30). Skipping.");
             return;
         }
+
+        $this->command->info("Clinic 27 has {$totalExistingTreatments} treatments. Need to create more to reach target of 30.");
 
         // Insert treatments
         Treatment::insert($treatments);
