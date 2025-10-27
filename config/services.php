@@ -46,4 +46,10 @@ return [
         'api_key' => env('HUGGINGFACE_API_KEY'),
     ],
 
+    'semaphore' => [
+        'api_key' => env('SEMAPHORE_API_KEY'),
+        'sender_name' => env('SEMAPHORE_SENDER_NAME', 'SmileSuite'),
+        'test_mode' => env('SEMAPHORE_TEST_MODE', true),
+    ],
+
 ];

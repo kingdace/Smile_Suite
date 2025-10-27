@@ -13,6 +13,20 @@ if [ "$CLINIC_COUNT" -lt "30" ]; then
     echo "✅ Database seeders completed"
 else
     echo "✅ Database already seeded ($CLINIC_COUNT clinics found)"
+
+    # Check if we need to add business data for Clinic 27
+    echo "Checking if Clinic 27 needs business data..."
+    APPOINTMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Appointment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+
+    if [ "$APPOINTMENT_COUNT" -lt "10" ]; then
+        echo "Clinic 27 has insufficient data. Running business data seeders..."
+        php artisan db:seed --class=AppointmentSeeder
+        php artisan db:seed --class=TreatmentSeeder
+        php artisan db:seed --class=PaymentSeeder
+        echo "✅ Business data seeded for Clinic 27"
+    else
+        echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
+    fi
 fi
 
 # Ensure storage directories exist

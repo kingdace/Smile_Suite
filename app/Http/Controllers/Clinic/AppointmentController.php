@@ -20,6 +20,7 @@ use App\Mail\AppointmentApprovedMail;
 use App\Mail\AppointmentDeniedMail;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
+use App\Services\SemaphoreSmsService;
 
 class AppointmentController extends Controller
 {
@@ -445,6 +446,10 @@ class AppointmentController extends Controller
         $dentist = $appointment->assignedDentist;
         $mailSent = false;
         $mailError = null;
+        $smsSent = false;
+        $smsError = null;
+
+        // Send email notification
         if ($patient && $patient->email) {
             try {
                 Log::info('Sending approval email to: ' . $patient->email);
@@ -455,11 +460,33 @@ class AppointmentController extends Controller
                 $mailError = $e->getMessage();
             }
         }
+
+        // Send SMS notification
+        if ($patient && $patient->phone_number) {
+            try {
+                Log::info('Sending approval SMS to: ' . $patient->phone_number);
+                $smsService = app(SemaphoreSmsService::class);
+                $smsResult = $smsService->sendAppointmentConfirmation($appointment, $patient, $dentist);
+                $smsSent = $smsResult['success'];
+
+                if (isset($smsResult['error'])) {
+                    $smsError = $smsResult['error'];
+                }
+
+                Log::info('SMS sent: ' . ($smsSent ? 'Yes' : 'No'), ['result' => $smsResult]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send approval SMS: ' . $e->getMessage());
+                $smsError = $e->getMessage();
+            }
+        }
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'mail_sent' => $mailSent,
                 'mail_error' => $mailError,
+                'sms_sent' => $smsSent,
+                'sms_error' => $smsError,
                 'message' => 'Appointment approved and confirmed.'
             ]);
         }

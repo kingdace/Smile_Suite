@@ -149,6 +149,17 @@ class TreatmentSeeder extends Seeder
             ];
         }
 
+        // Check if treatments for these appointments already exist to prevent duplicates
+        $appointmentIds = collect($treatments)->pluck('appointment_id')->filter();
+        $existingTreatments = Treatment::where('clinic_id', $clinicId)
+            ->whereIn('appointment_id', $appointmentIds)
+            ->count();
+
+        if ($existingTreatments > 0) {
+            $this->command->warn("Some treatments already exist for these appointments. Skipping duplicate creation.");
+            return;
+        }
+
         // Insert treatments
         Treatment::insert($treatments);
 

@@ -135,6 +135,17 @@ class AppointmentSeeder extends Seeder
             }
         }
 
+        // Check if appointments for these dates already exist to prevent duplicates
+        $existingAppointments = Appointment::where('clinic_id', $clinicId)
+            ->whereIn('created_at', collect($appointments)->pluck('created_at'))
+            ->count();
+
+        if ($existingAppointments > 0) {
+            $this->command->warn("Some appointments already exist. Skipping duplicate creation.");
+            $this->command->info("To re-run, please clear existing appointments first.");
+            return;
+        }
+
         // Insert appointments
         Appointment::insert($appointments);
 
