@@ -424,8 +424,12 @@ class AppointmentController extends Controller
 
     public function approveOnlineRequest(Request $request, Clinic $clinic, Appointment $appointment)
     {
+        // Load relationships
+        $appointment->load('type', 'status');
+
         $this->authorize('update', [$appointment, $clinic]);
-        if (!$appointment->type || !isset($appointment->type->name) || strtolower($appointment->type->name) !== 'online booking' || !$appointment->status || !isset($appointment->status->name) || $appointment->status->name !== 'Pending') {
+
+        if (!$appointment->type || !isset($appointment->type->name) || strtolower($appointment->type->name) !== 'online booking' || !$appointment->status || !isset($appointment->status->name) || strtolower($appointment->status->name) !== 'pending') {
             $msg = 'Only pending online requests can be approved.';
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['message' => $msg], 422);
@@ -495,8 +499,12 @@ class AppointmentController extends Controller
 
     public function denyOnlineRequest(Request $request, Clinic $clinic, Appointment $appointment)
     {
+        // Load relationships
+        $appointment->load('type', 'status');
+
         $this->authorize('update', [$appointment, $clinic]);
-        if (!$appointment->type || !isset($appointment->type->name) || strtolower($appointment->type->name) !== 'online booking' || !$appointment->status || !isset($appointment->status->name) || $appointment->status->name !== 'Pending') {
+
+        if (!$appointment->type || !isset($appointment->type->name) || strtolower($appointment->type->name) !== 'online booking' || !$appointment->status || !isset($appointment->status->name) || strtolower($appointment->status->name) !== 'pending') {
             $msg = 'Only pending online requests can be denied.';
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['message' => $msg], 422);
@@ -543,9 +551,12 @@ class AppointmentController extends Controller
      */
     public function approveReschedule(Request $request, Clinic $clinic, Appointment $appointment)
     {
+        // Load relationships
+        $appointment->load('type', 'status');
+
         $this->authorize('update', [$appointment, $clinic]);
 
-        if (!$appointment->status || $appointment->status->name !== 'Pending Reschedule') {
+        if (!$appointment->status || strtolower($appointment->status->name) !== 'pending reschedule') {
             $msg = 'Only pending reschedule requests can be approved.';
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['message' => $msg], 422);
@@ -624,9 +635,12 @@ class AppointmentController extends Controller
      */
     public function denyReschedule(Request $request, Clinic $clinic, Appointment $appointment)
     {
+        // Load relationships
+        $appointment->load('type', 'status');
+
         $this->authorize('update', [$appointment, $clinic]);
 
-        if (!$appointment->status || $appointment->status->name !== 'Pending Reschedule') {
+        if (!$appointment->status || strtolower($appointment->status->name) !== 'pending reschedule') {
             $msg = 'Only pending reschedule requests can be denied.';
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['message' => $msg], 422);
