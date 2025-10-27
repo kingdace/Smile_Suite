@@ -117,18 +117,18 @@ class AppointmentController extends Controller
                 return $apt->status && $apt->status->name === 'Cancelled';
             })->count(),
             'walk_in_appointments' => $allAppointments->filter(function($apt) {
-                return $apt->type && $apt->type->name === 'Walk-In';
+                return $apt->type && $apt->type->name === 'Walk-in';
             })->count(),
             'online_bookings' => $allAppointments->filter(function($apt) {
-                return $apt->type && $apt->type->name === 'Online Booking';
+                return $apt->type && strtolower($apt->type->name) === 'online booking';
             })->count(),
             'pending_online_bookings' => $allAppointments->filter(function($apt) {
-                return $apt->type && $apt->type->name === 'Online Booking' &&
-                       $apt->status && $apt->status->name === 'Pending';
+                return $apt->type && strtolower($apt->type->name) === 'online booking' &&
+                       $apt->status && strtolower($apt->status->name) === 'pending';
             })->count(),
             'patient_cancelled_online' => $allAppointments->filter(function($apt) {
-                return $apt->type && $apt->type->name === 'Online Booking' &&
-                       $apt->status && $apt->status->name === 'Cancelled' &&
+                return $apt->type && strtolower($apt->type->name) === 'online booking' &&
+                       $apt->status && strtolower($apt->status->name) === 'cancelled' &&
                        $apt->cancelled_at && $apt->cancellation_reason;
             })->count(),
         ];

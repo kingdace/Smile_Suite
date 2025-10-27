@@ -146,15 +146,16 @@ class TreatmentSeeder extends Seeder
             ];
         }
 
-        // Check total treatment count to avoid re-seeding
+        // Check total treatment count
         $totalExistingTreatments = Treatment::where('clinic_id', $clinicId)->count();
 
-        if ($totalExistingTreatments >= 30) {
-            $this->command->info("Clinic 27 already has {$totalExistingTreatments} treatments (target: 30). Skipping.");
+        // Target: treatments for all 39 appointments
+        if ($totalExistingTreatments >= 39) {
+            $this->command->info("Clinic 27 already has {$totalExistingTreatments} treatments (target: 39). Skipping.");
             return;
         }
 
-        $this->command->info("Clinic 27 has {$totalExistingTreatments} treatments. Need to create more to reach target of 30.");
+        $this->command->info("Clinic 27 has {$totalExistingTreatments} treatments. Creating treatments for all appointments...");
 
         // Insert treatments
         Treatment::insert($treatments);

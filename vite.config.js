@@ -20,10 +20,10 @@ export default defineConfig({
         }
     },
     server: {
-        host: "172.28.99.70",
+        host: "192.168.1.25",
         port: 5173,
         hmr: {
-            host: "172.28.99.70", // Default to localhost for normal dev
+            host: "192.168.1.25", // Default to localhost for normal dev
         },
         cors: true,
         strictPort: true,
@@ -32,6 +32,7 @@ export default defineConfig({
         },
     },
 });
+
 
 
 

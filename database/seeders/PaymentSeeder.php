@@ -31,10 +31,13 @@ class PaymentSeeder extends Seeder
         // Check total payment count first
         $totalExistingPayments = Payment::where('clinic_id', $clinicId)->count();
 
-        if ($totalExistingPayments >= 40) {
-            $this->command->info("Clinic 27 already has {$totalExistingPayments} payments (target: 40). Skipping.");
+        // Target: payments for all treatments (typically 50-60+ payments)
+        if ($totalExistingPayments >= 50) {
+            $this->command->info("Clinic 27 already has {$totalExistingPayments} payments (target: 50+). Skipping.");
             return;
         }
+
+        $this->command->info("Clinic 27 has {$totalExistingPayments} payments. Creating payments for all treatments...");
 
         if ($treatments->isEmpty()) {
             $this->command->info("No treatments found without payments for clinic ID {$clinicId}");

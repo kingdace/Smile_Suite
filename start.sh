@@ -41,12 +41,12 @@ else
 
     echo "Clinic 27 has: $PATIENT_COUNT patients, $DENTIST_COUNT dentists, $SERVICE_COUNT services"
 
-    if [ "$APPOINTMENT_COUNT" -lt "20" ]; then
+    if [ "$APPOINTMENT_COUNT" -lt "39" ]; then
         if [ "$PATIENT_COUNT" -eq "0" ] || [ "$DENTIST_COUNT" -eq "0" ] || [ "$SERVICE_COUNT" -eq "0" ]; then
             echo "⚠️  Clinic 27 missing required data (patients, dentists, or services). Cannot seed business data."
             echo "   Please ensure Clinic 27 has at least 1 patient, 1 dentist, and 1 service."
         else
-            echo "Clinic 27 has $APPOINTMENT_COUNT appointments (need 20+). Checking if seeders can add data..."
+            echo "Clinic 27 has $APPOINTMENT_COUNT appointments (target: 39). Seeding full dataset..."
 
             # Check if treatments and payments also need seeding
             TREATMENT_COUNT=$(php artisan tinker --execute="echo App\Models\Treatment::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
@@ -54,18 +54,19 @@ else
 
             echo "Clinic 27 has: $TREATMENT_COUNT treatments, $PAYMENT_COUNT payments"
 
-            if [ "$APPOINTMENT_COUNT" -lt "30" ]; then
-                echo "Running business data seeders to reach 30 appointments..."
+            # Always try to seed if counts are below targets
+            if [ "$APPOINTMENT_COUNT" -lt "39" ]; then
+                echo "Running AppointmentSeeder to reach 39 appointments..."
                 php artisan db:seed --class=AppointmentSeeder --force
             fi
 
-            if [ "$TREATMENT_COUNT" -lt "30" ]; then
-                echo "Running treatment seeder to reach 30 treatments..."
+            if [ "$TREATMENT_COUNT" -lt "39" ]; then
+                echo "Running TreatmentSeeder to reach 39 treatments..."
                 php artisan db:seed --class=TreatmentSeeder --force
             fi
 
-            if [ "$PAYMENT_COUNT" -lt "40" ]; then
-                echo "Running payment seeder to reach 40 payments..."
+            if [ "$PAYMENT_COUNT" -lt "50" ]; then
+                echo "Running PaymentSeeder to reach 50+ payments..."
                 php artisan db:seed --class=PaymentSeeder --force
             fi
 

@@ -64,6 +64,17 @@ class AppointmentSeeder extends Seeder
             return;
         }
 
+        // Check total appointment count FIRST before generating data
+        $totalExistingAppointments = Appointment::where('clinic_id', $clinicId)->count();
+
+        // Target: at least 39 appointments (full dataset)
+        if ($totalExistingAppointments >= 39) {
+            $this->command->info("Clinic 27 already has {$totalExistingAppointments} appointments (target: 39). Skipping.");
+            return;
+        }
+
+        $this->command->info("Clinic 27 has {$totalExistingAppointments} appointments. Creating full dataset (39 total appointments)...");
+
         $appointments = [];
 
         // Define creation months with different counts
@@ -142,19 +153,8 @@ class AppointmentSeeder extends Seeder
             }
         }
 
-        // Check total appointment count to avoid re-seeding
-        $totalExistingAppointments = Appointment::where('clinic_id', $clinicId)->count();
-
-        if ($totalExistingAppointments >= 30) {
-            $this->command->info("Clinic 27 already has {$totalExistingAppointments} appointments (target: 30). Skipping.");
-            return;
-        }
-
-        $this->command->info("Clinic 27 has {$totalExistingAppointments} appointments. Need to create more to reach target of 30.");
-
         // Insert appointments
         Appointment::insert($appointments);
-
         $totalCreated = count($appointments);
         $walkInCount = collect($appointments)->where('is_online_booking', false)->count();
         $onlineCount = collect($appointments)->where('is_online_booking', true)->count();
