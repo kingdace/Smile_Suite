@@ -91,3 +91,4 @@ The 419 errors you were seeing were likely due to:
 -   Better error messages
 -   Standard Laravel CSRF behavior
 -   More reliable overall
+

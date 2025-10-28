@@ -24,34 +24,56 @@ window.getCsrfToken = () => {
     return meta ? meta.getAttribute("content") : null;
 };
 
-// Add response interceptor to handle 419 CSRF errors gracefully
+// Add response interceptor to handle 419 CSRF errors
 axios.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         // Handle 419 CSRF token mismatch errors
-        if (error.response?.status === 419) {
-            console.warn("CSRF token mismatch (419). This usually means:");
-            console.warn(
-                "1. Your session has expired - please refresh the page"
-            );
-            console.warn(
-                "2. The CSRF token in the page doesn't match the server token"
-            );
+        if (
+            error.response?.status === 419 &&
+            error.config &&
+            !error.config._retry
+        ) {
+            // Mark this request as retried to prevent infinite loops
+            error.config._retry = true;
 
-            // Show user-friendly error message
-            const errorMessage =
-                error.response?.data?.message ||
-                error.response?.data?.error ||
-                "Session expired. Please refresh the page and try again.";
+            try {
+                // Fetch a fresh CSRF token from Laravel
+                const response = await axios.get("/sanctum/csrf-cookie", {
+                    withCredentials: true,
+                });
 
-            // Don't try to auto-fix this - user needs to refresh the page
-            // The meta tag will have a fresh token after page reload
-            console.error("CSRF Error Details:", {
-                url: error.config?.url,
-                message: errorMessage,
-            });
+                // Update meta tag with new token if available
+                const metaTag = document.querySelector(
+                    'meta[name="csrf-token"]'
+                );
+                const newToken = metaTag?.getAttribute("content");
+
+                if (newToken) {
+                    updateCsrfToken(newToken);
+                }
+
+                // Retry the original request
+                return axios.request(error.config);
+            } catch (refreshError) {
+                console.error("Failed to refresh CSRF token:", refreshError);
+                // If refresh fails, reject with original error
+                return Promise.reject(error);
+            }
         }
 
         return Promise.reject(error);
     }
 );
+
+// Helper function to update CSRF token
+function updateCsrfToken(token) {
+    // Update meta tag
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    if (metaTag) {
+        metaTag.setAttribute("content", token);
+    }
+
+    // Update axios defaults
+    axios.defaults.headers.common["X-CSRF-TOKEN"] = token;
+}
