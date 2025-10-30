@@ -73,7 +73,7 @@ else
             # Check and seed notifications for Clinic 27
             NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
             echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
-            
+
             if [ "$NOTIFICATION_COUNT" -lt "39" ]; then
                 echo "Running NotificationSeeder to create notifications for appointments..."
                 php artisan db:seed --class=NotificationSeeder --force
@@ -86,11 +86,11 @@ else
         fi
     else
         echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
-        
+
         # Still check if notifications need to be created
         NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
         echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
-        
+
         if [ "$NOTIFICATION_COUNT" -lt "39" ]; then
             echo "Running NotificationSeeder to create notifications for existing appointments..."
             php artisan db:seed --class=NotificationSeeder --force
@@ -143,10 +143,17 @@ php artisan schedule:work &
 SCHEDULER_PID=$!
 echo "✅ Scheduler started (PID: $SCHEDULER_PID)"
 
+# Start the queue worker in the background
+echo "Starting Laravel queue worker..."
+php artisan queue:work --tries=3 --timeout=90 &
+QUEUE_PID=$!
+echo "✅ Queue worker started (PID: $QUEUE_PID)"
+
 # Function to cleanup background processes on script exit
 cleanup() {
-    echo "Stopping scheduler..."
+    echo "Stopping scheduler and queue worker..."
     kill $SCHEDULER_PID 2>/dev/null || true
+    kill $QUEUE_PID 2>/dev/null || true
     echo "✅ Cleanup complete"
 }
 
