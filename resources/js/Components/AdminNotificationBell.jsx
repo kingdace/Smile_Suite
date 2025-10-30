@@ -82,7 +82,7 @@ export default function AdminNotificationBell({ auth }) {
     const markAllAsRead = async () => {
         try {
             const response = await fetch(
-                route("admin.admin.notifications.mark-all-read"),
+                route("admin.notifications.mark-all-read"),
                 {
                     method: "POST",
                     headers: {
