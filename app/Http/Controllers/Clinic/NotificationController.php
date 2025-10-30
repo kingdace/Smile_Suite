@@ -26,7 +26,21 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
+        // 🔍 DEBUG LOGGING
+        \Log::info('NotificationController::index called', [
+            'user_id' => $user ? $user->id : null,
+            'user_email' => $user ? $user->email : null,
+            'user_role' => $user ? $user->role : null,
+            'user_clinic_id' => $user ? $user->clinic_id : null,
+            'request_ip' => $request->ip(),
+            'request_url' => $request->fullUrl(),
+        ]);
+
         if (!$user || !$user->clinic_id) {
+            \Log::warning('NotificationController: No user or clinic_id', [
+                'has_user' => $user !== null,
+                'clinic_id' => $user ? $user->clinic_id : null,
+            ]);
             return response()->json([
                 'notifications' => [],
                 'unread_count' => 0,
@@ -38,6 +52,16 @@ class NotificationController extends Controller
 
         $notifications = $this->notificationService->getNotificationsForUser($user, $limit, $unreadOnly);
         $unreadCount = $this->notificationService->getUnreadCountForUser($user);
+
+        // 🔍 DEBUG LOGGING
+        \Log::info('NotificationController: Fetched notifications', [
+            'user_id' => $user->id,
+            'clinic_id' => $user->clinic_id,
+            'notifications_count' => $notifications->count(),
+            'unread_count' => $unreadCount,
+            'limit' => $limit,
+            'unread_only' => $unreadOnly,
+        ]);
 
         return response()->json([
             'notifications' => $notifications,

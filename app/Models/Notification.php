@@ -48,6 +48,13 @@ class Notification extends Model
 
     public function scopeForUser($query, $user)
     {
+        // 🔍 DEBUG LOGGING
+        \Log::info('Notification::scopeForUser called', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
+            'user_clinic_id' => $user->clinic_id ?? 'null',
+        ]);
+
         return $query->where(function($q) use ($user) {
             $q->whereJsonContains('target_roles', $user->role)
               ->orWhere('user_id', $user->id);
