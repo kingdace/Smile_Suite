@@ -28,15 +28,6 @@ export default function NotificationBell({ auth }) {
     const fetchNotifications = async (silent = false) => {
         if (!silent) setIsLoading(true);
 
-        console.log(
-            "🔔 [NotificationBell] Fetching notifications for clinic:",
-            auth.clinic_id
-        );
-        console.log(
-            "🔔 [NotificationBell] Route URL:",
-            route("clinic.notifications.index", auth.clinic_id)
-        );
-
         try {
             const response = await fetch(
                 route("clinic.notifications.index", auth.clinic_id),
@@ -45,40 +36,17 @@ export default function NotificationBell({ auth }) {
                     headers: {
                         "X-Requested-With": "XMLHttpRequest",
                     },
-                    credentials: "same-origin", // ✅ CRITICAL: Send session cookies
+                    credentials: "same-origin",
                 }
             );
 
-            console.log(
-                "🔔 [NotificationBell] Response status:",
-                response.status
-            );
-            console.log("🔔 [NotificationBell] Response OK:", response.ok);
-
             if (response.ok) {
                 const data = await response.json();
-                console.log("🔔 [NotificationBell] Data received:", data);
-                console.log(
-                    "🔔 [NotificationBell] Notifications count:",
-                    data.notifications?.length || 0
-                );
-                console.log(
-                    "🔔 [NotificationBell] Unread count:",
-                    data.unread_count
-                );
-
                 setNotifications(data.notifications);
                 setUnreadCount(data.unread_count);
-            } else {
-                console.error("🔔 [NotificationBell] Response not OK!");
-                const text = await response.text();
-                console.error(
-                    "🔔 [NotificationBell] Response text:",
-                    text.substring(0, 500)
-                );
             }
         } catch (error) {
-            console.error("🔔 [NotificationBell] Fetch error:", error);
+            console.error("Error fetching notifications:", error);
         } finally {
             if (!silent) setIsLoading(false);
         }

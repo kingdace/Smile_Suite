@@ -51,19 +51,9 @@ class AdminNotificationController extends Controller
             ->notExpired()
             ->count();
 
-        // 🔍 TEMPORARY DEBUG OUTPUT
-        \Log::info('Admin Notification API Returning', [
-            'user_id' => $user->id,
-            'user_role' => $user->role,
-            'notifications_count' => $notifications->count(),
-            'unread_count' => $unreadCount,
-        ]);
-
         return response()->json([
             'notifications' => $notifications,
             'unread_count' => $unreadCount,
-            'debug_user_id' => $user->id,
-            'debug_role' => $user->role,
         ]);
     }
 

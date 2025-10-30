@@ -52,16 +52,6 @@ class NotificationService
      */
     public function getNotificationsForUser(User $user, int $limit = 10, bool $unreadOnly = false)
     {
-        // 🔍 DEBUG: Check database connection
-        $connection = \DB::connection();
-        $dbName = $connection->getDatabaseName();
-        $config = $connection->getConfig();
-        
-        // Store in property for debugging
-        $this->debug_db = $dbName;
-        $this->debug_host = $config['host'] ?? 'N/A';
-        $this->debug_connection = $connection->getName();
-        
         $query = Notification::forClinic($user->clinic_id)
             ->forUser($user)
             ->notExpired()
@@ -71,23 +61,7 @@ class NotificationService
             $query->unread();
         }
 
-        // 🔍 DEBUG: Capture SQL and bindings
-        $sql = $query->toSql();
-        $bindings = $query->getBindings();
-        
-        $results = $query->limit($limit)->get();
-        
-        // 🔍 DEBUG: Store for debugging (hacky but effective)
-        $results->debug_sql = $sql;
-        $results->debug_bindings = $bindings;
-        $results->debug_user_id = $user->id;
-        $results->debug_clinic_id = $user->clinic_id;
-        $results->debug_user_role = $user->role;
-        $results->debug_db_name = $this->debug_db ?? 'N/A';
-        $results->debug_db_host = $this->debug_host ?? 'N/A';
-        $results->debug_connection_name = $this->debug_connection ?? 'N/A';
-
-        return $results;
+        return $query->limit($limit)->get();
     }
 
     /**

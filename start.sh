@@ -70,44 +70,20 @@ else
                 php artisan db:seed --class=PaymentSeeder --force
             fi
 
-            # Check and seed notifications for Clinic 27
-            NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
-            echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
-
-            # Force seeder to run if count is 0 (Railway MySQL is empty)
-            if [ "$NOTIFICATION_COUNT" -lt "1" ]; then
-                echo "🔥 FORCE RUNNING NotificationSeeder (count is 0 on Railway MySQL)..."
-                php artisan db:seed --class=NotificationSeeder --force
-                echo "✅ Notifications seeded for Clinic 27"
-            elif [ "$NOTIFICATION_COUNT" -lt "39" ]; then
-                echo "Running NotificationSeeder to create notifications for appointments..."
-                php artisan db:seed --class=NotificationSeeder --force
-                echo "✅ Notifications seeded for Clinic 27"
-            else
-                echo "✅ Clinic 27 already has sufficient notifications ($NOTIFICATION_COUNT found)"
-            fi
+            # ⚠️ NotificationSeeder DISABLED - foreign key constraint issues on Railway
+            # NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+            # echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
+            echo "⚠️  NotificationSeeder is disabled (skipping notification seeding)"
 
             echo "✅ Business data seeded for Clinic 27"
         fi
     else
         echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
 
-        # Still check if notifications need to be created
-        NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
-        echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
-
-        # Force seeder to run if count is 0 (Railway MySQL is empty)
-        if [ "$NOTIFICATION_COUNT" -lt "1" ]; then
-            echo "🔥 FORCE RUNNING NotificationSeeder (count is 0 on Railway MySQL)..."
-            php artisan db:seed --class=NotificationSeeder --force
-            echo "✅ Notifications seeded for Clinic 27"
-        elif [ "$NOTIFICATION_COUNT" -lt "39" ]; then
-            echo "Running NotificationSeeder to create notifications for existing appointments..."
-            php artisan db:seed --class=NotificationSeeder --force
-            echo "✅ Notifications seeded for Clinic 27"
-        else
-            echo "✅ Clinic 27 already has sufficient notifications ($NOTIFICATION_COUNT found)"
-        fi
+        # ⚠️ NotificationSeeder DISABLED - foreign key constraint issues on Railway
+        # NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+        # echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
+        echo "⚠️  NotificationSeeder is disabled (skipping notification seeding)"
     fi
 fi
 
