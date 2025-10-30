@@ -48,9 +48,9 @@ class NotificationController extends Controller
                     'user_clinic_id' => $user ? $user->clinic_id : null,
                     'has_user' => $user !== null,
                     'has_clinic_id' => $user && $user->clinic_id !== null,
-                    'raw_notifications_count' => $user && $user->clinic_id ? 
+                    'raw_notifications_count' => $user && $user->clinic_id ?
                         \DB::table('notifications')->where('clinic_id', $user->clinic_id)->count() : 0,
-                    'notifications_with_role_filter' => $user && $user->role ? 
+                    'notifications_with_role_filter' => $user && $user->role ?
                         \DB::table('notifications')
                             ->where('clinic_id', $user->clinic_id)
                             ->whereRaw("JSON_CONTAINS(target_roles, ?)", [json_encode($user->role)])
