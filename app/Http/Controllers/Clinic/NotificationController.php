@@ -77,9 +77,21 @@ class NotificationController extends Controller
         $notifications = $this->notificationService->getNotificationsForUser($user, $limit, $unreadOnly);
         $unreadCount = $this->notificationService->getUnreadCountForUser($user);
 
+        // 🔍 TEMPORARY DEBUG OUTPUT
+        \Log::info('Notification API Returning', [
+            'user_id' => $user->id,
+            'user_role' => $user->role,
+            'clinic_id' => $user->clinic_id,
+            'notifications_count' => $notifications->count(),
+            'unread_count' => $unreadCount,
+        ]);
+
         return response()->json([
             'notifications' => $notifications,
             'unread_count' => $unreadCount,
+            'debug_user_id' => $user->id,
+            'debug_role' => $user->role,
+            'debug_clinic' => $user->clinic_id,
         ]);
     }
 
