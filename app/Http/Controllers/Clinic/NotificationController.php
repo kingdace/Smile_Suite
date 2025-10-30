@@ -26,6 +26,18 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
+        // 🔍 ALWAYS LOG FOR DEBUGGING ON PRODUCTION
+        \Log::info('Notification API Called', [
+            'has_user' => $user !== null,
+            'user_id' => $user ? $user->id : null,
+            'user_email' => $user ? $user->email : null,
+            'user_role' => $user ? $user->role : null,
+            'user_clinic_id' => $user ? $user->clinic_id : null,
+            'request_path' => $request->path(),
+            'session_id' => $request->session()->getId(),
+            'has_session' => $request->hasSession(),
+        ]);
+
         // 🔍 DIRECT DEBUG OUTPUT (temporary)
         if ($request->get('debug') === 'true') {
             return response()->json([
@@ -48,6 +60,10 @@ class NotificationController extends Controller
         }
 
         if (!$user || !$user->clinic_id) {
+            \Log::warning('Notification API: No user or clinic', [
+                'has_user' => $user !== null,
+                'has_clinic_id' => $user && $user->clinic_id,
+            ]);
             return response()->json([
                 'notifications' => [],
                 'unread_count' => 0,
