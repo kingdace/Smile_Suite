@@ -36,6 +36,7 @@ export default function NotificationBell({ auth }) {
                     headers: {
                         "X-Requested-With": "XMLHttpRequest",
                     },
+                    credentials: 'same-origin', // ✅ CRITICAL: Send session cookies
                 }
             );
 
@@ -66,6 +67,7 @@ export default function NotificationBell({ auth }) {
                             'meta[name="csrf-token"]'
                         ).content,
                     },
+                    credentials: 'same-origin', // ✅ Send session cookies
                 }
             );
 
@@ -95,6 +97,7 @@ export default function NotificationBell({ auth }) {
                             'meta[name="csrf-token"]'
                         ).content,
                     },
+                    credentials: 'same-origin', // ✅ Send session cookies
                 }
             );
 
