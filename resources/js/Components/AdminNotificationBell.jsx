@@ -28,25 +28,51 @@ export default function AdminNotificationBell({ auth }) {
     const fetchNotifications = async (silent = false) => {
         if (!silent) setIsLoading(true);
 
+        console.log("🔔 [AdminNotificationBell] Fetching notifications...");
+        console.log(
+            "🔔 [AdminNotificationBell] Route URL:",
+            route("admin.notifications.index")
+        );
+
         try {
-            const response = await fetch(
-                route("admin.notifications.index"),
-                {
-                    method: "GET",
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    credentials: 'same-origin', // ✅ Send session cookies
-                }
+            const response = await fetch(route("admin.notifications.index"), {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+                credentials: "same-origin", // ✅ Send session cookies
+            });
+
+            console.log(
+                "🔔 [AdminNotificationBell] Response status:",
+                response.status
             );
+            console.log("🔔 [AdminNotificationBell] Response OK:", response.ok);
 
             if (response.ok) {
                 const data = await response.json();
+                console.log("🔔 [AdminNotificationBell] Data received:", data);
+                console.log(
+                    "🔔 [AdminNotificationBell] Notifications count:",
+                    data.notifications?.length || 0
+                );
+                console.log(
+                    "🔔 [AdminNotificationBell] Unread count:",
+                    data.unread_count
+                );
+
                 setNotifications(data.notifications);
                 setUnreadCount(data.unread_count);
+            } else {
+                console.error("🔔 [AdminNotificationBell] Response not OK!");
+                const text = await response.text();
+                console.error(
+                    "🔔 [AdminNotificationBell] Response text:",
+                    text.substring(0, 500)
+                );
             }
         } catch (error) {
-            console.error("Failed to fetch admin notifications:", error);
+            console.error("🔔 [AdminNotificationBell] Fetch error:", error);
         } finally {
             if (!silent) setIsLoading(false);
         }
@@ -64,7 +90,7 @@ export default function AdminNotificationBell({ auth }) {
                             'meta[name="csrf-token"]'
                         ).content,
                     },
-                    credentials: 'same-origin', // ✅ Send session cookies
+                    credentials: "same-origin", // ✅ Send session cookies
                 }
             );
 
@@ -93,7 +119,7 @@ export default function AdminNotificationBell({ auth }) {
                             'meta[name="csrf-token"]'
                         ).content,
                     },
-                    credentials: 'same-origin', // ✅ Send session cookies
+                    credentials: "same-origin", // ✅ Send session cookies
                 }
             );
 

@@ -1,0 +1,1 @@
+import{r as a}from"./app-BScAtUKl.js";import{b as t,c as o}from"./ExportButton-DuQ1fv9Y.js";var i=["axis"],s=a.forwardRef((r,e)=>a.createElement(t,{chartName:"LineChart",defaultTooltipEventType:"axis",validateTooltipEventTypes:i,tooltipPayloadSearcher:o,categoricalChartProps:r,ref:e}));export{s as L};
