@@ -74,7 +74,7 @@ class NotificationController extends Controller
         $limit = $request->get('limit', 10);
         $unreadOnly = $request->get('unread_only', false);
 
-        // 🔍 BYPASS SERVICE - Query directly to test
+        // 🔍 TEST 1: Direct Eloquent query
         $directQuery = Notification::forClinic($user->clinic_id)
             ->forUser($user)
             ->notExpired()
@@ -84,6 +84,12 @@ class NotificationController extends Controller
         $directResults = $directQuery->get();
         $directCount = $directResults->count();
         
+        // 🔍 TEST 2: Raw SQL query
+        $rawSql = "select * from `notifications` where (`clinic_id` is null or `clinic_id` = ?) and (json_contains(`target_roles`, ?) or `user_id` = ?) and (`expires_at` is null or `expires_at` > ?) order by `created_at` desc limit 10";
+        $rawBindings = [27, '"clinic_admin"', 91, now()->toDateTimeString()];
+        $rawResults = \DB::select($rawSql, $rawBindings);
+        $rawCount = count($rawResults);
+
         // Now also try the service
         $notifications = $this->notificationService->getNotificationsForUser($user, $limit, $unreadOnly);
         $unreadCount = $this->notificationService->getUnreadCountForUser($user);
@@ -107,6 +113,7 @@ class NotificationController extends Controller
             'debug_clinic' => $user->clinic_id,
             'debug_count_before_json' => $count,
             'debug_direct_count' => $directCount,
+            'debug_raw_count' => $rawCount,
             'debug_sql' => $notifications->debug_sql ?? 'N/A',
             'debug_bindings' => $notifications->debug_bindings ?? [],
             'debug_service_user' => $notifications->debug_user_id ?? null,
