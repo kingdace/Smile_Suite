@@ -43,7 +43,10 @@ class Notification extends Model
     // Scopes
     public function scopeForClinic($query, $clinicId)
     {
-        return $query->where('clinic_id', $clinicId);
+        return $query->where(function($q) use ($clinicId) {
+            $q->whereNull('clinic_id')  // Include global notifications
+              ->orWhere('clinic_id', $clinicId);  // Include clinic-specific notifications
+        });
     }
 
     public function scopeForUser($query, $user)
