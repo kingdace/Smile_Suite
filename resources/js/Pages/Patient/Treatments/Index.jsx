@@ -18,6 +18,7 @@ import {
     Star,
     TrendingUp,
     Activity,
+    ChevronRight,
 } from "lucide-react";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import { Button } from "@/Components/ui/button";
