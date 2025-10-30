@@ -74,6 +74,17 @@ class NotificationController extends Controller
         $limit = $request->get('limit', 10);
         $unreadOnly = $request->get('unread_only', false);
 
+        // 🔍 BYPASS SERVICE - Query directly to test
+        $directQuery = Notification::forClinic($user->clinic_id)
+            ->forUser($user)
+            ->notExpired()
+            ->orderBy('created_at', 'desc')
+            ->limit($limit);
+        
+        $directResults = $directQuery->get();
+        $directCount = $directResults->count();
+        
+        // Now also try the service
         $notifications = $this->notificationService->getNotificationsForUser($user, $limit, $unreadOnly);
         $unreadCount = $this->notificationService->getUnreadCountForUser($user);
 
