@@ -50,9 +50,14 @@ class NotificationSeeder extends Seeder
 
             foreach ($appointments as $appointment) {
                 try {
+                    // Skip if appointment doesn't have required relationships
+                    if (!$appointment->patient || !$appointment->status) {
+                        continue;
+                    }
+
                     // Check if notification already exists for this appointment
                     $existingNotification = Notification::where('clinic_id', $clinic->id)
-                        ->where('data->appointment_id', $appointment->id)
+                        ->whereRaw("JSON_EXTRACT(data, '$.appointment_id') = ?", [$appointment->id])
                         ->first();
 
                     if ($existingNotification) {
