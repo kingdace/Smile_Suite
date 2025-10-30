@@ -98,6 +98,9 @@ class NotificationController extends Controller
             'debug_sql' => $notifications->debug_sql ?? 'N/A',
             'debug_bindings' => $notifications->debug_bindings ?? [],
             'debug_service_user' => $notifications->debug_user_id ?? null,
+            'debug_db_name' => $notifications->debug_db_name ?? 'N/A',
+            'debug_db_host' => $notifications->debug_db_host ?? 'N/A',
+            'debug_connection' => $notifications->debug_connection_name ?? 'N/A',
         ]);
     }
 
