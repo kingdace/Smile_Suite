@@ -36,6 +36,7 @@ export default function AdminNotificationBell({ auth }) {
                     headers: {
                         "X-Requested-With": "XMLHttpRequest",
                     },
+                    credentials: 'same-origin', // ✅ Send session cookies
                 }
             );
 
@@ -63,6 +64,7 @@ export default function AdminNotificationBell({ auth }) {
                             'meta[name="csrf-token"]'
                         ).content,
                     },
+                    credentials: 'same-origin', // ✅ Send session cookies
                 }
             );
 
@@ -91,6 +93,7 @@ export default function AdminNotificationBell({ auth }) {
                             'meta[name="csrf-token"]'
                         ).content,
                     },
+                    credentials: 'same-origin', // ✅ Send session cookies
                 }
             );
 
