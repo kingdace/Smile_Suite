@@ -113,6 +113,22 @@ else
     fi
 fi
 
-# Start the application
+# Start the Laravel scheduler in the background
+echo "Starting Laravel scheduler..."
+php artisan schedule:work &
+SCHEDULER_PID=$!
+echo "✅ Scheduler started (PID: $SCHEDULER_PID)"
+
+# Function to cleanup background processes on script exit
+cleanup() {
+    echo "Stopping scheduler..."
+    kill $SCHEDULER_PID 2>/dev/null || true
+    echo "✅ Cleanup complete"
+}
+
+# Trap exit signals to ensure cleanup
+trap cleanup EXIT INT TERM
+
+# Start the application (foreground process)
 echo "Starting PHP server on port $PORT..."
 php artisan serve --host=0.0.0.0 --port=$PORT

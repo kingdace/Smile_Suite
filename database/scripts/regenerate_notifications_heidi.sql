@@ -23,7 +23,7 @@
 -- SAFETY CHECK: Verify all required tables exist
 -- ===========================================================================
 -- Run this first to check if your database is ready:
--- SELECT 
+-- SELECT
 --     (SELECT COUNT(*) FROM clinics) as clinic_count,
 --     (SELECT COUNT(*) FROM appointments) as appointment_count,
 --     (SELECT COUNT(*) FROM patients) as patient_count;
@@ -62,8 +62,8 @@ INNER JOIN clinics c ON a.clinic_id = c.id  -- Added: Ensure clinic exists
 LEFT JOIN users u ON a.assigned_to = u.id
 WHERE ast.name = 'Pending'
 AND NOT EXISTS (
-    SELECT 1 FROM notifications n 
-    WHERE n.clinic_id = a.clinic_id 
+    SELECT 1 FROM notifications n
+    WHERE n.clinic_id = a.clinic_id
     AND JSON_EXTRACT(n.data, '$.appointment_id') = a.id
 );
 
@@ -100,8 +100,8 @@ INNER JOIN clinics c ON a.clinic_id = c.id  -- Added: Ensure clinic exists
 LEFT JOIN users u ON a.assigned_to = u.id
 WHERE ast.name = 'Confirmed'
 AND NOT EXISTS (
-    SELECT 1 FROM notifications n 
-    WHERE n.clinic_id = a.clinic_id 
+    SELECT 1 FROM notifications n
+    WHERE n.clinic_id = a.clinic_id
     AND JSON_EXTRACT(n.data, '$.appointment_id') = a.id
 );
 
@@ -138,8 +138,8 @@ INNER JOIN clinics c ON a.clinic_id = c.id  -- Added: Ensure clinic exists
 LEFT JOIN users u ON a.assigned_to = u.id
 WHERE ast.name = 'Completed'
 AND NOT EXISTS (
-    SELECT 1 FROM notifications n 
-    WHERE n.clinic_id = a.clinic_id 
+    SELECT 1 FROM notifications n
+    WHERE n.clinic_id = a.clinic_id
     AND JSON_EXTRACT(n.data, '$.appointment_id') = a.id
 );
 
@@ -176,8 +176,8 @@ INNER JOIN clinics c ON a.clinic_id = c.id  -- Added: Ensure clinic exists
 LEFT JOIN users u ON a.assigned_to = u.id
 WHERE ast.name = 'Cancelled'
 AND NOT EXISTS (
-    SELECT 1 FROM notifications n 
-    WHERE n.clinic_id = a.clinic_id 
+    SELECT 1 FROM notifications n
+    WHERE n.clinic_id = a.clinic_id
     AND JSON_EXTRACT(n.data, '$.appointment_id') = a.id
 );
 
@@ -214,8 +214,8 @@ INNER JOIN clinics c ON a.clinic_id = c.id  -- Added: Ensure clinic exists
 LEFT JOIN users u ON a.assigned_to = u.id
 WHERE ast.name = 'No Show'
 AND NOT EXISTS (
-    SELECT 1 FROM notifications n 
-    WHERE n.clinic_id = a.clinic_id 
+    SELECT 1 FROM notifications n
+    WHERE n.clinic_id = a.clinic_id
     AND JSON_EXTRACT(n.data, '$.appointment_id') = a.id
 );
 
