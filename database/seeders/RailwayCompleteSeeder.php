@@ -79,6 +79,11 @@ class RailwayCompleteSeeder extends Seeder
         $this->command->info('   Creating payments for treatments...');
         $this->call(PaymentSeeder::class);
 
+        // Step 14: Notifications (regenerate from existing appointments)
+        $this->command->info('🔔 Step 14: Seeding Notifications...');
+        $this->command->info('   Generating notifications from existing appointments...');
+        $this->call(NotificationSeeder::class);
+
         $this->command->newLine();
         $this->command->info('✅ Railway Complete Seeding Process Finished!');
         $this->command->newLine();
@@ -91,6 +96,7 @@ class RailwayCompleteSeeder extends Seeder
         $appointmentCount = \App\Models\Appointment::count();
         $treatmentCount = \App\Models\Treatment::count();
         $paymentCount = \App\Models\Payment::count();
+        $notificationCount = \App\Models\Notification::count();
 
         $this->command->info('📊 Database Summary:');
         $this->command->info("   - Clinics: {$clinicCount}");
@@ -100,6 +106,7 @@ class RailwayCompleteSeeder extends Seeder
         $this->command->info("   - Appointments: {$appointmentCount}");
         $this->command->info("   - Treatments: {$treatmentCount}");
         $this->command->info("   - Payments: {$paymentCount}");
+        $this->command->info("   - Notifications: {$notificationCount}");
     }
 }
 
