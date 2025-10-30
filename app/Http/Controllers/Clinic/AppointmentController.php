@@ -294,7 +294,7 @@ class AppointmentController extends Controller
     public function show(Clinic $clinic, Appointment $appointment)
     {
         $this->authorize('view', [$appointment, $clinic]);
-        $appointment->load(['patient', 'type', 'status', 'assignedDentist', 'service', 'creator']);
+        $appointment->load(['patient', 'type', 'status', 'assignedDentist', 'service', 'creator', 'treatments.service', 'treatments.dentist']);
 
         // Load patient address names if patient exists
         if ($appointment->patient) {
@@ -340,7 +340,7 @@ class AppointmentController extends Controller
     public function edit(Clinic $clinic, Appointment $appointment)
     {
         $this->authorize('update', [$appointment, $clinic]);
-        $appointment->load(['patient', 'type', 'status', 'assignedDentist', 'service']);
+        $appointment->load(['patient', 'type', 'status', 'assignedDentist', 'service', 'creator']);
         return Inertia::render('Clinic/Appointments/Edit', [
             'clinic' => $clinic,
             'appointment' => $appointment,

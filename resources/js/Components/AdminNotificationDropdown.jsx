@@ -127,7 +127,7 @@ export default function AdminNotificationDropdown({
             {/* Footer */}
             <div className="px-3 py-2 border-t border-gray-200 bg-gradient-to-r from-orange-50 to-red-50 rounded-b-lg">
                 <Link
-                    href={route("admin.admin.notifications.page")}
+                    href={route("admin.notifications.page")}
                     className="w-full text-center text-sm text-orange-600 hover:text-orange-800 font-medium block"
                 >
                     View All Admin Notifications

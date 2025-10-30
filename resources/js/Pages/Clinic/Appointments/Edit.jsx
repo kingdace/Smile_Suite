@@ -31,6 +31,9 @@ import {
     Package,
     MessageSquare,
     Bell,
+    Phone,
+    Mail,
+    Pencil,
 } from "lucide-react";
 import { Link, router } from "@inertiajs/react";
 import { format, parseISO } from "date-fns";
@@ -46,24 +49,43 @@ export default function Edit({
 }) {
     const { toasts, removeToast, showSuccess, showError } = useToast();
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-    // Helper function to format datetime for datetime-local input
+    
+    // Helper function to clean notes by removing SMS reminder data
+    const cleanNotes = (notes) => {
+        if (!notes) return "";
+        // Remove SMS reminder data like [sms_reminder_2025-10-27]
+        return notes.replace(/\[sms_reminder_[\d-]+\]/g, '').trim();
+    };
+    
+    // Helper function to format datetime for datetime-local input (converts to local timezone)
     const formatDateTimeForInput = (dateTimeString) => {
         if (!dateTimeString) return "";
         try {
             const date = new Date(dateTimeString);
-            return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+            // Get local date components
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            // Format: YYYY-MM-DDTHH:mm (in local timezone)
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
         } catch (error) {
             console.error("Error formatting datetime:", error);
             return "";
         }
     };
 
-    // Helper function to format date for date input
+    // Helper function to format date for date input (converts to local timezone)
     const formatDateForInput = (dateString) => {
         if (!dateString) return "";
         try {
             const date = new Date(dateString);
-            return date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            // Format: YYYY-MM-DD (in local timezone)
+            return `${year}-${month}-${day}`;
         } catch (error) {
             console.error("Error formatting date:", error);
             return "";
@@ -78,7 +100,7 @@ export default function Edit({
         ended_at: formatDateTimeForInput(appointment.ended_at),
         duration: String(appointment.duration || 30),
         reason: appointment.reason || "",
-        notes: appointment.notes || "",
+        notes: cleanNotes(appointment.notes),
         cancellation_reason: appointment.cancellation_reason || "",
         payment_status: appointment.payment_status || "pending",
         service_id: String(appointment.service_id || "none"),
@@ -200,43 +222,127 @@ export default function Edit({
         >
             <Head title="Edit Appointment" />
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
-                <div className="max-w-7xl mx-auto px-6 py-8">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <div className="bg-white rounded-lg shadow-sm border p-6">
-                            <div className="flex items-start justify-between mb-2">
-                                <h1 className="text-2xl font-bold text-gray-900">
-                                    Edit Appointment #{appointment.id}
-                                </h1>
+            <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                    {/* Enhanced Header Section */}
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mb-6 rounded-xl shadow-2xl">
+                        <div className="absolute inset-0 bg-black/5"></div>
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
+
+                        <div className="relative px-6 py-4">
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                                {/* Left side - Appointment info */}
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <div className="p-2.5 bg-white/25 rounded-xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                            <Pencil className="h-5 w-5 text-white" />
+                                        </div>
+                                        {/* Status indicator dot */}
+                                        <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm ${
+                                            appointment.status?.name === 'Confirmed' ? 'bg-green-400' :
+                                            appointment.status?.name === 'Pending' ? 'bg-yellow-400' :
+                                            appointment.status?.name === 'Completed' ? 'bg-blue-400' :
+                                            appointment.status?.name === 'Cancelled' ? 'bg-red-400' :
+                                            'bg-gray-400'
+                                        }`}></div>
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <Link
+                                                href={route("clinic.appointments.show", [clinic.id, appointment.id])}
+                                                className="text-white/80 hover:text-white transition-colors text-xs"
+                                            >
+                                                Appointment #{appointment.id}
+                                            </Link>
+                                            <span className="text-white/60 text-xs">/</span>
+                                            <span className="text-white font-semibold text-xs">Edit</span>
+                                        </div>
+                                        <h1 className="text-xl font-bold text-white">
+                                            {appointment.patient?.first_name} {appointment.patient?.last_name}
+                                        </h1>
+                                        <p className="text-white/80 text-xs mt-0.5">
+                                            {format(parseISO(appointment.scheduled_at), "EEEE, MMM d, yyyy 'at' h:mm a")}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {/* Right side - Back button */}
                                 <Link
-                                    href={route("clinic.appointments.show", [
-                                        clinic.id,
-                                        appointment.id,
-                                    ])}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                    href={route("clinic.appointments.show", [clinic.id, appointment.id])}
                                 >
-                                    <ArrowLeft className="h-4 w-4" />
-                                    Back to Details
+                                    <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/40 backdrop-blur-sm transition-all shadow-lg">
+                                        <ArrowLeft className="h-4 w-4 mr-2" />
+                                        Back to Details
+                                    </Button>
                                 </Link>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                                <div className="flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    <span>
-                                        {appointment.patient?.first_name}{" "}
-                                        {appointment.patient?.last_name}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4" />
-                                    <span>
-                                        {format(parseISO(appointment.scheduled_at), "PPP 'at' p")}
-                                    </span>
-                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Patient Information Card - Read Only */}
+                    <Card className="shadow-lg border-0 bg-gradient-to-r from-cyan-50 to-blue-50 mb-8">
+                        <CardHeader className="bg-gradient-to-r from-cyan-600 to-blue-600">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="flex items-center gap-3 text-white">
+                                    <User className="h-6 w-6" />
+                                    Patient Information
+                                </CardTitle>
+                                <Link
+                                    href={route("clinic.patients.show", [
+                                        clinic.id,
+                                        appointment.patient_id,
+                                    ])}
+                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-lg text-xs font-medium text-white transition-colors shadow-sm"
+                                >
+                                    <User className="h-3.5 w-3.5" />
+                                    View Full Profile
+                                </Link>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-cyan-100 rounded-lg">
+                                        <User className="h-5 w-5 text-cyan-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">
+                                            Patient Name
+                                        </p>
+                                        <p className="font-semibold text-gray-900">
+                                            {appointment.patient?.first_name}{" "}
+                                            {appointment.patient?.last_name}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Phone className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Phone</p>
+                                        <p className="font-semibold text-gray-900">
+                                            {appointment.patient?.phone_number ||
+                                                "Not provided"}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-indigo-100 rounded-lg">
+                                        <Mail className="h-5 w-5 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600">Email</p>
+                                        <p className="font-semibold text-gray-900 text-sm truncate">
+                                            {appointment.patient?.email ||
+                                                "Not provided"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     <form onSubmit={handleSubmit} method="POST" action="#">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -888,13 +994,19 @@ export default function Edit({
                                                         appointment.payment_status?.slice(1)}
                                                 </Badge>
                                             </div>
-                                            <div className="flex items-center justify-between py-2">
+                                            <div className="flex items-center justify-between py-2 border-b border-gray-100">
                                                 <span className="text-sm font-medium text-gray-700">Created</span>
                                                 <span className="text-sm text-gray-600">
                                                     {format(
                                                         new Date(appointment.created_at),
                                                         "MMM d, yyyy"
                                                     )}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between py-2">
+                                                <span className="text-sm font-medium text-gray-700">Created By</span>
+                                                <span className="text-sm text-gray-600">
+                                                    {appointment.creator?.name || 'System'}
                                                 </span>
                                             </div>
                                         </div>

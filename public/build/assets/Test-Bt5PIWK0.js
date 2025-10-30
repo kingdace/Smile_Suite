@@ -1,1 +1,0 @@
-import{j as e}from"./app-Da6D7O2r.js";function t(){return e.jsxs("div",{children:[e.jsx("h1",{children:"Test Page"}),e.jsx("p",{children:"If you see this, Vite is serving this component correctly!"})]})}export{t as default};

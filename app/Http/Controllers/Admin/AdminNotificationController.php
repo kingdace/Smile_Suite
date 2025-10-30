@@ -131,7 +131,9 @@ class AdminNotificationController extends Controller
         return Inertia::render('Admin/Notifications/Index', [
             'notifications' => $notifications,
             'stats' => $stats,
-            'auth' => $user,
+            'auth' => [
+                'user' => $user
+            ],
         ]);
     }
 }

@@ -23,26 +23,30 @@ export default function AdminNotificationPreview({
         // Priority 2: Navigate to appropriate admin pages based on notification type
         switch (notification.type) {
             case "support":
-                return `/admin/support-tickets/${
-                    notification.data?.ticket_id || ""
-                }`;
+                // If ticket_id is provided, go to specific ticket, otherwise list
+                if (notification.data?.ticket_id) {
+                    return route("admin.support.show", notification.data.ticket_id);
+                }
+                return route("admin.support.index");
 
             case "clinic_registration":
-                return `/admin/clinic-requests/${
-                    notification.data?.request_id || ""
-                }`;
+                // If request_id is provided, go to specific request, otherwise list
+                if (notification.data?.request_id) {
+                    return route("admin.clinic-requests.show", notification.data.request_id);
+                }
+                return route("admin.clinic-requests.index");
 
             case "subscription":
-                return `/admin/subscriptions`;
+                return route("admin.subscriptions.index");
 
             case "user_management":
-                return `/admin/users`;
+                return route("admin.users.index");
 
             case "system":
-                return `/admin/dashboard`;
+                return route("admin.dashboard");
 
             default:
-                return `/admin/notifications`;
+                return route("admin.notifications.page");
         }
     };
 

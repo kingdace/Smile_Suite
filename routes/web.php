@@ -208,7 +208,7 @@ Route::middleware('auth')->group(function () {
         Route::get('test-subscription-access', [App\Http\Controllers\Clinic\TestController::class, 'testSubscriptionAccess'])->name('test.subscription-access');
 
         // Admin Notification Routes
-        Route::prefix('admin/notifications')->name('admin.notifications.')->group(function () {
+        Route::prefix('notifications')->name('notifications.')->group(function () {
             Route::get('api', [App\Http\Controllers\Admin\AdminNotificationController::class, 'index'])
                 ->name('index');
             Route::post('api/{id}/read', [App\Http\Controllers\Admin\AdminNotificationController::class, 'markAsRead'])
@@ -217,8 +217,8 @@ Route::middleware('auth')->group(function () {
                 ->name('mark-all-read');
         });
 
-        Route::get('admin/notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'page'])
-            ->name('admin.notifications.page');
+        Route::get('notifications', [App\Http\Controllers\Admin\AdminNotificationController::class, 'page'])
+            ->name('notifications.page');
 
         // Admin Support Ticket Routes
         Route::prefix('support')->name('support.')->group(function () {

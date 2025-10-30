@@ -30,7 +30,7 @@ export default function AdminNotificationBell({ auth }) {
 
         try {
             const response = await fetch(
-                route("admin.admin.notifications.index"),
+                route("admin.notifications.index"),
                 {
                     method: "GET",
                     headers: {
@@ -54,7 +54,7 @@ export default function AdminNotificationBell({ auth }) {
     const markAsRead = async (notificationId) => {
         try {
             const response = await fetch(
-                route("admin.admin.notifications.mark-read", notificationId),
+                route("admin.notifications.mark-read", notificationId),
                 {
                     method: "POST",
                     headers: {

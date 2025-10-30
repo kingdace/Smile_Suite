@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { format } from "date-fns";
 import {
     ArrowLeft,
@@ -33,6 +34,13 @@ import {
 import { Link } from "@inertiajs/react";
 
 export default function Show({ auth, clinic, appointment, flash }) {
+    // Helper function to clean notes by removing SMS reminder data
+    const cleanNotes = (notes) => {
+        if (!notes) return "";
+        // Remove SMS reminder data like [sms_reminder_2025-10-27]
+        return notes.replace(/\[sms_reminder_[\d-]+\]/g, '').trim();
+    };
+
     const getStatusColor = (statusName) => {
         const colors = {
             Pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
@@ -93,10 +101,10 @@ export default function Show({ auth, clinic, appointment, flash }) {
         >
             <Head title="Appointment Details" />
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+            <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-150 to-cyan-100 rounded-t-lg mx-0 pt-4 shadow-2xl border border-blue-200/50 border-t border-t-blue-200">
                 {/* Success Message */}
                 {flash?.success && (
-                    <div className="max-w-7xl mx-auto px-6 pt-6">
+                    <div className="max-w-7xl mx-auto px-6 pt-2">
                         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-sm mb-4">
                             <div className="flex items-center">
                                 <CheckCircle className="w-5 h-5 mr-2" />
@@ -108,71 +116,77 @@ export default function Show({ auth, clinic, appointment, flash }) {
                     </div>
                 )}
 
-                <div className="max-w-7xl mx-auto px-6 py-8">
-                    {/* Header with Actions */}
-                    <div className="mb-8">
-                        <div className="flex items-center gap-4 mb-6">
-                            <Link
-                                href={route(
-                                    "clinic.appointments.index",
-                                    clinic.id
-                                )}
-                                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors bg-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                Back to Appointments
-                            </Link>
-                        </div>
+                <div className="max-w-7xl mx-auto px-6 py-4">
+                    {/* Enhanced Header Section */}
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 mb-6 rounded-xl shadow-2xl">
+                        <div className="absolute inset-0 bg-black/5"></div>
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
 
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-900">
-                                    Appointment #{appointment.id}
-                                </h1>
-                                <p className="text-gray-600 mt-2">
-                                    {format(
-                                        new Date(appointment.scheduled_at),
-                                        "EEEE, MMMM d, yyyy"
-                                    )}{" "}
-                                    at{" "}
-                                    {format(
-                                        new Date(appointment.scheduled_at),
-                                        "h:mm a"
-                                    )}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                        copyToClipboard(
-                                            `Appointment #${appointment.id}`
-                                        )
-                                    }
-                                >
-                                    <Copy className="h-4 w-4 mr-2" />
-                                    Copy ID
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => window.print()}
-                                >
-                                    <Printer className="h-4 w-4 mr-2" />
-                                    Print
-                                </Button>
-                                <Link
-                                    href={route("clinic.appointments.edit", [
-                                        clinic.id,
-                                        appointment.id,
-                                    ])}
-                                >
-                                    <Button>
-                                        <Pencil className="h-4 w-4 mr-2" />
-                                        Edit Appointment
+                        <div className="relative px-6 py-4">
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                                {/* Left side - Appointment info */}
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <div className="p-2.5 bg-white/25 rounded-xl backdrop-blur-sm border border-white/40 shadow-lg">
+                                            <Calendar className="h-5 w-5 text-white" />
+                                        </div>
+                                        {/* Status indicator dot */}
+                                        <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm ${
+                                            appointment.status?.name === 'Confirmed' ? 'bg-green-400' :
+                                            appointment.status?.name === 'Pending' ? 'bg-yellow-400' :
+                                            appointment.status?.name === 'Completed' ? 'bg-blue-400' :
+                                            appointment.status?.name === 'Cancelled' ? 'bg-red-400' :
+                                            'bg-gray-400'
+                                        }`}></div>
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <Link
+                                                href={route("clinic.appointments.index", clinic.id)}
+                                                className="text-white/80 hover:text-white transition-colors text-xs"
+                                            >
+                                                Appointments
+                                            </Link>
+                                            <span className="text-white/60 text-xs">/</span>
+                                            <span className="text-white font-semibold text-xs">Appointment #{appointment.id}</span>
+                                        </div>
+                                        <h1 className="text-xl font-bold text-white">
+                                            {appointment.patient?.first_name} {appointment.patient?.last_name}
+                                        </h1>
+                                        <p className="text-white/80 text-xs mt-0.5">
+                                            {format(new Date(appointment.scheduled_at), "EEEE, MMM d, yyyy 'at' h:mm a")}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {/* Right side - Action buttons */}
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => copyToClipboard(`Appointment #${appointment.id}`)}
+                                        className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
+                                    >
+                                        <Copy className="h-3.5 w-3.5 mr-1.5" />
+                                        Copy ID
                                     </Button>
-                                </Link>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.print()}
+                                        className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
+                                    >
+                                        <Printer className="h-3.5 w-3.5 mr-1.5" />
+                                        Print
+                                    </Button>
+                                    <Link href={route("clinic.appointments.edit", [clinic.id, appointment.id])}>
+                                        <Button className="bg-white/20 hover:bg-white/30 text-white border border-white/40 backdrop-blur-sm transition-all shadow-lg">
+                                            <Pencil className="h-4 w-4 mr-2" />
+                                            Edit Appointment
+                                        </Button>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -375,7 +389,7 @@ export default function Show({ auth, clinic, appointment, flash }) {
 
                             {/* Patient Reschedule Alert */}
                             {appointment.notes &&
-                                appointment.notes.includes(
+                                cleanNotes(appointment.notes).includes(
                                     "Rescheduled by patient"
                                 ) && (
                                     <Card className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-l-blue-500">
@@ -416,7 +430,7 @@ export default function Show({ auth, clinic, appointment, flash }) {
                                                             Notes
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
-                                                            {appointment.notes}
+                                                            {cleanNotes(appointment.notes)}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -483,6 +497,63 @@ export default function Show({ auth, clinic, appointment, flash }) {
                                         </CardContent>
                                     </Card>
                                 )}
+
+                            {/* Follow-up Appointment Alert */}
+                            {(appointment.is_follow_up || appointment.previous_visit_date || appointment.previous_visit_notes) && (
+                                <Card className="shadow-lg border-0 bg-gradient-to-r from-orange-50 to-yellow-50 border-l-4 border-l-orange-500">
+                                    <CardHeader className="bg-gradient-to-r from-orange-600 to-yellow-600">
+                                        <CardTitle className="flex items-center gap-3 text-white">
+                                            <AlertCircle className="h-6 w-6" />
+                                            Follow-up Appointment
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-6">
+                                        <div className="space-y-4">
+                                            {appointment.previous_visit_date && (
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-orange-100 rounded-lg">
+                                                        <Calendar className="h-5 w-5 text-orange-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-600">Previous Visit</p>
+                                                        <p className="font-semibold text-orange-800">
+                                                            {format(new Date(appointment.previous_visit_date), "MMMM d, yyyy")}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {appointment.previous_visit_notes && (
+                                                <div className="flex items-start gap-3">
+                                                    <div className="p-2 bg-yellow-100 rounded-lg">
+                                                        <FileText className="h-5 w-5 text-yellow-600" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-sm text-gray-600 mb-2">Previous Visit Notes</p>
+                                                        <p className="text-gray-800 bg-white p-3 rounded-lg border border-orange-200">
+                                                            {appointment.previous_visit_notes}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {!appointment.previous_visit_date && !appointment.previous_visit_notes && appointment.is_follow_up && (
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-orange-100 rounded-lg">
+                                                        <AlertCircle className="h-5 w-5 text-orange-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-orange-800">
+                                                            This is marked as a follow-up appointment
+                                                        </p>
+                                                        <p className="text-sm text-gray-600">
+                                                            No previous visit details recorded
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
 
                             {/* Patient Information Card */}
                             <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
@@ -749,14 +820,19 @@ export default function Show({ auth, clinic, appointment, flash }) {
                                                                     .name
                                                             }
                                                         </p>
-                                                        <p className="text-sm text-gray-500">
-                                                            ₱
-                                                            {
-                                                                appointment
-                                                                    .service
-                                                                    .price
-                                                            }
-                                                        </p>
+                                                        <div className="flex items-center gap-3 mt-1">
+                                                            <p className="text-sm font-semibold text-cyan-600">
+                                                                ₱{appointment.service.price}
+                                                            </p>
+                                                            {appointment.service.duration_minutes && (
+                                                                <>
+                                                                    <span className="text-gray-400">•</span>
+                                                                    <p className="text-sm text-gray-500">
+                                                                        {appointment.service.duration_minutes} min
+                                                                    </p>
+                                                                </>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
@@ -765,9 +841,96 @@ export default function Show({ auth, clinic, appointment, flash }) {
                                 </CardContent>
                             </Card>
 
+                            {/* Treatments Section */}
+                            {appointment.treatments && appointment.treatments.length > 0 && (
+                                <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
+                                    <CardHeader className="bg-gradient-to-r from-cyan-600 via-cyan-700 to-blue-800">
+                                        <CardTitle className="flex items-center gap-3 text-white">
+                                            <Stethoscope className="h-6 w-6" />
+                                            Treatments Performed ({appointment.treatments.length})
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-6">
+                                        <div className="space-y-4">
+                                            {appointment.treatments.map((treatment, index) => (
+                                                <div
+                                                    key={treatment.id || index}
+                                                    className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border border-cyan-200 hover:shadow-md transition-shadow"
+                                                >
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <h4 className="font-semibold text-gray-900 text-lg">
+                                                            {treatment.service?.name || treatment.treatment_name || "Treatment"}
+                                                        </h4>
+                                                        {treatment.total_cost && (
+                                                            <Badge className="bg-green-100 text-green-800 border-green-300 text-sm px-3 py-1">
+                                                                ₱{parseFloat(treatment.total_cost).toLocaleString()}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mb-3">
+                                                        {treatment.dentist && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Stethoscope className="h-4 w-4 text-cyan-600" />
+                                                                <div>
+                                                                    <span className="text-gray-600">Dentist:</span>{" "}
+                                                                    <span className="font-medium">{treatment.dentist.name}</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {treatment.status && (
+                                                            <div className="flex items-center gap-2">
+                                                                <CheckCircle className="h-4 w-4 text-green-600" />
+                                                                <div>
+                                                                    <span className="text-gray-600">Status:</span>{" "}
+                                                                    <Badge className={`ml-1 ${
+                                                                        treatment.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                                        treatment.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                                                        'bg-gray-100 text-gray-800'
+                                                                    }`}>
+                                                                        {treatment.status.charAt(0).toUpperCase() + treatment.status.slice(1).replace('_', ' ')}
+                                                                    </Badge>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {treatment.tooth_number && (
+                                                            <div className="flex items-center gap-2">
+                                                                <Package className="h-4 w-4 text-purple-600" />
+                                                                <div>
+                                                                    <span className="text-gray-600">Tooth:</span>{" "}
+                                                                    <span className="font-medium">#{treatment.tooth_number}</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {treatment.notes && (
+                                                        <div className="mt-3 p-3 bg-white rounded border border-cyan-100">
+                                                            <p className="text-sm text-gray-600 mb-1 font-medium">Treatment Notes:</p>
+                                                            <p className="text-sm text-gray-700">{treatment.notes}</p>
+                                                        </div>
+                                                    )}
+
+                                                    {treatment.id && (
+                                                        <div className="mt-3 flex gap-2">
+                                                            <Link href={route('clinic.treatments.show', [clinic.id, treatment.id])}>
+                                                                <Button size="sm" variant="outline" className="border-cyan-300 text-cyan-700 hover:bg-cyan-50">
+                                                                    <FileText className="h-3 w-3 mr-1" />
+                                                                    View Details
+                                                                </Button>
+                                                            </Link>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
                             {/* Notes and Additional Information */}
                             {(appointment.reason ||
-                                appointment.notes ||
+                                (appointment.notes && cleanNotes(appointment.notes)) ||
                                 appointment.cancellation_reason) && (
                                 <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
                                     <CardHeader className="bg-gradient-to-r from-gray-600 via-gray-700 to-slate-800">
@@ -788,13 +951,13 @@ export default function Show({ auth, clinic, appointment, flash }) {
                                                     </p>
                                                 </div>
                                             )}
-                                            {appointment.notes && (
+                                            {appointment.notes && cleanNotes(appointment.notes) && (
                                                 <div>
                                                     <p className="text-sm font-medium text-gray-600 mb-2">
                                                         Notes
                                                     </p>
                                                     <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
-                                                        {appointment.notes}
+                                                        {cleanNotes(appointment.notes)}
                                                     </p>
                                                 </div>
                                             )}
