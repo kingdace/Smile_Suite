@@ -35,11 +35,14 @@ class DatabaseSeeder extends Seeder
             ClinicGallerySeeder::class,
             ReviewSeeder::class,
 
-            // Step 7: Business Data for Clinic 27 (Enhaynes Dental Clinic)
-            // Note: These only run if clinic 27 doesn't have this data yet
-            AppointmentSeeder::class,  // Creates 39 appointments for months Jan, May, Jul, Aug, Sep
-            TreatmentSeeder::class,     // Creates treatments from those appointments
-            PaymentSeeder::class,       // Creates payments for those treatments
-        ]);
-    }
+        // Step 7: Business Data for Clinic 27 (Enhaynes Dental Clinic)
+        // Note: These only run if clinic 27 doesn't have this data yet
+        AppointmentSeeder::class,  // Creates 39 appointments for months Jan, May, Jul, Aug, Sep
+        TreatmentSeeder::class,     // Creates treatments from those appointments
+        PaymentSeeder::class,       // Creates payments for those treatments
+
+        // Step 8: Notifications (Generate from existing appointments)
+        NotificationSeeder::class,  // Creates notifications for existing appointments
+    ]);
+}
 }
