@@ -77,13 +77,15 @@ class NotificationController extends Controller
         $notifications = $this->notificationService->getNotificationsForUser($user, $limit, $unreadOnly);
         $unreadCount = $this->notificationService->getUnreadCountForUser($user);
 
-        // 🔍 TEMPORARY DEBUG OUTPUT
-        \Log::info('Notification API Returning', [
+        // 🔍 DETAILED DEBUG - COUNT BEFORE RETURN
+        $count = $notifications->count();
+        $notifArray = $notifications->toArray();
+        
+        \Log::info('Notification API - Before JSON Response', [
             'user_id' => $user->id,
-            'user_role' => $user->role,
-            'clinic_id' => $user->clinic_id,
-            'notifications_count' => $notifications->count(),
-            'unread_count' => $unreadCount,
+            'collection_count' => $count,
+            'array_count' => count($notifArray),
+            'first_notif_id' => $count > 0 ? $notifications->first()->id : null,
         ]);
 
         return response()->json([
@@ -92,6 +94,7 @@ class NotificationController extends Controller
             'debug_user_id' => $user->id,
             'debug_role' => $user->role,
             'debug_clinic' => $user->clinic_id,
+            'debug_count_before_json' => $count,
         ]);
     }
 
