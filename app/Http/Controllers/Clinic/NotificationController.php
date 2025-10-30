@@ -26,24 +26,32 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
-        // 🔍 DEBUG LOGGING
-        \Log::info('NotificationController::index called', [
-            'user_id' => $user ? $user->id : null,
-            'user_email' => $user ? $user->email : null,
-            'user_role' => $user ? $user->role : null,
-            'user_clinic_id' => $user ? $user->clinic_id : null,
-            'request_ip' => $request->ip(),
-            'request_url' => $request->fullUrl(),
-        ]);
+        // 🔍 DIRECT DEBUG OUTPUT (temporary)
+        if ($request->get('debug') === 'true') {
+            return response()->json([
+                'DEBUG' => [
+                    'user_id' => $user ? $user->id : null,
+                    'user_email' => $user ? $user->email : null,
+                    'user_role' => $user ? $user->role : null,
+                    'user_clinic_id' => $user ? $user->clinic_id : null,
+                    'has_user' => $user !== null,
+                    'has_clinic_id' => $user && $user->clinic_id !== null,
+                    'raw_notifications_count' => $user && $user->clinic_id ? 
+                        \DB::table('notifications')->where('clinic_id', $user->clinic_id)->count() : 0,
+                    'notifications_with_role_filter' => $user && $user->role ? 
+                        \DB::table('notifications')
+                            ->where('clinic_id', $user->clinic_id)
+                            ->whereRaw("JSON_CONTAINS(target_roles, ?)", [json_encode($user->role)])
+                            ->count() : 0,
+                ]
+            ]);
+        }
 
         if (!$user || !$user->clinic_id) {
-            \Log::warning('NotificationController: No user or clinic_id', [
-                'has_user' => $user !== null,
-                'clinic_id' => $user ? $user->clinic_id : null,
-            ]);
             return response()->json([
                 'notifications' => [],
                 'unread_count' => 0,
+                'debug' => 'no_user_or_clinic',
             ]);
         }
 
@@ -52,16 +60,6 @@ class NotificationController extends Controller
 
         $notifications = $this->notificationService->getNotificationsForUser($user, $limit, $unreadOnly);
         $unreadCount = $this->notificationService->getUnreadCountForUser($user);
-
-        // 🔍 DEBUG LOGGING
-        \Log::info('NotificationController: Fetched notifications', [
-            'user_id' => $user->id,
-            'clinic_id' => $user->clinic_id,
-            'notifications_count' => $notifications->count(),
-            'unread_count' => $unreadCount,
-            'limit' => $limit,
-            'unread_only' => $unreadOnly,
-        ]);
 
         return response()->json([
             'notifications' => $notifications,
