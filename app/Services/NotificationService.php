@@ -52,6 +52,15 @@ class NotificationService
      */
     public function getNotificationsForUser(User $user, int $limit = 10, bool $unreadOnly = false)
     {
+        // 🔍 DEBUG: Log query building
+        \Log::info('NotificationService: Building query', [
+            'user_id' => $user->id,
+            'clinic_id' => $user->clinic_id,
+            'user_role' => $user->role,
+            'limit' => $limit,
+            'unreadOnly' => $unreadOnly,
+        ]);
+        
         $query = Notification::forClinic($user->clinic_id)
             ->forUser($user)
             ->notExpired()
@@ -61,7 +70,21 @@ class NotificationService
             $query->unread();
         }
 
-        return $query->limit($limit)->get();
+        // 🔍 DEBUG: Log SQL before execution
+        \Log::info('NotificationService: SQL Query', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+        ]);
+        
+        $results = $query->limit($limit)->get();
+        
+        // 🔍 DEBUG: Log results
+        \Log::info('NotificationService: Query Results', [
+            'count' => $results->count(),
+            'first_id' => $results->count() > 0 ? $results->first()->id : null,
+        ]);
+
+        return $results;
     }
 
     /**
