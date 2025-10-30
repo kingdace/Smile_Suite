@@ -1,4 +1,5 @@
 import { Head, Link } from "@inertiajs/react";
+import { useState } from "react";
 import {
     Stethoscope,
     Calendar,
@@ -16,11 +17,13 @@ import {
     Heart,
     Shield,
     Activity,
-    Image,
+    Image as ImageIcon,
     Star,
     AlertCircle,
     CalendarDays,
     Timer,
+    ClipboardList,
+    Lightbulb,
 } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
@@ -28,6 +31,7 @@ import { Badge } from "@/Components/ui/badge";
 import SiteHeader from "@/Components/SiteHeader";
 import { cn } from "@/lib/utils";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
+import ImprovedDentalChart from "@/Components/ImprovedDentalChart/DentalChart";
 
 export default function PatientTreatmentShow({
     auth,
@@ -202,10 +206,10 @@ export default function PatientTreatmentShow({
                     </div>
                 )}
 
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* TOP SECTION: Two Column Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
                     {/* Left Column - Main Treatment Info */}
-                    <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                    <div className="lg:col-span-2 flex flex-col gap-4 sm:gap-6">
                         {/* Treatment Overview Card */}
                         <Card className="bg-white border-0 shadow-lg">
                             <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-blue-100 p-3 sm:p-4 md:p-6">
@@ -343,8 +347,8 @@ export default function PatientTreatmentShow({
                             </CardContent>
                         </Card>
 
-                        {/* Medical Information Card */}
-                        <Card className="bg-white border-0 shadow-lg">
+                        {/* Medical Information Card - Fixed Height */}
+                        <Card className="bg-white border-0 shadow-lg flex-1">
                             <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100 p-3 sm:p-4 md:p-6">
                                 <div className="flex items-center gap-2 sm:gap-3">
                                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -361,7 +365,10 @@ export default function PatientTreatmentShow({
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-3 sm:p-4 md:p-6">
+                            <CardContent
+                                className="p-3 sm:p-4 md:p-6 overflow-y-auto"
+                                style={{ maxHeight: "600px" }}
+                            >
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                     {/* Diagnosis & Outcome */}
                                     <div className="space-y-3 sm:space-y-4">
@@ -467,77 +474,6 @@ export default function PatientTreatmentShow({
                                 )}
                             </CardContent>
                         </Card>
-
-                        {/* Prescriptions Card */}
-                        {treatment?.prescriptions &&
-                            Array.isArray(treatment.prescriptions) &&
-                            treatment.prescriptions.length > 0 && (
-                                <Card className="bg-white border-0 shadow-lg">
-                                    <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-3 sm:p-4 md:p-6">
-                                        <div className="flex items-center gap-2 sm:gap-3">
-                                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                                <Pill className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-base sm:text-lg font-bold text-gray-900">
-                                                    Prescriptions
-                                                </h3>
-                                                <p className="text-gray-600 text-xs sm:text-sm">
-                                                    Medications and instructions
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="p-3 sm:p-4 md:p-6">
-                                        <div className="space-y-3 sm:space-y-4">
-                                            {treatment.prescriptions.map(
-                                                (prescription, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="bg-green-50 rounded-lg p-3 sm:p-4 border border-green-100"
-                                                    >
-                                                        <div className="flex items-start gap-2 sm:gap-3">
-                                                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                                                <Pill className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                                                            </div>
-                                                            <div className="flex-1">
-                                                                <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
-                                                                    {prescription.medication ||
-                                                                        prescription.name ||
-                                                                        `Prescription ${
-                                                                            index +
-                                                                            1
-                                                                        }`}
-                                                                </h4>
-                                                                {prescription.dosage && (
-                                                                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                                                                        <span className="font-medium">
-                                                                            Dosage:
-                                                                        </span>{" "}
-                                                                        {
-                                                                            prescription.dosage
-                                                                        }
-                                                                    </p>
-                                                                )}
-                                                                {prescription.instructions && (
-                                                                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                                                                        <span className="font-medium">
-                                                                            Instructions:
-                                                                        </span>{" "}
-                                                                        {
-                                                                            prescription.instructions
-                                                                        }
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            )}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
                     </div>
 
                     {/* Right Column - Sidebar Info */}
@@ -671,7 +607,7 @@ export default function PatientTreatmentShow({
                                         </div>
 
                                         {treatment.dentist.phone_number && (
-                                            <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                                                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
                                                     <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                                                 </div>
@@ -780,6 +716,306 @@ export default function PatientTreatmentShow({
                             </Card>
                         )}
                     </div>
+                </div>
+
+                {/* BOTTOM SECTION: Full Width Cards */}
+                <div className="space-y-4 sm:space-y-6">
+                    {/* Dental Chart Card */}
+                    {treatment?.tooth_numbers &&
+                        Array.isArray(treatment.tooth_numbers) &&
+                        treatment.tooth_numbers.length > 0 && (
+                            <Card className="bg-white border-0 shadow-lg overflow-hidden">
+                                <CardHeader className="bg-gradient-to-r from-cyan-50 to-blue-50 border-b border-cyan-100 p-3 sm:p-4 md:p-6">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2 sm:gap-3">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+                                                <svg
+                                                    className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                                                    Dental Chart
+                                                </h3>
+                                                <p className="text-gray-600 text-xs sm:text-sm">
+                                                    Teeth involved in this
+                                                    treatment
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Badge className="bg-blue-500 text-white border-blue-600 px-3 py-1.5 text-sm font-semibold">
+                                            {treatment.tooth_numbers.length}{" "}
+                                            {treatment.tooth_numbers.length ===
+                                            1
+                                                ? "Tooth"
+                                                : "Teeth"}
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-3 sm:p-4 md:p-6">
+                                    {/* Simple indicator */}
+                                    <p className="text-sm text-gray-600 mb-3 text-center">
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <svg
+                                                className="w-4 h-4 text-blue-500"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                            <span className="font-medium">
+                                                Blue highlighted teeth were
+                                                treated
+                                            </span>
+                                        </span>
+                                    </p>
+
+                                    {/* Dental Chart */}
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <ImprovedDentalChart
+                                            selectedTeeth={treatment.tooth_numbers.map(
+                                                Number
+                                            )}
+                                            onToothSelect={() => {}}
+                                            readOnly={true}
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                    {/* Procedures Details Card */}
+                    {treatment?.procedures_details &&
+                        Array.isArray(treatment.procedures_details) &&
+                        treatment.procedures_details.length > 0 && (
+                            <Card className="bg-white border-0 shadow-lg">
+                                <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100 p-3 sm:p-4 md:p-6">
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                            <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                                                Procedures Performed
+                                            </h3>
+                                            <p className="text-gray-600 text-xs sm:text-sm">
+                                                Details of treatments provided
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-3 sm:p-4 md:p-6">
+                                    <div className="space-y-3">
+                                        {treatment.procedures_details.map(
+                                            (procedure, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="bg-indigo-50 rounded-lg p-3 sm:p-4 border border-indigo-100"
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                            <span className="text-xs font-bold text-indigo-600">
+                                                                {index + 1}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            {typeof procedure ===
+                                                            "string" ? (
+                                                                <p className="text-gray-900 text-sm">
+                                                                    {procedure}
+                                                                </p>
+                                                            ) : (
+                                                                <>
+                                                                    {procedure.name && (
+                                                                        <p className="font-semibold text-gray-900 text-sm mb-1">
+                                                                            {
+                                                                                procedure.name
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                    {procedure.description && (
+                                                                        <p className="text-gray-700 text-xs">
+                                                                            {
+                                                                                procedure.description
+                                                                            }
+                                                                        </p>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                    {/* Follow-up Instructions Card */}
+                    {treatment?.follow_up_notes && (
+                        <Card className="bg-white border-0 shadow-lg">
+                            <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 border-b border-amber-100 p-3 sm:p-4 md:p-6">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                                        <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                                            Follow-up Instructions
+                                        </h3>
+                                        <p className="text-gray-600 text-xs sm:text-sm">
+                                            Important care instructions for you
+                                        </p>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-3 sm:p-4 md:p-6">
+                                <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                                    <p className="text-gray-900 text-sm whitespace-pre-wrap leading-relaxed">
+                                        {treatment.follow_up_notes}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Images Gallery Card */}
+                    {treatment?.images &&
+                        Array.isArray(treatment.images) &&
+                        treatment.images.length > 0 && (
+                            <Card className="bg-white border-0 shadow-lg">
+                                <CardHeader className="bg-gradient-to-r from-pink-50 to-rose-50 border-b border-pink-100 p-3 sm:p-4 md:p-6">
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-pink-100 rounded-lg flex items-center justify-center">
+                                            <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-600" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                                                Treatment Images
+                                            </h3>
+                                            <p className="text-gray-600 text-xs sm:text-sm">
+                                                Before and after photos
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-3 sm:p-4 md:p-6">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                                        {treatment.images.map(
+                                            (image, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-pink-300 transition-all duration-300 cursor-pointer group"
+                                                >
+                                                    <img
+                                                        src={
+                                                            typeof image ===
+                                                            "string"
+                                                                ? image
+                                                                : image.url
+                                                        }
+                                                        alt={`Treatment image ${
+                                                            index + 1
+                                                        }`}
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                                        onError={(e) => {
+                                                            e.target.src =
+                                                                "/images/placeholder-image.png";
+                                                        }}
+                                                    />
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                    {/* Prescriptions Card */}
+                    {treatment?.prescriptions &&
+                        Array.isArray(treatment.prescriptions) &&
+                        treatment.prescriptions.length > 0 && (
+                            <Card className="bg-white border-0 shadow-lg">
+                                <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-3 sm:p-4 md:p-6">
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                            <Pill className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                                                Prescriptions
+                                            </h3>
+                                            <p className="text-gray-600 text-xs sm:text-sm">
+                                                Medications and instructions
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-3 sm:p-4 md:p-6">
+                                    <div className="space-y-3 sm:space-y-4">
+                                        {treatment.prescriptions.map(
+                                            (prescription, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="bg-green-50 rounded-lg p-3 sm:p-4 border border-green-100"
+                                                >
+                                                    <div className="flex items-start gap-2 sm:gap-3">
+                                                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                            <Pill className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h4 className="font-semibold text-gray-900 text-sm sm:text-base">
+                                                                {prescription.medication ||
+                                                                    prescription.name ||
+                                                                    `Prescription ${
+                                                                        index +
+                                                                        1
+                                                                    }`}
+                                                            </h4>
+                                                            {prescription.dosage && (
+                                                                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                                                                    <span className="font-medium">
+                                                                        Dosage:
+                                                                    </span>{" "}
+                                                                    {
+                                                                        prescription.dosage
+                                                                    }
+                                                                </p>
+                                                            )}
+                                                            {prescription.instructions && (
+                                                                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                                                                    <span className="font-medium">
+                                                                        Instructions:
+                                                                    </span>{" "}
+                                                                    {
+                                                                        prescription.instructions
+                                                                    }
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
                 </div>
             </main>
         </div>

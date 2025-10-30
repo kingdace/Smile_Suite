@@ -19,6 +19,8 @@ import {
     TrendingUp,
     Activity,
     ChevronRight,
+    Timer,
+    Eye,
 } from "lucide-react";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
 import { Button } from "@/Components/ui/button";
@@ -283,12 +285,12 @@ export default function PatientTreatmentsIndex({
                                                 </div>
                                             </div>
 
-                                            {/* Treatment Information Grid */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-3 sm:mb-4">
-                                                {/* Service and Clinic Info */}
-                                                <div className="lg:col-span-2 space-y-3 sm:space-y-4">
-                                                    <div>
-                                                        <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">
+                                            {/* Treatment Information - Improved Layout */}
+                                            <div className="space-y-4 mb-4">
+                                                {/* Top: Service Name & Cost */}
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="flex-1">
+                                                        <h4 className="text-xl font-bold text-gray-900 mb-1">
                                                             {treatment.service
                                                                 ?.name ||
                                                                 treatment.name ||
@@ -296,7 +298,7 @@ export default function PatientTreatmentsIndex({
                                                         </h4>
                                                         {treatment.service
                                                             ?.description && (
-                                                            <p className="text-gray-600 text-xs sm:text-sm">
+                                                            <p className="text-gray-600 text-sm line-clamp-2">
                                                                 {
                                                                     treatment
                                                                         .service
@@ -306,162 +308,131 @@ export default function PatientTreatmentsIndex({
                                                         )}
                                                     </div>
 
-                                                    {/* Clinic and Dentist Info */}
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-                                                        <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
-                                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden border border-gray-200">
-                                                                <img
-                                                                    src={
-                                                                        treatment
-                                                                            .clinic
-                                                                            ?.logo_url ||
-                                                                        "/images/clinic-logo.png"
-                                                                    }
-                                                                    alt={`${
-                                                                        treatment
-                                                                            .clinic
-                                                                            ?.name ||
-                                                                        "Clinic"
-                                                                    } Logo`}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={(
-                                                                        e
-                                                                    ) => {
-                                                                        e.target.src =
-                                                                            "/images/clinic-logo.png";
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-semibold text-gray-900 text-xs sm:text-sm">
-                                                                    {treatment
-                                                                        .clinic
-                                                                        ?.name ||
-                                                                        "Clinic"}
-                                                                </p>
-                                                                <p className="text-xs text-gray-600">
-                                                                    {treatment
-                                                                        .clinic
-                                                                        ?.street_address ||
-                                                                        "Address not available"}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        {treatment.dentist && (
-                                                            <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
-                                                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                                                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="font-semibold text-gray-900 text-xs sm:text-sm">
-                                                                        {getDentistDisplayName(
-                                                                            treatment.dentist
-                                                                        )}
-                                                                    </p>
-                                                                    <p className="text-xs text-gray-600">
-                                                                        Dentist
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Appointment Info */}
-                                                    {treatment.appointment && (
-                                                        <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-blue-50 rounded-lg">
-                                                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-semibold text-gray-900 text-xs sm:text-sm">
-                                                                    {new Date(
-                                                                        treatment.appointment.scheduled_at
-                                                                    ).toLocaleDateString(
-                                                                        "en-US",
-                                                                        {
-                                                                            weekday:
-                                                                                "short",
-                                                                            month: "short",
-                                                                            day: "numeric",
-                                                                        }
-                                                                    )}
-                                                                </p>
-                                                                <p className="text-xs text-gray-600">
-                                                                    {new Date(
-                                                                        treatment.appointment.scheduled_at
-                                                                    ).toLocaleTimeString(
-                                                                        "en-US",
-                                                                        {
-                                                                            hour: "2-digit",
-                                                                            minute: "2-digit",
-                                                                        }
-                                                                    )}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Cost and Additional Info */}
-                                                <div className="space-y-3 sm:space-y-4">
+                                                    {/* Cost - Prominent */}
                                                     {treatment.cost && (
-                                                        <div className="bg-green-50 rounded-lg p-3 sm:p-4 border border-green-200">
-                                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                                                                <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                                                                <span className="text-xs sm:text-sm font-semibold text-green-700">
-                                                                    Treatment
-                                                                    Cost
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-lg sm:text-xl font-bold text-green-800">
+                                                        <div className="flex-shrink-0 text-right">
+                                                            <p className="text-xs text-gray-500 mb-0.5">
+                                                                Cost
+                                                            </p>
+                                                            <p className="text-2xl font-bold text-green-600">
                                                                 ₱
                                                                 {treatment.cost.toLocaleString()}
                                                             </p>
                                                         </div>
                                                     )}
+                                                </div>
 
-                                                    {treatment.estimated_duration_minutes && (
-                                                        <div className="bg-orange-50 rounded-lg p-3 sm:p-4 border border-orange-200">
-                                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                                                                <Timer className="w-3 h-3 sm:w-4 sm:h-4 text-orange-600" />
-                                                                <span className="text-xs sm:text-sm font-semibold text-orange-700">
-                                                                    Duration
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-base sm:text-lg font-bold text-orange-800">
-                                                                {Math.floor(
-                                                                    treatment.estimated_duration_minutes /
-                                                                        60
-                                                                )}
-                                                                h{" "}
-                                                                {treatment.estimated_duration_minutes %
-                                                                    60}
-                                                                m
+                                                {/* Provider Info - 3 Column Grid */}
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    {/* Clinic */}
+                                                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-300 flex-shrink-0">
+                                                            <img
+                                                                src={
+                                                                    treatment
+                                                                        .clinic
+                                                                        ?.logo_url ||
+                                                                    "/images/clinic-logo.png"
+                                                                }
+                                                                alt={`${
+                                                                    treatment
+                                                                        .clinic
+                                                                        ?.name ||
+                                                                    "Clinic"
+                                                                } Logo`}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(
+                                                                    e
+                                                                ) => {
+                                                                    e.target.src =
+                                                                        "/images/clinic-logo.png";
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs text-gray-500">
+                                                                Clinic
                                                             </p>
+                                                            <p className="font-semibold text-sm text-gray-900 truncate">
+                                                                {treatment
+                                                                    .clinic
+                                                                    ?.name ||
+                                                                    "N/A"}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Dentist */}
+                                                    {treatment.dentist && (
+                                                        <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                                                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                                <User className="w-5 h-5 text-green-600" />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-xs text-gray-500">
+                                                                    Dentist
+                                                                </p>
+                                                                <p className="font-semibold text-sm text-gray-900 truncate">
+                                                                    {getDentistDisplayName(
+                                                                        treatment.dentist
+                                                                    )}
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     )}
 
-                                                    {treatment.notes && (
-                                                        <div className="bg-blue-50 rounded-lg p-3 sm:p-4 border border-blue-200">
-                                                            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                                                                <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
-                                                                <span className="text-xs sm:text-sm font-semibold text-blue-700">
-                                                                    Notes
-                                                                </span>
+                                                    {/* Appointment */}
+                                                    {treatment.appointment && (
+                                                        <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                                                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                                <Calendar className="w-5 h-5 text-blue-600" />
                                                             </div>
-                                                            <p className="text-xs sm:text-sm text-gray-700 line-clamp-2">
-                                                                {
-                                                                    treatment.notes
-                                                                }
-                                                            </p>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-xs text-gray-500">
+                                                                    Appointment
+                                                                </p>
+                                                                <p className="font-semibold text-sm text-gray-900 truncate">
+                                                                    {new Date(
+                                                                        treatment.appointment.scheduled_at
+                                                                    ).toLocaleDateString(
+                                                                        "en-US",
+                                                                        {
+                                                                            month: "short",
+                                                                            day: "numeric",
+                                                                        }
+                                                                    )}
+                                                                </p>
+                                                            </div>
                                                         </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Additional Info - Inline Badges */}
+                                                <div className="flex flex-wrap items-center gap-2 text-xs">
+                                                    {treatment.estimated_duration_minutes && (
+                                                        <span className="inline-flex items-center gap-1 bg-orange-50 text-orange-700 px-2 py-1 rounded-full border border-orange-200 font-medium">
+                                                            <Timer className="w-3 h-3" />
+                                                            {Math.floor(
+                                                                treatment.estimated_duration_minutes /
+                                                                    60
+                                                            )}
+                                                            h{" "}
+                                                            {treatment.estimated_duration_minutes %
+                                                                60}
+                                                            m
+                                                        </span>
+                                                    )}
+                                                    {treatment.notes && (
+                                                        <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full border border-blue-200 font-medium">
+                                                            <FileText className="w-3 h-3" />
+                                                            Has notes
+                                                        </span>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            {/* Action Button */}
-                                            <div className="flex justify-end pt-3 sm:pt-4 border-t border-gray-200">
+                                            {/* Action Button - Compact */}
+                                            <div className="flex justify-end pt-3 border-t border-gray-200">
                                                 {treatment.id &&
                                                 treatment.id > 0 ? (
                                                     <Link
@@ -471,25 +442,21 @@ export default function PatientTreatmentsIndex({
                                                         )}
                                                     >
                                                         <Button
-                                                            variant="outline"
                                                             size="sm"
-                                                            className="flex items-center gap-1 sm:gap-2 hover:bg-blue-50 hover:border-blue-300 text-blue-700 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm"
+                                                            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1.5 px-3 py-1.5 text-xs h-8"
                                                         >
-                                                            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                            <Eye className="w-3.5 h-3.5" />
                                                             View Details
-                                                            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                                                         </Button>
                                                     </Link>
                                                 ) : (
                                                     <Button
-                                                        variant="outline"
                                                         size="sm"
-                                                        className="flex items-center gap-1 sm:gap-2 opacity-50 cursor-not-allowed px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm"
+                                                        className="opacity-50 cursor-not-allowed flex items-center gap-1.5 px-3 py-1.5 text-xs h-8"
                                                         disabled
                                                     >
-                                                        <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                        <Eye className="w-3.5 h-3.5" />
                                                         View Details
-                                                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                                                     </Button>
                                                 )}
                                             </div>
