@@ -80,7 +80,7 @@ class NotificationController extends Controller
         // 🔍 DETAILED DEBUG - COUNT BEFORE RETURN
         $count = $notifications->count();
         $notifArray = $notifications->toArray();
-        
+
         \Log::info('Notification API - Before JSON Response', [
             'user_id' => $user->id,
             'collection_count' => $count,
@@ -95,6 +95,9 @@ class NotificationController extends Controller
             'debug_role' => $user->role,
             'debug_clinic' => $user->clinic_id,
             'debug_count_before_json' => $count,
+            'debug_sql' => $notifications->debug_sql ?? 'N/A',
+            'debug_bindings' => $notifications->debug_bindings ?? [],
+            'debug_service_user' => $notifications->debug_user_id ?? null,
         ]);
     }
 

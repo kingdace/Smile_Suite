@@ -70,19 +70,18 @@ class NotificationService
             $query->unread();
         }
 
-        // 🔍 DEBUG: Log SQL before execution
-        \Log::info('NotificationService: SQL Query', [
-            'sql' => $query->toSql(),
-            'bindings' => $query->getBindings(),
-        ]);
+        // 🔍 DEBUG: Capture SQL and bindings
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
         
         $results = $query->limit($limit)->get();
         
-        // 🔍 DEBUG: Log results
-        \Log::info('NotificationService: Query Results', [
-            'count' => $results->count(),
-            'first_id' => $results->count() > 0 ? $results->first()->id : null,
-        ]);
+        // 🔍 DEBUG: Store for debugging (hacky but effective)
+        $results->debug_sql = $sql;
+        $results->debug_bindings = $bindings;
+        $results->debug_user_id = $user->id;
+        $results->debug_clinic_id = $user->clinic_id;
+        $results->debug_user_role = $user->role;
 
         return $results;
     }
