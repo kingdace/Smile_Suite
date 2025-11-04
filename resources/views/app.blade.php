@@ -7,14 +7,14 @@
         <meta name="pusher-key" content="{{ config('broadcasting.connections.pusher.key', '') }}">
         <meta name="pusher-cluster" content="{{ config('broadcasting.connections.pusher.options.cluster', 'mt1') }}">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'Smile Suite') }}</title>
 
         <!-- Favicon -->
         <link rel="icon" type="image/png" sizes="16x16" href="/images/smile-suite-logo.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/images/smile-suite-logo.png">
-<link rel="icon" type="image/png" sizes="48x48" href="/images/smile-suite-logo.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/images/smile-suite-logo.png">
-
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/smile-suite-logo.png">
+        <link rel="icon" type="image/png" sizes="48x48" href="/images/smile-suite-logo.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/images/smile-suite-logo.png">
+        <link rel="apple-touch-icon" href="/images/smile-suite-logo.png">
         <link rel="shortcut icon" type="image/png" href="/images/smile-suite-logo.png">
 
         <!-- Fonts -->

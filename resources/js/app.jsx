@@ -11,7 +11,7 @@ import { route } from "ziggy-js";
 // Make route function available globally
 window.route = route;
 
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+const appName = import.meta.env.VITE_APP_NAME || "Smile Suite";
 
 // Update CSRF token in meta tag and axios when token changes
 const updateCsrfToken = (token) => {
