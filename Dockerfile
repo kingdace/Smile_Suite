@@ -56,10 +56,27 @@ RUN mkdir -p storage/app/public/clinic-gallery \
 # Expose port (Render sets PORT env var)
 EXPOSE 10000
 
-# Make render-start.sh executable
-RUN chmod +x render-start.sh
+# Make render-start.sh executable (it should be copied by COPY . . above)
+RUN if [ -f render-start.sh ]; then \
+        chmod +x render-start.sh && \
+        echo "✅ render-start.sh found and made executable"; \
+    else \
+        echo "⚠️ render-start.sh not found, will create inline script"; \
+    fi
 
-# Default command - runs render-start.sh which handles migrations, seeding, and starts the server
-# This will be used when no custom Docker Command is specified
-CMD ["./render-start.sh"]
+# Create fallback startup script (only if render-start.sh doesn't exist)
+RUN echo '#!/bin/sh\n\
+set -e\n\
+export TZ=Asia/Manila\n\
+echo "🚀 Starting Smile Suite application on Render..."\n\
+echo "📋 Running database migrations..."\n\
+php artisan migrate --force || true\n\
+echo "🔗 Creating storage symlink..."\n\
+php artisan storage:link || ln -sf ../storage/app/public public/storage || true\n\
+echo "🌐 Starting PHP server on port ${PORT:-10000}..."\n\
+exec php artisan serve --host=0.0.0.0 --port=${PORT:-10000}' > /var/www/html/docker-entrypoint.sh && \
+    chmod +x /var/www/html/docker-entrypoint.sh
+
+# Use render-start.sh if it exists, otherwise use fallback
+CMD ["/bin/sh", "-c", "if [ -x /var/www/html/render-start.sh ]; then /var/www/html/render-start.sh; else /var/www/html/docker-entrypoint.sh; fi"]
 

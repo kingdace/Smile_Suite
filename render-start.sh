@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Startup script for Render deployment
 # This is separate from start.sh (Railway) to handle platform differences
