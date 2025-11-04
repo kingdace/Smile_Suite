@@ -7,9 +7,29 @@ echo "🚀 Starting Smile Suite application on Render..."
 # Set timezone
 export TZ=Asia/Manila
 
+# Critical: Clear all caches first (fixes 500 errors)
+echo "🧹 Clearing all Laravel caches..."
+php artisan config:clear || true
+php artisan cache:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
+
+# Check if APP_KEY is set
+echo "🔑 Checking APP_KEY..."
+if [ -z "$APP_KEY" ]; then
+    echo "⚠️ APP_KEY not set! Generating new key..."
+    php artisan key:generate --force || echo "❌ Failed to generate APP_KEY"
+else
+    echo "✅ APP_KEY is set"
+fi
+
+# Test database connection
+echo "🔌 Testing database connection..."
+php artisan db:show || echo "⚠️ Database connection test failed (will continue anyway)"
+
 # Check if we need to run migrations
 echo "📋 Running database migrations..."
-php artisan migrate --force
+php artisan migrate --force || echo "⚠️ Migration failed (will continue anyway)"
 
 # Check if we need to run seeders (only if database is empty or missing seed data)
 echo "🌱 Checking if seeders need to be run..."
@@ -104,24 +124,29 @@ fi
 
 # Create storage symlink
 echo "🔗 Creating storage symlink..."
-php artisan storage:link
+if [ ! -L "public/storage" ]; then
+    php artisan storage:link || ln -sf ../storage/app/public public/storage || true
+fi
 
 # Verify storage symlink was created
-if [ -L "public/storage" ]; then
-    echo "✅ Storage symlink created successfully"
-    ls -la public/ | grep storage
+if [ -L "public/storage" ] || [ -d "public/storage" ]; then
+    echo "✅ Storage symlink exists"
 else
-    echo "❌ Failed to create storage symlink with artisan command"
-    echo "Creating manual symlink..."
-    ln -sf ../storage/app/public public/storage
-    if [ -L "public/storage" ]; then
-        echo "✅ Manual storage symlink created"
-        ls -la public/ | grep storage
-    else
-        echo "❌ Manual symlink creation failed"
-        echo "Storage symlink status:"
-        ls -la public/ | grep storage || echo "No storage found in public/"
-    fi
+    echo "⚠️ Storage symlink not found (will continue anyway)"
+fi
+
+# Optimize Laravel for production
+echo "⚡ Optimizing Laravel..."
+php artisan config:cache || echo "⚠️ Config cache failed"
+php artisan route:cache || echo "⚠️ Route cache failed"
+php artisan view:cache || echo "⚠️ View cache failed"
+
+# Final check: verify APP_KEY exists
+echo "🔍 Final verification..."
+if php artisan tinker --execute="echo config('app.key') ? 'APP_KEY OK' : 'APP_KEY MISSING';" 2>/dev/null | grep -q "OK"; then
+    echo "✅ APP_KEY verified"
+else
+    echo "❌ APP_KEY verification failed - this may cause 500 errors!"
 fi
 
 # Start the queue worker in the background (Render handles this separately via worker service)
