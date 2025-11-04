@@ -56,6 +56,10 @@ RUN mkdir -p storage/app/public/clinic-gallery \
 # Expose port (Render sets PORT env var)
 EXPOSE 10000
 
-# Start command (Render will override this)
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+# Make render-start.sh executable
+RUN chmod +x render-start.sh
+
+# Default command - runs render-start.sh which handles migrations, seeding, and starts the server
+# This will be used when no custom Docker Command is specified
+CMD ["./render-start.sh"]
 

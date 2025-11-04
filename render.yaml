@@ -1,0 +1,58 @@
+services:
+  # Web Service (Main Application)
+  - type: web
+    name: smile-suite-web
+    env: docker
+    region: oregon
+    plan: free
+    # Build command left empty - Dockerfile handles it
+    buildCommand: ""
+    startCommand: chmod +x render-start.sh && ./render-start.sh
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_TIMEZONE
+        value: Asia/Manila
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+    healthCheckPath: /
+    numInstances: 1
+
+  # Worker Service (Scheduler & Queue Worker)
+  - type: worker
+    name: smile-suite-worker
+    env: docker
+    region: oregon
+    plan: free
+    # Build command left empty - Dockerfile handles it
+    buildCommand: ""
+    startCommand: php artisan schedule:work
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_TIMEZONE
+        value: Asia/Manila
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+    numInstances: 1
+
+databases:
+  # PostgreSQL Database (Render's default - free tier available)
+  # Note: If you need MySQL specifically, you can:
+  # 1. Use external MySQL service (Railway, PlanetScale, etc.)
+  # 2. Modify Laravel config to use PostgreSQL (recommended)
+  # 3. Upgrade Render plan for MySQL support
+  - name: smile-suite-db
+    databaseName: smile_suite
+    user: smile_suite_user
+    plan: free
+    postgresMajorVersion: 14
+
