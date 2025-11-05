@@ -72,10 +72,29 @@ class NotificationController extends Controller
         // Check queue worker status (if queue connection is database)
         $queueJobsPending = 0;
         $queueJobsFailed = 0;
+        $failedJobsDetails = [];
         try {
             if (config('queue.default') === 'database') {
                 $queueJobsPending = DB::table('jobs')->count();
                 $queueJobsFailed = DB::table('failed_jobs')->where('failed_at', '>=', now()->subDay())->count();
+
+                // Get details of recent failed jobs
+                if ($queueJobsFailed > 0) {
+                    $recentFailed = DB::table('failed_jobs')
+                        ->where('failed_at', '>=', now()->subDay())
+                        ->orderBy('failed_at', 'desc')
+                        ->limit(3)
+                        ->get(['uuid', 'queue', 'exception', 'failed_at']);
+
+                    foreach ($recentFailed as $job) {
+                        $failedJobsDetails[] = [
+                            'uuid' => $job->uuid,
+                            'queue' => $job->queue,
+                            'failed_at' => $job->failed_at,
+                            'exception_preview' => substr($job->exception, 0, 200), // First 200 chars
+                        ];
+                    }
+                }
             }
         } catch (\Exception $e) {
             // Queue tables might not exist, ignore
@@ -96,6 +115,7 @@ class NotificationController extends Controller
                     'pending_jobs' => $queueJobsPending,
                     'failed_jobs_today' => $queueJobsFailed,
                     'queue_driver' => config('queue.default'),
+                    'failed_jobs_details' => $failedJobsDetails,
                 ],
             ],
         ]);

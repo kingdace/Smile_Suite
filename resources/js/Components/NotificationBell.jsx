@@ -270,8 +270,25 @@ export default function NotificationBell({ auth }) {
                                                 .failed_jobs_today,
                                         issue: "Jobs are failing to process",
                                         action: "Check Render logs for error details",
+                                        failedJobsDetails:
+                                            data._debug.queue_status
+                                                .failed_jobs_details || [],
                                     }
                                 );
+
+                                // Show preview of failed job errors
+                                if (
+                                    data._debug.queue_status
+                                        .failed_jobs_details &&
+                                    data._debug.queue_status.failed_jobs_details
+                                        .length > 0
+                                ) {
+                                    console.error(
+                                        "📋 [QUEUE] Failed Job Details:",
+                                        data._debug.queue_status
+                                            .failed_jobs_details
+                                    );
+                                }
                             }
 
                             if (
