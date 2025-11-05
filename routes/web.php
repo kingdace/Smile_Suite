@@ -249,6 +249,14 @@ Route::middleware('auth')->group(function () {
             return response()->json($metrics);
         })->name('clinic.dashboard.metrics');
 
+        // Send appointment reminders (clinic-specific)
+        Route::post('/clinic/{clinic}/appointments/send-reminders', [DashboardController::class, 'sendAppointmentReminders'])
+            ->name('clinic.appointments.send-reminders');
+
+        // Standalone page for sending reminders
+        Route::get('/clinic/{clinic}/appointments/send-reminders', [DashboardController::class, 'showSendRemindersPage'])
+            ->name('clinic.appointments.send-reminders.page');
+
         Route::get('/clinic/{clinic}/dashboard/chart-data', function (Request $request, $clinic) {
             $timeRange = $request->get('range', 'week');
             $clinicModel = \App\Models\Clinic::findOrFail($clinic);

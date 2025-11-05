@@ -14,6 +14,7 @@ use App\Services\DashboardMetricsService;
 use App\Traits\SubscriptionAccessControl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -270,5 +271,154 @@ class DashboardController extends Controller
         ];
     }
 
+    /**
+     * Show the send reminders page
+     */
+    public function showSendRemindersPage(Request $request, Clinic $clinic)
+    {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
+        // Only clinic_admin can access
+        $user = Auth::user();
+        if ($user->role !== 'clinic_admin' || $user->clinic_id !== $clinic->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $user = Auth::user();
+
+        // Prepare user data with permissions (using accessor)
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar_url' => $user->avatar_url,
+            'clinic_id' => $user->clinic_id,
+            'role' => $user->role,
+            'permissions' => $user->permissions, // Uses getPermissionsAttribute accessor
+        ];
+
+        return Inertia::render('Clinic/Appointments/SendReminders', [
+            'clinic' => $clinic,
+            'auth' => [
+                'user' => $userData,
+                'clinic' => $clinic,
+                'clinic_id' => $clinic->id,
+            ]
+        ]);
+    }
+
+    /**
+     * Send SMS reminders for today's appointments (clinic-specific)
+     */
+    public function sendAppointmentReminders(Request $request, Clinic $clinic)
+    {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
+        // Only clinic_admin can send reminders
+        $user = Auth::user();
+        if ($user->role !== 'clinic_admin' || $user->clinic_id !== $clinic->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        try {
+            // Get appointments scheduled for today for THIS clinic
+            $todayStart = now()->startOfDay();
+            $todayEnd = now()->endOfDay();
+
+            $todayAppointments = \App\Models\Appointment::with(['patient', 'assignedDentist', 'status', 'clinic', 'service'])
+                ->where('clinic_id', $clinic->id)
+                ->whereBetween('scheduled_at', [$todayStart, $todayEnd])
+                ->whereHas('status', function($query) {
+                    $query->whereIn('name', ['Pending', 'Confirmed']);
+                })
+                ->where(function($query) use ($todayStart) {
+                    $todayMarker = 'sms_reminder_' . $todayStart->format('Y-m-d');
+                    $query->whereNull('notes')
+                          ->orWhere('notes', 'NOT LIKE', "%{$todayMarker}%");
+                })
+                ->get();
+
+            $smsService = app(\App\Services\SemaphoreSmsService::class);
+
+            $stats = [
+                'total' => $todayAppointments->count(),
+                'sms_sent' => 0,
+                'sms_failed' => 0,
+                'no_phone' => 0,
+            ];
+
+            $output = "🕐 Starting daily appointment reminders for {$clinic->name}...\n";
+            $output .= "📋 Found {$todayAppointments->count()} appointments scheduled for today\n\n";
+
+            if ($todayAppointments->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'No appointments found for today',
+                    'output' => "✅ No appointments scheduled for today. Skipping reminders.\n",
+                ]);
+            }
+
+            foreach ($todayAppointments as $appointment) {
+                try {
+                    $patient = $appointment->patient;
+                    if (!$patient) {
+                        continue;
+                    }
+
+                    if ($patient->phone_number) {
+                        try {
+                            $smsResult = $smsService->sendAppointmentReminder($appointment, $patient, $appointment->assignedDentist);
+
+                            if ($smsResult['success']) {
+                                $stats['sms_sent']++;
+                                $todayMarker = 'sms_reminder_' . now()->format('Y-m-d');
+                                $currentNotes = $appointment->notes ?? '';
+                                $appointment->update([
+                                    'notes' => $currentNotes . "\n[{$todayMarker}]"
+                                ]);
+                                $output .= "📱 SMS sent to {$patient->first_name} {$patient->last_name}\n";
+                            } else {
+                                $stats['sms_failed']++;
+                                $output .= "⚠️ SMS failed for {$patient->first_name} {$patient->last_name}: " . ($smsResult['error'] ?? 'Unknown error') . "\n";
+                            }
+                        } catch (\Exception $e) {
+                            $stats['sms_failed']++;
+                            \Illuminate\Support\Facades\Log::error('Failed to send SMS reminder', [
+                                'appointment_id' => $appointment->id,
+                                'patient_id' => $patient->id,
+                                'error' => $e->getMessage()
+                            ]);
+                            $output .= "⚠️ SMS failed for {$patient->first_name} {$patient->last_name}: " . $e->getMessage() . "\n";
+                        }
+                    } else {
+                        $stats['no_phone']++;
+                    }
+                } catch (\Exception $e) {
+                    $stats['sms_failed']++;
+                    $output .= "⚠️ Error processing appointment ID {$appointment->id}: " . $e->getMessage() . "\n";
+                }
+            }
+
+            $output .= "\n✅ Daily reminders completed!\n";
+            $output .= "   Total: {$stats['total']}\n";
+            $output .= "   SMS Sent: {$stats['sms_sent']}\n";
+            $output .= "   Failed: {$stats['sms_failed']}\n";
+            $output .= "   No Phone: {$stats['no_phone']}\n";
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment reminders sent successfully',
+                'output' => $output,
+                'stats' => $stats,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send reminders: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 
 }

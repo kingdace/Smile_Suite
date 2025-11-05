@@ -52,8 +52,18 @@ class Notification extends Model
     public function scopeForUser($query, $user)
     {
         return $query->where(function($q) use ($user) {
-            $q->whereJsonContains('target_roles', $user->role)
-              ->orWhere('user_id', $user->id);
+            // PostgreSQL compatible JSON query
+            // For PostgreSQL, whereJsonContains works with text values
+            $driver = config('database.default');
+            if ($driver === 'pgsql') {
+                // PostgreSQL: target_roles @> '["role"]'::jsonb
+                $q->whereRaw("target_roles::text LIKE ?", ['%' . $user->role . '%'])
+                  ->orWhere('user_id', $user->id);
+            } else {
+                // MySQL/MariaDB: JSON_CONTAINS
+                $q->whereJsonContains('target_roles', $user->role)
+                  ->orWhere('user_id', $user->id);
+            }
         });
     }
 

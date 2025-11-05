@@ -224,6 +224,7 @@ export default function Dashboard({
 
             <EnhancedDashboardLayout
                 clinic={clinic}
+                auth={auth}
                 stats={stats}
                 todayAppointments={today_appointments}
                 upcomingAppointments={upcoming_appointments}

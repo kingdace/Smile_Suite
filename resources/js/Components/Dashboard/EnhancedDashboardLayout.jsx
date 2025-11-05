@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "@inertiajs/react";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
@@ -34,6 +35,7 @@ import {
     Download,
     Share2,
     CreditCard,
+    Send,
 } from "lucide-react";
 import EnhancedKPICard from "./EnhancedKPICard";
 import AdvancedChart from "./AdvancedChart";
@@ -42,6 +44,7 @@ import TimeRangeSelector from "./TimeRangeSelector";
 
 const EnhancedDashboardLayout = ({
     clinic,
+    auth,
     stats,
     todayAppointments,
     upcomingAppointments,
@@ -182,6 +185,17 @@ const EnhancedDashboardLayout = ({
                                 </div>
 
                                 <div className="flex items-center space-x-3">
+                                    {/* Compact Send SMS Reminders Button - Only for clinic_admin */}
+                                    {clinic &&
+                                        auth?.user?.role === "clinic_admin" && (
+                                            <Link
+                                                href={`/clinic/${clinic.id}/appointments/send-reminders`}
+                                                className="hidden md:flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-white/30 hover:scale-105"
+                                            >
+                                                <Send className="w-4 h-4" />
+                                                Send SMS
+                                            </Link>
+                                        )}
                                     {/* Time Range Selector */}
                                     <TimeRangeSelector
                                         value={timeRange}
