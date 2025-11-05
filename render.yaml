@@ -30,7 +30,7 @@ services:
     plan: free
     # Build command left empty - Dockerfile handles it
     buildCommand: ""
-    startCommand: php artisan schedule:work
+    startCommand: chmod +x render-worker-start.sh && ./render-worker-start.sh
     envVars:
       - key: APP_ENV
         value: production
@@ -55,4 +55,3 @@ databases:
     user: smile_suite_user
     plan: free
     postgresMajorVersion: 14
-

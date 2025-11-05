@@ -56,12 +56,19 @@ RUN mkdir -p storage/app/public/clinic-gallery \
 # Expose port (Render sets PORT env var)
 EXPOSE 10000
 
-# Make render-start.sh executable (it should be copied by COPY . . above)
+# Make render-start.sh and render-worker-start.sh executable (they should be copied by COPY . . above)
 RUN if [ -f render-start.sh ]; then \
         chmod +x render-start.sh && \
         echo "✅ render-start.sh found and made executable"; \
     else \
         echo "⚠️ render-start.sh not found, will create inline script"; \
+    fi
+
+RUN if [ -f render-worker-start.sh ]; then \
+        chmod +x render-worker-start.sh && \
+        echo "✅ render-worker-start.sh found and made executable"; \
+    else \
+        echo "⚠️ render-worker-start.sh not found"; \
     fi
 
 # Create fallback startup script (only if render-start.sh doesn't exist)
