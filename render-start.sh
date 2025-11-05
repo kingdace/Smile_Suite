@@ -149,16 +149,24 @@ else
     echo "❌ APP_KEY verification failed - this may cause 500 errors!"
 fi
 
-# Start the queue worker in the background (Render handles this separately via worker service)
-# But we'll start it here as a fallback if worker service isn't configured
+# Start the Laravel scheduler in the background
+# (SMS reminders, subscription checks, etc.)
+echo "📅 Starting Laravel scheduler..."
+php artisan schedule:work &
+SCHEDULER_PID=$!
+echo "✅ Scheduler started (PID: $SCHEDULER_PID)"
+
+# Start the queue worker in the background
+# (Notifications, broadcast events, etc.)
 echo "🔄 Starting queue worker in background..."
-php artisan queue:work --tries=3 --timeout=90 --daemon &
+php artisan queue:work --tries=3 --timeout=90 &
 QUEUE_PID=$!
 echo "✅ Queue worker started (PID: $QUEUE_PID)"
 
 # Function to cleanup background processes on script exit
 cleanup() {
-    echo "🛑 Stopping queue worker..."
+    echo "🛑 Stopping scheduler and queue worker..."
+    kill $SCHEDULER_PID 2>/dev/null || true
     kill $QUEUE_PID 2>/dev/null || true
     echo "✅ Cleanup complete"
 }
