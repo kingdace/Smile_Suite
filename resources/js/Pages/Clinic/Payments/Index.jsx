@@ -508,17 +508,17 @@ export default function Index({
                                     </div>
                                     <div className="flex-1 min-w-0 w-full">
                                         <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
-                                            Total Balance
+                                            This Week
                                         </p>
                                         <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             {formatCurrency(
-                                                summary.total_balance
+                                                summary.this_week_income || 0
                                             )}
                                         </p>
                                         <div className="flex items-center justify-center gap-1">
                                             <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
                                             <span className="text-[10px] text-green-600 font-medium truncate">
-                                                Current balance
+                                                This week income
                                             </span>
                                         </div>
                                     </div>
@@ -560,21 +560,21 @@ export default function Index({
                             <CardContent className="p-5 relative">
                                 <div className="flex flex-col items-center gap-3 text-center">
                                     <div className="p-3 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 flex-shrink-0">
-                                        <Clock className="h-6 w-6 text-white" />
+                                        <TrendingUp className="h-6 w-6 text-white" />
                                     </div>
                                     <div className="flex-1 min-w-0 w-full">
                                         <p className="text-xs text-gray-600 font-medium mb-1 leading-tight">
-                                            Pending
+                                            This Day
                                         </p>
                                         <p className="text-xl font-bold text-gray-900 mb-1 leading-tight truncate">
                                             {formatCurrency(
-                                                summary.pending_payments
+                                                summary.this_day_income || 0
                                             )}
                                         </p>
                                         <div className="flex items-center justify-center gap-1">
                                             <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse"></div>
                                             <span className="text-[10px] text-orange-600 font-medium truncate">
-                                                Awaiting payment
+                                                Today's income
                                             </span>
                                         </div>
                                     </div>

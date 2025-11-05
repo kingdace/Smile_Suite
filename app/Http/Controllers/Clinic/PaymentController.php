@@ -662,18 +662,31 @@ class PaymentController extends Controller
         }
 
         $total_revenue = (clone $query)->where('status', Payment::STATUS_COMPLETED)->sum('amount');
-        $total_balance = Patient::where('clinic_id', $clinicId)->sum('balance') ?? 0;
         $payments_this_month = (clone $query)->where('status', Payment::STATUS_COMPLETED)
             ->whereMonth('payment_date', now()->month)
             ->whereYear('payment_date', now()->year)
             ->sum('amount');
-        $pending_payments = (clone $query)->where('status', Payment::STATUS_PENDING)->sum('amount');
+
+        // Calculate this week income (always current week, regardless of date filters)
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $this_week_income = Payment::where('clinic_id', $clinicId)
+            ->where('status', Payment::STATUS_COMPLETED)
+            ->whereBetween('payment_date', [$startOfWeek, $endOfWeek])
+            ->sum('amount');
+
+        // Calculate this day income (always today, regardless of date filters)
+        $today = Carbon::today();
+        $this_day_income = Payment::where('clinic_id', $clinicId)
+            ->where('status', Payment::STATUS_COMPLETED)
+            ->whereDate('payment_date', $today)
+            ->sum('amount');
 
         return [
             'total_revenue' => $total_revenue,
-            'total_balance' => $total_balance,
+            'this_week_income' => $this_week_income,
             'payments_this_month' => $payments_this_month,
-            'pending_payments' => $pending_payments,
+            'this_day_income' => $this_day_income,
         ];
     }
 }
