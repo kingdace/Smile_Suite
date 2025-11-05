@@ -224,6 +224,100 @@ export default function NotificationBell({ auth }) {
                         userRole: auth.user?.role,
                         clinicId: auth.clinic_id,
                     });
+
+                    // Log 7: Backend Debug Info (if available)
+                    if (data._debug) {
+                        console.log("🔍 [7] Backend Debug Info:", {
+                            totalForClinic: data._debug.total_for_clinic,
+                            totalForUser: data._debug.total_for_user,
+                            totalNotExpired: data._debug.total_not_expired,
+                            userRole: data._debug.user_role,
+                            queueStatus: data._debug.queue_status,
+                        });
+
+                        // Log Queue/Worker Status
+                        if (data._debug.queue_status) {
+                            console.log("⚙️ [8] Queue/Worker Status:", {
+                                queueDriver:
+                                    data._debug.queue_status.queue_driver,
+                                pendingJobs:
+                                    data._debug.queue_status.pending_jobs,
+                                failedJobsToday:
+                                    data._debug.queue_status.failed_jobs_today,
+                            });
+
+                            if (data._debug.queue_status.pending_jobs > 0) {
+                                console.warn(
+                                    "⚠️ [QUEUE] There are pending jobs in the queue!",
+                                    {
+                                        pendingJobs:
+                                            data._debug.queue_status
+                                                .pending_jobs,
+                                        issue: "Queue worker might not be processing jobs",
+                                        action: "Check if queue worker is running on Render",
+                                    }
+                                );
+                            }
+
+                            if (
+                                data._debug.queue_status.failed_jobs_today > 0
+                            ) {
+                                console.error(
+                                    "❌ [QUEUE] Failed jobs detected!",
+                                    {
+                                        failedJobsToday:
+                                            data._debug.queue_status
+                                                .failed_jobs_today,
+                                        issue: "Jobs are failing to process",
+                                        action: "Check Render logs for error details",
+                                    }
+                                );
+                            }
+
+                            if (
+                                data._debug.queue_status.pending_jobs === 0 &&
+                                data._debug.queue_status.failed_jobs_today === 0
+                            ) {
+                                console.log(
+                                    "✅ [QUEUE] Queue worker appears to be working (no pending/failed jobs)"
+                                );
+                            }
+                        }
+
+                        // Analysis
+                        if (data._debug.total_for_clinic === 0) {
+                            console.error(
+                                "❌ [ANALYSIS] No notifications exist for clinic 27!",
+                                {
+                                    action: "Run NotificationSeeder or create a new appointment to trigger observer",
+                                }
+                            );
+                        } else if (
+                            data._debug.total_for_user === 0 &&
+                            data._debug.total_for_clinic > 0
+                        ) {
+                            console.error(
+                                "❌ [ANALYSIS] Notifications exist for clinic but NOT matching user role!",
+                                {
+                                    userRole: data._debug.user_role,
+                                    totalForClinic:
+                                        data._debug.total_for_clinic,
+                                    issue: "PostgreSQL JSON query may not be matching correctly",
+                                    action: "Check Notification model scopeForUser method",
+                                }
+                            );
+                        } else if (
+                            data._debug.total_not_expired === 0 &&
+                            data._debug.total_for_user > 0
+                        ) {
+                            console.error(
+                                "❌ [ANALYSIS] All notifications are expired!",
+                                {
+                                    action: "Create new appointments to generate fresh notifications",
+                                }
+                            );
+                        }
+                    }
                 }
 
                 setNotifications(data.notifications);

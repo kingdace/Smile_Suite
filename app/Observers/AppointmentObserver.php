@@ -21,11 +21,31 @@ class AppointmentObserver
      */
     public function created(Appointment $appointment): void
     {
-        // Broadcast appointment creation for real-time dashboard updates
-        broadcast(new AppointmentUpdated($appointment, 'created'));
+        Log::info('👁️ [APPOINTMENT OBSERVER] Appointment created event fired', [
+            'appointment_id' => $appointment->id,
+            'clinic_id' => $appointment->clinic_id,
+            'patient_id' => $appointment->patient_id,
+        ]);
 
-        // Create notification for new appointment request
-        $this->createAppointmentNotification($appointment, 'created');
+        try {
+            // Broadcast appointment creation for real-time dashboard updates
+            Log::info('📡 [APPOINTMENT OBSERVER] Broadcasting AppointmentUpdated event', [
+                'appointment_id' => $appointment->id,
+            ]);
+            broadcast(new AppointmentUpdated($appointment, 'created'));
+
+            // Create notification for new appointment request
+            Log::info('🔔 [APPOINTMENT OBSERVER] Creating notification for appointment created', [
+                'appointment_id' => $appointment->id,
+            ]);
+            $this->createAppointmentNotification($appointment, 'created');
+        } catch (\Exception $e) {
+            Log::error('❌ [APPOINTMENT OBSERVER] Error in created() method', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 
     /**
@@ -113,11 +133,33 @@ class AppointmentObserver
      */
     private function createAppointmentNotification(Appointment $appointment, string $eventType): void
     {
+        Log::info('🔔 [APPOINTMENT OBSERVER] createAppointmentNotification called', [
+            'appointment_id' => $appointment->id,
+            'event_type' => $eventType,
+        ]);
+
         try {
             $patient = $appointment->patient;
             $dentist = $appointment->assignedDentist;
             $status = $appointment->status;
-            $appointmentDate = $appointment->scheduled_at->format('M j, Y \a\t g:i A');
+
+            if (!$patient) {
+                Log::warning('⚠️ [APPOINTMENT OBSERVER] Appointment has no patient, skipping notification', [
+                    'appointment_id' => $appointment->id,
+                ]);
+                return;
+            }
+
+            if (!$status) {
+                Log::warning('⚠️ [APPOINTMENT OBSERVER] Appointment has no status, skipping notification', [
+                    'appointment_id' => $appointment->id,
+                ]);
+                return;
+            }
+
+            $appointmentDate = $appointment->scheduled_at ?
+                $appointment->scheduled_at->format('M j, Y \a\t g:i A') :
+                'Not scheduled';
 
             // Determine notification content based on event type
             $notificationData = $this->getNotificationContent($appointment, $eventType, $patient, $dentist, $status, $appointmentDate);
@@ -125,8 +167,15 @@ class AppointmentObserver
             // Determine target roles based on event type
             $targetRoles = $this->getTargetRoles($eventType, $appointment);
 
+            Log::info('📝 [APPOINTMENT OBSERVER] Prepared notification data', [
+                'appointment_id' => $appointment->id,
+                'event_type' => $eventType,
+                'title' => $notificationData['title'],
+                'target_roles' => $targetRoles,
+            ]);
+
             // Create the notification
-            $this->notificationService->createAppointmentNotification([
+            $notification = $this->notificationService->createAppointmentNotification([
                 'clinic_id' => $appointment->clinic_id,
                 'title' => $notificationData['title'],
                 'message' => $notificationData['message'],
@@ -145,12 +194,19 @@ class AppointmentObserver
                 ]
             ]);
 
+            Log::info('✅ [APPOINTMENT OBSERVER] Notification created successfully', [
+                'appointment_id' => $appointment->id,
+                'notification_id' => $notification->id ?? 'unknown',
+                'event_type' => $eventType,
+            ]);
+
         } catch (\Exception $e) {
             // Log error but don't break the appointment flow
-            Log::error('Failed to create appointment notification: ' . $e->getMessage(), [
+            Log::error('❌ [APPOINTMENT OBSERVER] Failed to create appointment notification', [
                 'appointment_id' => $appointment->id,
                 'event_type' => $eventType,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }

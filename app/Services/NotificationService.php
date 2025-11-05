@@ -34,17 +34,44 @@ class NotificationService
         // Validate notification type and roles
         $this->validateNotificationData($data);
 
-        return Notification::create([
+        Log::info('🔔 [NOTIFICATION SERVICE] Creating notification', [
             'clinic_id' => $data['clinic_id'],
-            'user_id' => $data['user_id'] ?? null,
-            'target_roles' => $data['target_roles'],
             'type' => $data['type'],
             'title' => $data['title'],
-            'message' => $data['message'],
-            'data' => $data['data'] ?? null,
-            'priority' => $data['priority'] ?? self::PRIORITY_MEDIUM,
-            'expires_at' => $data['expires_at'] ?? null,
+            'target_roles' => $data['target_roles'],
+            'user_id' => $data['user_id'] ?? null,
         ]);
+
+        try {
+            $notification = Notification::create([
+                'clinic_id' => $data['clinic_id'],
+                'user_id' => $data['user_id'] ?? null,
+                'target_roles' => $data['target_roles'],
+                'type' => $data['type'],
+                'title' => $data['title'],
+                'message' => $data['message'],
+                'data' => $data['data'] ?? null,
+                'priority' => $data['priority'] ?? self::PRIORITY_MEDIUM,
+                'expires_at' => $data['expires_at'] ?? null,
+            ]);
+
+            Log::info('✅ [NOTIFICATION SERVICE] Notification created successfully', [
+                'notification_id' => $notification->id,
+                'clinic_id' => $notification->clinic_id,
+                'type' => $notification->type,
+                'title' => $notification->title,
+                'target_roles' => $notification->target_roles,
+            ]);
+
+            return $notification;
+        } catch (\Exception $e) {
+            Log::error('❌ [NOTIFICATION SERVICE] Failed to create notification', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+            ]);
+            throw $e;
+        }
     }
 
     /**
