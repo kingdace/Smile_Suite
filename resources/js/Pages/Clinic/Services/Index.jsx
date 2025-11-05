@@ -1,6 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 import ProtectedRoute from "@/Components/ProtectedRoute";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { getDentistDisplayName } from "@/Helpers/DentistHelper";
@@ -67,6 +68,9 @@ export default function Index({
     categories,
     filters,
 }) {
+    const { hasPermission } = usePermissions();
+    const canManageServices = hasPermission("manage_services");
+
     const [searchTerm, setSearchTerm] = useState(filters?.search || "");
     const [filterCategory, setFilterCategory] = useState(
         filters?.category || "all"
@@ -154,6 +158,10 @@ export default function Index({
         }) || [];
 
     const handleCreate = () => {
+        // Check permission before opening modal
+        if (!canManageServices) {
+            return;
+        }
         setData({
             name: "",
             description: "",
@@ -183,6 +191,10 @@ export default function Index({
     };
 
     const handleEdit = (service) => {
+        // Check permission before opening modal
+        if (!canManageServices) {
+            return;
+        }
         setEditingService(service);
         setData({
             name: service.name,
@@ -218,6 +230,10 @@ export default function Index({
     };
 
     const handleDelete = (service) => {
+        // Check permission before opening delete dialog
+        if (!canManageServices) {
+            return;
+        }
         setDeletingService(service);
         setShowDeleteDialog(true);
     };
@@ -290,7 +306,10 @@ export default function Index({
                                     </p>
                                 </div>
                             </div>
-                            <ProtectedRoute permission="manage_services" isButton={true}>
+                            <ProtectedRoute
+                                permission="manage_services"
+                                isButton={true}
+                            >
                                 <Button
                                     onClick={handleCreate}
                                     className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-500/20 backdrop-blur-sm"
@@ -729,7 +748,10 @@ export default function Index({
                                                         >
                                                             <Eye className="h-3 w-3" />
                                                         </Button>
-                                                        <ProtectedRoute permission="manage_services" isButton={true}>
+                                                        <ProtectedRoute
+                                                            permission="manage_services"
+                                                            isButton={true}
+                                                        >
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
@@ -744,18 +766,18 @@ export default function Index({
                                                                 <Edit className="h-3 w-3" />
                                                             </Button>
                                                         </ProtectedRoute>
-                                                        <ProtectedRoute permission="manage_services" isButton={true}>
+                                                        <ProtectedRoute
+                                                            permission="manage_services"
+                                                            isButton={true}
+                                                        >
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                onClick={() => {
-                                                                    setDeletingService(
+                                                                onClick={() =>
+                                                                    handleDelete(
                                                                         service
-                                                                    );
-                                                                    setShowDeleteDialog(
-                                                                        true
-                                                                    );
-                                                                }}
+                                                                    )
+                                                                }
                                                                 className="h-8 w-8 p-0 bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 hover:text-red-700 rounded-lg transition-all duration-200 hover:scale-105"
                                                                 title="Delete Service"
                                                             >
@@ -794,7 +816,10 @@ export default function Index({
                                             ? "Try adjusting your search or filter criteria to find what you're looking for."
                                             : "Get started by creating your first service to build your clinic's service catalog."}
                                     </p>
-                                    <ProtectedRoute permission="manage_services" isButton={true}>
+                                    <ProtectedRoute
+                                        permission="manage_services"
+                                        isButton={true}
+                                    >
                                         <Button
                                             onClick={handleCreate}
                                             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
@@ -811,7 +836,16 @@ export default function Index({
             </div>
 
             {/* Enhanced Create Service Dialog */}
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <Dialog
+                open={showCreateDialog && canManageServices}
+                onOpenChange={(open) => {
+                    // Only allow opening if user has permission
+                    if (open && !canManageServices) {
+                        return;
+                    }
+                    setShowCreateDialog(open);
+                }}
+            >
                 <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto bg-white">
                     <DialogHeader className="text-center pb-4">
                         <DialogTitle className="text-xl font-bold text-gray-900">
@@ -1381,7 +1415,16 @@ export default function Index({
             </Dialog>
 
             {/* Edit Service Dialog */}
-            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+            <Dialog
+                open={showEditDialog && canManageServices}
+                onOpenChange={(open) => {
+                    // Only allow opening if user has permission
+                    if (open && !canManageServices) {
+                        return;
+                    }
+                    setShowEditDialog(open);
+                }}
+            >
                 <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto bg-white">
                     <DialogHeader className="text-center pb-4">
                         <DialogTitle className="text-xl font-bold text-gray-900">

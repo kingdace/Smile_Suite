@@ -315,6 +315,11 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:create_appointments')
             ->name('clinic.appointments.create-simplified');
 
+        // Appointment search route
+        Route::get('clinic/{clinic}/appointments/search', [AppointmentController::class, 'search'])
+            ->middleware('permission:view_appointments')
+            ->name('clinic.appointments.search');
+
         // Appointment Management Routes (without create - using simplified version)
         Route::get('clinic/{clinic}/appointments', [AppointmentController::class, 'index'])
             ->middleware('permission:view_appointments')
@@ -345,6 +350,11 @@ Route::middleware('auth')->group(function () {
         Route::get('clinic/{clinic}/treatments/export', [TreatmentController::class, 'export'])
             ->middleware('permission:view_treatments')
             ->name('clinic.treatments.export');
+
+        // Treatment search route
+        Route::get('clinic/{clinic}/treatments/search', [TreatmentController::class, 'search'])
+            ->middleware('permission:view_treatments')
+            ->name('clinic.treatments.search');
 
         // Treatment Management Routes
         Route::get('clinic/{clinic}/treatments', [TreatmentController::class, 'index'])

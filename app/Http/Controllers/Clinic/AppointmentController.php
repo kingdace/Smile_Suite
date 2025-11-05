@@ -178,7 +178,64 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function search(Request $request, Clinic $clinic)
+    {
+        $this->authorize('viewAny', [Appointment::class, $clinic]);
 
+        $search = $request->input('search', '');
+
+        $appointments = $clinic->appointments()
+            ->with(['patient.user', 'type', 'status', 'assignedDentist', 'service'])
+            ->where(function ($query) use ($search) {
+                // Search by patient name
+                $query->whereHas('patient', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone_number', 'like', "%{$search}%");
+                })
+                // Search by appointment type
+                ->orWhereHas('type', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                // Search by appointment status
+                ->orWhereHas('status', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                // Search by dentist name
+                ->orWhereHas('assignedDentist', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })
+                // Search by notes or reason
+                ->orWhere('notes', 'like', "%{$search}%")
+                ->orWhere('reason', 'like', "%{$search}%");
+            })
+            ->orderBy('scheduled_at', 'desc')
+            ->limit(20)
+            ->get()
+            ->map(function ($appointment) {
+                return [
+                    'id' => $appointment->id,
+                    'scheduled_at' => $appointment->scheduled_at,
+                    'patient' => [
+                        'id' => $appointment->patient?->id,
+                        'name' => $appointment->patient ? ($appointment->patient->first_name . ' ' . $appointment->patient->last_name) : 'Unknown Patient',
+                        'full_name' => $appointment->patient ? ($appointment->patient->first_name . ' ' . $appointment->patient->last_name) : 'Unknown Patient',
+                    ],
+                    'dentist' => [
+                        'id' => $appointment->assignedDentist?->id,
+                        'name' => $appointment->assignedDentist?->name ?? 'Unassigned',
+                    ],
+                    'type' => $appointment->type?->name ?? 'Unknown Type',
+                    'status' => $appointment->status?->name ?? 'Unknown Status',
+                    'service' => $appointment->service?->name ?? null,
+                    'notes' => $appointment->notes,
+                    'reason' => $appointment->reason,
+                ];
+            });
+
+        return response()->json($appointments);
+    }
 
     public function createSimplified(Request $request, Clinic $clinic)
     {

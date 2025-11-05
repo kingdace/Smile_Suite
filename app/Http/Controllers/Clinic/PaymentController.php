@@ -174,6 +174,14 @@ class PaymentController extends Controller
             'gcash_reference' => 'nullable|string|max:255',
         ]);
 
+        // Ensure treatment belongs to clinic if provided
+        if ($validated['treatment_id']) {
+            $treatment = Treatment::find($validated['treatment_id']);
+            if (!$treatment || $treatment->clinic_id !== $clinic->id) {
+                return back()->withErrors(['treatment_id' => 'The selected treatment does not belong to this clinic.']);
+            }
+        }
+
         $validated['received_by'] = Auth::id();
         $validated['currency'] = $validated['currency'] ?? 'PHP';
 
@@ -309,6 +317,14 @@ class PaymentController extends Controller
             'currency' => 'nullable|string|max:3',
             'gcash_reference' => 'nullable|string|max:255',
         ]);
+
+        // Ensure treatment belongs to clinic if provided
+        if ($validated['treatment_id']) {
+            $treatment = Treatment::find($validated['treatment_id']);
+            if (!$treatment || $treatment->clinic_id !== $clinic->id) {
+                return back()->withErrors(['treatment_id' => 'The selected treatment does not belong to this clinic.']);
+            }
+        }
 
         $validated['currency'] = $validated['currency'] ?? 'PHP';
         $payment->update($validated);

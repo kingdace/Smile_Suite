@@ -14,6 +14,7 @@ import {
 } from "@/Components/ui/select";
 import { Badge } from "@/Components/ui/badge";
 import PatientSelector from "@/Components/Appointment/PatientSelector";
+import TreatmentSelector from "@/Components/TreatmentSelector";
 import {
     DollarSign,
     ArrowLeft,
@@ -125,16 +126,16 @@ export default function Create({ auth, patients, treatments }) {
         }
     };
 
-    const handleTreatmentChange = (treatmentId) => {
-        setData("treatment_id", treatmentId);
-        const treatment = treatments.find(
-            (t) => t.id.toString() === treatmentId
-        );
+    const handleTreatmentSelect = (treatment) => {
         setSelectedTreatment(treatment);
-
-        // Auto-fill amount if treatment has total cost
-        if (treatment && treatment.total_cost && !data.amount) {
-            setData("amount", treatment.total_cost.toString());
+        if (treatment) {
+            setData("treatment_id", treatment.id.toString());
+            // Auto-fill amount if treatment has total cost and amount is empty
+            if (treatment.total_cost && !data.amount) {
+                setData("amount", treatment.total_cost.toString());
+            }
+        } else {
+            setData("treatment_id", "");
         }
     };
 
@@ -302,59 +303,16 @@ export default function Create({ auth, patients, treatments }) {
                                             error={errors.patient_id}
                                         />
 
-                                        <div>
-                                            <Label
-                                                htmlFor="treatment_id"
-                                                className="text-base font-medium text-gray-700 mb-3 block"
-                                            >
-                                                Treatment
-                                            </Label>
-                                            <Select
-                                                value={data.treatment_id}
-                                                onValueChange={
-                                                    handleTreatmentChange
-                                                }
-                                            >
-                                                <SelectTrigger className="h-14 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-xl">
-                                                    <SelectValue placeholder="Select treatment (optional)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {treatments.map(
-                                                        (treatment) => (
-                                                            <SelectItem
-                                                                key={
-                                                                    treatment.id
-                                                                }
-                                                                value={treatment.id.toString()}
-                                                            >
-                                                                <div className="flex items-center gap-2">
-                                                                    <Stethoscope className="h-4 w-4 text-gray-400" />
-                                                                    {
-                                                                        treatment.name
-                                                                    }
-                                                                    {treatment.total_cost && (
-                                                                        <Badge
-                                                                            variant="outline"
-                                                                            className="ml-auto"
-                                                                        >
-                                                                            {formatCurrency(
-                                                                                treatment.total_cost
-                                                                            )}
-                                                                        </Badge>
-                                                                    )}
-                                                                </div>
-                                                            </SelectItem>
-                                                        )
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.treatment_id && (
-                                                <div className="text-red-500 text-sm mt-2 flex items-center gap-2">
-                                                    <AlertCircle className="h-4 w-4" />
-                                                    {errors.treatment_id}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <TreatmentSelector
+                                            clinic={auth.clinic}
+                                            selectedTreatment={
+                                                selectedTreatment
+                                            }
+                                            onTreatmentSelect={
+                                                handleTreatmentSelect
+                                            }
+                                            error={errors.treatment_id}
+                                        />
 
                                         <div>
                                             <Label

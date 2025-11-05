@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/Components/ui/badge";
 import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector";
 import PatientSelector from "@/Components/Appointment/PatientSelector";
+import AppointmentSelector from "@/Components/Appointment/AppointmentSelector";
 import {
     CalendarIcon,
     Loader2,
@@ -65,6 +66,7 @@ export default function Edit({
     const [showTemplates, setShowTemplates] = useState(false);
     const [showDentalChartModal, setShowDentalChartModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     // Show loading state if treatment data is not available
     if (!treatment) {
@@ -236,6 +238,18 @@ export default function Edit({
             }
         }
     }, [treatment, patients]);
+
+    // Initialize selectedAppointment with current treatment's appointment
+    useEffect(() => {
+        if (treatment?.appointment_id && appointments) {
+            const currentAppointment = appointments.find(
+                (a) => a.id.toString() === treatment.appointment_id.toString()
+            );
+            if (currentAppointment) {
+                setSelectedAppointment(currentAppointment);
+            }
+        }
+    }, [treatment, appointments]);
 
     const statuses = [
         { value: "scheduled", label: "Scheduled" },
@@ -683,53 +697,27 @@ export default function Edit({
                                         Related Appointment
                                     </h3>
 
-                                    <div>
-                                        <Label htmlFor="appointment_id">
-                                            Appointment
-                                        </Label>
-                                        <Select
-                                            onValueChange={(value) =>
-                                                setData("appointment_id", value)
+                                    <AppointmentSelector
+                                        clinic={auth.clinic}
+                                        selectedAppointment={
+                                            selectedAppointment
+                                        }
+                                        onAppointmentSelect={(appointment) => {
+                                            setSelectedAppointment(appointment);
+                                            if (appointment) {
+                                                setData(
+                                                    "appointment_id",
+                                                    appointment.id.toString()
+                                                );
+                                            } else {
+                                                setData(
+                                                    "appointment_id",
+                                                    "no_appointment"
+                                                );
                                             }
-                                            value={data.appointment_id}
-                                        >
-                                            <SelectTrigger className="mt-1">
-                                                <SelectValue placeholder="Select an appointment" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="no_appointment">
-                                                    No Appointment
-                                                </SelectItem>
-                                                {(appointments || []).map(
-                                                    (appointment) => (
-                                                        <SelectItem
-                                                            key={appointment.id}
-                                                            value={appointment.id.toString()}
-                                                        >
-                                                            {format(
-                                                                new Date(
-                                                                    appointment.scheduled_at
-                                                                ),
-                                                                "PPP"
-                                                            )}{" "}
-                                                            -{" "}
-                                                            {appointment.patient
-                                                                ?.name ||
-                                                                "Unknown Patient"}{" "}
-                                                            (
-                                                            {appointment.type ||
-                                                                "Unknown Type"}
-                                                            )
-                                                        </SelectItem>
-                                                    )
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError
-                                            message={errors.appointment_id}
-                                            className="mt-2"
-                                        />
-                                    </div>
+                                        }}
+                                        error={errors.appointment_id}
+                                    />
                                 </div>
 
                                 {/* Scheduling */}

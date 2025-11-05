@@ -7,6 +7,7 @@ import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import TreatmentInventorySelector from "@/Components/TreatmentInventorySelector";
 import PatientSelector from "@/Components/Appointment/PatientSelector";
+import AppointmentSelector from "@/Components/Appointment/AppointmentSelector";
 import InputError from "@/Components/InputError";
 import { Textarea } from "@/Components/ui/textarea";
 import {
@@ -102,6 +103,7 @@ export default function Create({
     const [showTemplates, setShowTemplates] = useState(false);
     const [showDentalChartModal, setShowDentalChartModal] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handlePatientSelect = (patient) => {
@@ -529,66 +531,25 @@ export default function Create({
                                     <CardContent className="p-8">
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                             {/* Related Appointment */}
-                                            <div className="space-y-3">
-                                                <Label
-                                                    htmlFor="appointment_id"
-                                                    className="font-semibold text-gray-700 text-base"
-                                                >
-                                                    Related Appointment
-                                                </Label>
-                                                <Select
-                                                    onValueChange={(value) =>
-                                                        setData(
-                                                            "appointment_id",
-                                                            value
-                                                        )
-                                                    }
-                                                    value={data.appointment_id}
-                                                >
-                                                    <SelectTrigger className="w-full h-10 text-sm">
-                                                        <SelectValue placeholder="Select an appointment" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {appointments &&
-                                                            appointments.length >
-                                                                0 &&
-                                                            appointments.map(
-                                                                (
-                                                                    appointment
-                                                                ) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            appointment.id
-                                                                        }
-                                                                        value={appointment.id.toString()}
-                                                                    >
-                                                                        {format(
-                                                                            new Date(
-                                                                                appointment.scheduled_at
-                                                                            ),
-                                                                            "PPP"
-                                                                        )}{" "}
-                                                                        -{" "}
-                                                                        {appointment
-                                                                            .patient
-                                                                            ?.name ||
-                                                                            "Unknown Patient"}{" "}
-                                                                        (
-                                                                        {appointment.type ||
-                                                                            "No Type"}
-                                                                        )
-                                                                    </SelectItem>
-                                                                )
-                                                            )}
-                                                    </SelectContent>
-                                                </Select>
-                                                <InputError
-                                                    message={
-                                                        errors.appointment_id
-                                                    }
-                                                    className="mt-2"
-                                                />
-                                            </div>
+                                            <AppointmentSelector
+                                                clinic={auth.clinic}
+                                                selectedAppointment={
+                                                    selectedAppointment
+                                                }
+                                                onAppointmentSelect={(
+                                                    appointment
+                                                ) => {
+                                                    setSelectedAppointment(
+                                                        appointment
+                                                    );
+                                                    setData(
+                                                        "appointment_id",
+                                                        appointment?.id?.toString() ||
+                                                            ""
+                                                    );
+                                                }}
+                                                error={errors.appointment_id}
+                                            />
 
                                             {/* Service Selection */}
                                             <div className="space-y-3">

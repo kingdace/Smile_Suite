@@ -790,6 +790,72 @@ class TreatmentController extends Controller
         }
     }
 
+    public function search(Request $request, Clinic $clinic)
+    {
+        // Check subscription access first
+        $this->checkSubscriptionAccess();
+
+        $search = $request->input('search', '');
+
+        $treatments = $clinic->treatments()
+            ->with(['patient.user', 'dentist', 'service', 'inventoryItems'])
+            ->where(function ($query) use ($search) {
+                // Search by treatment name
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('notes', 'like', "%{$search}%")
+                    // Search by patient name
+                    ->orWhereHas('patient', function ($q) use ($search) {
+                        $q->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    // Search by dentist name
+                    ->orWhereHas('dentist', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    // Search by service name
+                    ->orWhereHas('service', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get()
+            ->map(function ($treatment) {
+                // Calculate total cost (service cost + inventory cost)
+                $serviceCost = $treatment->cost ?? 0;
+                $inventoryCost = $treatment->inventoryItems->sum('total_cost') ?? 0;
+                $totalCost = $serviceCost + $inventoryCost;
+
+                return [
+                    'id' => $treatment->id,
+                    'name' => $treatment->name,
+                    'cost' => $treatment->cost,
+                    'total_cost' => $totalCost,
+                    'status' => $treatment->status,
+                    'payment_status' => $treatment->payment_status,
+                    'description' => $treatment->description,
+                    'patient' => [
+                        'id' => $treatment->patient?->id,
+                        'name' => $treatment->patient ? ($treatment->patient->first_name . ' ' . $treatment->patient->last_name) : 'Unknown Patient',
+                    ],
+                    'dentist' => [
+                        'id' => $treatment->dentist?->id,
+                        'name' => $treatment->dentist?->name ?? 'Unassigned',
+                    ],
+                    'service' => [
+                        'id' => $treatment->service?->id,
+                        'name' => $treatment->service?->name ?? null,
+                    ],
+                    'start_date' => $treatment->start_date,
+                    'created_at' => $treatment->created_at,
+                ];
+            });
+
+        return response()->json($treatments);
+    }
+
     /**
      * Export treatments data to Excel
      */
