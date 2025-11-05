@@ -98,12 +98,36 @@ else
                 php artisan db:seed --class=PaymentSeeder --force
             fi
 
-            echo "⚠️  NotificationSeeder is disabled (skipping notification seeding)"
+            # Check and seed notifications for Clinic 27
+            echo "Checking if Clinic 27 needs notifications..."
+            NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+            echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
+
+            if [ "$NOTIFICATION_COUNT" -lt "39" ]; then
+                echo "Running NotificationSeeder to create notifications for appointments..."
+                php artisan db:seed --class=NotificationSeeder --force
+                echo "✅ Notifications seeded for Clinic 27"
+            else
+                echo "✅ Clinic 27 already has sufficient notifications ($NOTIFICATION_COUNT found)"
+            fi
+
             echo "✅ Business data seeded for Clinic 27"
         fi
     else
         echo "Clinic 27 already has sufficient data ($APPOINTMENT_COUNT appointments)"
-        echo "⚠️  NotificationSeeder is disabled (skipping notification seeding)"
+
+        # Check and seed notifications even if appointments already exist
+        echo "Checking if Clinic 27 needs notifications..."
+        NOTIFICATION_COUNT=$(php artisan tinker --execute="echo App\Models\Notification::where('clinic_id', 27)->count();" 2>/dev/null || echo "0")
+        echo "Clinic 27 has: $NOTIFICATION_COUNT notifications"
+
+        if [ "$NOTIFICATION_COUNT" -lt "39" ]; then
+            echo "Running NotificationSeeder to create notifications for existing appointments..."
+            php artisan db:seed --class=NotificationSeeder --force
+            echo "✅ Notifications seeded for Clinic 27"
+        else
+            echo "✅ Clinic 27 already has sufficient notifications ($NOTIFICATION_COUNT found)"
+        fi
     fi
 fi
 
