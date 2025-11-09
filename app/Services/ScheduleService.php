@@ -137,17 +137,84 @@ class ScheduleService
             $startTime->addMinutes($slotDuration);
         }
 
-        // Remove slots that are already booked
-        $bookedSlots = $dentist->appointments()
+        // Remove slots that overlap with existing appointments
+        // This properly handles appointments with different durations
+        $existingAppointments = $dentist->appointments()
             ->whereDate('scheduled_at', $date->format('Y-m-d'))
             ->where('appointment_status_id', '!=', 4) // Exclude cancelled
-            ->pluck('scheduled_at')
-            ->map(function ($datetime) {
-                return Carbon::parse($datetime)->format('H:i');
-            })
-            ->toArray();
+            ->whereNull('deleted_at')
+            ->get(['scheduled_at', 'ended_at', 'duration']);
 
-        return array_values(array_diff($slots, $bookedSlots));
+        // Filter out slots that overlap with any existing appointment
+        $availableSlots = array_filter($slots, function ($slotTime) use ($existingAppointments, $date, $slotDuration, $dentist) {
+            $slotStart = Carbon::parse($date->format('Y-m-d') . ' ' . $slotTime);
+            $slotEnd = $slotStart->copy()->addMinutes($slotDuration);
+
+            foreach ($existingAppointments as $appointment) {
+                $appointmentStart = Carbon::parse($appointment->scheduled_at);
+                
+                // Use ended_at if available, otherwise calculate from duration
+                if ($appointment->ended_at) {
+                    $appointmentEnd = Carbon::parse($appointment->ended_at);
+                } else {
+                    // Fallback: calculate from duration if ended_at is not set
+                    $appointmentDuration = $appointment->duration ?? 30;
+                    $appointmentEnd = $appointmentStart->copy()->addMinutes($appointmentDuration);
+                }
+
+                // Check if slot overlaps with appointment
+                // Overlap occurs if: slot starts before appointment ends AND slot ends after appointment starts
+                // This ensures that appointments that end exactly when a slot starts don't block that slot
+                // Example: Appointment 9:00-9:30, Slot 9:30-10:00 -> NO overlap (9:30 is boundary)
+                // Example: Appointment 9:00-9:30, Slot 9:15-9:45 -> OVERLAP (slot starts during appointment)
+                $overlaps = $slotStart < $appointmentEnd && $slotEnd > $appointmentStart;
+                
+                if ($overlaps) {
+                    // Only log in debug mode to avoid log bloat in production
+                    if (config('app.debug')) {
+                        Log::debug('Slot overlaps with appointment - excluded', [
+                            'dentist_id' => $dentist->id,
+                            'slot_time' => $slotTime,
+                            'slot_start' => $slotStart->format('Y-m-d H:i:s'),
+                            'slot_end' => $slotEnd->format('Y-m-d H:i:s'),
+                            'appointment_id' => $appointment->id,
+                            'appointment_start' => $appointmentStart->format('Y-m-d H:i:s'),
+                            'appointment_end' => $appointmentEnd->format('Y-m-d H:i:s'),
+                            'appointment_duration' => $appointment->duration ?? 'N/A',
+                        ]);
+                    }
+                    return false; // Slot overlaps, exclude it
+                }
+            }
+
+            return true; // Slot is available
+        });
+        
+        // Log available slots for debugging (only in debug mode to avoid log bloat)
+        if (config('app.debug')) {
+            Log::debug('Available slots after filtering', [
+                'dentist_id' => $dentist->id,
+                'date' => $date->format('Y-m-d'),
+                'slot_duration' => $slotDuration,
+                'total_slots_generated' => count($slots),
+                'total_appointments' => $existingAppointments->count(),
+                'available_slots' => array_values($availableSlots),
+            ]);
+        }
+
+        // If the date is today, filter out past time slots
+        $today = Carbon::today();
+        if ($date->isSameDay($today)) {
+            $now = Carbon::now();
+            $bufferMinutes = 30;
+            $cutoffTime = $now->copy()->addMinutes($bufferMinutes)->format('H:i');
+            
+            $availableSlots = array_filter($availableSlots, function ($slot) use ($cutoffTime) {
+                return $slot >= $cutoffTime;
+            });
+        }
+
+        return array_values($availableSlots);
     }
 
     /**
@@ -162,11 +229,31 @@ class ScheduleService
         $endTime = Carbon::parse('17:00');
 
         while ($startTime < $endTime) {
-            $slots[] = $startTime->format('H:i');
+            $slotTime = $startTime->format('H:i');
+            $hour = (int) $startTime->format('H');
+            $minute = (int) $startTime->format('i');
+            
+            // Exclude lunch time (12:01 PM - 12:59 PM)
+            if (!($hour === 12 && $minute > 0)) {
+                $slots[] = $slotTime;
+            }
+            
             $startTime->addMinutes($slotDuration);
         }
 
-        return $slots;
+        // If the date is today, filter out past time slots
+        $today = Carbon::today();
+        if ($date->isSameDay($today)) {
+            $now = Carbon::now();
+            $bufferMinutes = 30;
+            $cutoffTime = $now->copy()->addMinutes($bufferMinutes)->format('H:i');
+            
+            $slots = array_filter($slots, function ($slot) use ($cutoffTime) {
+                return $slot >= $cutoffTime;
+            });
+        }
+
+        return array_values($slots);
     }
 
     /**
@@ -462,5 +549,326 @@ class ScheduleService
             'unavailable_dates' => $dentist->unavailable_dates,
             'schedule_source' => $advancedSchedules > 0 ? 'advanced' : 'profile',
         ];
+    }
+
+    /**
+     * Get clinic-wide available time slots for a specific date
+     * Aggregates availability across all active dentists in the clinic
+     * Returns time slots where at least one dentist is available
+     */
+    public function getClinicAvailableSlots(int $clinicId, string $date, int $duration = null): array
+    {
+        try {
+            $dateCarbon = Carbon::parse($date);
+        } catch (\Exception $e) {
+            Log::error('Error parsing date in getClinicAvailableSlots', [
+                'date' => $date,
+                'error' => $e->getMessage(),
+                'clinic_id' => $clinicId,
+            ]);
+            return [];
+        }
+
+        try {
+            $clinic = \App\Models\Clinic::find($clinicId);
+
+            if (!$clinic) {
+                Log::warning('Clinic not found in getClinicAvailableSlots', [
+                    'clinic_id' => $clinicId,
+                ]);
+                return [];
+            }
+
+            // Check clinic operating hours first
+            $clinicHours = $this->getClinicOperatingHoursForDate($clinic, $dateCarbon);
+            if (empty($clinicHours)) {
+                return []; // Clinic is closed on this date
+            }
+
+            // Get all active dentists for this clinic
+            $dentists = User::where('clinic_id', $clinicId)
+                ->where('role', 'dentist')
+                ->where('is_active', true)
+                ->get();
+
+            if ($dentists->isEmpty()) {
+                // No dentists, but clinic might have operating hours
+                // Generate slots based on clinic hours only
+                try {
+                    return $this->generateSlotsFromClinicHours($clinicHours, $duration, $dateCarbon);
+                } catch (\Exception $e) {
+                    Log::error('Error generating slots from clinic hours', [
+                        'error' => $e->getMessage(),
+                        'clinic_id' => $clinicId,
+                        'date' => $date,
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    return [];
+                }
+            }
+
+            // Aggregate available slots from all dentists
+            $allAvailableSlots = [];
+            foreach ($dentists as $dentist) {
+                try {
+                    // Get slots for this dentist, passing clinicId to ensure business hours are applied
+                    $dentistSlots = $this->getAvailableSlots($dentist->id, $date, $duration, $clinicId);
+                    $allAvailableSlots = array_merge($allAvailableSlots, $dentistSlots);
+                } catch (\Exception $e) {
+                    Log::warning('Error getting slots for dentist', [
+                        'dentist_id' => $dentist->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Continue with other dentists if one fails
+                    continue;
+                }
+            }
+
+            // Count how many dentists are available for each slot (for future use)
+            $slotAvailabilityCount = [];
+            foreach ($allAvailableSlots as $slot) {
+                $slotAvailabilityCount[$slot] = ($slotAvailabilityCount[$slot] ?? 0) + 1;
+            }
+
+            // Remove duplicates and sort
+            $uniqueSlots = array_unique($allAvailableSlots);
+            sort($uniqueSlots);
+
+            // Filter by clinic operating hours
+            try {
+                $filteredSlots = $this->filterSlotsByClinicHours($uniqueSlots, $dateCarbon, $clinicId);
+            } catch (\Exception $e) {
+                Log::error('Error filtering slots by clinic hours', [
+                    'error' => $e->getMessage(),
+                    'clinic_id' => $clinicId,
+                ]);
+                $filteredSlots = $uniqueSlots; // Use unfiltered slots if filtering fails
+            }
+
+            // Exclude lunch time (12:01 PM - 12:59 PM) - lunch break
+            $filteredSlots = array_filter($filteredSlots, function ($slot) {
+                try {
+                    $parts = explode(':', $slot);
+                    if (count($parts) !== 2) {
+                        return false; // Invalid format
+                    }
+                    $hour = (int) $parts[0];
+                    $minute = (int) $parts[1];
+                    // Exclude 12:01 to 12:59 (lunch time)
+                    if ($hour === 12 && $minute > 0) {
+                        return false;
+                    }
+                    return true;
+                } catch (\Exception $e) {
+                    return false; // Skip invalid slots
+                }
+            });
+
+            // If the date is today, filter out past time slots
+            try {
+                $today = Carbon::today();
+                if ($dateCarbon->isSameDay($today)) {
+                    $now = Carbon::now();
+                    
+                    // Filter out slots that have already passed (add 30 minutes buffer for safety)
+                    $bufferMinutes = 30;
+                    $cutoffTime = $now->copy()->addMinutes($bufferMinutes)->format('H:i');
+                    
+                    $filteredSlots = array_filter($filteredSlots, function ($slot) use ($cutoffTime) {
+                        return $slot >= $cutoffTime;
+                    });
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error filtering past time slots for today', [
+                    'error' => $e->getMessage(),
+                    'date' => $dateCarbon->format('Y-m-d'),
+                ]);
+                // Continue without filtering if there's an error
+            }
+
+            return array_values($filteredSlots);
+        } catch (\Exception $e) {
+            Log::error('Unexpected error in getClinicAvailableSlots', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'clinic_id' => $clinicId,
+                'date' => $date,
+            ]);
+            return []; // Return empty array on error instead of throwing
+        }
+    }
+
+    /**
+     * Get availability status for multiple dates (for calendar display)
+     * Returns array with date as key and availability status: 'available', 'limited', 'full', 'closed'
+     */
+    public function getClinicAvailabilityStatus(int $clinicId, string $startDate, string $endDate, int $duration = null): array
+    {
+        $startCarbon = Carbon::parse($startDate);
+        $endCarbon = Carbon::parse($endDate);
+        $clinic = \App\Models\Clinic::find($clinicId);
+
+        if (!$clinic) {
+            return [];
+        }
+
+        $availabilityStatus = [];
+        $currentDate = $startCarbon->copy();
+
+        while ($currentDate <= $endCarbon) {
+            $dateKey = $currentDate->format('Y-m-d');
+            
+            // Check if clinic is closed (holiday or no operating hours for this day)
+            $clinicHours = $this->getClinicOperatingHoursForDate($clinic, $currentDate);
+            if (empty($clinicHours)) {
+                $availabilityStatus[$dateKey] = 'closed';
+                $currentDate->addDay();
+                continue;
+            }
+
+            // Get available slots for this date
+            $availableSlots = $this->getClinicAvailableSlots($clinicId, $dateKey, $duration);
+            
+            if (empty($availableSlots)) {
+                $availabilityStatus[$dateKey] = 'full';
+            } else {
+                // Check if there are any existing appointments on this date
+                // This includes ALL appointments (regardless of how they were created - old system or new calendar)
+                // Only count active appointments (exclude cancelled)
+                $existingAppointmentsCount = \App\Models\Appointment::where('clinic_id', $clinicId)
+                    ->whereDate('scheduled_at', $dateKey)
+                    ->where('appointment_status_id', '!=', 4) // Exclude cancelled (status ID 4)
+                    ->whereNull('deleted_at') // Also exclude soft-deleted appointments
+                    ->count();
+                
+                // If there are existing appointments, mark as "limited" (yellow)
+                // This ensures users see that the date has some bookings, even if there are still many slots available
+                // This addresses the user's concern: dates with appointments should show yellow, not green
+                if ($existingAppointmentsCount > 0) {
+                    $availabilityStatus[$dateKey] = 'limited';
+                    
+                    Log::debug('Availability status: limited (has appointments)', [
+                        'clinic_id' => $clinicId,
+                        'date' => $dateKey,
+                        'appointment_count' => $existingAppointmentsCount,
+                        'available_slots' => count($availableSlots),
+                    ]);
+                } else {
+                    // No appointments yet, determine status based on slot availability ratio
+                    // Consider it "limited" if less than 25% of potential slots are available
+                    $potentialSlots = $this->calculatePotentialSlots($clinicHours, $duration);
+                    $availabilityRatio = count($availableSlots) / max($potentialSlots, 1);
+                    
+                    if ($availabilityRatio < 0.25) {
+                        $availabilityStatus[$dateKey] = 'limited';
+                    } else {
+                        $availabilityStatus[$dateKey] = 'available';
+                    }
+                }
+            }
+
+            $currentDate->addDay();
+        }
+
+        return $availabilityStatus;
+    }
+
+    /**
+     * Get clinic operating hours for a specific date
+     * Returns array with 'open' and 'close' times, or empty array if closed
+     */
+    private function getClinicOperatingHoursForDate(\App\Models\Clinic $clinic, Carbon $date): array
+    {
+        // Check if it's a holiday
+        if (\App\Models\ClinicHoliday::isHoliday($clinic->id, $date->format('Y-m-d'))) {
+            return [];
+        }
+
+        if (!$clinic->operating_hours) {
+            // No operating hours set, use default (9 AM to 5 PM)
+            return ['open' => '09:00', 'close' => '17:00'];
+        }
+
+        $dayOfWeek = strtolower($date->format('l'));
+        $dayHours = $clinic->operating_hours[$dayOfWeek] ?? null;
+
+        if (!$dayHours) {
+            return [];
+        }
+
+        // Handle different operating hours formats
+        if (is_array($dayHours) && count($dayHours) === 2) {
+            // Format: ['09:00', '17:00']
+            return ['open' => $dayHours[0], 'close' => $dayHours[1]];
+        } elseif (is_array($dayHours) && isset($dayHours['open'])) {
+            // Format: {open: '09:00', close: '17:00', is_closed: false}
+            if ($dayHours['is_closed'] ?? false) {
+                return [];
+            }
+            return [
+                'open' => $dayHours['open'] ?? '09:00',
+                'close' => $dayHours['close'] ?? '17:00'
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Generate time slots from clinic operating hours
+     */
+    private function generateSlotsFromClinicHours(array $clinicHours, int $duration = null, Carbon $date = null): array
+    {
+        $slotDuration = $duration ?? 30;
+        $slots = [];
+        $startTime = Carbon::parse($clinicHours['open']);
+        $endTime = Carbon::parse($clinicHours['close']);
+
+        while ($startTime < $endTime) {
+            $slotTime = $startTime->format('H:i');
+            $hour = (int) $startTime->format('H');
+            $minute = (int) $startTime->format('i');
+            
+            // Exclude lunch time (12:01 PM - 12:59 PM)
+            if (!($hour === 12 && $minute > 0)) {
+                $slots[] = $slotTime;
+            }
+            
+            $startTime->addMinutes($slotDuration);
+        }
+
+        // If the date is today, filter out past time slots
+        if ($date) {
+            $today = Carbon::today();
+            if ($date->isSameDay($today)) {
+                $now = Carbon::now();
+                $bufferMinutes = 30;
+                $cutoffTime = $now->copy()->addMinutes($bufferMinutes)->format('H:i');
+                
+                $slots = array_filter($slots, function ($slot) use ($cutoffTime) {
+                    return $slot >= $cutoffTime;
+                });
+            }
+        }
+
+        return array_values($slots);
+    }
+
+    /**
+     * Calculate potential number of slots for a given operating hours and duration
+     */
+    private function calculatePotentialSlots(array $clinicHours, int $duration = null): int
+    {
+        $slotDuration = $duration ?? 30;
+        $startTime = Carbon::parse($clinicHours['open']);
+        $endTime = Carbon::parse($clinicHours['close']);
+        $slots = 0;
+
+        while ($startTime < $endTime) {
+            $slots++;
+            $startTime->addMinutes($slotDuration);
+        }
+
+        return $slots;
     }
 }

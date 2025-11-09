@@ -8,6 +8,8 @@ import {
     AlertCircle,
     Stethoscope,
 } from "lucide-react";
+import AppointmentCalendar from "../Calendar/AppointmentCalendar";
+import TimeSlotSelector from "../Calendar/TimeSlotSelector";
 
 export default function BookingModal({
     showModal,
@@ -30,17 +32,16 @@ export default function BookingModal({
         { id: 8, label: "Other" },
     ];
 
-    // Get minimum date (today)
-    const getMinDate = () => {
-        const today = new Date();
-        return today.toISOString().split("T")[0];
+    // Handle date selection from calendar
+    const handleDateSelect = (date) => {
+        setData("date", date);
+        // Clear time when date changes
+        setData("time", "");
     };
 
-    // Get maximum date (1 year from today)
-    const getMaxDate = () => {
-        const maxDate = new Date();
-        maxDate.setFullYear(maxDate.getFullYear() + 1);
-        return maxDate.toISOString().split("T")[0];
+    // Handle time selection from time slot selector
+    const handleTimeSelect = (time) => {
+        setData("time", time);
     };
 
     if (!showModal) return null;
@@ -48,7 +49,7 @@ export default function BookingModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md">
             <div
-                className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-2xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[85vh] overflow-y-auto"
+                className="bg-white rounded-xl shadow-2xl border border-gray-200 p-6 max-w-4xl w-[95vw] sm:w-full relative mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto"
                 style={{
                     scrollbarWidth: "thin",
                     scrollbarColor: "#d1d5db #f3f4f6",
@@ -77,58 +78,75 @@ export default function BookingModal({
                     </div>
                 </div>
 
-                <form onSubmit={onSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            Preferred Date *
-                        </label>
-                        <input
-                            type="date"
-                            className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                                errors.date
-                                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                                    : "border-gray-300"
-                            }`}
-                            value={data.date}
-                            min={getMinDate()}
-                            max={getMaxDate()}
-                            onChange={(e) => setData("date", e.target.value)}
-                            required
-                        />
-                        {errors.date && (
-                            <div className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                                <AlertCircle className="w-4 h-4" />
-                                {errors.date}
+                <form onSubmit={onSubmit} className="space-y-5">
+                    {/* Date and Time Selection Section - Enhanced with equal heights and narrower width */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 max-w-4xl mx-auto">
+                        {/* Calendar Section - Compact and Appealing */}
+                        <div className="flex flex-col">
+                            <label className="block text-xs font-bold text-gray-800 mb-2.5 flex items-center gap-2">
+                                <div className="p-1.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg shadow-sm">
+                                    <Calendar className="w-3.5 h-3.5 text-blue-700" />
+                                </div>
+                                <span className="text-gray-800">
+                                    Select Date *
+                                </span>
+                            </label>
+                            <div
+                                className={`border-2 rounded-xl p-3.5 bg-gradient-to-br from-white to-gray-50/50 shadow-md flex-1 flex flex-col ${
+                                    errors.date
+                                        ? "border-red-300 bg-red-50/30"
+                                        : "border-gray-300 hover:border-blue-400 hover:shadow-lg transition-all duration-200"
+                                }`}
+                                style={{ minHeight: "360px", maxWidth: "100%" }}
+                            >
+                                <AppointmentCalendar
+                                    clinic={clinic}
+                                    selectedDate={data.date}
+                                    onDateSelect={handleDateSelect}
+                                    duration={30}
+                                />
                             </div>
-                        )}
-                    </div>
+                            {errors.date && (
+                                <div className="text-red-600 text-xs mt-1.5 flex items-center gap-1">
+                                    <AlertCircle className="w-3.5 h-3.5" />
+                                    {errors.date}
+                                </div>
+                            )}
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            Preferred Time *
-                        </label>
-                        <input
-                            type="time"
-                            className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                                errors.time
-                                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                                    : "border-gray-300"
-                            }`}
-                            value={data.time}
-                            onChange={(e) => setData("time", e.target.value)}
-                            required
-                        />
-                        {errors.time && (
-                            <div className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                                <AlertCircle className="w-4 h-4" />
-                                {errors.time}
+                        {/* Time Slot Selection Section - Compact and Appealing, same height */}
+                        <div className="flex flex-col">
+                            <label className="block text-xs font-bold text-gray-800 mb-2.5 flex items-center gap-2">
+                                <div className="p-1.5 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg shadow-sm">
+                                    <Clock className="w-3.5 h-3.5 text-blue-700" />
+                                </div>
+                                <span className="text-gray-800">
+                                    Select Time *
+                                </span>
+                            </label>
+                            <div
+                                className={`border-2 rounded-xl p-3.5 bg-gradient-to-br from-white to-gray-50/50 shadow-md flex-1 flex flex-col ${
+                                    errors.time
+                                        ? "border-red-300 bg-red-50/30"
+                                        : "border-gray-300 hover:border-blue-400 hover:shadow-lg transition-all duration-200"
+                                }`}
+                                style={{ minHeight: "360px", maxWidth: "100%" }}
+                            >
+                                <TimeSlotSelector
+                                    clinic={clinic}
+                                    selectedDate={data.date}
+                                    selectedTime={data.time}
+                                    onTimeSelect={handleTimeSelect}
+                                    duration={30}
+                                />
                             </div>
-                        )}
-                        <p className="text-xs text-gray-500 mt-1">
-                            We'll do our best to accommodate your preferred time
-                        </p>
+                            {errors.time && (
+                                <div className="text-red-600 text-xs mt-1.5 flex items-center gap-1">
+                                    <AlertCircle className="w-3.5 h-3.5" />
+                                    {errors.time}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div>
@@ -249,6 +267,10 @@ export default function BookingModal({
                             <li>
                                 • This is a booking request that requires clinic
                                 approval
+                            </li>
+                            <li>
+                                • Appointments are scheduled for 30-minute time
+                                slots
                             </li>
                             <li>
                                 • You'll receive a confirmation email once

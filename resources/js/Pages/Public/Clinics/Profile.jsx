@@ -32,6 +32,7 @@ export default function ClinicProfile({ clinic, auth }) {
         reason: "",
         notes: "",
         service_id: "",
+        duration: 30, // Default 30 minutes, matches the calendar duration
     });
 
     const handleBookAppointment = () => {

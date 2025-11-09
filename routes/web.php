@@ -40,6 +40,8 @@ Route::get('/', [ClinicDirectoryController::class, 'landing'])->name('public.lan
 Route::get('/clinics', [ClinicDirectoryController::class, 'index'])->name('public.clinics.index');
 Route::get('/clinics/{slug}', [ClinicDirectoryController::class, 'profile'])->name('public.clinics.profile');
 Route::post('/clinics/{clinic}/book-appointment', [\App\Http\Controllers\Public\ClinicDirectoryController::class, 'bookAppointment'])->name('public.clinics.book-appointment');
+Route::get('/clinics/{clinic}/availability-status', [\App\Http\Controllers\Public\ClinicDirectoryController::class, 'getAvailabilityStatus'])->name('public.clinics.availability-status');
+Route::get('/clinics/{clinic}/available-slots', [\App\Http\Controllers\Public\ClinicDirectoryController::class, 'getAvailableSlots'])->name('public.clinics.available-slots');
 
 
 // Review Routes
