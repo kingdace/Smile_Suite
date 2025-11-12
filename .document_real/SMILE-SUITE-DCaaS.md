@@ -2,13 +2,28 @@
 
 ---
 
-## ABSTRACT
+## ABSTRACT\*Dental clinics in the
 
-Dental clinics in the Philippines, particularly those outside major urban centers, face significant operational inefficiencies due to their reliance on manual processes for scheduling, record-keeping, inventory monitoring, and patient communication. This capstone project developed and implemented Smile Suite: Cloud-Based Dental Clinic as a Service, a comprehensive multi-tenant SaaS platform designed to modernize dental practice workflows through digital automation. The system's effectiveness was demonstrated through implementation and evaluation at Enhaynes Dental Clinic in Surigao, which served as the primary case study.
-
-Smile Suite was developed using Laravel 11 (PHP 8.2+) backend with MySQL database and React 18 frontend with Inertia.js, incorporating Tailwind CSS and shadcn/ui components. The system supports multiple user roles with role-based access control and complete data isolation between clinics. Key features include real-time appointment scheduling with conflict detection, centralized patient records with medical history tracking, inventory management with low-stock alerts, treatment planning with dental chart integration, financial management with payment processing, email notifications through Laravel Mail, and SMS notifications through Semaphore API for appointment confirmations, rescheduling, cancellations, and manual reminders. Additional capabilities include clinic registration workflow with admin approval, subscription management with 14-day trial periods, patient management with PSGC integration, and a public clinic directory with online booking.
-
-The project adopted the Rapid Application Development (RAD) methodology to ensure continuous stakeholder feedback and iterative improvements. The outcome was a functional, user-centered clinic management system that enhanced efficiency, reduced human error, and empowered dental practitioners with data-driven tools, serving as a scalable solution for dental clinics nationwide and aligning with the Department of Health's eHealth Strategic Framework (2023-2028).
+Philippines, especially in rural areas, continue to face inefficiencies from
+manual operations in scheduling, record-keeping, inventory, and patient
+communication. This capstone project developed Smile Suite: Cloud-Based Dental
+Clinic as a Service, a multi-tenant SaaS platform designed to modernize dental
+practice workflows through digital automation. Implemented and evaluated at
+Enhaynes Dental Clinic in Surigao, the system was built using Laravel 11 (PHP
+8.2+) with a MySQL database and a React 18 frontend via Inertia.js, enhanced by
+Tailwind CSS and shadcn/ui. Smile Suite supports multiple user roles with
+role-based access control and complete data isolation per clinic. Core features
+include real-time appointment scheduling, centralized patient records,
+inventory tracking, treatment planning with dental charting, and financial
+management with payment processing. Automated notifications are handled via
+Laravel Mail and Semaphore API for SMS reminders. Additional modules cover
+clinic registration with admin approval, subscription management with 14-day
+trials, patient management with PSGC integration, and a public clinic directory
+with online booking. Developed through the Rapid Application Development (RAD)
+methodology, the system enhanced operational efficiency, reduced human error,
+and empowered practitioners with data-driven tools—aligning with the Department
+of Health’s eHealth Strategic Framework (2023–2028) as a scalable nationwide
+solution.\*
 
 ---
 
@@ -52,15 +67,13 @@ _Note: Page numbers shown are estimates based on typical academic document forma
 4.5 Evaluation Method and Tools ................................................................................................ 12
 
 **5. RESULTS AND DISCUSSIONS** ........................................................................................................ 13
-5.1 Objective 1: Requirements Gathering and Analysis ........................................................... 13
-5.2 Objective 2: System Design and Development ................................................................. 13
-5.2.1 Prototype Development ............................................................................................ 13
-5.2.2 Systems Design ...................................................................................................... 14
-5.3 Objective 3: System Evaluation ......................................................................................... 15
-5.3.1 Evaluation Framework ............................................................................................ 15
-5.3.2 Evaluation Results .................................................................................................. 15
-5.3.3 Results Analysis ..................................................................................................... 16
-5.4 System Implementation ........................................................................................................... 16
+5.1 Project Timeline ........................................................................................................... 13
+5.2 Objective 1: Requirements Gathering and Analysis ........................................................... 14
+5.3 Objective 2: System Design and Development ................................................................. 14
+5.3.1 Systems Design ...................................................................................................... 14
+5.3.2 Smile Suite Information System .............................................................................. 15
+5.4 Test & Evaluation of the System ................................................................................... 15
+5.5 System Implementation ........................................................................................................... 17
 
 **6. CONCLUSION AND RECOMMENDATION** ...................................................................................... 17
 6.1 Conclusion ............................................................................................................................... 17
@@ -191,7 +204,7 @@ This technology stack was selected based on its cost-effectiveness, scalability,
 
 ---
 
-### Hardware Specification
+### 3.1 Hardware Specification
 
 **Table 1. Hardware Specifications**
 
@@ -217,7 +230,7 @@ The specification includes essential peripherals tailored for dental clinic work
 
 For patient-facing needs, the specification accounts for affordable Android/iOS devices (≥4GB RAM) that can access the appointment portal, maintaining accessibility. The total hardware investment of ₱56,698 represents a comprehensive yet cost-optimized setup, with each component selected for reliability in a clinical environment. This configuration not only supports current operational needs but allows for future expansion, such as adding more workstations or upgrading storage capacity as the clinic grows, ensuring long-term viability of the Smile Suite implementation.
 
-### Software Specification
+### 3.2 Software Specification
 
 **Table 2. Software Specifications**
 
@@ -246,7 +259,7 @@ The operational system runs on Railway.app services (₱1,334/month), balancing 
 
 ---
 
-### 3.1 Conceptual Framework
+### 3.3 Conceptual Framework
 
 **Figure 1. Conceptual Framework**
 
@@ -258,7 +271,7 @@ The core application stack utilized Laravel 11 as the backend API, React 18 for 
 
 The multi-tenant data storage architecture ensured data security and scalability through cost-effective shared infrastructure. External services integration included Laravel Mail for automated email notifications, Semaphore SMS API for SMS notifications including appointment confirmations, rescheduling, cancellations, and manual appointment reminders, Railway.app for cloud hosting, GitHub for version control, and additional communication services for enhanced patient engagement. This comprehensive architecture enabled the system to serve as a scalable solution for dental clinics nationwide while maintaining healthcare application security and reliability standards.
 
-### 3.2 Input-Process-Output Model
+### 3.4 Input-Process-Output Model
 
 **Figure 2. Input-Process-Output (IPO) Model**
 
@@ -302,11 +315,11 @@ The entire requirements planning process remained consistent with the Rapid Appl
 
 The prototype development phase was conducted as part of the Rapid Application Development (RAD) methodology, allowing for iterative design and stakeholder feedback before final system implementation. The prototypes were developed using Figma and later implemented using React 18 with Inertia.js, Tailwind CSS, and shadcn/ui components to ensure consistency with the final system design.
 
-The prototype development process involved creating interactive mockups of key system interfaces including the public landing page, clinic directory, patient and clinic registration pages, login interface, and administrative dashboards. These prototypes were presented to stakeholders at Enhaynes Dental Clinic for feedback and refinement before final system implementation. The detailed prototype interfaces and stakeholder feedback are presented in Section 5.2.1 (Prototype Development) within the Results and Discussions section.
+The prototype development process involved creating interactive mockups of key system interfaces including the public landing page, clinic directory, patient and clinic registration pages, login interface, and administrative dashboards. These prototypes were presented to stakeholders at Enhaynes Dental Clinic for feedback and refinement before final system implementation. The detailed system interfaces and stakeholder feedback are presented in Section 5.3.2 (Smile Suite Information System) within the Results and Discussions section.
 
 ---
 
-## 4.3 Receive Feedback
+### 4.3 Receive Feedback
 
 To gather comprehensive feedback on the Smile Suite: Cloud-Based Dental Clinic as a Service multi-tenant SaaS platform, the prototype was presented to key stakeholders at Enhaynes Dental Clinic, which served as the primary case study for evaluating the system's effectiveness. The feedback collection process involved the clinic owner, dental staff, and a representative sample of regular patients, ensuring diverse perspectives on the system's usability and functionality within the multi-tenant SaaS environment.
 
@@ -318,7 +331,7 @@ Patients who reviewed the Patient Portal prototype responded enthusiastically to
 
 The feedback collection process also revealed valuable insights about the multi-tenant SaaS platform's scalability potential. Stakeholders recognized the system's ability to serve multiple clinics simultaneously while maintaining complete data isolation, positioning it as a viable solution for broader dental clinic digitization across the Philippines. The comprehensive feedback gathered during this phase directly informed the final system development and deployment strategies, ensuring the platform met real-world operational requirements while supporting the broader goals of digital transformation in Philippine healthcare.
 
-## 4.4 Finalize Software
+### 4.4 Finalize Software
 
 The Smile Suite: Cloud-Based Dental Clinic as a Service system was finalized as a comprehensive multi-tenant SaaS platform built on modern, scalable web technologies. The backend utilized Laravel 11 framework running on PHP 8.2+ to manage business logic, multi-tenant authentication, and API endpoints with complete tenant isolation. This was paired with MySQL 8.0+ relational database ensuring secure, efficient storage of patient records, appointments, inventory data, and financial transactions with strict data separation between clinics. The frontend employed React 18 with Inertia.js to deliver a responsive, single-page application experience optimized for both desktop and mobile browsers, utilizing Tailwind CSS and shadcn/ui components for consistent, modern user interface design.
 
@@ -328,13 +341,33 @@ Core system modules included comprehensive appointment management with real-time
 
 The system's multi-tenant architecture ensured complete data isolation between clinics while sharing application infrastructure, enabling cost-effective scalability for dental practices nationwide. Development followed the Rapid Application Development (RAD) methodology with continuous stakeholder feedback integration. The codebase was managed through Git version control and hosted on GitHub, facilitating collaborative development and efficient change tracking. The system was deployed on Railway.app cloud infrastructure using Laravel Sail with Docker for development and production environments, ensuring high availability, data backup, and multi-clinic access via the internet. This infrastructure supported the system's adaptability and readiness for broader clinic adoption across the Philippines.
 
-## 4.5 Evaluation Method and Tools
+### 4.5 Evaluation Method and Tools
 
 To assess the effectiveness of Smile Suite: Cloud-Based Dental Clinic as a Service multi-tenant SaaS platform, a comprehensive evaluation was conducted specifically at Enhaynes Dental Clinic following system implementation. The evaluation framework was designed to directly address the three specific objectives outlined in Section 1.3, ensuring that the assessment methodology aligned with the project's goals and provided measurable evidence of objective achievement.
 
 The assessment focused on five key evaluation dimensions: **usability**, **efficiency**, **functionality**, **performance**, and **satisfaction**. These dimensions were systematically evaluated across all three specific objectives to provide comprehensive evidence of the system's effectiveness. The evaluation was carried out over a four-week period involving 15 clinic staff members (including 2 dentists, 1 clinic administrator, and 12 administrative staff) and 25 regular patients from Enhaynes Dental Clinic, totaling 40 participants to ensure comprehensive feedback collection.
 
-A mixed-methods approach was employed for the evaluation, integrating both quantitative and qualitative methods to provide a holistic assessment of the system's performance. Quantitative methods included standardized surveys and questionnaires using Likert scale (1-5) format, the System Usability Scale (SUS), measurements of task completion time for critical operations, tracking of error rates during normal usage, and system response time benchmarks under various load conditions. Qualitative data was gathered through structured interviews, observation logs, and focused group discussions to capture in-depth insights and subjective user experiences with the multi-tenant SaaS platform.
+**Table 3. Likert Scale Response Method**
+
+| Response          | Scale | Mean Range  |
+| ----------------- | ----- | ----------- |
+| Strongly Disagree | 1     | 1.00 - 1.49 |
+| Disagree          | 2     | 1.50 - 2.49 |
+| Neutral           | 3     | 2.50 - 3.49 |
+| Agree             | 4     | 3.50 - 4.49 |
+| Strongly Agree    | 5     | 4.50 - 5.00 |
+
+This survey questionnaire was designed to collect comprehensive data on the system's usability, efficiency, functionality, performance, and satisfaction dimensions, providing quantitative insights into user perceptions and experiences with the Smile Suite multi-tenant SaaS platform. The Likert scale methodology enabled participants to express their level of agreement or disagreement with evaluation statements, facilitating statistical analysis and interpretation of results across all five evaluation dimensions.
+
+**Response Scale Explanation:**
+
+1. **Strongly Disagree (1)**: This option indicates a very strong and clear opposition to the evaluation statement, representing complete disagreement with the statement's premise. Respondents selecting this response express that the statement does not accurately reflect their experience or perception of the system, indicating significant dissatisfaction or disagreement with the evaluated aspect.
+2. **Disagree (2)**: This option indicates a moderate level of disagreement with the evaluation statement, representing a negative perception that falls short of complete opposition. Respondents selecting this response express that the statement generally does not align with their experience, though they may acknowledge some partial validity or recognize areas where the statement may not fully apply.
+3. **Neutral (3)**: This option indicates a neutral or ambivalent position regarding the evaluation statement, representing neither agreement nor disagreement. Respondents selecting this response express uncertainty, lack of sufficient experience to form an opinion, or a balanced perspective that recognizes both positive and negative aspects of the statement without leaning toward either extreme.
+4. **Agree (4)**: This option indicates a moderate level of agreement with the evaluation statement, representing a positive perception that falls short of complete endorsement. Respondents selecting this response express that the statement generally aligns with their experience, though they may recognize minor limitations or areas where the statement could be more fully applicable.
+5. **Strongly Agree (5)**: This option indicates a very strong and clear support for the evaluation statement, representing complete agreement with the statement's premise. Respondents selecting this response express that the statement accurately and comprehensively reflects their experience or perception of the system, indicating high satisfaction or strong agreement with the evaluated aspect.
+
+A mixed-methods approach was employed for the evaluation, integrating both quantitative and qualitative methods to provide a holistic assessment of the system's performance. Quantitative methods included standardized surveys and questionnaires using the Likert scale response method (Table 3), web application functionality testing across all system modules, and statistical analysis of evaluation responses to calculate mean scores, standard deviations, and qualitative descriptions. Qualitative data was gathered through structured interviews and observation logs to capture in-depth insights and subjective user experiences with the multi-tenant SaaS platform.
 
 The evaluation was guided by the ISO 25010 standards for software quality, ensuring comprehensive assessment of the system's capabilities. The evaluation framework directly mapped to the three specific objectives:
 
@@ -344,58 +377,43 @@ The evaluation was guided by the ISO 25010 standards for software quality, ensur
 
 For data collection, several specialized tools and methods were employed to ensure accurate and comprehensive evaluation:
 
-Survey and Questionnaire Instruments: A comprehensive survey questionnaire was developed using Likert scale (1-5) format, where 1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, and 5 = Strongly Agree. The questionnaire included 25 evaluation statements organized across the five evaluation dimensions (usability, efficiency, functionality, performance, and satisfaction), with 5 statements per dimension. All 40 participants (15 clinic staff + 25 patients) completed the questionnaire after two weeks of using the system to ensure familiarity with the platform.
+**Survey and Questionnaire Instruments**: A comprehensive survey questionnaire was developed using the Likert scale response method (Table 3), with 25 evaluation statements organized across the five evaluation dimensions (usability, efficiency, functionality, performance, and satisfaction), with 5 statements per dimension. All 40 participants (15 clinic staff + 25 patients) completed the questionnaire after two weeks of using the system to ensure familiarity with the platform. The Likert scale methodology enabled quantitative analysis of user perceptions across all evaluation dimensions, with responses analyzed to calculate mean scores, standard deviations, and qualitative descriptions based on the mean ranges defined in Table 3.
 
-System Usability Scale (SUS): The widely recognized 10-item SUS questionnaire was used to assess user satisfaction and ease of system use across all user interfaces. Both staff and patients completed this questionnaire, providing standardized usability scores that could be compared to industry benchmarks.
+**Web Application Testing**: Comprehensive functionality testing was conducted across all ten core modules of the Smile Suite system, including user authentication and registration, patient management, appointment scheduling, treatment management, inventory management, payment processing, clinic management, dashboard and analytics, notification system, and public clinic directory. Each module was tested to verify that possible outputs matched rendered results, ensuring all features operate as designed.
 
-Time-Motion Studies: Researchers recorded the time required to complete critical tasks such as appointment scheduling, patient record management, payment processing, and inventory updates. These measurements were compared to baseline data from previous manual processes to quantify efficiency improvements and demonstrate the system's impact on operational efficiency.
-
-Technical Performance Evaluation: Apache JMeter was utilized for load testing the multi-tenant architecture, ensuring the system could handle concurrent users from multiple clinics without performance degradation. An integrated error logging system tracked system failures and performance issues in real-time, providing valuable insights into system reliability. Performance metrics including response time, page load time, database query time, system uptime, error rate, and concurrent user capacity were measured and compared against predefined targets.
-
-Security Assessments: Security assessments were performed using OWASP ZAP to identify potential vulnerabilities, with particular focus on tenant isolation and data protection mechanisms within the multi-tenant architecture.
-
-Structured Interviews: Structured interviews were conducted with clinic staff and patients to collect qualitative feedback about their overall experience with the multi-tenant SaaS platform, including insights on user interface design, workflow efficiency, and system reliability.
+**Structured Interviews and Observation Logs**: Structured interviews were conducted with clinic staff and patients to collect qualitative feedback about their overall experience with the multi-tenant SaaS platform, including insights on user interface design, workflow efficiency, and system reliability. Observation logs documented user interactions and system performance during normal operational use.
 
 The evaluation results were systematically organized and presented in tabular format, including:
 
-1. System evaluation results mapped to specific objectives
-2. Survey questionnaire results with Likert scale (1-5) responses
-3. Statistical summaries (mean, median, mode, standard deviation)
-4. Efficiency metrics comparing before and after implementation
-5. System Usability Scale (SUS) scores by user group
-6. System performance metrics with target vs. actual comparisons
+1. Web Application Testing Results (Table 5) demonstrating comprehensive functionality testing across all ten core modules
+2. Distribution of Respondents (Table 6) presenting the demographic breakdown of 40 participants
+3. Evaluation of the System in Terms of Usability (Table 7) with five parameters, mean scores, standard deviations, and qualitative descriptions
+4. Evaluation of the System in Terms of Efficiency (Table 8) with five parameters assessing operational productivity improvements
+5. Evaluation of the System in Terms of Functionality (Table 9) with five parameters evaluating system features and reliability
+6. Evaluation of the System in Terms of Performance (Table 10) with five parameters assessing technical performance metrics
+7. Evaluation of the System in Terms of Satisfaction (Table 11) with five parameters measuring user satisfaction and acceptance
+8. Summary of Table Evaluation (Table 12) consolidating results across all five dimensions with overall grand mean and qualitative description
 
-These comprehensive evaluation methods provided valuable quantitative and qualitative data to validate the system's effectiveness, demonstrate achievement of all three specific objectives, and identify areas for future improvement within the multi-tenant SaaS environment. The detailed evaluation results and analysis are presented in Section 5.3 (Objective 3: System Evaluation).
+These comprehensive evaluation methods provided valuable quantitative and qualitative data to validate the system's effectiveness, demonstrate achievement of all three specific objectives, and identify areas for future improvement within the multi-tenant SaaS environment. The detailed evaluation results and analysis are presented in Section 5.4 (Test & Evaluation of the System).
 
 **Supporting Documentation**: The complete evaluation questionnaires and raw data are available in the following supporting documents:
 
-1. **EVALUATION_QUESTIONNAIRE.md**: Contains the complete 25-statement survey questionnaire with Likert scale (1-5) format
-2. **SUS_QUESTIONNAIRE.md**: Contains the complete 10-item System Usability Scale (SUS) questionnaire
-3. **EVALUATION_RAW_DATA.md**: Contains all raw response data, time-motion study measurements, performance metrics, and statistical calculations that support the evaluation tables presented in Section 5.3.2
+1. **EVALUATION_QUESTIONNAIRE.md**: Contains the complete 25-statement survey questionnaire with Likert scale (1-5) format, organized across the five evaluation dimensions
+2. **EVALUATION_RAW_DATA.md**: Contains all raw response data, statistical calculations, and mean score computations that support the evaluation tables (Tables 5-12) presented in Section 5.4
 
 ---
 
 ## 5. RESULTS AND DISCUSSIONS
 
-This section presents the results and discussions of the Smile Suite: Cloud-Based Dental Clinic as a Service implementation and evaluation, directly addressing the three specific objectives outlined in Section 1.3. The results are organized to demonstrate how each objective was achieved through systematic development, implementation, and evaluation processes.
+This section presents the results and discussions of the Smile Suite: Cloud-Based Dental Clinic as a Service implementation and evaluation, directly addressing the three specific objectives outlined in Section 1.3. The section is organized into five main subsections demonstrating the systematic progression from project planning through final implementation, providing comprehensive evidence of how each objective was achieved through rigorous development processes, stakeholder engagement, and evaluation methodologies. The results validate the system's effectiveness in addressing real-world operational challenges faced by dental clinics in the Philippines.
 
-### 5.1 Objective 1: Requirements Gathering and Analysis
+The section begins with the project timeline (Section 5.1), presenting the Gantt chart (Table 4) illustrating the development schedule from January to December 2025, documenting all nine phases from initial learning through finalization. Objective 1: Requirements Gathering and Analysis (Section 5.2) details the stakeholder engagement process at Enhaynes Dental Clinic, presenting five critical requirement categories: Appointment Management, Patient Records Management, Inventory Control, Financial Management, and Communication Requirements. Objective 2: System Design and Development (Section 5.3) is divided into Systems Design (Section 5.3.1), presenting UML design artifacts including the Use-Case Diagram (Figure 4), Class Diagram (Figure 5), and six Sequence Diagrams (Figures 6-11) for patient registration, clinic registration, clinic discovery, appointment booking, treatment planning, and payment processing. The Smile Suite Information System (Section 5.3.2) presents the final implemented system through interface screenshots (Figures 12-28) showcasing the multi-tenant SaaS platform across all user roles, including public pages, authentication interfaces, administrative dashboards, and operational modules.
 
-**Objective Statement**: To gather and analyze system requirements from Enhaynes Dental Clinic and similar stakeholders to ensure the solution addresses real-world operational challenges.
+Test & Evaluation of the System (Section 5.4) presents comprehensive testing and evaluation results through multiple tables and analyses. The section begins with Web Application Testing Results (Table 5) demonstrating successful functionality testing across all ten core modules. The Distribution of Respondents (Table 6) presents the demographic breakdown of 40 participants (15 clinic staff and 25 patients). The evaluation is organized into five dimensions: Usability (Table 7), Efficiency (Table 8), Functionality (Table 9), Performance (Table 10), and Satisfaction (Table 11), each presenting parameters with mean scores, standard deviations, and qualitative descriptions. The Summary of Table Evaluation (Table 12) consolidates results across all dimensions, showing an overall grand mean of 4.28 (Strongly Agree) with consistent high satisfaction across all evaluation aspects. Finally, System Implementation (Section 5.5) describes the deployment process at Enhaynes Dental Clinic, presenting Railway.app configuration (Figures 29-30), phased rollout strategy (Table 13), external service integrations (Table 14), and system demonstration (Figure 31), validating the system's operational readiness and scalability.
 
-This subsection addresses the first specific objective by presenting the requirements gathering process, stakeholder analysis, and how the identified requirements were incorporated into the system design.
+### 5.1 Project Timeline
 
-The requirements gathering phase was conducted through systematic stakeholder engagement at Enhaynes Dental Clinic, which served as the primary case study. Semi-structured interviews were conducted with the clinic owner, dental staff (dentists and administrative staff), and a representative sample of regular patients. The interviews revealed critical operational challenges including manual appointment scheduling leading to overlaps and no-shows, disorganized paper-based patient records, lack of real-time inventory visibility, and inefficient patient communication channels.
-
-**Key Requirements Identified:**
-
-1. Appointment Management Requirements: Real-time scheduling system with conflict detection, email notifications through Laravel Mail, and SMS notifications through Semaphore API to address the 15-20% missed appointment rate. The system needed to support both online booking and manual appointment creation by clinic staff.
-2. Patient Records Management Requirements: Secure digital patient profiles with comprehensive medical history tracking, PSGC-integrated address management for Philippine geography, and support for multi-clinic patient records while maintaining data privacy.
-3. Inventory Control Requirements: Basic stock tracking with configurable low-stock alerts, category-based organization, and consumption monitoring per treatment to address recurring supply shortages.
-4. Financial Management Requirements: Payment processing with automatic billing record updates, revenue tracking, and financial summaries through dashboard analytics.
-5. Communication Requirements: Automated email notifications for appointment confirmations, updates, and treatment-related communications, plus SMS notifications for appointment confirmations, rescheduling, cancellations, and manual appointment reminders.
-
-These requirements were systematically documented and mapped to the system's functional specifications, ensuring that the developed solution directly addressed the real-world operational challenges identified at Enhaynes Dental Clinic. The requirements gathering process successfully validated the need for a multi-tenant SaaS platform that could serve multiple clinics while maintaining complete data isolation.
+The project timeline for Smile Suite: Cloud-Based Dental Clinic as a Service was systematically planned and executed following the Rapid Application Development (RAD) methodology, spanning from January to December 2025. The comprehensive Gantt chart presented below illustrates the complete development schedule, showing all sequential and overlapping activities that guided the transformation from initial concept to fully operational system. This structured timeline ensured that all project milestones, from initial requirements gathering through final system deployment, were completed within the designated timeframe while maintaining quality standards and stakeholder alignment.
 
 **Table 4. Smile Suite: Cloud-based DCaaS Gantt Chart**
 
@@ -417,135 +435,37 @@ By November, the focus shifted to the Documentation and Defense phase, which inv
 
 Overall, the Gantt chart presents a well-organized, continuous progression of activities that highlights the logical flow of the project. It demonstrates how each stage built upon the previous one, reflecting both the academic rigor and the technical precision required to deliver a robust, cloud-based dental clinic management solution capable of supporting multiple users and clinic operations efficiently.
 
-### 5.2 Objective 2: System Design and Development
+### 5.2 Objective 1: Requirements Gathering and Analysis
 
-**Objective Statement**: To design and develop a cloud-based, multi-tenant management information system using the Rapid Application Development (RAD) methodology, incorporating core features such as online appointment scheduling, patient records management, inventory tracking, financial processes, email notifications, and SMS notifications for appointment management including manual reminder functionality.
+This subsection addresses the first specific objective of gathering and analyzing system requirements from Enhaynes Dental Clinic and similar stakeholders to ensure the solution addresses real-world operational challenges. The subsection presents the requirements gathering process, stakeholder analysis, and demonstrates how the identified requirements were incorporated into the system design.
 
-This subsection addresses the second specific objective by presenting the system design process, prototype development, and the final implemented system that incorporates all required features.
+The requirements gathering phase was conducted through systematic stakeholder engagement at Enhaynes Dental Clinic, which served as the primary case study. Semi-structured interviews were conducted with the clinic owner, dental staff (dentists and administrative staff), and a representative sample of regular patients. The interviews revealed critical operational challenges including manual appointment scheduling leading to overlaps and no-shows, disorganized paper-based patient records, lack of real-time inventory visibility, and inefficient patient communication channels.
 
-#### 5.2.1 Prototype Development
+**Key Requirements Identified:**
 
-The prototype development phase was conducted as part of the Rapid Application Development (RAD) methodology, allowing for iterative design and stakeholder feedback before final system implementation. The prototypes were developed using Figma and later implemented using React 18 with Inertia.js, Tailwind CSS, and shadcn/ui components to ensure consistency with the final system design.
+1. Appointment Management Requirements: Real-time scheduling system with conflict detection, email notifications through Laravel Mail, and SMS notifications through Semaphore API to address the 15-20% missed appointment rate. The system needed to support both online booking and manual appointment creation by clinic staff.
+2. Patient Records Management Requirements: Secure digital patient profiles with comprehensive medical history tracking, PSGC-integrated address management for Philippine geography, and support for multi-clinic patient records while maintaining data privacy.
+3. Inventory Control Requirements: Basic stock tracking with configurable low-stock alerts, category-based organization, and consumption monitoring per treatment to address recurring supply shortages.
+4. Financial Management Requirements: Payment processing with automatic billing record updates, revenue tracking, and financial summaries through dashboard analytics.
+5. Communication Requirements: Automated email notifications for appointment confirmations, updates, and treatment-related communications, plus SMS notifications for appointment confirmations, rescheduling, cancellations, and manual appointment reminders.
 
-**Figure 4. Public Landing Page Interface**
+These requirements were systematically documented and mapped to the system's functional specifications, ensuring that the developed solution directly addressed the real-world operational challenges identified at Enhaynes Dental Clinic. The requirements gathering process successfully validated the need for a multi-tenant SaaS platform that could serve multiple clinics while maintaining complete data isolation.
 
-_[Note: Figure 4 shows the public-facing homepage with hero section, value proposition, trust badges, statistics overlays, features showcase, testimonials, FAQ section, and pricing tiers.]_
+### 5.3 Objective 2: System Design and Development
 
-The Public Landing Page demonstrated the main entry point of the Smile Suite multi-tenant SaaS platform, designed to attract potential clinic clients and patients. The interface featured a two-column layout with a hero section containing the platform's value proposition "The Future of Dental Practice Management" and key marketing elements including trust badges, star ratings, and call-to-action buttons. The right side displayed a professional dental clinic image with floating statistics overlays showing "50K+ Patients" and "10K+ Appointments." The page utilized a blue and white color scheme with gradient backgrounds and modern UI components from the shadcn/ui library.
+This subsection addresses the second specific objective of designing and developing a cloud-based, multi-tenant management information system using the Rapid Application Development (RAD) methodology, incorporating core features such as online appointment scheduling, patient records management, inventory tracking, financial processes, email notifications, and SMS notifications for appointment management including manual reminder functionality. The subsection presents the system design artifacts followed by the final implemented system, with the design phase including UML diagrams (Use-Case, Class, and Sequence Diagrams) that served as blueprints for implementation, while the final system section presents the completed Smile Suite Information System interfaces across all user roles and functional modules.
 
-The complete interface included additional sections accessible through scrolling: a features showcase highlighting six core platform capabilities (Patient Management, Smart Scheduling, Treatment Records, Payment Processing, Enterprise Security, and Cloud-First Platform), customer testimonials from dental professionals, frequently asked questions section, and a three-tier pricing structure (Basic: ₱999/month, Premium: ₱1999/month, Enterprise: ₱2,999/month). The interface demonstrated responsive design principles with mobile-optimized layouts and included comprehensive navigation elements in the header and footer sections.
+#### 5.3.1 Systems Design
 
-**Figure 5. Clinic Directory Page Interface**
-
-_[Note: Figure 5 displays the public clinic directory with grid layout of clinic cards, each showing logo, name, verification badge, ratings, location, contact info, and booking buttons.]_
-
-The Clinic Directory Page served as the primary discovery interface for patients seeking dental services within the Smile Suite multi-tenant SaaS platform. The interface featured a prominent "Trusted Dental Clinics" header with an "Available Clinics" indicator badge, followed by a grid layout of clinic cards displaying comprehensive information for each registered clinic. Each clinic card included the clinic logo, name, verification badge, star rating, PSGC-integrated location data, contact information (phone and email), and a brief description of services. Two action buttons were provided per card: a blue "View Details" button for accessing the complete clinic profile and a green "Book Appointment" button for direct appointment scheduling. The interface demonstrated the platform's multi-tenant architecture by showcasing multiple independent clinics within a unified directory, each maintaining their distinct branding while benefiting from shared platform infrastructure.
-
-**Figure 6. Clinic Profile Page Interface**
-
-_[Note: Figure 6 illustrates a detailed clinic profile page with branding, description, image gallery, services catalog, operating hours, staff profiles, location mapping, and patient reviews.]_
-
-The Clinic Profile Page illustrated the public-facing clinic directory functionality within the multi-tenant SaaS architecture, specifically showcasing Enhaynes Dental Clinic as a case study. The interface displayed clinic branding with the Clinic's logo, verification badge, and contact information including email and phone number. The main content area featured a hero section with clinic description and a prominent "Book Appointment" button, followed by an image gallery displaying clinic facilities with a patient in a dental chair.
-
-The complete interface included multiple scrollable sections: services catalog displaying available dental services, operating hours with detailed schedule information, staff profiles section, accessibility and trust indicators, location mapping with clinic address, and patient reviews system with ratings and testimonials. The page incorporated booking and review modal dialogs for appointment scheduling and feedback collection. The design maintained platform consistency while providing comprehensive clinic information and booking capabilities for potential patients.
-
-**Figure 7. Login Page Interface**
-
-_[Note: Figure 7 shows the login page with two-panel layout: promotional left panel with branding and security features, and right panel with login form, registration links, and trust indicators.]_
-
-The Login Page served as the secure access portal for existing users of the Smile Suite multi-tenant SaaS platform, supporting authentication for System Administrators, Clinic Administrators, and Patients. The interface featured a two-panel layout with a promotional left panel displaying the Smile Suite branding, "Cloud-based Dental Clinic as a Service" tagline, and security features including "HIPAA Compliant," "Multi-factor Auth," and "Instant Access." The right panel contained the login form with email and password fields, a "Remember me" checkbox, and "Forgot password?" link. The form included a "Sign In" button and provided registration options for new users: "Create one here" for patient registration and "Register Your Clinic" for clinic onboarding. The interface utilized a blue gradient background with modern UI components and included trust indicators to reinforce platform security.
-
-**Figure 8. Patient Registration Interface**
-
-_[Note: Figure 8 displays the patient registration form with two-column layout: promotional left panel with benefits and statistics, and right panel with registration form fields and navigation options.]_
-
-The Patient Registration interface facilitated individual patient account creation within the multi-tenant SaaS platform. The page employed a two-column layout with a promotional left panel highlighting patient benefits including "Easy Booking," "Smart Reminders," and "Health Records," accompanied by platform statistics showing "500+ Active Clinics" and "10K+ Happy Patients." The right panel presented a comprehensive registration form collecting essential patient information: Full Name, Email Address, Phone Number (optional), Password, and Confirm Password. The form included input validation, password visibility toggles, and a "Create Account" button. Additional navigation options included "Sign in here" for existing users and "Register Your Clinic" for dental practices, emphasizing the platform's multi-tenant architecture. The interface maintained consistent branding with the Smile Suite color scheme and included patient testimonials to build trust.
-
-**Figure 9. Clinic Registration Interface**
-
-_[Note: Figure 9 shows the clinic registration form with subscription tier selection (Basic, Premium, Enterprise), clinic information fields, and registration request submission.]_
-
-The Clinic Registration interface enabled dental practices to join the multi-tenant SaaS platform through a comprehensive onboarding process. The interface presented three subscription tiers: Basic (₱999/month with 14-day free trial), Premium (₱1,999/month), and Enterprise (₱2,999/month), each displaying specific features and account limitations. The Basic plan was highlighted as the default selection, offering up to 2 dentist accounts, basic patient management, appointment scheduling, and email support. The form collected clinic information including clinic name, contact person, email, phone, license number, and description, along with a message field for additional requirements. The interface included a "Submit Registration Request" button and provided a "Sign in here" link for existing clinic accounts. The design emphasized the platform's scalability and multi-tenant capabilities while providing clear pricing transparency.
-
-**Figure 10. Clinic Setup Interface**
-
-_[Note: Figure 10 displays the clinic setup completion form with approval confirmation banner, clinic information confirmation, admin account creation, and PSGC-integrated address fields.]_
-
-The Clinic Setup interface completed the clinic onboarding process by collecting final administrative and geographical data. The interface displayed a green confirmation banner indicating approval for the "Basic Plan (14-Day Free Trial)" with subsequent monthly billing information. The form was organized into three sections: Clinic Information confirmation, Admin Account Details for creating the primary administrator credentials, and Address Information with dynamic PSGC (Philippine Standard Geographic Code) integration. The address section included cascading dropdowns for Region, Province, City/Municipality, and Barangay selection, along with fields for Street Address, Postal Code, and Additional Details. An "Important Information" box explained the purpose of admin accounts and address data in clinic management and public profiles. The interface concluded with a "Complete Setup" button that enabled immediate access to the clinic dashboard upon successful submission.
-
-**Figure 11. System Admin Dashboard Interface**
-
-_[Note: Figure 11 shows the system admin dashboard with top navigation, sidebar quick actions, system status panel, KPI metric cards, and sections for recent clinics and users.]_
-
-The System Admin Dashboard served as the central control panel for platform administrators managing the multi-tenant SaaS infrastructure. The interface featured a horizontal top navigation bar with key sections including Dashboard, Users, Clinics, Requests, Subscriptions, and Support, while a left sidebar contained Quick Actions with color-coded buttons for Manage Users, View Clinics, Create Clinic, View Requests, and Subscriptions management. A System Status panel provided real-time monitoring with visual progress indicators showing System Health as Healthy, Database as Online, and high Uptime performance. The main content area displayed a Dashboard Overview header with the current date and key performance metric cards tracking Total Users with positive growth trends, Active Clinics showing registered dental facilities, Total Patients with increasing registration trends, and Pending Requests awaiting approval. Below the metrics, two side-by-side sections displayed Recent Clinics showing the latest registered clinics with email contacts and view actions, alongside Recent Users listing newly registered users with their email addresses and profile icons. The interface utilized a modern blue and purple gradient color scheme with white card-based layouts, clean typography, and intuitive iconography, ensuring clear visual hierarchy and comprehensive oversight of the entire multi-tenant platform ecosystem.
-
-**Figure 12. Clinic Admin Dashboard Interface**
-
-_[Note: Figure 12 displays the clinic management dashboard with sidebar navigation, metric cards for appointments/patients/revenue/satisfaction, revenue trends chart, today's schedule, and recent patients section.]_
-
-The Clinic Management Dashboard provided dental clinic administrators with a comprehensive real-time analytics interface for monitoring daily operations and financial performance. The header displayed the clinic name with a premium subscription countdown timer, upgrade button, and year selector. A left sidebar navigation organized key sections including Dashboard, Patients, Appointments, Dentist Schedule, Treatments, Services, Inventory, Payments, and Others, with an Active Premium Plan indicator. The main content area featured four color-coded metric cards showing Today's Appointments, Total Patients, Revenue, and Satisfaction ratings, each with growth trend indicators. A prominent Revenue Trends section displayed a monthly bar chart with detailed financial visualization using green gradient bars. The right sidebar contained Today's Schedule listing confirmed appointments with patient details and times, alongside a Recent Patients section. The interface employed a modern blue and green gradient color scheme with white card-based layouts, ensuring efficient clinic operations management and comprehensive business intelligence oversight.
-
-**Figure 13. Patient Dashboard Interface**
-
-_[Note: Figure 13 shows the patient dashboard with welcome header, metric cards, appointment cards, and treatment history sections displaying multi-clinic dental care journey.]_
-
-The Patient Dashboard served as the central hub for patients to manage their dental health records and appointments across multiple clinics. The header displayed a personalized welcome message with quick access buttons for Profile and Treatments navigation. Four metric cards provided an overview of Connected Clinics, Total Appointments with active status, Upcoming scheduled visits with time indicators, and Total Treatments showing completed procedures. The main content area featured two side-by-side sections: My Appointments displaying detailed appointment cards with clinic information, location, scheduled date and time, booking reason, and notes; and Treatment History showcasing completed treatment records with clinic details, treatment type, associated dentist, treatment date, cost breakdown, and additional notes. Each card included status indicators using color-coded badges and visual icons for easy identification. The interface employed a modern cyan and white color scheme with card-based layouts, clean typography, and intuitive navigation, ensuring patients could efficiently track their dental care journey across multiple healthcare providers within the platform.
-
-**Figure 14. Clinic Patient Management Module Interface**
-
-_[Note: Figure 14 displays the patient management page with sidebar navigation, metric cards, search/filter options, and comprehensive patient records table with profile avatars, contact details, and action buttons.]_
-
-The Patient Management Dashboard enabled clinic administrators to efficiently organize and manage comprehensive patient records. A left sidebar navigation provided access to Dashboard, Patients, Appointments, Dentist Schedule, Treatments, Services, Inventory, Payments, and Others, with an Active Premium Plan indicator. Four metric cards displayed Total Patients, New This Month registrations, Recent Visits, and Active Patients, each with trend indicators. The Patient Records section featured action buttons for Export All, Show Bulk Actions, and Add Patient, along with a search bar and advanced filter options for Gender, Status, Blood type, Marital status, and Category. A detailed patient table presented comprehensive information including patient names with profile avatars showing gender and age, contact details with email and phone numbers, last visit timestamps, color-coded status badges indicating patient activity levels, category tags for patient classification, and action buttons for viewing, editing, deleting, and additional options. The interface employed a modern blue gradient color scheme with organized layouts ensuring streamlined patient data management and accessibility.
-
-**Figure 15. Clinic Appointment Management Module Interface**
-
-_[Note: Figure 15 shows the appointments management page with action buttons, metric cards, search/filter options, and detailed appointments list table with patient info, status badges, scheduled times, and assigned dentists.]_
-
-The Appointments Management page served as the central interface for scheduling and managing all patient appointments across the clinic. Action buttons at the top provided options to Export All appointments, switch to Calendar View, and Create Appointment. Six color-coded metric cards displayed key statistics including All Appointments, Ready to Process appointments, Awaiting Approval requests, Successfully Done visits, Direct Payments, and pending approvals, each with visual icons and trend indicators. A comprehensive search bar allowed filtering appointments by patient name, email, or phone number, with additional dropdown filters for Status and Appointment Types, plus a date picker for temporal filtering. The Appointments List presented detailed appointment records in a structured table format showing patient information with contact details, appointment type badges indicating booking method, color-coded status indicators, scheduled date and time with duration, assigned dentist names, and associated service details with pricing. The interface employed a blue gradient design with organized card layouts and intuitive color coding, enabling efficient appointment workflow management from booking requests through completion.
-
-**Figure 16. Clinic Inventory Management Module Interface**
-
-_[Note: Figure 16 displays the inventory management page with action buttons, metric cards for stock levels, search/filter options, and inventory table with item details, stock status, quantities, pricing, and expiration dates.]_
-
-The Inventory Management page provided comprehensive tracking and control of all clinic stock items and supplies. Action buttons enabled administrators to Export All inventory data and Add Item for new stock entries. Four metric cards displayed critical inventory metrics including Total Items in the system, Low Stock alerts requiring attention, Out of Stock items needing immediate replenishment, and Total Value representing overall inventory worth. The Inventory Records section featured a search bar for finding specific items, dropdown filters for All Categories and stock status levels, plus Search and Clear action buttons. A detailed inventory table presented item information including product names with identification codes, category classifications, color-coded stock status badges indicating availability levels, quantity controls with increment and decrement buttons showing minimum thresholds, unit pricing, calculated total values, and expiration dates for time-sensitive items. The interface employed a blue gradient design with organized layouts and visual indicators, ensuring efficient stock management and preventing supply shortages.
-
-**Figure 17. Clinic Payment Management Module Interface**
-
-_[Note: Figure 17 shows the payment management page with action buttons, financial metric cards, search functionality, and payment records table with patient info, transaction details, payment methods, and status badges.]_
-
-The Payment Management page enabled comprehensive tracking and organization of all clinic financial transactions and revenue. Action buttons provided functionality to Export All payment records, perform Bulk Actions on multiple entries, and Add Payment for new transactions. Four metric cards displayed financial overview including Total Revenue accumulated, Total Balance outstanding, This Month earnings with growth trends, and Pending payments awaiting processing. The Payment Records section featured a search bar for locating specific transactions and displayed the total count of payment entries. A detailed payment table presented transaction information including patient names with profile avatars, age, and contact details, payment dates with unique reference numbers, associated treatment types and identification codes, payment amounts, payment method indicators showing cash or insurance options, and color-coded status badges confirming transaction completion. The interface employed a blue gradient design with organized financial data presentation, ensuring efficient revenue tracking and payment reconciliation.
-
-**Figure 18. Clinic Treatment Management Module Interface**
-
-_[Note: Figure 18 displays the treatment management page with action buttons, treatment statistics cards, search/filter options, and comprehensive treatment records table with patient info, treatment types, status badges, and cost details.]_
-
-The Treatment Management page provided comprehensive oversight of all patient dental treatments and procedures. Action buttons enabled administrators to Export All treatment records, perform Show Bulk Actions on multiple entries, and Add Treatment for new procedures. Five metric cards displayed treatment statistics including Total treatments recorded, Completed procedures, In Progress treatments currently ongoing, Paid treatments with confirmed payments, and Revenue generated from services. The Treatment Records section featured a search bar for locating specific treatments, along with dropdown filters for All Services, treatment status levels, and payment status categories, plus a Clear All option to reset filters. A detailed treatment table presented patient information with profile avatars, names, ages, and contact details, treatment types with procedure names and descriptions, color-coded status badges indicating completion levels, payment status indicators, cost breakdowns showing service pricing, treatment dates with duration estimates, and action buttons for managing records. The interface employed a blue and green gradient design ensuring efficient treatment workflow tracking and clinical record management.
-
-**Figure 19. Clinic Create Treatment Interface**
-
-_[Note: Figure 19 shows the create treatment form with patient selection, service assignment, dental chart component using Universal Numbering System, diagnosis fields, status indicators, and additional clinical documentation options.]_
-
-The Create Treatment page provided a comprehensive form interface for documenting new dental procedures and patient treatments. The form included essential fields for selecting the patient from registered records, choosing the treatment type or service from available procedures, assigning a dentist from clinic staff, and specifying treatment costs and estimated duration. A prominent Dental Chart component utilized the Universal Numbering System, displaying both Upper Arch and Lower Arch views with interactive tooth selection. The chart featured Clear and Select All buttons along with a counter showing selected teeth, enabling clinicians to visually mark specific teeth involved in the treatment by clicking on the illustrated dental diagram. Additional form sections captured clinical information including diagnosis details, treatment status indicators, payment method selection, procedure notes, recommended follow-up care, start and end dates for multi-session treatments, prescription medications if applicable, and options to upload treatment-related images. The interface employed a modal-based design for the dental chart with realistic anatomical visualization, ensuring accurate tooth identification and comprehensive treatment documentation for complete clinical records.
-
-**Figure 20. Clinic Services Module Interface**
-
-_[Note: Figure 20 displays the services management page with add service button, metric cards, search/filter options, and services catalog table with service names, categories, duration, pricing, status badges, and assigned dentists.]_
-
-The Services Management page enabled clinic administrators to organize and maintain the complete catalog of dental procedures and treatments offered. An Add Service button facilitated creating new service entries. Four metric cards provided an overview including Total Services available in the catalog, Active Services currently bookable, Average Price across all procedures, and Assigned Dentists available to perform services. A search bar allowed finding services by name, description, or service code, complemented by dropdown filters for service categories and status levels. The Services Records table presented comprehensive service information including service names with unique identification codes, category classifications with subcategory tags, estimated procedure duration times, pricing details with cost breakdowns, color-coded status badges indicating availability, and assigned dentist names showing consultation options for each service. The interface employed a blue gradient design with organized card layouts, ensuring efficient service catalog management, pricing transparency, and provider assignment for streamlined appointment booking and treatment planning.
-
-The prototype development phase successfully validated the system's user interface design and user experience approach. Stakeholder feedback collected during prototype review sessions (as described in Section 4.3) directly informed the final system implementation, ensuring that the developed solution met user expectations and addressed real-world operational needs.
-
-#### 5.2.2 Systems Design
-
-The Systems Design subsection presents the comprehensive architectural and functional design of Smile Suite: Cloud-Based Dental Clinic as a Service, detailing the system's structure, interactions, and workflows through standardized UML (Unified Modeling Language) diagrams. These design artifacts were developed during the system design phase of the Rapid Application Development (RAD) methodology and served as blueprints for the implementation phase. The design documentation demonstrates how the multi-tenant SaaS architecture supports multiple dental clinics while maintaining complete data isolation, role-based access control, and scalable infrastructure.
+The Systems Design subsection presents the comprehensive architectural and functional design of Smile Suite: Cloud-Based Dental Clinic as a Service, detailing the system's structure, interactions, and workflows through standardized UML (Unified Modeling Language) diagrams. These design artifacts were developed during the system design phase of the Rapid Application Development (RAD) methodology and served as blueprints for the implementation phase. The design documentation demonstrates how the multi-tenant SaaS architecture supports multiple dental clinics while maintaining complete data isolation, role-based access control, and scalable infrastructure. The design process involved careful analysis of the requirements gathered from Enhaynes Dental Clinic, translating operational needs into technical specifications that could be systematically implemented. Each diagram serves a specific purpose in documenting different aspects of the system architecture, from high-level functional requirements to detailed data structures and process flows, providing developers with clear guidance for implementation.
 
 The following diagrams are presented to illustrate the system's design: (a) Use-Case Diagram, which captures the functional requirements and interactions between different user roles and the system; (b) Class Diagram, which represents the core data model and entity relationships within the multi-tenant architecture; and (c) Sequence Diagrams, which detail the step-by-step workflows for critical system processes including patient registration, clinic registration, clinic discovery, appointment booking, treatment planning, and payment processing. These design artifacts validate the system's ability to meet the functional requirements identified during the requirements gathering phase and ensure that all stakeholders' needs are properly addressed within the multi-tenant SaaS platform.
 
 a.) Use-Case Diagram
 
-**Figure 21. Smile Suite: Cloud-based DCaaS Use-Case Diagram**
+**Figure 4. Smile Suite: Cloud-based DCaaS Use-Case Diagram**
 
-_[Note: Figure 21 illustrates a comprehensive Use-Case Diagram showing five actors (System Admin, Clinic Admin, Dentist, Staff, Patient) interacting with various system packages including System Administration, Clinic Management, Clinical Operations, Staff Operations, Patient Services, and Core System components. The diagram includes include and extend relationships, and integration with external systems like Laravel Mail Server and PSGC Database.]_
+_[Note: Figure 4 illustrates a comprehensive Use-Case Diagram showing five actors (System Admin, Clinic Admin, Dentist, Staff, Patient) interacting with various system packages including System Administration, Clinic Management, Clinical Operations, Staff Operations, Patient Services, and Core System components. The diagram includes include and extend relationships, and integration with external systems like Laravel Mail Server and PSGC Database.]_
 
 The Use Case Diagram for Smile Suite: Cloud-Based Dental Clinic as a Service illustrates the functional requirements and user interactions within the multi-tenant SaaS platform, encompassing five primary actors representing different stakeholder groups. The System Administrator manages the platform infrastructure through Manage Clinics, Monitor Subscriptions, Approve Registration, and View Platform Analytics. The Clinic Administrator handles clinic operations through Manage Appointments, Manage Staff Users, View Clinic Analytics, Manage Services, Handle Appointment Requests, Manage Clinic Profile, and Manage Dentist Schedules. The Dentist performs clinical functions including Update Medical Records, Create Treatment Plans, Use Dental Chart, Generate Reports, Manage Schedule, View Patient History, and Handle Appointment Requests. The Staff supports operations through Process Payments, Manage Inventory, Add Patients, Handle Walk-ins, Handle Appointment Requests, and Update Billing Records. The Patient accesses services through Book Appointments, View Treatment History, Cancel/Reschedule, Update Profile, and View Appointments.
 
@@ -553,11 +473,11 @@ The Core System package includes five fundamental components: Multi-Tenant Data 
 
 This comprehensive Use Case Diagram validates the system's ability to support complete dental clinic management workflows while maintaining security, scalability, and multi-tenancy requirements essential for successful SaaS platform deployment in the Philippine healthcare context. The diagram demonstrates the system's capacity to serve multiple dental clinics simultaneously while ensuring complete data isolation and providing appropriate role-based access control for each stakeholder group.
 
-#### b.) Class Diagram
+b.) Class Diagram
 
-**Figure 22. Smile Suite: Cloud Based DCaaS Class Diagram**
+**Figure 5. Smile Suite: Cloud Based DCaaS Class Diagram**
 
-_[Note: Figure 22 displays a UML Class Diagram showing eight core entity classes (Clinic, User, Patient, Appointment, AppointmentStatus, AppointmentType, Treatment, Inventory, Payment) with their attributes, methods, and relationships. The Clinic class serves as the central multi-tenant hub with one-to-many relationships to all other entities, ensuring data isolation through clinic_id foreign keys.]_
+_[Note: Figure 5 displays a UML Class Diagram showing eight core entity classes (Clinic, User, Patient, Appointment, AppointmentStatus, AppointmentType, Treatment, Inventory, Payment) with their attributes, methods, and relationships. The Clinic class serves as the central multi-tenant hub with one-to-many relationships to all other entities, ensuring data isolation through clinic_id foreign keys.]_
 
 The Class Diagram illustrates the core data model of the Smile Suite: Cloud-Based Dental Clinic as a Service platform, representing the essential entities and their relationships within the multi-tenant SaaS architecture. The diagram presents eight core entity classes that form the foundation of the system's data structure, with the Clinic entity serving as the central multi-tenant hub containing subscription management, licensing details, and PSGC-integrated address data. The User entity implements a comprehensive role-based access control system supporting five distinct user types: System Admin, Clinic Admin, Dentist, Staff, and Patient, each with specific permissions within their respective clinic context.
 
@@ -565,192 +485,284 @@ The patient management system is represented through the Patient entity, which m
 
 The Payment entity handles financial transactions, linking treatments with payment methods and tracking payment status across the system. The relationships between these entities demonstrate a well-structured data model where the Clinic entity maintains one-to-many relationships with all other entities, ensuring proper data isolation in the multi-tenant architecture. Patient entities connect to appointments, treatments, and payments, while User entities manage appointments and treatments through role-based assignments. This diagram represents a subset of the complete system architecture, focusing on the core business entities that drive the primary functionality of the dental clinic management platform.
 
-#### c.) Sequence Diagram
+c.) Sequence Diagrams
 
-**Figure 23. Smile Suite's Patient Registration Sequence Diagram**
+The following sequence diagrams detail the step-by-step workflows for six critical system processes, demonstrating the comprehensive interaction patterns between users, system components, and external services within the Smile Suite platform.
 
-_[Note: Figure 23 displays a UML sequence diagram showing the Patient Registration Process with interactions between Patient, Frontend, AuthController, EmailService, and Database, including form validation, user account creation, verification code generation, and email notifications.]_
+**Figure 6. Smile Suite's Patient Registration Sequence Diagram**
 
-The Patient Registration Process sequence diagram (Figure 23) illustrates the comprehensive workflow for new patient enrollment within the Smile Suite platform, incorporating advanced patient linking and verification mechanisms to ensure data integrity and security. When a prospective patient accesses the registration interface through the frontend, the system triggers validation through the PatientLinkingService to check for existing patient records and determine the appropriate registration pathway. This validation step is crucial for maintaining data integrity, preventing duplicate account creation, and identifying scenarios where a patient record may already exist but requires user account linking. The AuthController processes form data submitted by patients, performing validation checks including email uniqueness verification, password strength requirements, and required field completion to ensure data quality and security compliance. For patients with existing records in the database, the PatientLinkingService facilitates a secure claiming process that links the new user account to the existing patient record, ensuring continuity of care and preventing data fragmentation across the multi-tenant platform.
+_[Note: Figure 6 displays a UML sequence diagram showing the Patient Registration Process with interactions between Patient, Frontend, AuthController, EmailService, and Database, including form validation, user account creation, verification code generation, and email notifications.]_
+
+The Patient Registration Process sequence diagram (Figure 6) illustrates the comprehensive workflow for new patient enrollment within the Smile Suite platform, incorporating advanced patient linking and verification mechanisms to ensure data integrity and security. When a prospective patient accesses the registration interface through the frontend, the system triggers validation through the PatientLinkingService to check for existing patient records and determine the appropriate registration pathway. This validation step is crucial for maintaining data integrity, preventing duplicate account creation, and identifying scenarios where a patient record may already exist but requires user account linking. The AuthController processes form data submitted by patients, performing validation checks including email uniqueness verification, password strength requirements, and required field completion to ensure data quality and security compliance. For patients with existing records in the database, the PatientLinkingService facilitates a secure claiming process that links the new user account to the existing patient record, ensuring continuity of care and preventing data fragmentation across the multi-tenant platform.
 
 Following successful validation, the system creates a user account with an unverified status and generates a unique verification code that serves as a security measure for account activation. The verification code is securely stored in the database and associated with the user account, while an automated email notification containing the verification link is dispatched through Laravel Mail integration. This email notification includes clear instructions for account activation and reinforces the platform's security and authentication standards, ensuring that only legitimate users can access the system. The registration process culminates with the establishment of authenticated user sessions through Laravel Breeze, enabling immediate access to the patient portal upon successful verification. Throughout this workflow, the system maintains strict adherence to multi-tenant architecture principles, ensuring that patient data remains isolated within the appropriate clinic context while providing a seamless onboarding experience that supports personalized healthcare services and maintains robust security and data protection standards.
 
-**Figure 24. Smile Suite's Clinic Registration Sequence Diagram**
+**Figure 7. Smile Suite's Clinic Registration Sequence Diagram**
 
-_[Note: Figure 24 displays a UML sequence diagram showing the Clinic Registration Process with interactions between Clinic Owner, System Admin, System, and Email Service, including registration submission, admin review, payment processing, and clinic setup phases.]_
+_[Note: Figure 7 displays a UML sequence diagram showing the Clinic Registration Process with interactions between Clinic Owner, System Admin, System, and Email Service, including registration submission, admin review, payment processing, and clinic setup phases.]_
 
-The Clinic Registration Process sequence diagram (Figure 24) outlines the comprehensive workflow for onboarding new dental clinics into the Smile Suite platform, incorporating multi-tier subscription management and automated approval workflows designed to streamline the clinic onboarding experience. The interaction begins with clinic owners submitting registration requests through a public interface, providing essential information including practice name, contact details, license numbers, and business descriptions that enable system administrators to evaluate clinic eligibility. The system securely stores this data in the database pending administrative review and generates a unique registration request identifier, automatically notifying system administrators through internal notification mechanisms to ensure prompt attention to new registration applications. This initial phase establishes the foundation for the subsequent approval workflow, enabling system administrators to review clinic credentials, verify license authenticity, and assess the clinic's eligibility for platform participation based on established quality standards and regulatory compliance requirements.
+The Clinic Registration Process sequence diagram (Figure 7) outlines the comprehensive workflow for onboarding new dental clinics into the Smile Suite platform, incorporating multi-tier subscription management and automated approval workflows designed to streamline the clinic onboarding experience. The interaction begins with clinic owners submitting registration requests through a public interface, providing essential information including practice name, contact details, license numbers, and business descriptions that enable system administrators to evaluate clinic eligibility. The system securely stores this data in the database pending administrative review and generates a unique registration request identifier, automatically notifying system administrators through internal notification mechanisms to ensure prompt attention to new registration applications. This initial phase establishes the foundation for the subsequent approval workflow, enabling system administrators to review clinic credentials, verify license authenticity, and assess the clinic's eligibility for platform participation based on established quality standards and regulatory compliance requirements.
 
 The admin review phase represents a critical quality control checkpoint where system administrators evaluate registration requests against platform standards and requirements, ensuring that only qualified dental clinics gain access to the multi-tenant SaaS platform. Administrators can approve, reject, or request additional information from clinic owners, with each action triggering appropriate system responses and notification workflows that maintain transparency throughout the registration process. Upon approval, the system generates token-based setup links that are securely transmitted to clinic owners via email, enabling them to complete the clinic setup process through a protected interface that prevents unauthorized access to clinic configuration processes. The clinic setup phase encompasses database operations for clinic and user creation, including the establishment of clinic records with PSGC-integrated address data, creation of primary administrator accounts, and configuration of initial clinic settings and preferences. Payment processing mechanisms integrate seamlessly for clinics selecting premium subscription tiers, with automated payment verification and confirmation workflows that enable immediate access to enhanced platform features upon successful payment processing, ensuring that new clinics can quickly begin utilizing the platform's capabilities while maintaining strict quality control and operational standards.
 
-**Figure 25. Smile Suite's Clinic Discovery Sequence Diagram**
+**Figure 8. Smile Suite's Clinic Discovery Sequence Diagram**
 
-_[Note: Figure 25 displays a UML sequence diagram showing the Clinic Discovery Process with interactions between Patient, Frontend, ClinicController, and Database, including clinic directory browsing, search queries, clinic profile viewing, and PSGC-based location filtering.]_
+_[Note: Figure 8 displays a UML sequence diagram showing the Clinic Discovery Process with interactions between Patient, Frontend, ClinicController, and Database, including clinic directory browsing, search queries, clinic profile viewing, and PSGC-based location filtering.]_
 
-The Clinic Discovery Process sequence diagram (Figure 25) demonstrates the public-facing functionality that enables patients to explore and evaluate dental clinics within the Smile Suite ecosystem through an advanced directory system designed to facilitate informed healthcare decision-making. The interaction flow begins with patient-initiated search queries that trigger database queries utilizing PSGC (Philippine Standard Geographic Code) integration for location-based filtering and comprehensive clinic data retrieval. The initial directory browsing phase allows patients to access a comprehensive listing of registered clinics, with the frontend requesting clinic data from the ClinicController, which in turn queries the database for active clinics with associated metadata including ratings, service categories, and availability status. The database response includes paginated results optimized for performance, ensuring that large datasets can be efficiently presented without compromising system responsiveness. The frontend then renders these clinic listings in an intuitive grid or list format, presenting key information such as clinic names, logos, star ratings, and brief descriptions that enable patients to quickly identify potential matches for their dental care needs.
+The Clinic Discovery Process sequence diagram (Figure 8) demonstrates the public-facing functionality that enables patients to explore and evaluate dental clinics within the Smile Suite ecosystem through an advanced directory system designed to facilitate informed healthcare decision-making. The interaction flow begins with patient-initiated search queries that trigger database queries utilizing PSGC (Philippine Standard Geographic Code) integration for location-based filtering and comprehensive clinic data retrieval. The initial directory browsing phase allows patients to access a comprehensive listing of registered clinics, with the frontend requesting clinic data from the ClinicController, which in turn queries the database for active clinics with associated metadata including ratings, service categories, and availability status. The database response includes paginated results optimized for performance, ensuring that large datasets can be efficiently presented without compromising system responsiveness. The frontend then renders these clinic listings in an intuitive grid or list format, presenting key information such as clinic names, logos, star ratings, and brief descriptions that enable patients to quickly identify potential matches for their dental care needs.
 
 When patients apply search filters or location-based queries, the system leverages PSGC integration to enable precise geographical filtering, allowing patients to find clinics within specific regions, provinces, cities, or barangays, which is particularly valuable in the Philippine context where patients often prefer clinics within their immediate vicinity. The ClinicController processes these search parameters, constructing optimized database queries that combine geographical filters with additional criteria such as service types, availability, and patient ratings, ensuring that search results are both relevant and comprehensive for informed decision-making. The clinic profile viewing phase provides patients with in-depth information about selected clinics, including comprehensive service catalogs, detailed practitioner profiles, operating hours, contact information, and patient review systems with statistical analysis that enable thorough evaluation before booking appointments. The system retrieves and presents this detailed information through efficient database relationship loading, minimizing query overhead while ensuring complete data availability. This discovery mechanism serves as the primary entry point for patients seeking dental services, establishing the foundation for informed decision-making and subsequent appointment booking processes within the multi-tenant SaaS platform.
 
-**Figure 26. Smile Suite's Appointment Booking Sequence Diagram**
+**Figure 9. Smile Suite's Appointment Booking Sequence Diagram**
 
-_[Note: Figure 26 displays a UML sequence diagram showing the Appointment Booking Process with interactions between Patient, Frontend, AppointmentController, EmailService, SmsService, Database, and Clinic Admin, including appointment request submission, patient record creation/linking, automated email notifications, and SMS notifications for confirmations, rescheduling, and cancellations.]_
+_[Note: Figure 9 displays a UML sequence diagram showing the Appointment Booking Process with interactions between Patient, Frontend, AppointmentController, EmailService, SmsService, Database, and Clinic Admin, including appointment request submission, patient record creation/linking, automated email notifications, and SMS notifications for confirmations, rescheduling, and cancellations.]_
 
-The Appointment Booking Process sequence diagram (Figure 26) outlines the sophisticated workflow for scheduling dental appointments through the Smile Suite platform, incorporating advanced patient management and automated notification systems designed to streamline the appointment booking experience. The interaction begins with patient-initiated appointment requests that trigger validation checks, patient record creation or linking, and database operations to establish confirmed appointments with proper status tracking throughout the appointment lifecycle. The appointment request submission phase initiates when patients select their preferred clinic and desired appointment time slot through the frontend interface, with the frontend forwarding this request to the AppointmentController which performs validation checks including time slot availability verification, practitioner schedule confirmation, and conflict detection to prevent double-booking scenarios. The system's conflict detection mechanism analyzes existing appointments for the selected dentist and time slot, ensuring that only available time slots can be booked, thereby maintaining schedule integrity. For patients without existing records in the clinic's database, the system automatically creates a new patient record through the PatientLinkingService, capturing essential demographic and contact information from the appointment request. Alternatively, for patients with existing records, the system links the appointment to the appropriate patient record, ensuring continuity of care and comprehensive treatment history tracking.
+The Appointment Booking Process sequence diagram (Figure 9) outlines the sophisticated workflow for scheduling dental appointments through the Smile Suite platform, incorporating advanced patient management and automated notification systems designed to streamline the appointment booking experience. The interaction begins with patient-initiated appointment requests that trigger validation checks, patient record creation or linking, and database operations to establish confirmed appointments with proper status tracking throughout the appointment lifecycle. The appointment request submission phase initiates when patients select their preferred clinic and desired appointment time slot through the frontend interface, with the frontend forwarding this request to the AppointmentController which performs validation checks including time slot availability verification, practitioner schedule confirmation, and conflict detection to prevent double-booking scenarios. The system's conflict detection mechanism analyzes existing appointments for the selected dentist and time slot, ensuring that only available time slots can be booked, thereby maintaining schedule integrity. For patients without existing records in the clinic's database, the system automatically creates a new patient record through the PatientLinkingService, capturing essential demographic and contact information from the appointment request. Alternatively, for patients with existing records, the system links the appointment to the appropriate patient record, ensuring continuity of care and comprehensive treatment history tracking.
 
 Upon successful validation and patient record establishment, the system creates an appointment record in the database with an initial status of "Pending" for online bookings or "Confirmed" for direct bookings, depending on the appointment type and clinic's approval workflow configuration. The AppointmentController then triggers automated email notifications through the EmailService and SMS notifications through the SmsService, sending confirmation messages to both the patient and the clinic administrator that include essential appointment details such as scheduled date and time, clinic location, assigned dentist information, and any preparation instructions or special notes. When appointments are rescheduled or cancelled, the system automatically sends SMS notifications to inform patients of the changes, ensuring transparent communication throughout the appointment management process. Clinic administrators can manually send appointment reminders to all patients with same-day appointments through a dedicated interface accessible from the clinic dashboard, significantly reducing no-show rates and enhancing patient engagement. The process incorporates real-time availability updates and comprehensive appointment tracking with support for different appointment types and statuses, ensuring proper data isolation within the multi-tenant architecture while facilitating efficient healthcare service delivery.
 
-**Figure 27. Smile Suite's Treatment Planning Sequence Diagram**
+**Figure 10. Smile Suite's Treatment Planning Sequence Diagram**
 
-_[Note: Figure 27 displays a UML sequence diagram showing the Treatment Planning Process with interactions between Dentist, Frontend, TreatmentController, EmailService, Database, and Patient, including treatment dashboard access, appointment retrieval, treatment plan creation with dental chart data, and patient notifications.]_
+_[Note: Figure 10 displays a UML sequence diagram showing the Treatment Planning Process with interactions between Dentist, Frontend, TreatmentController, EmailService, Database, and Patient, including treatment dashboard access, appointment retrieval, treatment plan creation with dental chart data, and patient notifications.]_
 
-The Treatment Planning Process sequence diagram (Figure 27) illustrates the sophisticated workflow for creating and managing dental treatment plans within the Smile Suite platform, incorporating advanced dental chart functionality and comprehensive treatment documentation that enhances clinical decision-making and patient care quality. The interaction begins when dental practitioners access the treatment planning interface through the frontend, which triggers a request to the TreatmentController to retrieve relevant patient appointments and existing treatment records that provide essential context for treatment planning decisions. The TreatmentController queries the database for patient appointment details, including appointment history, associated patient records, and any existing treatment plans, providing practitioners with comprehensive context that enables them to make informed treatment decisions based on the patient's complete dental care history. This comprehensive data retrieval ensures that dental professionals have access to all relevant information needed to develop effective treatment plans that align with the patient's overall oral health status and previous treatments.
+The Treatment Planning Process sequence diagram (Figure 10) illustrates the sophisticated workflow for creating and managing dental treatment plans within the Smile Suite platform, incorporating advanced dental chart functionality and comprehensive treatment documentation that enhances clinical decision-making and patient care quality. The interaction begins when dental practitioners access the treatment planning interface through the frontend, which triggers a request to the TreatmentController to retrieve relevant patient appointments and existing treatment records that provide essential context for treatment planning decisions. The TreatmentController queries the database for patient appointment details, including appointment history, associated patient records, and any existing treatment plans, providing practitioners with comprehensive context that enables them to make informed treatment decisions based on the patient's complete dental care history. This comprehensive data retrieval ensures that dental professionals have access to all relevant information needed to develop effective treatment plans that align with the patient's overall oral health status and previous treatments.
 
 The treatment plan creation phase represents the core of the clinical documentation workflow, where practitioners design and document detailed treatment procedures for their patients using advanced tools and features integrated into the system. When a dentist initiates treatment plan creation, the frontend collects comprehensive treatment information including patient selection, service assignment, diagnosis details, and treatment notes that capture the essential elements of the proposed treatment. A prominent feature of this process is the integration of a dental chart component that utilizes the Universal Numbering System, enabling practitioners to visually select specific teeth involved in the treatment by interacting with an anatomical dental diagram. The dental chart integration enables practitioners to select teeth from both the upper and lower arches, with the system maintaining a real-time count of selected teeth and providing options to clear selections or select all teeth for bulk operations. The selected tooth numbers are stored as JSON data in the treatment record, supporting accurate clinical documentation and treatment tracking. Upon completion of the treatment plan form, the TreatmentController processes the submitted data, performing validation checks and storing the comprehensive treatment record in the database, including treatment categorization, cost calculation, progress tracking information, prescriptions, materials used, vital signs, and follow-up notes that support comprehensive patient care management. The system then triggers automated email notifications through the EmailService, sending treatment plan summaries to patients, enabling them to review their treatment details and stay informed about their dental care, fostering transparency and patient engagement in the treatment planning process.
 
-**Figure 28. Smile Suite's Clinic Payment Sequence Diagram**
+**Figure 11. Smile Suite's Payment Processing Sequence Diagram**
 
-_[Note: Figure 28 displays a UML sequence diagram showing the Payment Processing workflow with interactions between Patient, Frontend, PaymentController, EmailService, and Database, including payment dashboard access, payment submission, transaction recording, and confirmation notifications.]_
+_[Note: Figure 11 displays a UML sequence diagram showing the Payment Processing workflow with interactions between Patient, Frontend, PaymentController, EmailService, and Database, including payment dashboard access, payment submission, transaction recording, and confirmation notifications.]_
 
-The Payment Processing sequence diagram (Figure 28) demonstrates the secure and efficient workflow for handling financial transactions within the Smile Suite platform, incorporating multiple payment methods and comprehensive transaction tracking designed to ensure transparent and reliable financial management. The interaction begins when patients access the payment dashboard through the frontend, which requests payment information from the PaymentController to display outstanding financial obligations and payment history. The PaymentController queries the database for outstanding treatment costs and pending payment obligations associated with the patient's account, retrieving comprehensive billing information including treatment details, service costs, and payment history that enables patients to make informed payment decisions based on their complete financial obligations. This comprehensive billing information presentation ensures that patients have full visibility into their payment responsibilities, promoting transparency and facilitating timely payment processing that supports clinic financial operations.
+The Payment Processing sequence diagram (Figure 11) demonstrates the secure and efficient workflow for handling financial transactions within the Smile Suite platform, incorporating multiple payment methods and comprehensive transaction tracking designed to ensure transparent and reliable financial management. The interaction begins when patients access the payment dashboard through the frontend, which requests payment information from the PaymentController to display outstanding financial obligations and payment history. The PaymentController queries the database for outstanding treatment costs and pending payment obligations associated with the patient's account, retrieving comprehensive billing information including treatment details, service costs, and payment history that enables patients to make informed payment decisions based on their complete financial obligations. This comprehensive billing information presentation ensures that patients have full visibility into their payment responsibilities, promoting transparency and facilitating timely payment processing that supports clinic financial operations.
 
 The payment submission phase initiates when patients select specific treatments or services for payment and submit their payment details through the frontend interface, triggering validation and security checks to ensure transaction integrity. The PaymentController performs validation checks including payment amount verification against outstanding balances, payment method validation, and transaction security checks to prevent fraudulent activities and ensure that all transactions comply with financial security standards. The system supports multiple payment methods including cash transactions for in-clinic payments, credit card processing for online payments, GCash integration for e-wallet transactions, bank transfer capabilities, and insurance payment processing, each with appropriate validation and security measures. Upon successful validation, the system generates a unique payment reference number that serves as a transaction identifier for tracking and reconciliation purposes, and the PaymentController creates a payment record in the database, linking the payment to the associated treatment, patient account, and clinic record, while updating treatment payment status and patient account balances. The payment confirmation phase involves automated receipt generation and notification systems, with the system generating detailed payment receipts containing transaction information including reference numbers, payment amounts, payment methods, treatment details, and transaction timestamps, which are automatically sent to patients via email through the EmailService. Concurrently, clinic administrators receive internal notifications of completed payments, enabling them to track revenue and manage financial operations effectively, supporting data-driven decision-making within the multi-tenant SaaS platform.
 
-### 5.3 Objective 3: System Evaluation
+#### 5.3.2 Smile Suite Information System
 
-**Objective Statement**: To test and evaluate the system's usability, functionality, performance, efficiency, and satisfaction based on stakeholder feedback and real clinic workflows, with a focus on improving operational efficiency and user satisfaction.
+The Smile Suite Information System represents the final implemented system developed following the design specifications presented in Section 5.3.1. The system was built using React 18 with Inertia.js, Tailwind CSS, and shadcn/ui components, implementing all interfaces designed during the prototype phase and refined through stakeholder feedback. The following figures present the complete system interfaces across all user roles and functional modules, demonstrating the fully operational multi-tenant SaaS platform deployed at Enhaynes Dental Clinic.
 
-This subsection addresses the third specific objective by presenting the comprehensive evaluation framework, survey/questionnaire results, and analysis of the system's performance across multiple dimensions.
+**Figure 12. Public Landing Page Interface**
 
-#### 5.3.1 Evaluation Framework
+_[Note: Figure 12 shows the public-facing homepage with hero section, value proposition, trust badges, statistics overlays, features showcase, testimonials, FAQ section, and pricing tiers.]_
 
-The comprehensive evaluation of Smile Suite: Cloud-Based Dental Clinic as a Service was conducted following the implementation at Enhaynes Dental Clinic, utilizing the evaluation methods and tools described in Section 4.5. The evaluation process assessed the system's performance across multiple dimensions including usability, efficiency, functionality, performance, and satisfaction, directly mapping to the three specific objectives outlined in Section 1.3.
+The Public Landing Page demonstrated the main entry point of the Smile Suite multi-tenant SaaS platform, designed to attract potential clinic clients and patients. The interface featured a two-column layout with a hero section containing the platform's value proposition "The Future of Dental Practice Management" and key marketing elements including trust badges, star ratings, and call-to-action buttons. The right side displayed a professional dental clinic image with floating statistics overlays showing "50K+ Patients" and "10K+ Appointments." The page utilized a blue and white color scheme with gradient backgrounds and modern UI components from the shadcn/ui library.
 
-The evaluation framework was designed to directly address each specific objective:
+The complete interface included additional sections accessible through scrolling: a features showcase highlighting six core platform capabilities (Patient Management, Smart Scheduling, Treatment Records, Payment Processing, Enterprise Security, and Cloud-First Platform), customer testimonials from dental professionals, frequently asked questions section, and a three-tier pricing structure (Basic: ₱999/month, Premium: ₱1999/month, Enterprise: ₱2,999/month). The interface demonstrated responsive design principles with mobile-optimized layouts and included comprehensive navigation elements in the header and footer sections.
 
-1. Objective 1 (Requirements Analysis): Evaluated through stakeholder feedback on whether the system addressed real-world operational challenges identified during requirements gathering.
-2. Objective 2 (System Development): Evaluated through functionality testing, technical performance metrics, and system reliability assessments to confirm successful development and implementation.
-3. Objective 3 (System Evaluation): Evaluated through comprehensive usability surveys, efficiency measurements, and user satisfaction assessments to validate system effectiveness.
+**Figure 13. Clinic Directory Page Interface**
 
-The evaluation was conducted over a four-week period involving 15 clinic staff members (including 2 dentists, 1 clinic administrator, and 12 administrative staff) and 25 regular patients from Enhaynes Dental Clinic. A mixed-methods approach was employed, integrating both quantitative (surveys, questionnaires, performance metrics) and qualitative (structured interviews, observation logs) methods to provide a holistic assessment of the system's performance.
+_[Note: Figure 13 displays the public clinic directory with grid layout of clinic cards, each showing logo, name, verification badge, ratings, location, contact info, and booking buttons.]_
 
-#### 5.3.2 Evaluation Results
+The Clinic Directory Page served as the primary discovery interface for patients seeking dental services within the Smile Suite multi-tenant SaaS platform. The interface featured a prominent "Trusted Dental Clinics" header with an "Available Clinics" indicator badge, followed by a grid layout of clinic cards displaying comprehensive information for each registered clinic. Each clinic card included the clinic logo, name, verification badge, star rating, PSGC-integrated location data, contact information (phone and email), and a brief description of services. Two action buttons were provided per card: a blue "View Details" button for accessing the complete clinic profile and a green "Book Appointment" button for direct appointment scheduling. The interface demonstrated the platform's multi-tenant architecture by showcasing multiple independent clinics within a unified directory, each maintaining their distinct branding while benefiting from shared platform infrastructure.
 
-**Table 5. System Evaluation Results Based on Specific Objectives**
+**Figure 14. Clinic Profile Page Interface**
 
-| Evaluation Dimension | Objective 1: Requirements Analysis | Objective 2: System Development | Objective 3: System Evaluation |
-| -------------------- | ---------------------------------- | ------------------------------- | ------------------------------ |
-| **Usability**        | 4.2/5.0 (84%)                      | 4.3/5.0 (86%)                   | 4.4/5.0 (88%)                  |
-| **Efficiency**       | 4.1/5.0 (82%)                      | 4.4/5.0 (88%)                   | 4.5/5.0 (90%)                  |
-| **Functionality**    | 4.3/5.0 (86%)                      | 4.5/5.0 (90%)                   | 4.4/5.0 (88%)                  |
-| **Performance**      | 4.0/5.0 (80%)                      | 4.3/5.0 (86%)                   | 4.2/5.0 (84%)                  |
-| **Satisfaction**     | 4.2/5.0 (84%)                      | 4.4/5.0 (88%)                   | 4.5/5.0 (90%)                  |
-| **Overall Average**  | 4.16/5.0 (83.2%)                   | 4.38/5.0 (87.6%)                | 4.40/5.0 (88.0%)               |
+_[Note: Figure 14 illustrates a detailed clinic profile page with branding, description, image gallery, services catalog, operating hours, staff profiles, location mapping, and patient reviews.]_
 
-**Table 6. Survey Questionnaire Results - Likert Scale (1-5)**
+The Clinic Profile Page illustrated the public-facing clinic directory functionality within the multi-tenant SaaS architecture, specifically showcasing Enhaynes Dental Clinic as a case study. The interface displayed clinic branding with the Clinic's logo, verification badge, and contact information including email and phone number. The main content area featured a hero section with clinic description and a prominent "Book Appointment" button, followed by an image gallery displaying clinic facilities with a patient in a dental chair.
 
-| Evaluation Statement                       | Strongly Disagree (1) | Disagree (2) | Neutral (3) | Agree (4) | Strongly Agree (5) | Mean | SD   |
-| ------------------------------------------ | --------------------- | ------------ | ----------- | --------- | ------------------ | ---- | ---- |
-| **Usability Dimension**                    |                       |              |             |           |                    |      |      |
-| The system interface is easy to use        | 0                     | 1            | 3           | 18        | 18                 | 4.33 | 0.75 |
-| Navigation is intuitive and clear          | 0                     | 2            | 4           | 16        | 18                 | 4.25 | 0.82 |
-| The system is user-friendly                | 0                     | 1            | 2           | 19        | 18                 | 4.35 | 0.70 |
-| I can complete tasks efficiently           | 0                     | 2            | 3           | 17        | 18                 | 4.28 | 0.80 |
-| The system requires minimal training       | 0                     | 3            | 5           | 15        | 17                 | 4.15 | 0.88 |
-| **Efficiency Dimension**                   |                       |              |             |           |                    |      |      |
-| The system reduces administrative workload | 0                     | 1            | 2           | 20        | 17                 | 4.33 | 0.72 |
-| Task completion time is improved           | 0                     | 2            | 3           | 18        | 17                 | 4.25 | 0.80 |
-| The system improves workflow efficiency    | 0                     | 1            | 4           | 19        | 16                 | 4.25 | 0.75 |
-| Appointment scheduling is faster           | 0                     | 1            | 2           | 19        | 18                 | 4.35 | 0.70 |
-| Inventory management is more efficient     | 0                     | 2            | 3           | 18        | 17                 | 4.25 | 0.80 |
-| **Functionality Dimension**                |                       |              |             |           |                    |      |      |
-| All required features are available        | 0                     | 1            | 2           | 20        | 17                 | 4.33 | 0.72 |
-| The system meets operational needs         | 0                     | 1            | 3           | 19        | 17                 | 4.30 | 0.75 |
-| Features work as expected                  | 0                     | 2            | 2           | 20        | 16                 | 4.30 | 0.75 |
-| The system is reliable                     | 0                     | 1            | 3           | 19        | 17                 | 4.30 | 0.75 |
-| Error handling is appropriate              | 0                     | 2            | 4           | 18        | 16                 | 4.20 | 0.82 |
-| **Performance Dimension**                  |                       |              |             |           |                    |      |      |
-| System response time is acceptable         | 0                     | 2            | 4           | 18        | 16                 | 4.20 | 0.82 |
-| The system is stable and reliable          | 0                     | 1            | 3           | 20        | 16                 | 4.28 | 0.75 |
-| Data loading is fast                       | 0                     | 2            | 5           | 17        | 16                 | 4.18 | 0.85 |
-| The system handles workload well           | 0                     | 1            | 4           | 19        | 16                 | 4.25 | 0.75 |
-| System uptime is satisfactory              | 0                     | 1            | 2           | 21        | 16                 | 4.30 | 0.70 |
-| **Satisfaction Dimension**                 |                       |              |             |           |                    |      |      |
-| I am satisfied with the system             | 0                     | 1            | 2           | 20        | 17                 | 4.33 | 0.72 |
-| I would recommend this system              | 0                     | 1            | 3           | 19        | 17                 | 4.30 | 0.75 |
-| The system improves my work experience     | 0                     | 1            | 2           | 21        | 16                 | 4.33 | 0.72 |
-| The system meets my expectations           | 0                     | 2            | 3           | 19        | 16                 | 4.23 | 0.80 |
-| I would continue using this system         | 0                     | 1            | 2           | 20        | 17                 | 4.33 | 0.72 |
+The complete interface included multiple scrollable sections: services catalog displaying available dental services, operating hours with detailed schedule information, staff profiles section, accessibility and trust indicators, location mapping with clinic address, and patient reviews system with ratings and testimonials. The page incorporated booking and review modal dialogs for appointment scheduling and feedback collection. The design maintained platform consistency while providing comprehensive clinic information and booking capabilities for potential patients.
 
-_Note: N = 40 respondents (15 clinic staff + 25 patients). SD = Standard Deviation_
+**Figure 15. Login Page Interface**
 
-**Table 7. Statistical Summary of Evaluation Results**
+_[Note: Figure 15 shows the login page with two-panel layout: promotional left panel with branding and security features, and right panel with login form, registration links, and trust indicators.]_
 
-| Evaluation Dimension | Mean     | Median   | Mode     | Standard Deviation | Minimum  | Maximum  | Range    |
-| -------------------- | -------- | -------- | -------- | ------------------ | -------- | -------- | -------- |
-| Usability            | 4.27     | 4.30     | 4.33     | 0.79               | 2.00     | 5.00     | 3.00     |
-| Efficiency           | 4.29     | 4.30     | 4.33     | 0.75               | 2.00     | 5.00     | 3.00     |
-| Functionality        | 4.29     | 4.30     | 4.33     | 0.75               | 2.00     | 5.00     | 3.00     |
-| Performance          | 4.24     | 4.25     | 4.30     | 0.77               | 2.00     | 5.00     | 3.00     |
-| Satisfaction         | 4.30     | 4.33     | 4.33     | 0.74               | 2.00     | 5.00     | 3.00     |
-| **Overall**          | **4.28** | **4.30** | **4.33** | **0.76**           | **2.00** | **5.00** | **3.00** |
+The Login Page served as the secure access portal for existing users of the Smile Suite multi-tenant SaaS platform, supporting authentication for System Administrators, Clinic Administrators, and Patients. The interface featured a two-panel layout with a promotional left panel displaying the Smile Suite branding, "Cloud-based Dental Clinic as a Service" tagline, and security features including "HIPAA Compliant," "Multi-factor Auth," and "Instant Access." The right panel contained the login form with email and password fields, a "Remember me" checkbox, and "Forgot password?" link. The form included a "Sign In" button and provided registration options for new users: "Create one here" for patient registration and "Register Your Clinic" for clinic onboarding. The interface utilized a blue gradient background with modern UI components and included trust indicators to reinforce platform security.
 
-**Table 8. Efficiency Metrics - Before vs. After Implementation**
+**Figure 16. Patient Registration Interface**
 
-| Operational Task                   | Before Implementation | After Implementation | Improvement | Percentage Change |
-| ---------------------------------- | --------------------- | -------------------- | ----------- | ----------------- |
-| Appointment Scheduling (minutes)   | 8.5                   | 3.2                  | 5.3         | -62.4%            |
-| Patient Record Retrieval (minutes) | 5.2                   | 1.8                  | 3.4         | -65.4%            |
-| Inventory Update (minutes)         | 12.3                  | 4.5                  | 7.8         | -63.4%            |
-| Payment Processing (minutes)       | 6.8                   | 2.5                  | 4.3         | -63.2%            |
-| Treatment Documentation (minutes)  | 15.6                  | 7.2                  | 8.4         | -53.8%            |
-| **Average Task Time**              | **9.68**              | **3.84**             | **5.84**    | **-60.3%**        |
+_[Note: Figure 16 displays the patient registration form with two-column layout: promotional left panel with benefits and statistics, and right panel with registration form fields and navigation options.]_
 
-**Table 9. System Usability Scale (SUS) Results**
+The Patient Registration interface facilitated individual patient account creation within the multi-tenant SaaS platform. The page employed a two-column layout with a promotional left panel highlighting patient benefits including "Easy Booking," "Smart Reminders," and "Health Records," accompanied by platform statistics showing "500+ Active Clinics" and "10K+ Happy Patients." The right panel presented a comprehensive registration form collecting essential patient information: Full Name, Email Address, Phone Number (optional), Password, and Confirm Password. The form included input validation, password visibility toggles, and a "Create Account" button. Additional navigation options included "Sign in here" for existing users and "Register Your Clinic" for dental practices, emphasizing the platform's multi-tenant architecture. The interface maintained consistent branding with the Smile Suite color scheme and included patient testimonials to build trust.
 
-| User Group            | SUS Score | Interpretation | Percentile |
-| --------------------- | --------- | -------------- | ---------- |
-| Clinic Administrators | 82.5      | Excellent      | 90th       |
-| Dentists              | 85.0      | Excellent      | 95th       |
-| Administrative Staff  | 80.0      | Good           | 85th       |
-| Patients              | 78.5      | Good           | 80th       |
-| **Overall Average**   | **81.5**  | **Excellent**  | **87th**   |
+**Figure 17. Clinic Registration Interface**
 
-_Note: SUS scores range from 0-100. Scores above 80 are considered "Excellent", 68-80 are "Good", 51-67 are "OK", and below 51 are "Poor"._
+_[Note: Figure 17 shows the clinic registration form with subscription tier selection (Basic, Premium, Enterprise), clinic information fields, and registration request submission.]_
 
-**Table 10. System Performance Metrics**
+The Clinic Registration interface enabled dental practices to join the multi-tenant SaaS platform through a comprehensive onboarding process. The interface presented three subscription tiers: Basic (₱999/month with 14-day free trial), Premium (₱1,999/month), and Enterprise (₱2,999/month), each displaying specific features and account limitations. The Basic plan was highlighted as the default selection, offering up to 2 dentist accounts, basic patient management, appointment scheduling, and email support. The form collected clinic information including clinic name, contact person, email, phone, license number, and description, along with a message field for additional requirements. The interface included a "Submit Registration Request" button and provided a "Sign in here" link for existing clinic accounts. The design emphasized the platform's scalability and multi-tenant capabilities while providing clear pricing transparency.
 
-| Performance Metric         | Target | Actual | Status |
-| -------------------------- | ------ | ------ | ------ |
-| Average Response Time (ms) | < 500  | 342    | ✓ Pass |
-| Page Load Time (seconds)   | < 2.0  | 1.4    | ✓ Pass |
-| Database Query Time (ms)   | < 200  | 156    | ✓ Pass |
-| System Uptime (%)          | > 99.0 | 99.7   | ✓ Pass |
-| Error Rate (%)             | < 1.0  | 0.3    | ✓ Pass |
-| Concurrent Users Supported | > 50   | 75     | ✓ Pass |
+**Figure 18. Clinic Setup Interface**
 
-#### 5.3.3 Results Analysis
+_[Note: Figure 18 displays the clinic setup completion form with approval confirmation banner, clinic information confirmation, admin account creation, and PSGC-integrated address fields.]_
 
-The evaluation results demonstrate that Smile Suite successfully achieved all three specific objectives, with strong performance across all evaluation dimensions.
+The Clinic Setup interface completed the clinic onboarding process by collecting final administrative and geographical data. The interface displayed a green confirmation banner indicating approval for the "Basic Plan (14-Day Free Trial)" with subsequent monthly billing information. The form was organized into three sections: Clinic Information confirmation, Admin Account Details for creating the primary administrator credentials, and Address Information with dynamic PSGC (Philippine Standard Geographic Code) integration. The address section included cascading dropdowns for Region, Province, City/Municipality, and Barangay selection, along with fields for Street Address, Postal Code, and Additional Details. An "Important Information" box explained the purpose of admin accounts and address data in clinic management and public profiles. The interface concluded with a "Complete Setup" button that enabled immediate access to the clinic dashboard upon successful submission.
 
-Objective 1 Achievement: The requirements gathering and analysis objective was successfully achieved, as evidenced by the high satisfaction scores (4.16/5.0, 83.2%) indicating that the system effectively addressed real-world operational challenges identified during the requirements phase. Stakeholder feedback confirmed that the system's features directly addressed the operational inefficiencies identified at Enhaynes Dental Clinic, including manual appointment scheduling, disorganized patient records, and inefficient inventory management.
+**Figure 19. System Admin Dashboard Interface**
 
-Objective 2 Achievement: The system development objective was successfully achieved, with the highest overall average score (4.38/5.0, 87.6%) across all evaluation dimensions. Functionality testing confirmed that all core system features operated as designed and met the requirements specified in Section 1.4. The appointment management system successfully handled real-time scheduling, conflict detection, and recurring appointments. Patient record management demonstrated complete functionality with proper PSGC address integration. The inventory management module effectively tracked stock levels and generated low-stock alerts. Treatment planning with dental chart integration functioned accurately, allowing dentists to select specific teeth and document procedures comprehensively.
+_[Note: Figure 19 shows the system admin dashboard with top navigation, sidebar quick actions, system status panel, KPI metric cards, and sections for recent clinics and users.]_
 
-Objective 3 Achievement: The system evaluation objective was successfully achieved, with the highest overall average score (4.40/5.0, 88.0%) indicating strong system effectiveness. The comprehensive evaluation revealed significant improvements in operational efficiency, with an average task completion time reduction of 60.3%. Administrative workload was reduced by approximately 35% through the automation of key processes. The System Usability Scale (SUS) returned an overall average score of 81.5, which falls in the "Excellent" range and places the system in the 87th percentile compared to other software systems.
+The System Admin Dashboard served as the central control panel for platform administrators managing the multi-tenant SaaS infrastructure. The interface featured a horizontal top navigation bar with key sections including Dashboard, Users, Clinics, Requests, Subscriptions, and Support, while a left sidebar contained Quick Actions with color-coded buttons for Manage Users, View Clinics, Create Clinic, View Requests, and Subscriptions management. A System Status panel provided real-time monitoring with visual progress indicators showing System Health as Healthy, Database as Online, and high Uptime performance. The main content area displayed a Dashboard Overview header with the current date and key performance metric cards tracking Total Users with positive growth trends, Active Clinics showing registered dental facilities, Total Patients with increasing registration trends, and Pending Requests awaiting approval. Below the metrics, two side-by-side sections displayed Recent Clinics showing the latest registered clinics with email contacts and view actions, alongside Recent Users listing newly registered users with their email addresses and profile icons. The interface utilized a modern blue and purple gradient color scheme with white card-based layouts, clean typography, and intuitive iconography, ensuring clear visual hierarchy and comprehensive oversight of the entire multi-tenant platform ecosystem.
 
-**Key Findings**:
+**Figure 20. Clinic Admin Dashboard Interface**
 
-1. Usability: The system received high usability scores (4.27/5.0) across all user groups, with clinic administrators and dentists reporting the highest satisfaction. The intuitive interface design and clear navigation contributed to minimal training requirements.
-2. Efficiency: Significant efficiency improvements were observed, with task completion times reduced by an average of 60.3%. Appointment scheduling time decreased by 62.4%, patient record retrieval by 65.4%, and inventory updates by 63.4%.
-3. Functionality: All core features functioned as designed, with functionality scores averaging 4.29/5.0. The system successfully integrated all required features including online appointment scheduling, patient records management, inventory tracking, financial processes, email notifications, and SMS notifications.
-4. Performance: System performance metrics exceeded targets, with average response time of 342ms (target: <500ms), page load time of 1.4 seconds (target: <2.0s), and system uptime of 99.7% (target: >99.0%).
-5. Satisfaction: High satisfaction levels (4.30/5.0) were reported across all user groups, with 92.5% of respondents indicating they would recommend the system to others.
+_[Note: Figure 20 displays the clinic management dashboard with sidebar navigation, metric cards for appointments/patients/revenue/satisfaction, revenue trends chart, today's schedule, and recent patients section.]_
 
-Areas for Improvement: Despite the overwhelmingly positive results, the evaluation identified areas for future enhancement. Mobile responsiveness received a usability score of 78 out of 100, indicating a need for optimization on handheld devices, particularly for the Patient Portal interface. Additionally, some delays in staff onboarding suggested a potential learning curve that could be addressed through improved training modules and user documentation. The current cash-based payment system limitation was noted as an area for future enhancement, with stakeholders expressing interest in additional payment method integration.
+The Clinic Management Dashboard provided dental clinic administrators with a comprehensive real-time analytics interface for monitoring daily operations and financial performance. The header displayed the clinic name with a premium subscription countdown timer, upgrade button, and year selector. A left sidebar navigation organized key sections including Dashboard, Patients, Appointments, Dentist Schedule, Treatments, Services, Inventory, Payments, and Others, with an Active Premium Plan indicator. The main content area featured four color-coded metric cards showing Today's Appointments, Total Patients, Revenue, and Satisfaction ratings, each with growth trend indicators. A prominent Revenue Trends section displayed a monthly bar chart with detailed financial visualization using green gradient bars. The right sidebar contained Today's Schedule listing confirmed appointments with patient details and times, alongside a Recent Patients section. The interface employed a modern blue and green gradient color scheme with white card-based layouts, ensuring efficient clinic operations management and comprehensive business intelligence oversight.
 
-The evaluation results strongly validate the effectiveness of Smile Suite as a comprehensive dental clinic management solution, successfully achieving all three specific objectives and demonstrating significant improvements in operational efficiency, user satisfaction, and system performance.
+**Figure 21. Patient Dashboard Interface**
 
-### 5.4 System Implementation
+_[Note: Figure 21 shows the patient dashboard with welcome header, metric cards, appointment cards, and treatment history sections displaying multi-clinic dental care journey.]_
+
+The Patient Dashboard served as the central hub for patients to manage their dental health records and appointments across multiple clinics. The header displayed a personalized welcome message with quick access buttons for Profile and Treatments navigation. Four metric cards provided an overview of Connected Clinics, Total Appointments with active status, Upcoming scheduled visits with time indicators, and Total Treatments showing completed procedures. The main content area featured two side-by-side sections: My Appointments displaying detailed appointment cards with clinic information, location, scheduled date and time, booking reason, and notes; and Treatment History showcasing completed treatment records with clinic details, treatment type, associated dentist, treatment date, cost breakdown, and additional notes. Each card included status indicators using color-coded badges and visual icons for easy identification. The interface employed a modern cyan and white color scheme with card-based layouts, clean typography, and intuitive navigation, ensuring patients could efficiently track their dental care journey across multiple healthcare providers within the platform.
+
+**Figure 22. Clinic Patient Management Module Interface**
+
+_[Note: Figure 22 displays the patient management page with sidebar navigation, metric cards, search/filter options, and comprehensive patient records table with profile avatars, contact details, and action buttons.]_
+
+The Patient Management Dashboard enabled clinic administrators to efficiently organize and manage comprehensive patient records. A left sidebar navigation provided access to Dashboard, Patients, Appointments, Dentist Schedule, Treatments, Services, Inventory, Payments, and Others, with an Active Premium Plan indicator. Four metric cards displayed Total Patients, New This Month registrations, Recent Visits, and Active Patients, each with trend indicators. The Patient Records section featured action buttons for Export All, Show Bulk Actions, and Add Patient, along with a search bar and advanced filter options for Gender, Status, Blood type, Marital status, and Category. A detailed patient table presented comprehensive information including patient names with profile avatars showing gender and age, contact details with email and phone numbers, last visit timestamps, color-coded status badges indicating patient activity levels, category tags for patient classification, and action buttons for viewing, editing, deleting, and additional options. The interface employed a modern blue gradient color scheme with organized layouts ensuring streamlined patient data management and accessibility.
+
+**Figure 23. Clinic Appointment Management Module Interface**
+
+_[Note: Figure 23 shows the appointments management page with action buttons, metric cards, search/filter options, and detailed appointments list table with patient info, status badges, scheduled times, and assigned dentists.]_
+
+The Appointments Management page served as the central interface for scheduling and managing all patient appointments across the clinic. Action buttons at the top provided options to Export All appointments, switch to Calendar View, and Create Appointment. Six color-coded metric cards displayed key statistics including All Appointments, Ready to Process appointments, Awaiting Approval requests, Successfully Done visits, Direct Payments, and pending approvals, each with visual icons and trend indicators. A comprehensive search bar allowed filtering appointments by patient name, email, or phone number, with additional dropdown filters for Status and Appointment Types, plus a date picker for temporal filtering. The Appointments List presented detailed appointment records in a structured table format showing patient information with contact details, appointment type badges indicating booking method, color-coded status indicators, scheduled date and time with duration, assigned dentist names, and associated service details with pricing. The interface employed a blue gradient design with organized card layouts and intuitive color coding, enabling efficient appointment workflow management from booking requests through completion.
+
+**Figure 24. Clinic Inventory Management Module Interface**
+
+_[Note: Figure 24 displays the inventory management page with action buttons, metric cards for stock levels, search/filter options, and inventory table with item details, stock status, quantities, pricing, and expiration dates.]_
+
+The Inventory Management page provided comprehensive tracking and control of all clinic stock items and supplies. Action buttons enabled administrators to Export All inventory data and Add Item for new stock entries. Four metric cards displayed critical inventory metrics including Total Items in the system, Low Stock alerts requiring attention, Out of Stock items needing immediate replenishment, and Total Value representing overall inventory worth. The Inventory Records section featured a search bar for finding specific items, dropdown filters for All Categories and stock status levels, plus Search and Clear action buttons. A detailed inventory table presented item information including product names with identification codes, category classifications, color-coded stock status badges indicating availability levels, quantity controls with increment and decrement buttons showing minimum thresholds, unit pricing, calculated total values, and expiration dates for time-sensitive items. The interface employed a blue gradient design with organized layouts and visual indicators, ensuring efficient stock management and preventing supply shortages.
+
+**Figure 25. Clinic Payment Management Module Interface**
+
+_[Note: Figure 25 shows the payment management page with action buttons, financial metric cards, search functionality, and payment records table with patient info, transaction details, payment methods, and status badges.]_
+
+The Payment Management page enabled comprehensive tracking and organization of all clinic financial transactions and revenue. Action buttons provided functionality to Export All payment records, perform Bulk Actions on multiple entries, and Add Payment for new transactions. Four metric cards displayed financial overview including Total Revenue accumulated, Total Balance outstanding, This Month earnings with growth trends, and Pending payments awaiting processing. The Payment Records section featured a search bar for locating specific transactions and displayed the total count of payment entries. A detailed payment table presented transaction information including patient names with profile avatars, age, and contact details, payment dates with unique reference numbers, associated treatment types and identification codes, payment amounts, payment method indicators showing cash or insurance options, and color-coded status badges confirming transaction completion. The interface employed a blue gradient design with organized financial data presentation, ensuring efficient revenue tracking and payment reconciliation.
+
+**Figure 26. Clinic Treatment Management Module Interface**
+
+_[Note: Figure 26 displays the treatment management page with action buttons, treatment statistics cards, search/filter options, and comprehensive treatment records table with patient info, treatment types, status badges, and cost details.]_
+
+The Treatment Management page provided comprehensive oversight of all patient dental treatments and procedures. Action buttons enabled administrators to Export All treatment records, perform Show Bulk Actions on multiple entries, and Add Treatment for new procedures. Five metric cards displayed treatment statistics including Total treatments recorded, Completed procedures, In Progress treatments currently ongoing, Paid treatments with confirmed payments, and Revenue generated from services. The Treatment Records section featured a search bar for locating specific treatments, along with dropdown filters for All Services, treatment status levels, and payment status categories, plus a Clear All option to reset filters. A detailed treatment table presented patient information with profile avatars, names, ages, and contact details, treatment types with procedure names and descriptions, color-coded status badges indicating completion levels, payment status indicators, cost breakdowns showing service pricing, treatment dates with duration estimates, and action buttons for managing records. The interface employed a blue and green gradient design ensuring efficient treatment workflow tracking and clinical record management.
+
+**Figure 27. Clinic Create Treatment Interface**
+
+_[Note: Figure 27 shows the create treatment form with patient selection, service assignment, dental chart component using Universal Numbering System, diagnosis fields, status indicators, and additional clinical documentation options.]_
+
+The Create Treatment page provided a comprehensive form interface for documenting new dental procedures and patient treatments. The form included essential fields for selecting the patient from registered records, choosing the treatment type or service from available procedures, assigning a dentist from clinic staff, and specifying treatment costs and estimated duration. A prominent Dental Chart component utilized the Universal Numbering System, displaying both Upper Arch and Lower Arch views with interactive tooth selection. The chart featured Clear and Select All buttons along with a counter showing selected teeth, enabling clinicians to visually mark specific teeth involved in the treatment by clicking on the illustrated dental diagram. Additional form sections captured clinical information including diagnosis details, treatment status indicators, payment method selection, procedure notes, recommended follow-up care, start and end dates for multi-session treatments, prescription medications if applicable, and options to upload treatment-related images. The interface employed a modal-based design for the dental chart with realistic anatomical visualization, ensuring accurate tooth identification and comprehensive treatment documentation for complete clinical records.
+
+**Figure 28. Clinic Services Module Interface**
+
+_[Note: Figure 28 displays the services management page with add service button, metric cards, search/filter options, and services catalog table with service names, categories, duration, pricing, status badges, and assigned dentists.]_
+
+The Services Management page enabled clinic administrators to organize and maintain the complete catalog of dental procedures and treatments offered. An Add Service button facilitated creating new service entries. Four metric cards provided an overview including Total Services available in the catalog, Active Services currently bookable, Average Price across all procedures, and Assigned Dentists available to perform services. A search bar allowed finding services by name, description, or service code, complemented by dropdown filters for service categories and status levels. The Services Records table presented comprehensive service information including service names with unique identification codes, category classifications with subcategory tags, estimated procedure duration times, pricing details with cost breakdowns, color-coded status badges indicating availability, and assigned dentist names showing consultation options for each service. The interface employed a blue gradient design with organized card layouts, ensuring efficient service catalog management, pricing transparency, and provider assignment for streamlined appointment booking and treatment planning.
+
+The Smile Suite Information System successfully implements all design specifications established in the UML diagrams, providing a comprehensive, fully functional multi-tenant SaaS platform for dental clinic management. Stakeholder feedback collected during system demonstration sessions (as described in Section 4.3) confirmed that the implemented system met user expectations and addressed real-world operational needs identified during the requirements gathering phase.
+
+### 5.4 Test & Evaluation of the System
+
+This section addresses the third specific objective of testing and evaluating the system's usability, functionality, performance, efficiency, and satisfaction based on stakeholder feedback and real clinic workflows, with a focus on improving operational efficiency and user satisfaction. The comprehensive evaluation of Smile Suite: Cloud-Based Dental Clinic as a Service was conducted following the implementation at Enhaynes Dental Clinic, utilizing the evaluation methods and tools described in Section 4.5. The evaluation process assessed the system's performance across multiple dimensions including usability, efficiency, functionality, performance, and satisfaction, directly mapping to the three specific objectives outlined in Section 1.3.
+
+The evaluation was conducted over a four-week period involving 15 clinic staff members (including 2 dentists, 1 clinic administrator, and 12 administrative staff) and 25 regular patients from Enhaynes Dental Clinic, totaling 40 respondents. A mixed-methods approach was employed, integrating both quantitative (surveys, questionnaires, performance metrics) and qualitative (structured interviews, observation logs) methods to provide a holistic assessment of the system's performance. The evaluation framework was designed to directly address each specific objective: (1) Requirements Analysis was evaluated through stakeholder feedback on whether the system addressed real-world operational challenges identified during requirements gathering; (2) System Development was evaluated through functionality testing, technical performance metrics, and system reliability assessments to confirm successful development and implementation; and (3) System Evaluation was evaluated through comprehensive usability surveys, efficiency measurements, and user satisfaction assessments to validate system effectiveness.
+
+**Table 5. Web Application Testing Results**
+
+| SIN # | MODULES                            | POSSIBLE OUTPUT     | RENDERED RESULTS    | STATUS |
+| ----- | ---------------------------------- | ------------------- | ------------------- | ------ |
+| 1     | User Authentication & Registration | Login Success       | Login Success       | ✓ Pass |
+| 2     | Patient Management                 | Record Creation     | Record Creation     | ✓ Pass |
+| 3     | Appointment Scheduling             | Booking Success     | Booking Success     | ✓ Pass |
+| 4     | Treatment Management               | Plan Creation       | Plan Creation       | ✓ Pass |
+| 5     | Inventory Management               | Stock Tracking      | Stock Tracking      | ✓ Pass |
+| 6     | Payment Processing                 | Payment Recorded    | Payment Recorded    | ✓ Pass |
+| 7     | Clinic Management                  | Profile Updated     | Profile Updated     | ✓ Pass |
+| 8     | Dashboard & Analytics              | Metrics Displayed   | Metrics Displayed   | ✓ Pass |
+| 9     | Notification System                | Notifications Sent  | Notifications Sent  | ✓ Pass |
+| 10    | Public Clinic Directory            | Directory Displayed | Directory Displayed | ✓ Pass |
+
+The Web Application Testing Results demonstrate comprehensive functionality testing across all ten core modules of the Smile Suite system. Each module was tested to verify that the possible outputs matched the rendered results, ensuring that all features operate as designed. The testing process confirmed successful implementation of user authentication, patient management, appointment scheduling, treatment documentation, inventory tracking, payment processing, clinic management, analytics dashboards, notification systems, and public-facing clinic directory features. All modules passed testing with no critical failures, validating that the system meets the functional requirements specified during the design phase.
+
+**Table 6. Distribution of Respondents**
+
+| Respondents          | No. of Respondents | Percentage (%) |
+| -------------------- | ------------------ | -------------- |
+| Dentists             | 2                  | 5.0            |
+| Clinic Administrator | 1                  | 2.5            |
+| Administrative Staff | 12                 | 30.0           |
+| Patients             | 25                 | 62.5           |
+| **Total**            | **40**             | **100.0**      |
+
+The Distribution of Respondents table presents the demographic breakdown of the 40 participants involved in the system evaluation at Enhaynes Dental Clinic. The evaluation included 15 clinic staff members (comprising 2 dentists, 1 clinic administrator, and 12 administrative staff) representing 37.5% of the total respondents, and 25 regular patients representing 62.5% of the sample. This distribution ensured comprehensive feedback from both system operators (clinic staff) and end-users (patients), providing a balanced perspective on system usability, functionality, and satisfaction across different user roles and technical proficiency levels.
+
+**Table 7. Evaluation of the System in Terms of Usability**
+
+| Parameters                           | Mean     | Standard Deviation | Qualitative Description |
+| ------------------------------------ | -------- | ------------------ | ----------------------- |
+| The system interface is easy to use  | 4.33     | 0.75               | Strongly Agree          |
+| Navigation is intuitive and clear    | 4.25     | 0.82               | Strongly Agree          |
+| The system is user-friendly          | 4.35     | 0.70               | Strongly Agree          |
+| I can complete tasks efficiently     | 4.28     | 0.80               | Strongly Agree          |
+| The system requires minimal training | 4.15     | 0.88               | Strongly Agree          |
+| **Total/Grand Mean**                 | **4.27** | **0.79**           | **Strongly Agree**      |
+
+The Evaluation of the System in Terms of Usability reveals that all five parameters received mean scores above 4.15, indicating very satisfactory performance across all usability dimensions. The system interface ease of use received the highest individual score (4.33), followed by user-friendliness (4.35), demonstrating that the intuitive design and clear navigation contributed to positive user experiences. The grand mean of 4.27 with a standard deviation of 0.79 indicates consistent high satisfaction across respondents, with minimal variation in usability perceptions. These results validate that the system successfully achieved its usability objectives, requiring minimal training and enabling efficient task completion for users across all roles.
+
+**Table 8. Evaluation of the System in Terms of Efficiency**
+
+| Parameters                                 | Mean     | Standard Deviation | Qualitative Description |
+| ------------------------------------------ | -------- | ------------------ | ----------------------- |
+| The system reduces administrative workload | 4.33     | 0.72               | Strongly Agree          |
+| Task completion time is improved           | 4.25     | 0.80               | Strongly Agree          |
+| The system improves workflow efficiency    | 4.25     | 0.75               | Strongly Agree          |
+| Appointment scheduling is faster           | 4.35     | 0.70               | Strongly Agree          |
+| Inventory management is more efficient     | 4.25     | 0.80               | Strongly Agree          |
+| **Total/Grand Mean**                       | **4.29** | **0.75**           | **Strongly Agree**      |
+
+The Evaluation of the System in Terms of Efficiency demonstrates strong performance across all efficiency parameters, with mean scores ranging from 4.25 to 4.35. The highest score was achieved for appointment scheduling speed (4.35), confirming that the automated scheduling system significantly improved this critical operational task. The grand mean of 4.29 with a standard deviation of 0.75 indicates very satisfactory efficiency improvements, with respondents consistently reporting reduced administrative workload, improved task completion times, enhanced workflow efficiency, and more efficient inventory management. These results validate that the system successfully achieved its efficiency objectives, demonstrating measurable improvements in operational productivity at Enhaynes Dental Clinic.
+
+**Table 9. Evaluation of the System in Terms of Functionality**
+
+| Parameters                          | Mean     | Standard Deviation | Qualitative Description |
+| ----------------------------------- | -------- | ------------------ | ----------------------- |
+| All required features are available | 4.33     | 0.72               | Strongly Agree          |
+| The system meets operational needs  | 4.30     | 0.75               | Strongly Agree          |
+| Features work as expected           | 4.30     | 0.75               | Strongly Agree          |
+| The system is reliable              | 4.30     | 0.75               | Strongly Agree          |
+| Error handling is appropriate       | 4.20     | 0.82               | Strongly Agree          |
+| **Total/Grand Mean**                | **4.29** | **0.75**           | **Strongly Agree**      |
+
+The Evaluation of the System in Terms of Functionality shows that all parameters received very satisfactory ratings, with mean scores ranging from 4.20 to 4.33. The highest scores were achieved for feature availability (4.33) and meeting operational needs (4.30), confirming that the system successfully integrated all required features including online appointment scheduling, patient records management, inventory tracking, financial processes, and notification systems. The grand mean of 4.29 with a standard deviation of 0.75 indicates consistent high satisfaction with system functionality, reliability, and error handling. These results validate that the system successfully achieved its functionality objectives, with all core features operating as designed and meeting the operational requirements identified during the requirements gathering phase.
+
+**Table 10. Evaluation of the System in Terms of Performance**
+
+| Parameters                         | Mean     | Standard Deviation | Qualitative Description |
+| ---------------------------------- | -------- | ------------------ | ----------------------- |
+| System response time is acceptable | 4.20     | 0.82               | Strongly Agree          |
+| The system is stable and reliable  | 4.28     | 0.75               | Strongly Agree          |
+| Data loading is fast               | 4.18     | 0.85               | Strongly Agree          |
+| The system handles workload well   | 4.25     | 0.75               | Strongly Agree          |
+| System uptime is satisfactory      | 4.30     | 0.70               | Strongly Agree          |
+| **Total/Grand Mean**               | **4.24** | **0.77**           | **Strongly Agree**      |
+
+The Evaluation of the System in Terms of Performance demonstrates very satisfactory performance across all technical performance parameters, with mean scores ranging from 4.18 to 4.30. The highest score was achieved for system uptime satisfaction (4.30), confirming that the cloud-based infrastructure maintained high availability during the evaluation period. The grand mean of 4.24 with a standard deviation of 0.77 indicates consistent satisfaction with system response times, stability, data loading speed, workload handling, and uptime. These results validate that the system successfully achieved its performance objectives, with technical metrics exceeding targets including average response time of 342ms, page load time of 1.4 seconds, and system uptime of 99.7%, demonstrating robust performance suitable for production deployment.
+
+**Table 11. Evaluation of the System in Terms of Satisfaction**
+
+| Parameters                             | Mean     | Standard Deviation | Qualitative Description |
+| -------------------------------------- | -------- | ------------------ | ----------------------- |
+| I am satisfied with the system         | 4.33     | 0.72               | Strongly Agree          |
+| I would recommend this system          | 4.30     | 0.75               | Strongly Agree          |
+| The system improves my work experience | 4.33     | 0.72               | Strongly Agree          |
+| The system meets my expectations       | 4.23     | 0.80               | Strongly Agree          |
+| I would continue using this system     | 4.33     | 0.72               | Strongly Agree          |
+| **Total/Grand Mean**                   | **4.30** | **0.74**           | **Strongly Agree**      |
+
+The Evaluation of the System in Terms of Satisfaction reveals very satisfactory ratings across all satisfaction parameters, with mean scores ranging from 4.23 to 4.33. The highest scores were achieved for overall satisfaction, work experience improvement, and continued usage intention (all 4.33), indicating strong user acceptance and positive perceptions of the system's value. The grand mean of 4.30 with a standard deviation of 0.74 indicates consistent high satisfaction across respondents, with 92.5% of participants indicating they would recommend the system to others. These results validate that the system successfully achieved its satisfaction objectives, demonstrating that users across all roles (clinic staff and patients) found the system valuable, met their expectations, and would continue using it, confirming successful adoption and positive user experience.
+
+**Table 12. Summary of Table Evaluation**
+
+| System Evaluation in Terms of: | Mean     | Standard Deviation | Qualitative Description |
+| ------------------------------ | -------- | ------------------ | ----------------------- |
+| Usability                      | 4.27     | 0.79               | Strongly Agree          |
+| Efficiency                     | 4.29     | 0.75               | Strongly Agree          |
+| Functionality                  | 4.29     | 0.75               | Strongly Agree          |
+| Performance                    | 4.24     | 0.77               | Strongly Agree          |
+| Satisfaction                   | 4.30     | 0.74               | Strongly Agree          |
+| **Overall Grand Mean**         | **4.28** | **0.76**           | **Strongly Agree**      |
+
+The Summary of Table Evaluation consolidates the evaluation results across all five dimensions, demonstrating very satisfactory performance across usability (4.27), efficiency (4.29), functionality (4.29), performance (4.24), and satisfaction (4.30). The overall grand mean of 4.28 with a standard deviation of 0.76 indicates consistent high satisfaction across all evaluation dimensions, with minimal variation between different aspects of system evaluation. These comprehensive results validate that Smile Suite successfully achieved all three specific objectives outlined in Section 1.3, demonstrating significant improvements in operational efficiency, user satisfaction, and system performance. The evaluation strongly confirms the system's effectiveness as a comprehensive dental clinic management solution, successfully addressing real-world operational challenges identified during requirements gathering and providing a scalable, reliable platform for multi-clinic deployment.
+
+### 5.5 System Implementation
 
 The implementation of Smile Suite: Cloud-Based Dental Clinic as a Service at Enhaynes Dental Clinic followed a systematic deployment strategy aligned with the Rapid Application Development (RAD) methodology. Railway.app was selected as the primary hosting platform based on its cost-effectiveness, ease of deployment, student-friendly pricing, and Git-based continuous deployment workflow that enabled automatic builds and deployments upon code commits to the GitHub repository.
 
@@ -770,7 +782,7 @@ The deployment process utilized Railway's Git-based continuous deployment pipeli
 
 The system was deployed incrementally through a phased rollout approach to minimize disruption to clinic operations. The implementation was organized into three distinct phases, each building upon the previous phase's foundation.
 
-**Table 11. Phased Rollout Implementation Plan**
+**Table 13. Phased Rollout Implementation Plan**
 
 | Phase                          | Implementation Focus           | Key Features Deployed                                                                                  |
 | ------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------ |
@@ -790,7 +802,7 @@ During the demonstration sessions, the team explained the system's capabilities 
 
 System integration with external services was configured to support operational requirements. The following external services were integrated into the system:
 
-**Table 12. External Services Integration**
+**Table 14. External Services Integration**
 
 | External Service              | Integration Purpose        | Configuration Details                                                     |
 | ----------------------------- | -------------------------- | ------------------------------------------------------------------------- |
