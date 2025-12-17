@@ -13,17 +13,17 @@ export default defineConfig({
     build: {
         rollupOptions: {
             output: {
-                assetFileNames: 'assets/[name]-[hash][extname]',
-                chunkFileNames: 'assets/[name]-[hash].js',
-                entryFileNames: 'assets/[name]-[hash].js',
-            }
-        }
+                assetFileNames: "assets/[name]-[hash][extname]",
+                chunkFileNames: "assets/[name]-[hash].js",
+                entryFileNames: "assets/[name]-[hash].js",
+            },
+        },
     },
     server: {
-        host: "10.98.148.70",
+        host: "10.151.92.70",
         port: 5173,
         hmr: {
-            host: "10.98.148.70", // Default to localhost for normal dev
+            host: "10.151.92.70", // Default to localhost for normal dev
         },
         cors: true,
         strictPort: true,
@@ -32,22 +32,4 @@ export default defineConfig({
         },
     },
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
