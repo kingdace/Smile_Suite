@@ -11,6 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip this migration on fresh installations
+        // The base inventory table already has the essential fields
+        // This migration was designed to enhance an existing simple inventory table
+        $columns = Schema::getColumnListing('inventory');
+        
+        // Check if the fields we want to add already exist or if base fields are missing
+        if (in_array('sku', $columns) || !in_array('supplier_id', $columns)) {
+            // Either already enhanced or not a fresh migration - skip
+            return;
+        }
+        
         Schema::table('inventory', function (Blueprint $table) {
             // Advanced tracking fields
             $table->string('sku')->nullable()->after('name'); // Stock Keeping Unit

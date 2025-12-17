@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('clinic_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('inventory_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('inventory_id')->constrained('inventory')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // Who made the transaction
             $table->enum('type', ['in', 'out', 'adjustment', 'transfer', 'damaged', 'expired']);
             $table->integer('quantity');

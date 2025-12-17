@@ -20,7 +20,7 @@ return new class extends Migration
 
             // Foreign keys
             $table->foreignId('treatment_id')->constrained()->onDelete('cascade');
-            $table->foreignId('inventory_id')->constrained()->onDelete('cascade');
+            $table->foreignId('inventory_id')->constrained('inventory')->onDelete('cascade');
 
             // Usage details
             $table->integer('quantity_used')->comment('Quantity of inventory item used in treatment');

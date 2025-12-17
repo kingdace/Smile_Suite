@@ -2,7 +2,7 @@
 /node_modules
 /public/hot
 
-
+/vendor
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -20,7 +20,7 @@ yarn-error.log
 .env.staging
 
 # Logs
-
+/storage/logs/*.log
 
 # Cache
 /storage/framework/cache/*
