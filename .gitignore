@@ -1,6 +1,7 @@
 /.phpunit.cache
 /node_modules
 /public/hot
+# /public/build - COMMENTED OUT: Need to commit build files for cPanel deployment
 
 /vendor
 .phpunit.result.cache
