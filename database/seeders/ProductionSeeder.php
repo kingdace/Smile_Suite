@@ -22,30 +22,59 @@ class ProductionSeeder extends Seeder
             RoleSeeder::class,
             RolePermissionSeeder::class,
 
-            // DO NOT SEED:
-            // - InitialDataSeeder (contains demo clinic - Enhaynes Dental Clinic)
-            // - ClinicSeeder (contains 12 demo clinics)
-            // - ClinicSeeder2025 (contains 20 more demo clinics)
-            // - UserSeeder (contains demo users)
-            // - AppointmentSeeder (hardcoded for clinic ID 27)
-            // - TreatmentSeeder (hardcoded for clinic ID 27)
-            // - PaymentSeeder (hardcoded for clinic ID 27)
-            // - NotificationSeeder (depends on appointments)
-            // - ReviewSeeder (demo reviews)
-            // - ClinicGallerySeeder (demo gallery)
+            // Step 3: Initial Demo Data (Enhaynes Dental Clinic + users + suppliers + inventory)
+            // Safe: Uses dynamic clinic_id = 1 (first clinic created)
+            InitialDataSeeder::class,
+
+            // Step 4: Demo Users (if any)
+            UserSeeder::class,
+
+            // Step 5: Demo Clinics (12 clinics across Philippines)
+            // Safe: Creates clinics dynamically with unique slugs and emails
+            ClinicSeeder::class,
+
+            // Step 6: More Demo Clinics (20 Surigao clinics)
+            // Safe: Creates clinics dynamically
+            ClinicSeeder2025::class,
+
+            // Step 7: Clinic Gallery Images
+            // Safe: Uses dynamic clinic IDs
+            ClinicGallerySeeder::class,
+
+            // Step 8: Demo Reviews
+            // Safe: Uses dynamic clinic and patient IDs
+            ReviewSeeder::class,
+
+            // EXCLUDED SEEDERS (Hardcoded for Clinic ID 27):
+            // ❌ AppointmentSeeder - Hardcoded: $clinicId = 27
+            // ❌ TreatmentSeeder - Hardcoded: $clinicId = 27
+            // ❌ PaymentSeeder - Hardcoded: $clinicId = 27
+            // ❌ NotificationSeeder - Depends on appointments (which are clinic 27 specific)
         ]);
 
-        // Step 3: Create Super Admin Account
+        // Step 9: Create Super Admin Account
         $this->createSuperAdmin();
 
+        $this->command->info('');
         $this->command->info('✅ Production database seeded successfully!');
-        $this->command->info('✅ Super admin account created: dy_admin@gmail.com');
-        $this->command->warn('⚠️  No demo data created.');
+        $this->command->info('✅ Super admin account: dy_admin@gmail.com');
+        $this->command->info('✅ Demo data created:');
+        $this->command->info('   - 1 Initial clinic (Enhaynes Dental Clinic)');
+        $this->command->info('   - 12 Demo clinics (ClinicSeeder)');
+        $this->command->info('   - 20 Surigao clinics (ClinicSeeder2025)');
+        $this->command->info('   - Demo users, suppliers, inventory');
+        $this->command->info('   - Clinic galleries and reviews');
+        $this->command->warn('');
+        $this->command->warn('⚠️  Excluded seeders (hardcoded for clinic ID 27):');
+        $this->command->warn('   - AppointmentSeeder');
+        $this->command->warn('   - TreatmentSeeder');
+        $this->command->warn('   - PaymentSeeder');
+        $this->command->warn('   - NotificationSeeder');
         $this->command->info('');
         $this->command->info('Next steps:');
         $this->command->info('1. Login as super admin: dy_admin@gmail.com');
-        $this->command->info('2. Use admin panel to approve clinic registrations');
-        $this->command->info('3. Clinics register via public registration form');
+        $this->command->info('2. Explore 33 demo clinics in the system');
+        $this->command->info('3. Approve new clinic registrations via admin panel');
     }
 
     /**

@@ -43,6 +43,16 @@ class DatabaseSeeder extends Seeder
 
         // Step 8: Notifications (Generate from existing appointments)
         NotificationSeeder::class,  // Creates notifications for existing appointments
+
+        // Step 9: Comprehensive Test Data for Enhaynes Dental Clinic
+        // Creates 20 realistic records for each module with proper relationships
+        ServicesSeeder::class,      // 20 dental services (preventive, restorative, cosmetic, etc.)
+        InventorySeeder::class,     // 3 suppliers + 20 inventory items (medications, supplies, equipment)
+        PatientsSeeder::class,      // 20 diverse patients with Philippine data
+        AppointmentsSeeder::class,  // 20 appointments with proper status distribution
+        TreatmentsSeeder::class,    // 20 treatments linked to appointments
+        PaymentsSeeder::class,      // 20 payments linked to treatments
     ]);
+
 }
 }

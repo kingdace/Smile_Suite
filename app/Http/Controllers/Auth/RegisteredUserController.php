@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,6 +46,9 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        Log::info('=== REGISTRATION DEBUG START ===');
+        Log::info('Request data:', $request->only(['name', 'email', 'phone_number']));
+
                 try {
             $userData = [
                 'name' => $request->name,
@@ -53,10 +57,13 @@ class RegisteredUserController extends Controller
                 'password' => Hash::make($request->password),
             ];
 
+            Log::info('Calling handleSmileSuitePatientRegistration');
             // Check if there are existing patient records to claim
             $result = $this->patientLinkingService->handleSmileSuitePatientRegistration($userData);
+            Log::info('handleSmileSuitePatientRegistration result:', $result);
 
             if (isset($result['error'])) {
+                Log::error('Registration error detected:', $result);
                 return redirect()->back()
                     ->withErrors(['email' => $result['message']])
                     ->withInput();
@@ -64,6 +71,7 @@ class RegisteredUserController extends Controller
 
             // Check if claiming is needed (existing patient records found)
             if (isset($result['needs_verification']) && $result['needs_verification']) {
+                Log::info('Claiming verification needed');
                 // Store the registration data in session for claiming process
                 $request->session()->put('pending_registration', $userData);
                 $request->session()->put('unlinked_patients', $result['unlinked_patients']);
@@ -80,10 +88,13 @@ class RegisteredUserController extends Controller
 
             // Check if new registration is needed (no existing records)
             if (isset($result['needs_new_registration']) && $result['needs_new_registration']) {
+                Log::info('New registration needed, calling handleNewPatientRegistration');
                 // Proceed with new registration verification
                 $newRegistrationResult = $this->patientLinkingService->handleNewPatientRegistration($userData);
+                Log::info('handleNewPatientRegistration result:', $newRegistrationResult);
 
                 if (isset($newRegistrationResult['error'])) {
+                    Log::error('New registration error:', $newRegistrationResult);
                     return redirect()->back()
                         ->withErrors(['email' => $newRegistrationResult['message']])
                         ->withInput();
@@ -92,6 +103,7 @@ class RegisteredUserController extends Controller
                 // Store registration data for verification
                 $request->session()->put('pending_registration', $userData);
 
+                Log::info('Redirecting to verification form');
                 // Return Inertia response for better frontend handling
                 return redirect()->route('register')->with([
                     'needs_verification' => true,
@@ -103,6 +115,7 @@ class RegisteredUserController extends Controller
 
             // Check if user was created and linked to existing records (this should not happen anymore)
             if (isset($result['user']) && $result['user']) {
+                Log::info('User created and linked');
                 // Auto-login the user
                 Auth::login($result['user']);
                 event(new Registered($result['user']));
@@ -111,13 +124,18 @@ class RegisteredUserController extends Controller
             }
 
             // Fallback - this should not happen
+            Log::error('Registration fallback - unexpected state');
             return redirect()->back()
                 ->withErrors(['email' => 'Registration failed. Please try again.'])
                 ->withInput();
 
         } catch (\Exception $e) {
+            Log::error('Registration exception:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->back()
-                ->withErrors(['email' => 'Registration failed. Please try again.'])
+                ->withErrors(['email' => 'Registration failed: ' . $e->getMessage()])
                 ->withInput();
         }
     }

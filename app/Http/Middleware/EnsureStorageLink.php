@@ -26,12 +26,17 @@ class EnsureStorageLink
             if (!is_link($storagePath) || !file_exists($storagePath)) {
                 // Remove broken symlink if it exists
                 if (is_link($storagePath)) {
-                    unlink($storagePath);
+                    @unlink($storagePath);
                 }
 
-                // Create the symlink
-                if (is_dir($targetPath)) {
-                    symlink($targetPath, $storagePath);
+                // Remove regular directory/file if it exists
+                if (file_exists($storagePath) && !is_link($storagePath)) {
+                    @unlink($storagePath);
+                }
+
+                // Create the symlink only if target exists and symlink doesn't
+                if (is_dir($targetPath) && !file_exists($storagePath)) {
+                    @symlink($targetPath, $storagePath);
                 }
             }
         }

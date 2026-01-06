@@ -294,13 +294,15 @@ class PatientLinkingService
                 'error' => $e->getMessage()
             ]);
 
-            // Delete the user if email fails
-            $user->delete();
-
+            // Don't delete the user - keep them so they can resend verification
+            // This prevents duplicate key errors on retry
             return [
-                'success' => false,
-                'message' => 'Failed to send verification email. Please try again.',
-                'error' => true
+                'success' => true, // Changed to true so frontend shows verification form
+                'user' => $user,
+                'action' => 'needs_registration_verification',
+                'message' => 'Account created! We had trouble sending the verification email. Please click "Resend Code" to try again.',
+                'needs_verification' => true,
+                'email_failed' => true // Flag to indicate email sending failed
             ];
         }
 

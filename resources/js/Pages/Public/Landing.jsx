@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import SiteHeader from "@/Components/SiteHeader";
 import SmileyDy from "@/Components/Chatbot/SmileyDy";
+import RestrictionsOverlay from "@/Components/RestrictionsOverlay";
 
 // NOTE: For best results, add this to your <head> in public/index.html or your Blade layout:
 // <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@700&display=swap" rel="stylesheet">
@@ -80,10 +81,17 @@ function FaqItem({ question, answer, open, onClick, isFirst, isLast }) {
     );
 }
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Landing() {
     const [faqOpen, setFaqOpen] = useState(0);
+    const [showRestrictionsOverlay, setShowRestrictionsOverlay] =
+        useState(true);
+
+    const handleCloseOverlay = () => {
+        setShowRestrictionsOverlay(false);
+    };
+
     const faqs = [
         {
             q: "Is Smile Suite secure?",
@@ -102,6 +110,13 @@ export default function Landing() {
     return (
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 min-h-screen flex flex-col">
             <SiteHeader />
+
+            {/* Restrictions Overlay */}
+            <RestrictionsOverlay
+                isOpen={showRestrictionsOverlay}
+                onClose={handleCloseOverlay}
+            />
+
             {/* Hero Section: slightly more pronounced gradient */}
             <div className="relative overflow-hidden bg-gradient-to-br from-blue-100 via-blue-50 to-cyan-100 pb-0 z-10">
                 <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-stretch min-h-[28rem] sm:min-h-[32rem] md:min-h-[38rem] lg:min-h-[44rem]">

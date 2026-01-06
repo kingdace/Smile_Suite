@@ -23,11 +23,16 @@ class ActivityLogService
         string $category = ActivityLog::CATEGORY_SYSTEM_ACCESS,
         string $severity = ActivityLog::SEVERITY_MEDIUM,
         ?Request $request = null
-    ): ActivityLog {
+    ): ?ActivityLog {
         $user = Auth::user();
 
+        // Skip logging if user is not authenticated (e.g., during registration)
         if (!$user) {
-            throw new \Exception('User must be authenticated to log activity');
+            Log::debug('Skipping activity log - no authenticated user', [
+                'action' => $action,
+                'model' => $model ? get_class($model) : null,
+            ]);
+            return null;
         }
 
         $clinicId = $user->clinic_id;
@@ -36,7 +41,12 @@ class ActivityLogService
             if ($model && isset($model->clinic_id)) {
                 $clinicId = $model->clinic_id;
             } else {
-                throw new \Exception('User must belong to a clinic to log activity');
+                // Skip logging if no clinic context
+                Log::debug('Skipping activity log - no clinic context', [
+                    'user_id' => $user->id,
+                    'action' => $action,
+                ]);
+                return null;
             }
         }
 
@@ -77,7 +87,7 @@ class ActivityLogService
     /**
      * Log a model creation.
      */
-    public function logCreated(Model $model, string $description = null): ActivityLog
+    public function logCreated(Model $model, string $description = null): ?ActivityLog
     {
         $description = $description ?? "Created new {$this->getModelName($model)}";
 
@@ -94,7 +104,7 @@ class ActivityLogService
     /**
      * Log a model update with detailed field changes.
      */
-    public function logUpdated(Model $model, array $oldValues, string $description = null): ActivityLog
+    public function logUpdated(Model $model, array $oldValues, string $description = null): ?ActivityLog
     {
         // Get detailed field changes
         $fieldChanges = $this->getFieldChanges($model, $oldValues);
@@ -120,7 +130,7 @@ class ActivityLogService
     /**
      * Log a model deletion.
      */
-    public function logDeleted(Model $model, string $description = null): ActivityLog
+    public function logDeleted(Model $model, string $description = null): ?ActivityLog
     {
         $description = $description ?? "Deleted {$this->getModelName($model)}";
 
@@ -137,7 +147,7 @@ class ActivityLogService
     /**
      * Log a model restoration.
      */
-    public function logRestored(Model $model, string $description = null): ActivityLog
+    public function logRestored(Model $model, string $description = null): ?ActivityLog
     {
         $description = $description ?? "Restored {$this->getModelName($model)}";
 
@@ -154,7 +164,7 @@ class ActivityLogService
     /**
      * Log user login.
      */
-    public function logLogin(User $user): ActivityLog
+    public function logLogin(User $user): ?ActivityLog
     {
         return $this->log(
             action: ActivityLog::ACTION_LOGIN,
@@ -168,7 +178,7 @@ class ActivityLogService
     /**
      * Log user logout.
      */
-    public function logLogout(User $user): ActivityLog
+    public function logLogout(User $user): ?ActivityLog
     {
         return $this->log(
             action: ActivityLog::ACTION_LOGOUT,
@@ -189,7 +199,7 @@ class ActivityLogService
         array $data = [],
         string $category = ActivityLog::CATEGORY_SYSTEM_ACCESS,
         string $severity = ActivityLog::SEVERITY_MEDIUM
-    ): ActivityLog {
+    ): ?ActivityLog {
         return $this->log(
             action: $action,
             description: $description,
